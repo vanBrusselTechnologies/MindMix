@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "528380549151",
+    "project_id": "mindmix-a147c",
+    "storage_bucket": "mindmix-a147c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:528380549151:android:f412c159f87c42f401dd2a",
+        "android_client_info": {
+          "package_name": "com.vanBrusselGames.MindMix"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "528380549151-3duhdu6f4m54o74ltj7h0sm86458qr2u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.vanBrusselGames.MindMix",
+            "certificate_hash": "d0c0c0ca885e47b5cca9c90d95f1673213efcc20"
+          }
+        },
+        {
+          "client_id": "528380549151-l079h9g6e2hpo6biq15j58o96p39j8pd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD4343DQccRVX6sJ17EZ0d88yVvxyVQQsY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "528380549151-l079h9g6e2hpo6biq15j58o96p39j8pd.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "528380549151-8dsc717nduibmlfkfed59tovgh6f4def.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.vanBrusselGames.MindMix"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

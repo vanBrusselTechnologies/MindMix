@@ -1,0 +1,1576 @@
+fileFormatVersion: 2
+guid: d769849946bbbbc43bf09952bfa83588
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 11
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMasterTextureLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 0
+    wrapV: 0
+    wrapW: 0
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 0
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 4096
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 100
+    crunchedCompression: 1
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Server
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: iPhone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: speelkaarten_alle_1
+      rect:
+        serializedVersion: 2
+        x: 992
+        y: 3277
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5b8c50a0d70edd4418b10baae6f7ac79
+      internalID: 714804951
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_2
+      rect:
+        serializedVersion: 2
+        x: 1556
+        y: 3277
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 853adf7f78a50764882290860fb49944
+      internalID: -1799364401
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_3
+      rect:
+        serializedVersion: 2
+        x: 2120
+        y: 3277
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e263506cabde2c049bb4fea43f950d21
+      internalID: 412256498
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_4
+      rect:
+        serializedVersion: 2
+        x: 2684
+        y: 3277
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 890a3b6a27cdfaa43baa7adce50d599f
+      internalID: -65995805
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_5
+      rect:
+        serializedVersion: 2
+        x: 3248
+        y: 3277
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6a9fd69eaa8da2047ab6801900bfa643
+      internalID: -18211401
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_6
+      rect:
+        serializedVersion: 2
+        x: 3812
+        y: 3277
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7a4f1c16512c27540aa4e15dcb2d01eb
+      internalID: -619638910
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_7
+      rect:
+        serializedVersion: 2
+        x: 4376
+        y: 3277
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4a9e6a7372699d94fba820518b69fa0e
+      internalID: -1919493520
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_8
+      rect:
+        serializedVersion: 2
+        x: 4940
+        y: 3277
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ab58c548c2f49aa45987b96de045e84f
+      internalID: 1440171961
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_9
+      rect:
+        serializedVersion: 2
+        x: 5504
+        y: 3277
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e6ba1a108a4aa234bb754888f3d35bb0
+      internalID: -596069306
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_10
+      rect:
+        serializedVersion: 2
+        x: 6068
+        y: 3277
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dd4a1e741d22c4e49b913e4e5c485e22
+      internalID: 1632977272
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_11
+      rect:
+        serializedVersion: 2
+        x: 6632
+        y: 3277
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7eb4b7dacfa9b8142a57b8a92762daa2
+      internalID: 867922967
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_12
+      rect:
+        serializedVersion: 2
+        x: 7196
+        y: 3277
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 256e39d5c732af64294ab5b6fb7b2fe7
+      internalID: 976779491
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_13
+      rect:
+        serializedVersion: 2
+        x: 428
+        y: 2458
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bdd8832d94c959b46929e9eeeff21c42
+      internalID: -2068808874
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_14
+      rect:
+        serializedVersion: 2
+        x: 992
+        y: 2458
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d0806f3a5ad01f440b120edabd27f4b6
+      internalID: -1554634905
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_15
+      rect:
+        serializedVersion: 2
+        x: 1556
+        y: 2458
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ccfaf3c17b491db45a776172cc65b957
+      internalID: 1550746510
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_16
+      rect:
+        serializedVersion: 2
+        x: 2120
+        y: 2458
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0262fdd2155d60740b674a75a36d357b
+      internalID: -1087719661
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_17
+      rect:
+        serializedVersion: 2
+        x: 2684
+        y: 2458
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 955637352b2d41f4bbd3d2057a9e337c
+      internalID: 1426812695
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_18
+      rect:
+        serializedVersion: 2
+        x: 3248
+        y: 2458
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9d87b0092c83d8c4f818a640254dc4b1
+      internalID: -1146516266
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_19
+      rect:
+        serializedVersion: 2
+        x: 3812
+        y: 2458
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 433ce626d1f7a3149af96d157a1f624d
+      internalID: -432469125
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_20
+      rect:
+        serializedVersion: 2
+        x: 4376
+        y: 2458
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c8b834c5cb218574ea4f3d11f0aeb19f
+      internalID: 660654137
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_21
+      rect:
+        serializedVersion: 2
+        x: 4940
+        y: 2458
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6594d8d8624e2684f872249898848d61
+      internalID: -317477470
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_22
+      rect:
+        serializedVersion: 2
+        x: 5504
+        y: 2458
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5be2fb0fc9e6bde49bd863d7b2ea5413
+      internalID: 588348315
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_23
+      rect:
+        serializedVersion: 2
+        x: 6068
+        y: 2458
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 362dd770cce75bd4d90824ff09c3131e
+      internalID: -906767814
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_24
+      rect:
+        serializedVersion: 2
+        x: 6632
+        y: 2458
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0f360cae29bcc3546b98091754570bbf
+      internalID: 1594107481
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_25
+      rect:
+        serializedVersion: 2
+        x: 7196
+        y: 2458
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dba93afa066a0824491ef3aca9270a13
+      internalID: -932822425
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_26
+      rect:
+        serializedVersion: 2
+        x: 428
+        y: 1639
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8c64cdba49bd6b94f95e434ab99e8822
+      internalID: -227557908
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_27
+      rect:
+        serializedVersion: 2
+        x: 992
+        y: 1639
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2a2f6dec6506e70419f05befdcb418e9
+      internalID: 1083572548
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_28
+      rect:
+        serializedVersion: 2
+        x: 1556
+        y: 1639
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ff3ff7f323b791f45a75b62145142333
+      internalID: 1184253468
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_29
+      rect:
+        serializedVersion: 2
+        x: 2120
+        y: 1639
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 829cfab2812d2534eabd12dac0d39225
+      internalID: 1930359914
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_30
+      rect:
+        serializedVersion: 2
+        x: 2684
+        y: 1639
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 92b8020ee7b2b47449ad918153e1ad6a
+      internalID: -930648566
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_31
+      rect:
+        serializedVersion: 2
+        x: 3248
+        y: 1639
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 38fca12a3433dbe428502f4200cca2f7
+      internalID: 160983454
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_32
+      rect:
+        serializedVersion: 2
+        x: 3812
+        y: 1639
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: afd8edff4ac2bdd4d89ce2500e096216
+      internalID: 1968882199
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_33
+      rect:
+        serializedVersion: 2
+        x: 4376
+        y: 1639
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 87228dde410cb13438c7d499f6fd200e
+      internalID: -299356804
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_34
+      rect:
+        serializedVersion: 2
+        x: 4940
+        y: 1639
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 206a24faeee6ce8449b9fbaefe61ba2c
+      internalID: 2040628447
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_35
+      rect:
+        serializedVersion: 2
+        x: 5504
+        y: 1639
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f6b01d87e6986f046a2800f95bd611e0
+      internalID: 1330316726
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_36
+      rect:
+        serializedVersion: 2
+        x: 6068
+        y: 1639
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 384ce7a4c1812d2498ba8026d96d0375
+      internalID: -2058616605
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_37
+      rect:
+        serializedVersion: 2
+        x: 6632
+        y: 1639
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 286362df98aa526419c30d519ccb3c2f
+      internalID: 1679870567
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_38
+      rect:
+        serializedVersion: 2
+        x: 7196
+        y: 1639
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d4c45b903e7b42a4b8ed6bde974c2626
+      internalID: 908606476
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_39
+      rect:
+        serializedVersion: 2
+        x: 428
+        y: 820
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cabf5c3b2325aee4298a00b88e7703ce
+      internalID: 1904542396
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_40
+      rect:
+        serializedVersion: 2
+        x: 992
+        y: 820
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b4b493a9a267e4044a27f591a0c3d3cb
+      internalID: -763525429
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_41
+      rect:
+        serializedVersion: 2
+        x: 1556
+        y: 820
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6306b95ca53dc6c42b60cec7e62c4d13
+      internalID: 35133312
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_42
+      rect:
+        serializedVersion: 2
+        x: 2120
+        y: 820
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 08129f6f478d82b458a76d45e5c89880
+      internalID: -1246388301
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_43
+      rect:
+        serializedVersion: 2
+        x: 2684
+        y: 820
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3e4385a8506b98847a8da31f67d41610
+      internalID: -1023853713
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_44
+      rect:
+        serializedVersion: 2
+        x: 3248
+        y: 820
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b47b2434897447b43bcd932aa447ce86
+      internalID: -168802382
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_45
+      rect:
+        serializedVersion: 2
+        x: 3812
+        y: 820
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8931d13c2becf05439c921d086351a83
+      internalID: 1245074997
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_46
+      rect:
+        serializedVersion: 2
+        x: 4376
+        y: 820
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 30b088ea7709288458e1a57c924f096c
+      internalID: -96116808
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_47
+      rect:
+        serializedVersion: 2
+        x: 4940
+        y: 820
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 41f8f8cdcfc87bc4d97ad108d471d514
+      internalID: -1131834484
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_48
+      rect:
+        serializedVersion: 2
+        x: 5504
+        y: 820
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 824e8f13623fcee48904c677b4ef04e6
+      internalID: 1368988989
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_49
+      rect:
+        serializedVersion: 2
+        x: 6068
+        y: 820
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b011f26ce87360b49a9b716f11cd730e
+      internalID: -1597161915
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_50
+      rect:
+        serializedVersion: 2
+        x: 6632
+        y: 820
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 04a80f5de9c0d144fb5b15b6b71f4c8c
+      internalID: 1632881502
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_51
+      rect:
+        serializedVersion: 2
+        x: 7196
+        y: 820
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 435db1a761f53a4409939312c603a6c9
+      internalID: -1366661698
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_52
+      rect:
+        serializedVersion: 2
+        x: 428
+        y: 1
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d2b4174a8776f474da842995860ba83d
+      internalID: 2137612280
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_53
+      rect:
+        serializedVersion: 2
+        x: 992
+        y: 1
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bdc419b4659769242890619fb22a5112
+      internalID: 1290134368
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_54
+      rect:
+        serializedVersion: 2
+        x: 1556
+        y: 1
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9a02dae7d26240a4dbb17f0564f0321a
+      internalID: -1038644505
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_55
+      rect:
+        serializedVersion: 2
+        x: 2120
+        y: 1
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 99ab6e7b1d136ef4e83af6daecfe4468
+      internalID: -696850356
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_56
+      rect:
+        serializedVersion: 2
+        x: 2684
+        y: 1
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8bf4a8199bd3b0743b4385daf6ca1700
+      internalID: 1183765161
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_57
+      rect:
+        serializedVersion: 2
+        x: 3248
+        y: 1
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d4dc0d5430660544295cfa0b844d8b7f
+      internalID: 248408952
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_58
+      rect:
+        serializedVersion: 2
+        x: 3812
+        y: 1
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 97b490dfbee535141a8c2956e305420c
+      internalID: 1023490773
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_59
+      rect:
+        serializedVersion: 2
+        x: 4376
+        y: 1
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 60f83334001e8ab4da77ed0103c0f903
+      internalID: -15775953
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_60
+      rect:
+        serializedVersion: 2
+        x: 4940
+        y: 1
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 49715155d7038584ea053c2c53838634
+      internalID: -768796230
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_61
+      rect:
+        serializedVersion: 2
+        x: 5504
+        y: 1
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 972a4c94d2db0b44bad4f280c9be1336
+      internalID: -178235013
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_62
+      rect:
+        serializedVersion: 2
+        x: 6068
+        y: 1
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 08dcd2c1b37096946833039ad8903f9f
+      internalID: -1746041816
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_63
+      rect:
+        serializedVersion: 2
+        x: 6632
+        y: 1
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ba66b1eec7dd34448b55c3f218913422
+      internalID: 1953397698
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_64
+      rect:
+        serializedVersion: 2
+        x: 7196
+        y: 1
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ccb6ad202fe5c5647b10ad88cfbd43d9
+      internalID: -1596304751
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: speelkaarten_alle_0
+      rect:
+        serializedVersion: 2
+        x: 428
+        y: 3277
+        width: 564
+        height: 819
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f33351767cc4f52468c2548f7bb42643
+      internalID: 158211405
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      speelkaarten_alle_0: 158211405
+      speelkaarten_alle_2: -1799364401
+      speelkaarten_alle_23: -906767814
+      speelkaarten_alle_8: 1440171961
+      speelkaarten_alle_45: 1245074997
+      speelkaarten_alle_7: -1919493520
+      speelkaarten_alle_20: 660654137
+      speelkaarten_alle_3: 412256498
+      speelkaarten_alle_26: -227557908
+      speelkaarten_alle_52: 2137612280
+      speelkaarten_alle_47: -1131834484
+      speelkaarten_alle_48: 1368988989
+      speelkaarten_alle_59: -15775953
+      speelkaarten_alle_32: 1968882199
+      speelkaarten_alle_42: -1246388301
+      speelkaarten_alle_36: -2058616605
+      speelkaarten_alle_40: -763525429
+      speelkaarten_alle_16: -1087719661
+      speelkaarten_alle_37: 1679870567
+      speelkaarten_alle_17: 1426812695
+      speelkaarten_alle_56: 1183765161
+      speelkaarten_alle_62: -1746041816
+      speelkaarten_alle_57: 248408952
+      speelkaarten_alle_50: 1632881502
+      speelkaarten_alle_1: 714804951
+      speelkaarten_alle_58: 1023490773
+      speelkaarten_alle_11: 867922967
+      speelkaarten_alle_28: 1184253468
+      speelkaarten_alle_63: 1953397698
+      speelkaarten_alle_38: 908606476
+      speelkaarten_alle_33: -299356804
+      speelkaarten_alle_10: 1632977272
+      speelkaarten_alle_30: -930648566
+      speelkaarten_alle_41: 35133312
+      speelkaarten_alle_51: -1366661698
+      speelkaarten_alle_18: -1146516266
+      speelkaarten_alle_21: -317477470
+      speelkaarten_alle_31: 160983454
+      speelkaarten_alle_29: 1930359914
+      speelkaarten_alle_60: -768796230
+      speelkaarten_alle_9: -596069306
+      speelkaarten_alle_13: -2068808874
+      speelkaarten_alle_14: -1554634905
+      speelkaarten_alle_46: -96116808
+      speelkaarten_alle_54: -1038644505
+      speelkaarten_alle_61: -178235013
+      speelkaarten_alle_24: 1594107481
+      speelkaarten_alle_27: 1083572548
+      speelkaarten_alle_6: -619638910
+      speelkaarten_alle_19: -432469125
+      speelkaarten_alle_34: 2040628447
+      speelkaarten_alle_39: 1904542396
+      speelkaarten_alle_53: 1290134368
+      speelkaarten_alle_5: -18211401
+      speelkaarten_alle_44: -168802382
+      speelkaarten_alle_22: 588348315
+      speelkaarten_alle_55: -696850356
+      speelkaarten_alle_12: 976779491
+      speelkaarten_alle_64: -1596304751
+      speelkaarten_alle_35: 1330316726
+      speelkaarten_alle_15: 1550746510
+      speelkaarten_alle_4: -65995805
+      speelkaarten_alle_49: -1597161915
+      speelkaarten_alle_25: -932822425
+      speelkaarten_alle_43: -1023853713
+  spritePackingTag: 
+  pSDRemoveMatte: 0
+  pSDShowRemoveMatteOption: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

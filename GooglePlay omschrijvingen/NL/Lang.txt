@@ -1,0 +1,16 @@
+MindMix is een verzameling van spellen waarbij je je verstand moet gebruiken!
+
+De verzameling bestaat momenteel uit 4 spellen:
+- 2048;
+- Sudoku;
+- Solitaire;
+- Mijnenveger.
+Per spel is de uitleg te vinden bij het vraagteken in de rechterbovenhoek.
+Het aantal spellen zal met komende updates steeds vergroot worden.
+
+Door het voltooien van spellen zijn er munten te verdienen. Hoe moeilijker niveau u gekozen hebt of hoe meer punten u hebt gehaald, hoe meer munten u er voor krijgt.
+Deze munten zijn uit te geven in de shop. Hier kunt u achtergronden en later ook speciale spelmodi kopen.
+
+MindMix is volledig offline te spelen, maar om de voortgang te bewaren is er wel de mogelijkheid om  online in te loggen met Google Play Games. Zo kunt u op andere apparaten verder spelen waar u gebleven was.
+
+Bij vragen, opmerkingen, feedback of klachten kunt u in de app op de supportpagina een van de support-opties kiezen. Daarnaast bent u vrij om een recensie te schrijven. Alle feedback wordt gewaardeerd en gebruikt om u en alle andere gebruikers de beste ervaring te geven.

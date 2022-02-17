@@ -1,0 +1,246 @@
+﻿using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+using TMPro;
+
+public class Achtergrond : MonoBehaviour
+{
+    [SerializeField] GameObject achtergrond;
+    private Image img;
+    private Color wisselColor;
+    private float xChangeBG;
+    private bool isPaused = false;
+    private bool wasPaused = false;
+    private DeviceOrientation vorigeDeviceOrientation;
+    private float vorigeScreenWidth;
+    GegevensHouder gegevensScript;
+    List<Color> kleuren = new List<Color>();
+    bool wisselendeKleur;
+    public bool aangepasteKleur = false;
+    [HideInInspector] public List<TMP_Dropdown.OptionData> colorOptionData = new List<TMP_Dropdown.OptionData>();
+    SaveScript saveScript;
+
+    private void Awake()
+    {
+        gegevensScript = GetComponent<GegevensHouder>();
+        saveScript = GetComponent<SaveScript>();
+        List<System.Drawing.Color> listOfDrawingColours = new List<System.Drawing.Color>();
+        bool isKleur = false;
+        foreach (System.Drawing.KnownColor knownColor in System.Enum.GetValues(typeof(System.Drawing.KnownColor)))
+        {
+            System.Drawing.Color col = System.Drawing.Color.FromKnownColor(knownColor);
+            listOfDrawingColours.Add(col);
+            if (col.Name.Equals("AliceBlue"))
+            {
+                isKleur = true;
+            }
+            if (isKleur)
+            {
+                colorOptionData.Add(new TMP_Dropdown.OptionData(col.Name));
+                Color color = new Color(col.R / 256f, col.G / 256f, col.B / 256f, col.A / 256f);
+                kleuren.Add(color);
+            }
+            if (col.Name.Equals("YellowGreen"))
+            {
+                isKleur = false;
+            }
+        }
+        DontDestroyOnLoad(this);
+    }
+
+    private void Start()
+    {
+        if (achtergrond)
+        {
+            img = achtergrond.GetComponent<Image>();
+            DontDestroyOnLoad(achtergrond.transform.parent.gameObject);
+            DontDestroyOnLoad(Camera.main);
+        }
+        wisselColor = Color.white;
+        SetBackground();
+    }
+
+    string newScene = "";
+
+    private void OnSceneLoaded(Scene scene1, Scene scene2)
+    {
+        if(newScene == scene2.name)
+        {
+            return;
+        }
+        newScene = scene2.name;
+        xChangeBG = 1;
+        SetBackground();
+    }
+
+    private void FixedUpdate()
+    {
+        DeviceOrientation huidigeOrientation = Input.deviceOrientation;
+        SceneManager.activeSceneChanged += OnSceneLoaded;
+        if (!isPaused && wasPaused)
+        {
+            if (xChangeBG == 0)
+            {
+                xChangeBG = 1;
+            }
+            SetBackground();
+        }
+        if (huidigeOrientation != vorigeDeviceOrientation || vorigeScreenWidth != Screen.width)
+        {
+            if (xChangeBG == 0)
+            {
+                xChangeBG = 1;
+            }
+            SetBackground();
+        }
+        if (aangepasteKleur)
+        {
+            aangepasteKleur = false;
+            SetBackground();
+        }
+        if (wisselendeKleur)
+        {
+            xChangeBG = 0;
+            SetBackground();
+        }
+        if (xChangeBG > 0)
+        {
+            if (xChangeBG == 3)
+            {
+                xChangeBG = 0;
+                vorigeDeviceOrientation = huidigeOrientation;
+                vorigeScreenWidth = Screen.width;
+                wasPaused = isPaused;
+                return;
+            }
+            xChangeBG += 1;
+        }
+    }
+
+    private void OnApplicationPause(bool pauseStatus)
+    {
+        isPaused = pauseStatus;
+    }
+
+    private void SetBackground()
+    {
+        List<int> BGList = gegevensScript.AchtergrondList();
+        wisselendeKleur = false;
+        if (BGList.Count < 2)
+        {
+            return;
+        }
+        int bgSoort = BGList[0];
+        if (img)
+        {
+            if (bgSoort == 1)
+            {
+                int afbInt = BGList[1];
+                if (afbInt == -1)
+                {
+                    if(Screen.width >= Screen.height)
+                    {
+                        //breedte gerichte voorplaat
+                    }
+                    else
+                    {
+                        //hoogte gerichte voorplaat
+                    }
+                    return;
+                }
+                img.sprite = gegevensScript.achtergronden[afbInt];
+                img.color = Color.white;
+                float width = Screen.width;
+                float height = Screen.height;
+                if (width > height)
+                {
+                    height = width;
+                }
+                else
+                {
+                    width = 1000*height;
+                }
+                achtergrond.GetComponent<RectTransform>().sizeDelta = new Vector2(width, height);
+                return;
+            }
+            if (bgSoort == 0)
+            {
+                int kleurInt = BGList[1];
+                img.sprite = gegevensScript.spriteWit;
+                if (kleurInt == -1)
+                {
+                    wisselendeKleur = true;
+                    WisselKleur(img, wisselColor);
+                }
+                else
+                {
+                    img.color = kleuren[kleurInt];
+                }
+                int width = Screen.width;
+                int height = Screen.height;
+                if (width > height)
+                {
+                    height = width;
+                }
+                else
+                {
+                    width = height;
+                }
+                achtergrond.GetComponent<RectTransform>().sizeDelta = new Vector2(width, height);
+                return;
+            }
+        }
+    }
+
+    void WisselKleur(Image img, Color oldColor)
+    {
+        if(oldColor.Equals(Color.white))
+        {
+            float tmpR = saveScript.floatDict["color.r"];
+            float tmpG = saveScript.floatDict["color.g"];
+            float tmpB = saveScript.floatDict["color.b"];
+            if (tmpR == 0 && tmpG == 0 && tmpB == 0)
+            {
+                oldColor = Color.red;
+            }
+            else
+            {
+                oldColor = new Color(tmpR, tmpG, tmpB, 1f);
+            }
+        }
+        Color nextColor = oldColor;
+        if (nextColor.r == 1f && nextColor.g != 1f && nextColor.b == 0f)
+        {
+            nextColor.g += 1f / 255;
+        }
+        else if ((nextColor.r == 1f && nextColor.g == 1f) || (nextColor.r != 0f && nextColor.g == 1f))
+        {
+            nextColor.r -= 1f / 255;
+            nextColor.r = Mathf.Max(nextColor.r, 0);
+        }
+        else if (nextColor.r == 0f && nextColor.g == 1f && nextColor.b != 1f)
+        {
+            nextColor.b += 1f / 255;
+        }
+        else if ((nextColor.g == 1f && nextColor.b == 1f) || (nextColor.g != 0f && nextColor.b == 1f))
+        {
+            nextColor.g -= 1f / 255;
+            nextColor.g = Mathf.Max(nextColor.g, 0);
+        }
+        else if (nextColor.b == 1f && nextColor.r != 1f)
+        {
+            nextColor.r += 1f / 255;
+        }
+        else if ((nextColor.b == 1f && nextColor.r == 1f) || (nextColor.b != 0f && nextColor.r == 1f))
+        {
+            nextColor.b -= 1f / 255;
+            nextColor.b = Mathf.Max(nextColor.b, 0);
+        }
+        img.color = nextColor;
+        wisselColor = nextColor;
+        saveScript.floatDict["color.r"] = nextColor.r;
+        saveScript.floatDict["color.g"] = nextColor.g;
+        saveScript.floatDict["color.b"] = nextColor.b;
+    }
+}
