@@ -113,16 +113,12 @@ public class OpenAppScript : MonoBehaviour
 
     public void PlayGamesLogin()
     {
-        Debug.Log("Start authentication: Social.localUser.Authenticate()");
-        Debug.Log("is already authenticated: "+Social.localUser.authenticated);
         Social.localUser.Authenticate((bool success) =>
         {
-            Debug.Log("authentication succesfull?: " + success);
             if (success)
             {
                 playgamesLoggedIn = true;
                 authCode = PlayGamesPlatform.Instance.GetServerAuthCode();
-                Debug.Log("authCode: " + authCode);
             }
         });
     }
