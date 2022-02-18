@@ -317,7 +317,6 @@ public class ShopScript : MonoBehaviour
                 }
             }
         }
-
         OpenGekochtScherm();
     }
 

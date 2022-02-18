@@ -25,9 +25,8 @@ public class BeloningScript : MonoBehaviour
 
     private void Start()
     {
-        saveScript = GetComponent<SaveScript>();
-        shopScript = GameObject.Find("EventSystem").GetComponent<ShopScript>();
         SceneManager.sceneLoaded += SceneLoaded;
+        saveScript = GetComponent<SaveScript>();
     }
 
     public int Beloning(Scene scene, int difficulty = 0, float score = 0, TMP_Text doelwitText = null)
@@ -125,6 +124,7 @@ public class BeloningScript : MonoBehaviour
     {
         if(scene.name == "Shop")
         {
+            shopScript = GameObject.Find("EventSystem").GetComponent<ShopScript>();
             ShowHuidigAantalMunten();
         }
         else
