@@ -6,7 +6,7 @@ using UnityEngine.Localization.Settings;
 
 public class GegevensHouder : MonoBehaviour
 {
-    bool testBuild = true;
+    bool testBuild = false;
     [HideInInspector] public bool startNewSudoku = false;
     [HideInInspector] public bool startNewSolitaire = false;
     [HideInInspector] public bool startNew2048 = false;
