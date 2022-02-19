@@ -2,7 +2,8 @@
   "project_info": {
     "project_number": "528380549151",
     "project_id": "mindmix-a147c",
-    "storage_bucket": "mindmix-a147c.appspot.com"
+    "storage_bucket": "mindmix-a147c.appspot.com",
+    "firebase_url": "https://mindmix-a147c.firebaseio.com"
   },
   "client": [
     {
