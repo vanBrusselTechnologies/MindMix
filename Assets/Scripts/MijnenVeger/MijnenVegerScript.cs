@@ -213,6 +213,7 @@ public class MijnenVegerScript : MonoBehaviour
                 for (int ii = 0; ii < 22; ii++)
                 {
                     int index = (i * 100) + ii;
+                    if (index == 0) index = -1;
                     saveScript.intDict["mijnenvegerVlaggenGezet" + index] = 0;
                 }
             }
@@ -244,7 +245,9 @@ public class MijnenVegerScript : MonoBehaviour
                     if (!isAlGedrukt)
                     {
                         Button a = Instantiate(knop, Vector3.zero, Quaternion.identity, speelVeld.transform);
-                        a.name = (kolom + (rij * 100)).ToString();
+                        int buttonNum = (kolom + (rij * 100));
+                        if (buttonNum == 0) buttonNum = -1;
+                        a.name = buttonNum.ToString();
                         buttons.Add(a);
                         if (mvLayout.korteKant > mvLayout.langeKant)
                         {
@@ -294,6 +297,7 @@ public class MijnenVegerScript : MonoBehaviour
                     {
                         Button a = Instantiate(knop, Vector3.zero, Quaternion.identity, speelVeld.transform);
                         int buttonNum = (rij * 100) + kolom;
+                        if (buttonNum == 0) buttonNum = -1;
                         a.name = buttonNum.ToString();
                         buttons.Add(a);
                         if (mvLayout.korteKant > mvLayout.langeKant)
@@ -315,6 +319,7 @@ public class MijnenVegerScript : MonoBehaviour
                     else if (isAlGedrukt)
                     {
                         int buttonNum = (rij * 100) + kolom;
+                        if (buttonNum == 0) buttonNum = -1;
                         int index = vakjesGehad.IndexOf(buttonNum);
                         if (index == -1)
                         {
@@ -382,13 +387,13 @@ public class MijnenVegerScript : MonoBehaviour
             kolom = Mathf.FloorToInt(x / (mvSpeelveldRechts - mvSpeelveldLinks) * mvLayout.langeKant); //0 is linker rij
             rij = Mathf.FloorToInt(y / (mvSpeelveldBoven - mvSpeelveldOnder) * mvLayout.korteKant); //0 is onderste rij
             int vakjesGehadNummer = (rij * 100) + kolom;
+            if (vakjesGehadNummer == 0) vakjesGehadNummer = -1;
             if (vakjesGehad.IndexOf(vakjesGehadNummer) != -1)
             {
                 isAlGedrukt = true;
             }
             else
             {
-                if(vakjesGehadNummer == 0) vakjesGehadNummer = -1;
                 saveScript.intDict["mijnenvegerVakjesgehad" + vakjesGehad.Count] = vakjesGehadNummer;
                 isAlGedrukt = false;
                 vakjesGehad.Add(vakjesGehadNummer);
@@ -403,13 +408,13 @@ public class MijnenVegerScript : MonoBehaviour
             rij = 21 - Mathf.FloorToInt(x / (mvSpeelveldRechts - mvSpeelveldLinks) * mvLayout.langeKant); //0 is onderste rij
             kolom = Mathf.FloorToInt(y / (mvSpeelveldBoven - mvSpeelveldOnder) * mvLayout.korteKant); //0 is linker rij
             int vakjesGehadNummer = (rij * 100) + kolom;
+            if (vakjesGehadNummer == 0) vakjesGehadNummer = -1;
             if (vakjesGehad.IndexOf(vakjesGehadNummer) != -1)
             {
                 isAlGedrukt = true;
             }
             else
             {
-                if (vakjesGehadNummer == 0) vakjesGehadNummer = -1;
                 saveScript.intDict["mijnenvegerVakjesgehad" + vakjesGehad.Count] = vakjesGehadNummer;
                 isAlGedrukt = false;
                 vakjesGehad.Add(vakjesGehadNummer);
