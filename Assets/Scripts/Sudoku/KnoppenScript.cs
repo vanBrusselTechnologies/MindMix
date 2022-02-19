@@ -530,8 +530,6 @@ public class KnoppenScript : MonoBehaviour
         }
         Button knop = knoppen[dei].GetComponent<Button>();
         ColorBlock colorBlock = knop.colors;
-        colorBlock.normalColor = normaalVakjesKleur;
-        knop.colors = colorBlock;
         foreach (int getal2 in kolomGetallen)
         {
             if (dei == getal2 || afScript.getallen[dei] == 0) {; }
@@ -565,6 +563,8 @@ public class KnoppenScript : MonoBehaviour
                 return;
             }
         }
+        colorBlock.normalColor = normaalVakjesKleur;
+        knop.colors = colorBlock;
         CheckVoorDubbelGetal(dei + 1);
     }
 }
