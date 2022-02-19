@@ -163,7 +163,7 @@ public class KnoppenScript : MonoBehaviour
                 rect.offsetMin = new Vector2(0, 0);
                 TMP_Text text = knoppen[dei].transform.GetChild(0).GetComponent<TMP_Text>();
                 text.alignment = TextAlignmentOptions.Center;
-                text.fontSize = 250;
+                text.fontSize = 285;
                 text.text = selectedNumber;
                 saveScript.intDict["DoorSpelerIngevuldBij" + dei] = int.Parse(selectedNumber);
                 afScript.getallen[dei] = int.Parse(selectedNumber);

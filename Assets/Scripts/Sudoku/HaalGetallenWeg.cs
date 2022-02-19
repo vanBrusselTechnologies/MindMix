@@ -80,7 +80,7 @@ public class HaalGetallenWeg : MonoBehaviour
                     rect.offsetMin = new Vector2(0, 0);
                     TMP_Text text = knoppen[getalTot81].transform.GetChild(0).GetComponent<TMP_Text>();
                     text.alignment = TextAlignmentOptions.Center;
-                    text.fontSize = 250;
+                    text.fontSize = 285;
                     int doorSpelerIngevuld = saveScript.intDict["DoorSpelerIngevuldBij" + getalTot81];
                     text.text = doorSpelerIngevuld.ToString();
                     cijfers.Add(doorSpelerIngevuld);
