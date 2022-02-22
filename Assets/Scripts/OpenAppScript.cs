@@ -53,7 +53,7 @@ public class OpenAppScript : MonoBehaviour
         if (eersteFrame && (fireBaseSetup.ready || fireBaseSetup.offline) && saveScript.ready)
         {
             eersteFrame = false;
-            if (SceneManager.GetActiveScene().name == "LogoEnAppOpstart")
+            if (SceneManager.GetActiveScene().name.Equals("LogoEnAppOpstart"))
             {
                 SceneManager.LoadScene("inlogEnVoorplaatApp");
                 return;
