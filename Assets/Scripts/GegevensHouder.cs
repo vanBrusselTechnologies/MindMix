@@ -29,6 +29,10 @@ public class GegevensHouder : MonoBehaviour
 
     private void Awake()
     {
+        if(Application.platform == RuntimePlatform.WindowsEditor)
+        {
+            testBuild = true;
+        }
         bgScript = GetComponent<Achtergrond>();
         saveScript = GetComponent<SaveScript>();
         Application.targetFrameRate = Mathf.Min(30, Screen.currentResolution.refreshRate);
