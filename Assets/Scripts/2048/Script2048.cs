@@ -363,7 +363,7 @@ public class Script2048 : MonoBehaviour
             List<GameObject> list = i == 1 ? knoppenRij1 : i == 2 ? knoppenRij2 : i == 3 ? knoppenRij3 : i == 4 ? knoppenRij4 : i == 5 ? knoppenRij5 : i == 6 ? knoppenRij6 : i == 7 ? knoppenRij7 : i == 8 ? knoppenRij8 : null;
             for (int a = 2; a <= list.Count; a++)
             {
-                magDezeOok = magDezeOok && list.Count >= a ? VoegSamen(list[^a], list[^(a - 1)]) : true;
+                magDezeOok = !magDezeOok || list.Count < a || VoegSamen(list[^a], list[^(a - 1)]);
             }
             for (int w = 0; w < buttonsOmTeWissen.Count; w++)
             {
@@ -406,7 +406,7 @@ public class Script2048 : MonoBehaviour
             List<GameObject> list = i == 1 ? knoppenRij1 : i == 2 ? knoppenRij2 : i == 3 ? knoppenRij3 : i == 4 ? knoppenRij4 : i == 5 ? knoppenRij5 : i == 6 ? knoppenRij6 : i == 7 ? knoppenRij7 : i == 8 ? knoppenRij8 : null;
             for (int a = 1; a < list.Count; a++)
             {
-                magDezeOok = magDezeOok && list.Count >= a ? VoegSamen(list[a], list[a - 1]) : true;
+                magDezeOok = !magDezeOok || list.Count < a || VoegSamen(list[a], list[a - 1]);
             }
             for (int w = 0; w < buttonsOmTeWissen.Count; w++)
             {
@@ -449,7 +449,7 @@ public class Script2048 : MonoBehaviour
             List<GameObject> list = i == 1 ? knoppenKolom1 : i == 2 ? knoppenKolom2 : i == 3 ? knoppenKolom3 : i == 4 ? knoppenKolom4 : i == 5 ? knoppenKolom5 : i == 6 ? knoppenKolom6 : i == 7 ? knoppenKolom7 : i == 8 ? knoppenKolom8 : null;
             for (int a = 1; a < list.Count; a++)
             {
-                magDezeOok = magDezeOok && list.Count >= a ? VoegSamen(list[a], list[a - 1]) : true;
+                magDezeOok = !magDezeOok || list.Count < a || VoegSamen(list[a], list[a - 1]);
             }
             for (int w = 0; w < buttonsOmTeWissen.Count; w++)
             {
@@ -492,7 +492,7 @@ public class Script2048 : MonoBehaviour
             List<GameObject> list = i == 1 ? knoppenKolom1 : i == 2 ? knoppenKolom2 : i == 3 ? knoppenKolom3 : i == 4 ? knoppenKolom4 : i == 5 ? knoppenKolom5 : i == 6 ? knoppenKolom6 : i == 7 ? knoppenKolom7 : i == 8 ? knoppenKolom8 : null;
             for (int a = 2; a <= list.Count; a++)
             {
-                magDezeOok = magDezeOok && list.Count >= a ? VoegSamen(list[^a], list[^(a - 1)]) : true;
+                magDezeOok = !magDezeOok || list.Count < a || VoegSamen(list[^a], list[^(a - 1)]);
             }
             for (int w = 0; w < buttonsOmTeWissen.Count; w++)
             {
