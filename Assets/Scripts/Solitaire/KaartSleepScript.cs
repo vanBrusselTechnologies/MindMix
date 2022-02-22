@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
+using VBG.Helpers;
 
 public class KaartSleepScript : MonoBehaviour
 {
@@ -61,125 +61,23 @@ public class KaartSleepScript : MonoBehaviour
         if(gameObject.transform.parent.localEulerAngles == achterkantboven) return;
         Vector3 muisPositie = Camera.main.ScreenToWorldPoint(Input.GetTouch(0).position);
         positieMuis = muisPositie;
-        for (int i = 0; i < deTeVerplaatsenKaarten.Count;)
+        deTeVerplaatsenKaarten.Clear();
+        int stapelInt = KrijgStapelBijPositie(muisPositie);
+        aantalKaartenTeVerplaatsen = 1;
+        if (stapelInt.IsBetween(1, 7))
         {
-            deTeVerplaatsenKaarten.RemoveAt(i);
-        }
-        if (KrijgStapelBijPositie(muisPositie) == 1)
-        {
-            if (ScriptSolitaire.Stapel1.Count - ScriptSolitaire.Stapel1.IndexOf(gameObject.transform.parent.gameObject) - 1 == 0)
+            GameObject parent = gameObject.transform.parent.gameObject;
+            List<GameObject> stapel = stapelInt == 1 ? ScriptSolitaire.Stapel1 : stapelInt == 2 ? ScriptSolitaire.Stapel2 : stapelInt == 3 ? ScriptSolitaire.Stapel3 : stapelInt == 4 ? ScriptSolitaire.Stapel4 : stapelInt == 5 ? ScriptSolitaire.Stapel5 : stapelInt == 6 ? ScriptSolitaire.Stapel6 : stapelInt == 7 ? ScriptSolitaire.Stapel7 : null;
+            int parentIndex = stapel.IndexOf(parent);
+            aantalKaartenTeVerplaatsen = stapel.Count - parentIndex - 1;
+            if (aantalKaartenTeVerplaatsen != 0)
             {
-                aantalKaartenTeVerplaatsen = 0;
-            }
-            else
-            {
-                aantalKaartenTeVerplaatsen = ScriptSolitaire.Stapel1.Count - ScriptSolitaire.Stapel1.IndexOf(gameObject.transform.parent.gameObject) - 1;
                 for (int i = 0; i < aantalKaartenTeVerplaatsen; i++)
                 {
-                    GameObject kaart = ScriptSolitaire.Stapel1[ScriptSolitaire.Stapel1.IndexOf(gameObject.transform.parent.gameObject) + i + 1];
+                    GameObject kaart = stapel[parentIndex + i + 1];
                     deTeVerplaatsenKaarten.Add(kaart);
                 }
             }
-        }
-        else if (KrijgStapelBijPositie(muisPositie) == 2)
-        {
-            if (ScriptSolitaire.Stapel2.Count - ScriptSolitaire.Stapel2.IndexOf(gameObject.transform.parent.gameObject) - 1 == 0)
-            {
-                aantalKaartenTeVerplaatsen = 0;
-            }
-            else
-            {
-                aantalKaartenTeVerplaatsen = ScriptSolitaire.Stapel2.Count - ScriptSolitaire.Stapel2.IndexOf(gameObject.transform.parent.gameObject) - 1;
-                for (int i = 0; i < aantalKaartenTeVerplaatsen; i++)
-                {
-                    GameObject kaart = ScriptSolitaire.Stapel2[ScriptSolitaire.Stapel2.IndexOf(gameObject.transform.parent.gameObject) + i + 1];
-                    deTeVerplaatsenKaarten.Add(kaart);
-                }
-            }
-        }
-        else if (KrijgStapelBijPositie(muisPositie) == 3)
-        {
-            if (ScriptSolitaire.Stapel3.Count - ScriptSolitaire.Stapel3.IndexOf(gameObject.transform.parent.gameObject) - 1 == 0)
-            {
-                aantalKaartenTeVerplaatsen = 0;
-            }
-            else
-            {
-                aantalKaartenTeVerplaatsen = ScriptSolitaire.Stapel3.Count - ScriptSolitaire.Stapel3.IndexOf(gameObject.transform.parent.gameObject) - 1;
-                for (int i = 0; i < aantalKaartenTeVerplaatsen; i++)
-                {
-                    GameObject kaart = ScriptSolitaire.Stapel3[ScriptSolitaire.Stapel3.IndexOf(gameObject.transform.parent.gameObject) + i + 1];
-                    deTeVerplaatsenKaarten.Add(kaart);
-                }
-            }
-        }
-        else if (KrijgStapelBijPositie(muisPositie) == 4)
-        {
-            if (ScriptSolitaire.Stapel4.Count - ScriptSolitaire.Stapel4.IndexOf(gameObject.transform.parent.gameObject) - 1 == 0)
-            {
-                aantalKaartenTeVerplaatsen = 0;
-            }
-            else
-            {
-                aantalKaartenTeVerplaatsen = ScriptSolitaire.Stapel4.Count - ScriptSolitaire.Stapel4.IndexOf(gameObject.transform.parent.gameObject) - 1;
-                for (int i = 0; i < aantalKaartenTeVerplaatsen; i++)
-                {
-                    GameObject kaart = ScriptSolitaire.Stapel4[ScriptSolitaire.Stapel4.IndexOf(gameObject.transform.parent.gameObject) + i + 1];
-                    deTeVerplaatsenKaarten.Add(kaart);
-                }
-            }
-        }
-        else if (KrijgStapelBijPositie(muisPositie) == 5)
-        {
-            if (ScriptSolitaire.Stapel5.Count - ScriptSolitaire.Stapel5.IndexOf(gameObject.transform.parent.gameObject) - 1 == 0)
-            {
-                aantalKaartenTeVerplaatsen = 0;
-            }
-            else
-            {
-                aantalKaartenTeVerplaatsen = ScriptSolitaire.Stapel5.Count - ScriptSolitaire.Stapel5.IndexOf(gameObject.transform.parent.gameObject) - 1;
-                for (int i = 0; i < aantalKaartenTeVerplaatsen; i++)
-                {
-                    GameObject kaart = ScriptSolitaire.Stapel5[ScriptSolitaire.Stapel5.IndexOf(gameObject.transform.parent.gameObject) + i + 1];
-                    deTeVerplaatsenKaarten.Add(kaart);
-                }
-            }
-        }
-        else if (KrijgStapelBijPositie(muisPositie) == 6)
-        {
-            if (ScriptSolitaire.Stapel6.Count - ScriptSolitaire.Stapel6.IndexOf(gameObject.transform.parent.gameObject) - 1 == 0)
-            {
-                aantalKaartenTeVerplaatsen = 0;
-            }
-            else
-            {
-                aantalKaartenTeVerplaatsen = ScriptSolitaire.Stapel6.Count - ScriptSolitaire.Stapel6.IndexOf(gameObject.transform.parent.gameObject) - 1;
-                for (int i = 0; i < aantalKaartenTeVerplaatsen; i++)
-                {
-                    GameObject kaart = ScriptSolitaire.Stapel6[ScriptSolitaire.Stapel6.IndexOf(gameObject.transform.parent.gameObject) + i + 1];
-                    deTeVerplaatsenKaarten.Add(kaart);
-                }
-            }
-        }
-        else if (KrijgStapelBijPositie(muisPositie) == 7)
-        {
-            if (ScriptSolitaire.Stapel7.Count - ScriptSolitaire.Stapel7.IndexOf(gameObject.transform.parent.gameObject) - 1 == 0)
-            {
-                aantalKaartenTeVerplaatsen = 0;
-            }
-            else
-            {
-                aantalKaartenTeVerplaatsen = ScriptSolitaire.Stapel7.Count - ScriptSolitaire.Stapel7.IndexOf(gameObject.transform.parent.gameObject) - 1;
-                for (int i = 0; i < aantalKaartenTeVerplaatsen; i++)
-                {
-                    GameObject kaart = ScriptSolitaire.Stapel7[ScriptSolitaire.Stapel7.IndexOf(gameObject.transform.parent.gameObject) + i + 1];
-                    deTeVerplaatsenKaarten.Add(kaart);
-                }
-            }
-        }
-        else
-        {
-            aantalKaartenTeVerplaatsen = 1;
         }
         kaartsoort_kaartX = gameObject.transform.parent.gameObject.name.Split('_');
         voorsteKaarten = krijgVoorsteKaartvanStapels();
@@ -203,133 +101,25 @@ public class KaartSleepScript : MonoBehaviour
                 }
             }
         }
-        if (kaartsoort_kaartX[1] == "A")
-        {
-            for (int i = 0; i < voorsteKaarten.Count; i++)
-            {
-                if (voorsteKaarten[i].name.Split('_')[1] == "2")
-                {
-                    mogelijk.Add(voorsteKaarten[i]);
-                }
-            }
-        }
-        else if (kaartsoort_kaartX[1] == "2")
-        {
-            for (int i = 0; i < voorsteKaarten.Count; i++)
-            {
-                if (voorsteKaarten[i].name.Split('_')[1] == "3")
-                {
-                    mogelijk.Add(voorsteKaarten[i]);
-                }
-            }
-        }
-        else if (kaartsoort_kaartX[1] == "3")
-        {
-            for (int i = 0; i < voorsteKaarten.Count; i++)
-            {
-                if (voorsteKaarten[i].name.Split('_')[1] == "4")
-                {
-                    mogelijk.Add(voorsteKaarten[i]);
-                }
-            }
-        }
-        else if (kaartsoort_kaartX[1] == "4")
-        {
-            for (int i = 0; i < voorsteKaarten.Count; i++)
-            {
-                if (voorsteKaarten[i].name.Split('_')[1] == "5")
-                {
-                    mogelijk.Add(voorsteKaarten[i]);
-                }
-            }
-        }
-        else if (kaartsoort_kaartX[1] == "5")
-        {
-            for (int i = 0; i < voorsteKaarten.Count; i++)
-            {
-                if (voorsteKaarten[i].name.Split('_')[1] == "6")
-                {
-                    mogelijk.Add(voorsteKaarten[i]);
-                }
-            }
-        }
-        else if (kaartsoort_kaartX[1] == "6")
-        {
-            for (int i = 0; i < voorsteKaarten.Count; i++)
-            {
-                if (voorsteKaarten[i].name.Split('_')[1] == "7")
-                {
-                    mogelijk.Add(voorsteKaarten[i]);
-                }
-            }
-        }
-        else if (kaartsoort_kaartX[1] == "7")
-        {
-            for (int i = 0; i < voorsteKaarten.Count; i++)
-            {
-                if (voorsteKaarten[i].name.Split('_')[1] == "8")
-                {
-                    mogelijk.Add(voorsteKaarten[i]);
-                }
-            }
-        }
-        else if (kaartsoort_kaartX[1] == "8")
-        {
-            for (int i = 0; i < voorsteKaarten.Count; i++)
-            {
-                if (voorsteKaarten[i].name.Split('_')[1] == "9")
-                {
-                    mogelijk.Add(voorsteKaarten[i]);
-                }
-            }
-        }
-        else if (kaartsoort_kaartX[1] == "9")
-        {
-            for (int i = 0; i < voorsteKaarten.Count; i++)
-            {
-                if (voorsteKaarten[i].name.Split('_')[1] == "10")
-                {
-                    mogelijk.Add(voorsteKaarten[i]);
-                }
-            }
-        }
-        else if (kaartsoort_kaartX[1] == "10")
-        {
-            for (int i = 0; i < voorsteKaarten.Count; i++)
-            {
-                if (voorsteKaarten[i].name.Split('_')[1] == "J")
-                {
-                    mogelijk.Add(voorsteKaarten[i]);
-                }
-            }
-        }
-        else if (kaartsoort_kaartX[1] == "J")
-        {
-            for (int i = 0; i < voorsteKaarten.Count; i++)
-            {
-                if (voorsteKaarten[i].name.Split('_')[1] == "Q")
-                {
-                    mogelijk.Add(voorsteKaarten[i]);
-                }
-            }
-        }
-        else if (kaartsoort_kaartX[1] == "Q")
-        {
-            for (int i = 0; i < voorsteKaarten.Count; i++)
-            {
-                if (voorsteKaarten[i].name.Split('_')[1] == "K")
-                {
-                    mogelijk.Add(voorsteKaarten[i]);
-                }
-            }
-        }
-        else if (kaartsoort_kaartX[1] == "K")
+        string huidigKaartX = kaartsoort_kaartX[1];
+        if (huidigKaartX.Equals("K"))
         {
             for (int i = 0; i < voorsteKaarten.Count; i++)
             {
                 if (voorsteKaarten[i].name == empty.name)
                 {
                     mogelijk.Add(voorsteKaarten[i]);
+                    mogelijk.Add(voorsteKaarten[i]);
+                }
+            }
+        }
+        else
+        {
+            string benodigdeKaart = huidigKaartX.Equals("A") ? "2" : huidigKaartX.Equals("10") ? "J" : huidigKaartX.Equals("J") ? "Q" : huidigKaartX.Equals("Q") ? "K" : (int.Parse(huidigKaartX) + 1).ToString();
+            for (int i = 0; i < voorsteKaarten.Count; i++)
+            {
+                if (voorsteKaarten[i].name.Split('_')[1] == benodigdeKaart)
+                {
                     mogelijk.Add(voorsteKaarten[i]);
                 }
             }
@@ -343,7 +133,7 @@ public class KaartSleepScript : MonoBehaviour
         }
         distance = Vector3.Distance(transform.position, Camera.main.transform.position);
         dragging = true;
-        mogelijk = mogelijk.GroupBy(x => x).Where(g => g.Count() > 1).Select(y => y.Key).ToList();
+        mogelijk = mogelijk.GetDuplicates();
         for (int i = 0; i < mogelijk.Count; i++)
         {
             deI[i] = voorsteKaarten.IndexOf(mogelijk[i]);
@@ -363,355 +153,65 @@ public class KaartSleepScript : MonoBehaviour
         dragging = false;
         for (int i = 0; i < mogelijk.Count; i++)
         {
-            if (KrijgStapelBijPositie(muisPositie) == 1)
+            int stapelInt = KrijgStapelBijPositie(muisPositie);
+            if (stapelInt.IsBetween(1, 7))
             {
-                if (ScriptSolitaire.Stapel1.IndexOf(mogelijk[i]) != -1)
+                List<GameObject> stapel = stapelInt == 1 ? ScriptSolitaire.Stapel1 : stapelInt == 2 ? ScriptSolitaire.Stapel2 : stapelInt == 3 ? ScriptSolitaire.Stapel3 : stapelInt == 4 ? ScriptSolitaire.Stapel4 : stapelInt == 5 ? ScriptSolitaire.Stapel5 : stapelInt == 6 ? ScriptSolitaire.Stapel6 : stapelInt == 7 ? ScriptSolitaire.Stapel7 : null;
+                if(stapel.IndexOf(mogelijk[i]) != -1)
                 {
-                    HaalUitStapels(gameObject.transform.parent.gameObject);
-                    ScriptSolitaire.Stapel1.Add(gameObject.transform.parent.gameObject);
-                    saveScript.intDict["Stapel1:" + (ScriptSolitaire.Stapel1.Count -1)] = ScriptSolitaire.kaarten.IndexOf(gameObject.transform.parent.gameObject);
+                    GameObject parent = gameObject.transform.parent.gameObject;
+                    HaalUitStapels(parent);
+                    stapel.Add(parent);
+                    saveScript.intDict["Stapel" + stapelInt + ":" + (stapel.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(parent);
                     klaar = true;
                     if (mogelijk[i].name == "leeg_leeg")
                     {
-                        ScriptSolitaire.Stapel1.RemoveAt(0);
+                        stapel.RemoveAt(0);
                     }
                     for (int a = 0; a < deTeVerplaatsenKaarten.Count; a++)
                     {
                         HaalUitStapels(deTeVerplaatsenKaarten[a]);
-                        ScriptSolitaire.Stapel1.Add(deTeVerplaatsenKaarten[a]);
-                        saveScript.intDict["Stapel1:" + (ScriptSolitaire.Stapel1.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(deTeVerplaatsenKaarten[a]);
+                        stapel.Add(deTeVerplaatsenKaarten[a]);
+                        saveScript.intDict["Stapel" + stapelInt + ":" + (stapel.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(deTeVerplaatsenKaarten[a]);
                     }
-                    saveScript.intDict["Stapel1Grootte"] = ScriptSolitaire.Stapel1.Count;
+                    saveScript.intDict["Stapel" + stapelInt + "Grootte"] = stapel.Count;
                     ScriptSolitaire.ZetKaartenOpGoedePlek(false);
                 }
             }
-            else if (KrijgStapelBijPositie(muisPositie) == 2)
+            if (!klaar && deTeVerplaatsenKaarten.Count == 0 && KanOpEindStapel())
             {
-                if (ScriptSolitaire.Stapel2.IndexOf(mogelijk[i]) != -1)
-                {
-                    HaalUitStapels(gameObject.transform.parent.gameObject);
-                    ScriptSolitaire.Stapel2.Add(gameObject.transform.parent.gameObject);
-                    saveScript.intDict["Stapel2:" + (ScriptSolitaire.Stapel2.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(gameObject.transform.parent.gameObject);
-                    klaar = true;
-                    if (mogelijk[i].name == "leeg_leeg")
-                    {
-                        ScriptSolitaire.Stapel2.RemoveAt(0);
-                    }
-                    for (int a = 0; a < deTeVerplaatsenKaarten.Count; a++)
-                    {
-                        HaalUitStapels(deTeVerplaatsenKaarten[a]);
-                        ScriptSolitaire.Stapel2.Add(deTeVerplaatsenKaarten[a]);
-                        saveScript.intDict["Stapel2:" + (ScriptSolitaire.Stapel2.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(deTeVerplaatsenKaarten[a]);
-                    }
-                    saveScript.intDict["Stapel2Grootte"] = ScriptSolitaire.Stapel2.Count;
-                    ScriptSolitaire.ZetKaartenOpGoedePlek(false);
-                }
-            }
-            else if (KrijgStapelBijPositie(muisPositie) == 3)
-            {
-                if (ScriptSolitaire.Stapel3.IndexOf(mogelijk[i]) != -1)
-                {
-                    HaalUitStapels(gameObject.transform.parent.gameObject);
-                    ScriptSolitaire.Stapel3.Add(gameObject.transform.parent.gameObject);
-                    saveScript.intDict["Stapel3:" + (ScriptSolitaire.Stapel3.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(gameObject.transform.parent.gameObject);
-                    klaar = true;
-                    if (mogelijk[i].name == "leeg_leeg")
-                    {
-                        ScriptSolitaire.Stapel3.RemoveAt(0);
-                    }
-                    for (int a = 0; a < deTeVerplaatsenKaarten.Count; a++)
-                    {
-                        HaalUitStapels(deTeVerplaatsenKaarten[a]);
-                        ScriptSolitaire.Stapel3.Add(deTeVerplaatsenKaarten[a]);
-                        saveScript.intDict["Stapel3:" + (ScriptSolitaire.Stapel3.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(deTeVerplaatsenKaarten[a]);
-                    }
-                    saveScript.intDict["Stapel3Grootte"] = ScriptSolitaire.Stapel3.Count;
-                    ScriptSolitaire.ZetKaartenOpGoedePlek(false);
-                }
-            }
-            else if (KrijgStapelBijPositie(muisPositie) == 4)
-            {
-                if (ScriptSolitaire.Stapel4.IndexOf(mogelijk[i]) != -1)
-                {
-                    HaalUitStapels(gameObject.transform.parent.gameObject);
-                    ScriptSolitaire.Stapel4.Add(gameObject.transform.parent.gameObject);
-                    saveScript.intDict["Stapel4:" + (ScriptSolitaire.Stapel4.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(gameObject.transform.parent.gameObject);
-                    klaar = true;
-                    if (mogelijk[i].name == "leeg_leeg")
-                    {
-                        ScriptSolitaire.Stapel4.RemoveAt(0);
-                    }
-                    for (int a = 0; a < deTeVerplaatsenKaarten.Count; a++)
-                    {
-                        HaalUitStapels(deTeVerplaatsenKaarten[a]);
-                        ScriptSolitaire.Stapel4.Add(deTeVerplaatsenKaarten[a]);
-                        saveScript.intDict["Stapel4:" + (ScriptSolitaire.Stapel4.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(deTeVerplaatsenKaarten[a]);
-                    }
-                    saveScript.intDict["Stapel4Grootte"] = ScriptSolitaire.Stapel4.Count;
-                    ScriptSolitaire.ZetKaartenOpGoedePlek(false);
-                }
-            }
-            else if (KrijgStapelBijPositie(muisPositie) == 5)
-            {
-                if (ScriptSolitaire.Stapel5.IndexOf(mogelijk[i]) != -1)
-                {
-                    HaalUitStapels(gameObject.transform.parent.gameObject);
-                    ScriptSolitaire.Stapel5.Add(gameObject.transform.parent.gameObject);
-                    saveScript.intDict["Stapel5:" + (ScriptSolitaire.Stapel5.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(gameObject.transform.parent.gameObject);
-                    klaar = true;
-                    if (mogelijk[i].name == "leeg_leeg")
-                    {
-                        ScriptSolitaire.Stapel5.RemoveAt(0);
-                    }
-                    for (int a = 0; a < deTeVerplaatsenKaarten.Count; a++)
-                    {
-                        HaalUitStapels(deTeVerplaatsenKaarten[a]);
-                        ScriptSolitaire.Stapel5.Add(deTeVerplaatsenKaarten[a]);
-                        saveScript.intDict["Stapel5:" + (ScriptSolitaire.Stapel5.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(deTeVerplaatsenKaarten[a]);
-                    }
-                    saveScript.intDict["Stapel5Grootte"] = ScriptSolitaire.Stapel5.Count;
-                    ScriptSolitaire.ZetKaartenOpGoedePlek(false);
-                }
-            }
-            else if (KrijgStapelBijPositie(muisPositie) == 6)
-            {
-                if (ScriptSolitaire.Stapel6.IndexOf(mogelijk[i]) != -1)
-                {
-                    HaalUitStapels(gameObject.transform.parent.gameObject);
-                    ScriptSolitaire.Stapel6.Add(gameObject.transform.parent.gameObject);
-                    saveScript.intDict["Stapel6:" + (ScriptSolitaire.Stapel6.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(gameObject.transform.parent.gameObject);
-                    klaar = true;
-                    if (mogelijk[i].name == "leeg_leeg")
-                    {
-                        ScriptSolitaire.Stapel6.RemoveAt(0);
-                    }
-                    for (int a = 0; a < deTeVerplaatsenKaarten.Count; a++)
-                    {
-                        HaalUitStapels(deTeVerplaatsenKaarten[a]);
-                        ScriptSolitaire.Stapel6.Add(deTeVerplaatsenKaarten[a]);
-                        saveScript.intDict["Stapel6:" + (ScriptSolitaire.Stapel6.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(deTeVerplaatsenKaarten[a]);
-                    }
-                    saveScript.intDict["Stapel6Grootte"] = ScriptSolitaire.Stapel6.Count;
-                    ScriptSolitaire.ZetKaartenOpGoedePlek(false);
-                }
-            }
-            else if (KrijgStapelBijPositie(muisPositie) == 7)
-            {
-                if (ScriptSolitaire.Stapel7.IndexOf(mogelijk[i]) != -1)
-                {
-                    HaalUitStapels(gameObject.transform.parent.gameObject);
-                    ScriptSolitaire.Stapel7.Add(gameObject.transform.parent.gameObject);
-                    saveScript.intDict["Stapel7:" + (ScriptSolitaire.Stapel7.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(gameObject.transform.parent.gameObject);
-                    klaar = true;
-                    if (mogelijk[i].name == "leeg_leeg")
-                    {
-                        ScriptSolitaire.Stapel7.RemoveAt(0);
-                    }
-                    for (int a = 0; a < deTeVerplaatsenKaarten.Count; a++)
-                    {
-                        HaalUitStapels(deTeVerplaatsenKaarten[a]);
-                        ScriptSolitaire.Stapel7.Add(deTeVerplaatsenKaarten[a]);
-                        saveScript.intDict["Stapel7:" + (ScriptSolitaire.Stapel7.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(deTeVerplaatsenKaarten[a]);
-                    }
-                    saveScript.intDict["Stapel7Grootte"] = ScriptSolitaire.Stapel7.Count;
-                    ScriptSolitaire.ZetKaartenOpGoedePlek(false);
-                }
-            }
-            else if ((KrijgStapelBijPositie(muisPositie) == 10 && KanOpEindStapel()) || KanOpEindStapel())
-            {
-                HaalUitStapels(gameObject.transform.parent.gameObject);
-                if (kaartsoort_kaartX[0] == "Klaver")
-                {
-                    ScriptSolitaire.EindStapel1.Add(gameObject.transform.parent.gameObject);
-                    saveScript.intDict["Eindstapel1:" + (ScriptSolitaire.EindStapel1.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(gameObject.transform.parent.gameObject);
-                    klaar = true;
-                    saveScript.intDict["Eindstapel1Grootte"] = ScriptSolitaire.EindStapel1.Count;
-                    ScriptSolitaire.ZetKaartenOpGoedePlek(false);
-                }
-                else if (kaartsoort_kaartX[0] == "Ruiten")
-                {
-                    ScriptSolitaire.EindStapel2.Add(gameObject.transform.parent.gameObject);
-                    saveScript.intDict["Eindstapel2:" + (ScriptSolitaire.EindStapel2.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(gameObject.transform.parent.gameObject);
-                    klaar = true;
-                    saveScript.intDict["Eindstapel2Grootte"] = ScriptSolitaire.EindStapel2.Count;
-                    ScriptSolitaire.ZetKaartenOpGoedePlek(false);
-                }
-                else if (kaartsoort_kaartX[0] == "Harten")
-                {
-                    ScriptSolitaire.EindStapel3.Add(gameObject.transform.parent.gameObject);
-                    saveScript.intDict["Eindstapel3:" + (ScriptSolitaire.EindStapel3.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(gameObject.transform.parent.gameObject);
-                    klaar = true;
-                    saveScript.intDict["Eindstapel3Grootte"] = ScriptSolitaire.EindStapel3.Count;
-                    ScriptSolitaire.ZetKaartenOpGoedePlek(false);
-                }
-                else if (kaartsoort_kaartX[0] == "Schoppe")
-                {
-                    ScriptSolitaire.EindStapel4.Add(gameObject.transform.parent.gameObject);
-                    saveScript.intDict["Eindstapel4:" + (ScriptSolitaire.EindStapel4.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(gameObject.transform.parent.gameObject);
-                    klaar = true;
-                    saveScript.intDict["Eindstapel4Grootte"] = ScriptSolitaire.EindStapel4.Count;
-                    ScriptSolitaire.ZetKaartenOpGoedePlek(false);
-                }
+                GameObject parent = gameObject.transform.parent.gameObject;
+                HaalUitStapels(parent);
+                int eindStapelInt = kaartsoort_kaartX[0].Equals("Klaver") ? 1 : kaartsoort_kaartX[0].Equals("Ruiten") ? 2 : kaartsoort_kaartX[0].Equals("Harten") ? 3 : kaartsoort_kaartX[0].Equals("Schoppe") ? 4 : 0;
+                List<GameObject> eindStapel = eindStapelInt == 1 ? ScriptSolitaire.EindStapel1 : eindStapelInt == 2 ? ScriptSolitaire.EindStapel2 : eindStapelInt == 3 ? ScriptSolitaire.EindStapel3 : eindStapelInt == 4 ? ScriptSolitaire.EindStapel4 : null;
+                eindStapel.Add(parent);
+                saveScript.intDict["Eindstapel" + eindStapelInt + ":" + (eindStapel.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(parent);
+                klaar = true;
+                saveScript.intDict["Eindstapel" + eindStapelInt + "Grootte"] = eindStapel.Count;
+                ScriptSolitaire.ZetKaartenOpGoedePlek(false);
             }
         }
         if (!klaar)
         {
-            if (KanOpEindStapel() && deTeVerplaatsenKaarten.Count == 0)
+            int stapelInt = deI[0] + 1;
+            if (mogelijk.Count != 0 && stapelInt.IsBetween(1, 7))
             {
-                HaalUitStapels(gameObject.transform.parent.gameObject);
-                if (kaartsoort_kaartX[0] == "Klaver")
+                List<GameObject> stapel = stapelInt == 1 ? ScriptSolitaire.Stapel1 : stapelInt == 2 ? ScriptSolitaire.Stapel2 : stapelInt == 3 ? ScriptSolitaire.Stapel3 : stapelInt == 4 ? ScriptSolitaire.Stapel4 : stapelInt == 5 ? ScriptSolitaire.Stapel5 : stapelInt == 6 ? ScriptSolitaire.Stapel6 : stapelInt == 7 ? ScriptSolitaire.Stapel7 : null;
+                GameObject parent = gameObject.transform.parent.gameObject;
+                HaalUitStapels(parent);
+                stapel.Add(parent);
+                saveScript.intDict["Stapel" + stapelInt + ":" + (stapel.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(parent);
+                if (stapel[0].name == "leeg_leeg")
                 {
-                    ScriptSolitaire.EindStapel1.Add(gameObject.transform.parent.gameObject);
-                    saveScript.intDict["Eindstapel1:" + (ScriptSolitaire.EindStapel1.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(gameObject.transform.parent.gameObject);
-                    saveScript.intDict["Eindstapel1Grootte"] = ScriptSolitaire.EindStapel1.Count;
-                    ScriptSolitaire.ZetKaartenOpGoedePlek(false);
-                }
-                else if (kaartsoort_kaartX[0] == "Ruiten")
-                {
-                    ScriptSolitaire.EindStapel2.Add(gameObject.transform.parent.gameObject);
-                    saveScript.intDict["Eindstapel2:" + (ScriptSolitaire.EindStapel2.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(gameObject.transform.parent.gameObject);
-                    saveScript.intDict["Eindstapel2Grootte"] = ScriptSolitaire.EindStapel2.Count;
-                    ScriptSolitaire.ZetKaartenOpGoedePlek(false);
-                }
-                else if (kaartsoort_kaartX[0] == "Harten")
-                {
-                    ScriptSolitaire.EindStapel3.Add(gameObject.transform.parent.gameObject);
-                    saveScript.intDict["Eindstapel3:" + (ScriptSolitaire.EindStapel3.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(gameObject.transform.parent.gameObject);
-                    saveScript.intDict["Eindstapel3Grootte"] = ScriptSolitaire.EindStapel3.Count;
-                    ScriptSolitaire.ZetKaartenOpGoedePlek(false);
-                }
-                else if (kaartsoort_kaartX[0] == "Schoppe")
-                {
-                    ScriptSolitaire.EindStapel4.Add(gameObject.transform.parent.gameObject);
-                    saveScript.intDict["Eindstapel4:" + (ScriptSolitaire.EindStapel4.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(gameObject.transform.parent.gameObject);
-                    saveScript.intDict["Eindstapel4Grootte"] = ScriptSolitaire.EindStapel4.Count;
-                    ScriptSolitaire.ZetKaartenOpGoedePlek(false);
-                }
-            }
-            else if (mogelijk.Count != 0 && deI[0] == 0)
-            {
-                HaalUitStapels(gameObject.transform.parent.gameObject);
-                ScriptSolitaire.Stapel1.Add(gameObject.transform.parent.gameObject);
-                saveScript.intDict["Stapel1:" + (ScriptSolitaire.Stapel1.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(gameObject.transform.parent.gameObject);
-                if (ScriptSolitaire.Stapel1[0].name == "leeg_leeg")
-                {
-                    ScriptSolitaire.Stapel1.RemoveAt(0);
+                    stapel.RemoveAt(0);
                 }
                 for (int a = 0; a < deTeVerplaatsenKaarten.Count; a++)
                 {
                     HaalUitStapels(deTeVerplaatsenKaarten[a]);
-                    ScriptSolitaire.Stapel1.Add(deTeVerplaatsenKaarten[a]);
-                    saveScript.intDict["Stapel1:" + (ScriptSolitaire.Stapel1.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(deTeVerplaatsenKaarten[a]);
+                    stapel.Add(deTeVerplaatsenKaarten[a]);
+                    saveScript.intDict["Stapel" + stapelInt + ":" + (stapel.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(deTeVerplaatsenKaarten[a]);
                 }
-                saveScript.intDict["Stapel1Grootte"] = ScriptSolitaire.Stapel1.Count;
-                ScriptSolitaire.ZetKaartenOpGoedePlek(false);
-            }
-            else if (mogelijk.Count != 0 && deI[0] == 1)
-            {
-                HaalUitStapels(gameObject.transform.parent.gameObject);
-                ScriptSolitaire.Stapel2.Add(gameObject.transform.parent.gameObject);
-                saveScript.intDict["Stapel2:" + (ScriptSolitaire.Stapel2.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(gameObject.transform.parent.gameObject);
-                if (ScriptSolitaire.Stapel2[0].name == "leeg_leeg")
-                {
-                    ScriptSolitaire.Stapel2.RemoveAt(0);
-                }
-                for (int a = 0; a < deTeVerplaatsenKaarten.Count; a++)
-                {
-                    HaalUitStapels(deTeVerplaatsenKaarten[a]);
-                    ScriptSolitaire.Stapel2.Add(deTeVerplaatsenKaarten[a]);
-                    saveScript.intDict["Stapel2:" + (ScriptSolitaire.Stapel2.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(deTeVerplaatsenKaarten[a]);
-                }
-                saveScript.intDict["Stapel2Grootte"] = ScriptSolitaire.Stapel2.Count;
-                ScriptSolitaire.ZetKaartenOpGoedePlek(false);
-            }
-            else if (mogelijk.Count != 0 && deI[0] == 2)
-            {
-                HaalUitStapels(gameObject.transform.parent.gameObject);
-                ScriptSolitaire.Stapel3.Add(gameObject.transform.parent.gameObject);
-                saveScript.intDict["Stapel3:" + (ScriptSolitaire.Stapel3.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(gameObject.transform.parent.gameObject);
-                if (ScriptSolitaire.Stapel3[0].name == "leeg_leeg")
-                {
-                    ScriptSolitaire.Stapel3.RemoveAt(0);
-                }
-                for (int a = 0; a < deTeVerplaatsenKaarten.Count; a++)
-                {
-                    HaalUitStapels(deTeVerplaatsenKaarten[a]);
-                    ScriptSolitaire.Stapel3.Add(deTeVerplaatsenKaarten[a]);
-                    saveScript.intDict["Stapel3:" + (ScriptSolitaire.Stapel3.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(deTeVerplaatsenKaarten[a]);
-                }
-                saveScript.intDict["Stapel3Grootte"] = ScriptSolitaire.Stapel3.Count;
-                ScriptSolitaire.ZetKaartenOpGoedePlek(false);
-            }
-            else if (mogelijk.Count != 0 && deI[0] == 3)
-            {
-                HaalUitStapels(gameObject.transform.parent.gameObject);
-                ScriptSolitaire.Stapel4.Add(gameObject.transform.parent.gameObject);
-                saveScript.intDict["Stapel4:" + (ScriptSolitaire.Stapel4.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(gameObject.transform.parent.gameObject);
-                if (ScriptSolitaire.Stapel4[0].name == "leeg_leeg")
-                {
-                    ScriptSolitaire.Stapel4.RemoveAt(0);
-                }
-                for (int a = 0; a < deTeVerplaatsenKaarten.Count; a++)
-                {
-                    HaalUitStapels(deTeVerplaatsenKaarten[a]);
-                    ScriptSolitaire.Stapel4.Add(deTeVerplaatsenKaarten[a]);
-                    saveScript.intDict["Stapel4:" + (ScriptSolitaire.Stapel4.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(deTeVerplaatsenKaarten[a]);
-                }
-                saveScript.intDict["Stapel4Grootte"] = ScriptSolitaire.Stapel4.Count;
-                ScriptSolitaire.ZetKaartenOpGoedePlek(false);
-            }
-            else if (mogelijk.Count != 0 && deI[0] == 4)
-            {
-                HaalUitStapels(gameObject.transform.parent.gameObject);
-                ScriptSolitaire.Stapel5.Add(gameObject.transform.parent.gameObject);
-                saveScript.intDict["Stapel5:" + (ScriptSolitaire.Stapel5.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(gameObject.transform.parent.gameObject);
-                if (ScriptSolitaire.Stapel5[0].name == "leeg_leeg")
-                {
-                    ScriptSolitaire.Stapel5.RemoveAt(0);
-                }
-                for (int a = 0; a < deTeVerplaatsenKaarten.Count; a++)
-                {
-                    HaalUitStapels(deTeVerplaatsenKaarten[a]);
-                    ScriptSolitaire.Stapel5.Add(deTeVerplaatsenKaarten[a]);
-                    saveScript.intDict["Stapel5:" + (ScriptSolitaire.Stapel5.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(deTeVerplaatsenKaarten[a]);
-                }
-                saveScript.intDict["Stapel5Grootte"] = ScriptSolitaire.Stapel5.Count;
-                ScriptSolitaire.ZetKaartenOpGoedePlek(false);
-            }
-            else if (mogelijk.Count != 0 && deI[0] == 5)
-            {
-                HaalUitStapels(gameObject.transform.parent.gameObject);
-                ScriptSolitaire.Stapel6.Add(gameObject.transform.parent.gameObject);
-                saveScript.intDict["Stapel6:" + (ScriptSolitaire.Stapel6.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(gameObject.transform.parent.gameObject);
-                if (ScriptSolitaire.Stapel6[0].name == "leeg_leeg")
-                {
-                    ScriptSolitaire.Stapel6.RemoveAt(0);
-                }
-                for (int a = 0; a < deTeVerplaatsenKaarten.Count; a++)
-                {
-                    HaalUitStapels(deTeVerplaatsenKaarten[a]);
-                    ScriptSolitaire.Stapel6.Add(deTeVerplaatsenKaarten[a]);
-                    saveScript.intDict["Stapel6:" + (ScriptSolitaire.Stapel6.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(deTeVerplaatsenKaarten[a]);
-                }
-                saveScript.intDict["Stapel6Grootte"] = ScriptSolitaire.Stapel6.Count;
-                ScriptSolitaire.ZetKaartenOpGoedePlek(false);
-            }
-            else if (mogelijk.Count != 0 && deI[0] == 6)
-            {
-                HaalUitStapels(gameObject.transform.parent.gameObject);
-                ScriptSolitaire.Stapel7.Add(gameObject.transform.parent.gameObject);
-                saveScript.intDict["Stapel7:" + (ScriptSolitaire.Stapel7.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(gameObject.transform.parent.gameObject);
-                if (ScriptSolitaire.Stapel7[0].name == "leeg_leeg")
-                {
-                    ScriptSolitaire.Stapel7.RemoveAt(0);
-                }
-                for (int a = 0; a < deTeVerplaatsenKaarten.Count; a++)
-                {
-                    HaalUitStapels(deTeVerplaatsenKaarten[a]);
-                    ScriptSolitaire.Stapel7.Add(deTeVerplaatsenKaarten[a]);
-                    saveScript.intDict["Stapel7:" + (ScriptSolitaire.Stapel7.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(deTeVerplaatsenKaarten[a]);
-                }
-                saveScript.intDict["Stapel7Grootte"] = ScriptSolitaire.Stapel7.Count;
+                saveScript.intDict["Stapel" + stapelInt + "Grootte"] = stapel.Count;
                 ScriptSolitaire.ZetKaartenOpGoedePlek(false);
             }
             else
@@ -729,61 +229,11 @@ public class KaartSleepScript : MonoBehaviour
             tag = "helemaalLeeg"
         };
         List<GameObject> voorsteKaarten = new List<GameObject>();
-        if (ScriptSolitaire.Stapel1.Count > 0)
+        for (int i = 1; i <= 7; i++)
         {
-            voorsteKaarten.Add(ScriptSolitaire.Stapel1[^1]);
-        }
-        else
-        {
-            voorsteKaarten.Add(empty);
-        }
-        if (ScriptSolitaire.Stapel2.Count > 0)
-        {
-            voorsteKaarten.Add(ScriptSolitaire.Stapel2[^1]);
-        }
-        else
-        {
-            voorsteKaarten.Add(empty);
-        }
-        if (ScriptSolitaire.Stapel3.Count > 0)
-        {
-            voorsteKaarten.Add(ScriptSolitaire.Stapel3[^1]);
-        }
-        else
-        {
-            voorsteKaarten.Add(empty);
-        }
-        if (ScriptSolitaire.Stapel4.Count > 0)
-        {
-            voorsteKaarten.Add(ScriptSolitaire.Stapel4[^1]);
-        }
-        else
-        {
-            voorsteKaarten.Add(empty);
-        }
-        if (ScriptSolitaire.Stapel5.Count > 0)
-        {
-            voorsteKaarten.Add(ScriptSolitaire.Stapel5[^1]);
-        }
-        else
-        {
-            voorsteKaarten.Add(empty);
-        }
-        if (ScriptSolitaire.Stapel6.Count > 0)
-        {
-            voorsteKaarten.Add(ScriptSolitaire.Stapel6[^1]);
-        }
-        else
-        {
-            voorsteKaarten.Add(empty);
-        }
-        if (ScriptSolitaire.Stapel7.Count > 0)
-        {
-            voorsteKaarten.Add(ScriptSolitaire.Stapel7[^1]);
-        }
-        else
-        {
-            voorsteKaarten.Add(empty);
+            List<GameObject> stapel = i == 1 ? ScriptSolitaire.Stapel1 : i == 2 ? ScriptSolitaire.Stapel2 : i == 3 ? ScriptSolitaire.Stapel3 : i == 4 ? ScriptSolitaire.Stapel4 : i == 5 ? ScriptSolitaire.Stapel5 : i == 6 ? ScriptSolitaire.Stapel6 : i == 7 ? ScriptSolitaire.Stapel7 : null;
+            if (stapel.Count > 0) voorsteKaarten.Add(stapel[^1]);
+            else voorsteKaarten.Add(empty);
         }
         return voorsteKaarten;
     }
@@ -948,12 +398,9 @@ public class KaartSleepScript : MonoBehaviour
     public bool KanOpEindStapel()
     {
         bool HetKan = false;
+        if (kaartsoort_kaartX[1] == "A") return true;
         int.TryParse(kaartsoort_kaartX[1], out int kaartX);
-        if (kaartsoort_kaartX[1] == "A")
-        {
-            HetKan = true;
-        }
-        else if (kaartX == 2)
+        if (kaartX == 2)
         {
             if (kaartsoort_kaartX[0] == "Klaver")
             {
