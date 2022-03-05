@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using VBG.Helpers;
+using VBG.Extensions;
 
 public class KaartSleepScript : MonoBehaviour
 {
