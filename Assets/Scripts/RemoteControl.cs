@@ -37,7 +37,6 @@ public class RemoteControl : MonoBehaviour
         if (Application.version.StartsWith(nieuwsteVersie))
         {
             Debug.Log("Nieuwste versie van app");
-            Debug.Log("Hier ook nog even naar kijken");
         }
         else
         {

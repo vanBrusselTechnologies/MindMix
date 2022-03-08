@@ -6,6 +6,7 @@ using System.Text;
 using System;
 using Firebase.Storage;
 using Firebase.Auth;
+using VBG.Extensions;
 
 public class SaveScript : MonoBehaviour
 {
@@ -179,21 +180,21 @@ public class SaveScript : MonoBehaviour
 
         //Alles
         //Int
-        foreach (string name in SudokuIntNames) { intDict.Add(name, 0); }
-        foreach (string name in SolitaireIntNames) { intDict.Add(name, 0); }
-        foreach (string name in MijnenVegerIntNames) { intDict.Add(name, 0); }
-        foreach (string name in intNames2048) { intDict.Add(name, 0); }
-        foreach (string name in SettingsIntNames) { intDict.Add(name, 0); }
-        foreach (string name in userIntNames) { intDict.Add(name, 0); }
-        foreach (string name in gekochteItems) { intDict.Add(name, 0); }
+        intDict.AddRange(SudokuIntNames, 0);
+        intDict.AddRange(SolitaireIntNames, 0);
+        intDict.AddRange(MijnenVegerIntNames, 0);
+        intDict.AddRange(intNames2048, 0);
+        intDict.AddRange(SettingsIntNames, 0);
+        intDict.AddRange(userIntNames, 0);
+        intDict.AddRange(gekochteItems, 0);
         //String
-        foreach (string name in SudokuStringNames) { stringDict.Add(name, "  "); }
-        foreach (string name in SettingsStringNames) { stringDict.Add(name, ""); }
+        stringDict.AddRange(SudokuStringNames, "  ");
+        stringDict.AddRange(SettingsStringNames, "");
         //Float
-        foreach (string name in SolitaireFloatNames) { floatDict.Add(name, 0f); }
-        foreach (string name in AchtergrondFloatNames) { floatDict.Add(name, 0f); }
+        floatDict.AddRange(SolitaireFloatNames, 0f);
+        floatDict.AddRange(AchtergrondFloatNames, 0f);
         //Long
-        foreach (string name in userLongNames) { longDict.Add(name, 0); }
+        longDict.AddRange(userLongNames, 0);
 
         intDict["kleur" + 9 + "gekocht"] = 1;
         intDict["kleur" + 113 + "gekocht"] = 1;
@@ -463,14 +464,12 @@ public class SaveScript : MonoBehaviour
             }
             if (!vorigeDataGevonden && !sceneName.Equals("nul"))
             {
-                Array.Resize(ref oldDataParts, oldDataParts.Length + 1);
-                oldDataParts[^1] = data.ToString()[3..];
+                oldDataParts = oldDataParts.Add(data.ToString()[3..]);
             }
             if (!userDataGevonden)
             {
-                Array.Resize(ref oldDataParts, oldDataParts.Length + 2);
-                oldDataParts[^2] = SaveUserData().ToString()[3..];
-                oldDataParts[^1] = SaveAchtergrond().ToString()[3..];
+                List<string> tmp = new List<string>() { SaveUserData().ToString()[3..], SaveAchtergrond().ToString()[3..] };
+                oldDataParts = oldDataParts.AddRange(tmp);
             }
             for (int i = 1; i < oldDataParts.Length; i++)
             {

@@ -58,7 +58,8 @@ public class BeloningScript : MonoBehaviour
         FirebaseAnalytics.LogEvent(
             FirebaseAnalytics.EventLevelEnd,
             new Parameter[]{
-                new Parameter(FirebaseAnalytics.ParameterLevelName, scene.name)
+                new Parameter(FirebaseAnalytics.ParameterLevelName, scene.name),
+                new Parameter(FirebaseAnalytics.ParameterSuccess, 1)
             }
         );
         laatstVerdiendeMunten = munten;
@@ -86,8 +87,8 @@ public class BeloningScript : MonoBehaviour
             FirebaseAnalytics.EventSpendVirtualCurrency,
             new Parameter[] {
                 new Parameter(FirebaseAnalytics.ParameterItemName, shopScript.naam),
-                new Parameter(FirebaseAnalytics.ParameterValue, muntenToSpend),
-                new Parameter(FirebaseAnalytics.ParameterVirtualCurrencyName, "Coin")
+                new Parameter(FirebaseAnalytics.ParameterVirtualCurrencyName, "Coin"),
+                new Parameter(FirebaseAnalytics.ParameterValue, muntenToSpend)
             }
         );
     }

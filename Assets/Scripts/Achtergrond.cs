@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
+using VBG.Extensions;
 
 public class Achtergrond : MonoBehaviour
 {
@@ -39,7 +40,7 @@ public class Achtergrond : MonoBehaviour
         {
             System.Drawing.Color col = System.Drawing.Color.FromKnownColor(knownColor);
             listOfDrawingColours.Add(col);
-            if (col.Name.Equals("AliceBlue"))
+            if (!isKleur && col.Name.Equals("AliceBlue"))
             {
                 isKleur = true;
             }
@@ -48,10 +49,10 @@ public class Achtergrond : MonoBehaviour
                 colorOptionData.Add(new TMP_Dropdown.OptionData(col.Name));
                 Color color = new Color(col.R / 256f, col.G / 256f, col.B / 256f, col.A / 256f);
                 kleuren.Add(color);
-            }
-            if (col.Name.Equals("YellowGreen"))
-            {
-                isKleur = false;
+                if (col.Name.Equals("YellowGreen"))
+                {
+                    isKleur = false;
+                }
             }
         }
         foreach(Sprite afbeelding in gegevensScript.achtergronden)
@@ -73,7 +74,7 @@ public class Achtergrond : MonoBehaviour
         beschikbareAfbeeldingen.Clear();
         for (int i = -1; i < 140; i++)
         {
-            if(saveScript.intDict["kleur" + i + "gekocht"] == 1)
+            if (saveScript.intDict["kleur" + i + "gekocht"] == 1)
             {
                 beschikbareKleuren.Add(i);
             }
@@ -152,10 +153,7 @@ public class Achtergrond : MonoBehaviour
     {
         List<int> BGList = gegevensScript.AchtergrondList();
         wisselendeKleur = false;
-        if (BGList.Count < 2)
-        {
-            return;
-        }
+        if (BGList.Count < 2) return;
         int bgSoort = BGList[0];
         if (achtergrondImg)
         {
@@ -163,27 +161,19 @@ public class Achtergrond : MonoBehaviour
             {
                 int afbInt = BGList[1];
                 achtergrondImg.color = Color.white;
+                float width = Screen.width;
+                float height = Screen.height;
+                Rect imgRect;
                 if (afbInt == -1)
                 {
                     achtergrondImg.sprite = voorplaat;
-                    Rect imgRect1 = achtergrondImg.sprite.rect;
-                    float width1 = Screen.width;
-                    float height1 = Screen.height;
-                    if (imgRect1.width / width1 < imgRect1.height / height1)
-                    {
-                        height1 = 1000 * width1;
-                    }
-                    else
-                    {
-                        width1 = 1000 * height1;
-                    }
-                    achtergrondRect.sizeDelta = new Vector2(width1, height1);
-                    return;
+                    imgRect = achtergrondImg.sprite.rect;
                 }
-                achtergrondImg.sprite = gegevensScript.achtergronden[afbInt];
-                Rect imgRect = achtergrondImg.sprite.rect;
-                float width = Screen.width;
-                float height = Screen.height;
+                else
+                {
+                    achtergrondImg.sprite = gegevensScript.achtergronden[afbInt];
+                    imgRect = achtergrondImg.sprite.rect;
+                }
                 if (imgRect.width / width < imgRect.height / height)
                 {
                     height = 1000 * width;
@@ -210,15 +200,8 @@ public class Achtergrond : MonoBehaviour
                 }
                 int width = Screen.width;
                 int height = Screen.height;
-                if (width > height)
-                {
-                    height = width;
-                }
-                else
-                {
-                    width = height;
-                }
-                achtergrondRect.sizeDelta = new Vector2(width, height);
+                int sizeFactor = width > height ? width : height;
+                achtergrondRect.sizeDelta = Vector2.one * sizeFactor;
                 return;
             }
         }
@@ -247,7 +230,7 @@ public class Achtergrond : MonoBehaviour
             nextColor.g += 1f / 255f;
             nextColor.g = Mathf.Min(nextColor.g, 1f);
         }
-        else if ((Mathf.Approximately(nextColor.r, 1f) && Mathf.Approximately(nextColor.g, 1f)) || (!Mathf.Approximately(nextColor.r, 0f) && Mathf.Approximately(nextColor.g, 1f)))
+        else if (nextColor.r.IsBetween(0, 1, false) && Mathf.Approximately(nextColor.g, 1f))
         {
             nextColor.r -= 1f / 255f;
             nextColor.r = Mathf.Max(nextColor.r, 0f);
@@ -257,7 +240,7 @@ public class Achtergrond : MonoBehaviour
             nextColor.b += 1f / 255f;
             nextColor.b = Mathf.Min(nextColor.b, 1f);
         }
-        else if ((Mathf.Approximately(nextColor.g, 1f) && Mathf.Approximately(nextColor.b, 1f)) || (!Mathf.Approximately(nextColor.g, 0f) && Mathf.Approximately(nextColor.b, 1f)))
+        else if (nextColor.g.IsBetween(0, 1, false) && Mathf.Approximately(nextColor.b, 1f))
         {
             nextColor.g -= 1f / 255f;
             nextColor.g = Mathf.Max(nextColor.g, 0f);
@@ -267,7 +250,7 @@ public class Achtergrond : MonoBehaviour
             nextColor.r += 1f / 255f;
             nextColor.r = Mathf.Min(nextColor.r, 1f);
         }
-        else if ((Mathf.Approximately(nextColor.b, 1f) && Mathf.Approximately(nextColor.r, 1f)) || (!Mathf.Approximately(nextColor.b, 0f) && Mathf.Approximately(nextColor.r, 1f)))
+        else if (nextColor.b.IsBetween(0, 1, false) && Mathf.Approximately(nextColor.r, 1f))
         {
             nextColor.b -= 1f / 255f;
             nextColor.b = Mathf.Max(nextColor.b, 0f);

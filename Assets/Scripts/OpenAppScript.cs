@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Firebase.Auth;
 using GooglePlayGames;
-using System.Net;
 
 public class OpenAppScript : MonoBehaviour
 {
