@@ -71,3 +71,7 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 Assets/Firebase/Plugins/x86_64/FirebaseCppApp-8_7_0.so
+
+
+ignore.conf
+.plastic
