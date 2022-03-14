@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace VBG.Extensions
 {
-    public static class Int
+    public static class IntExtension
     {
         public static bool IsBetween(this int i, int minimum, int maximum, bool minimumInclusive = true, bool maximumInclusive = true)
         {
@@ -13,7 +13,7 @@ namespace VBG.Extensions
         }
     }
 
-    public static class Float
+    public static class FloatExtension
     {
         public static double Round(this float f, int decimals = 0)
         {
@@ -42,7 +42,7 @@ namespace VBG.Extensions
         //public static 
     }
 
-    public static class Double
+    public static class DoubleExtension
     {
         public static double Round(this double d, int decimals = 0)
         {
@@ -74,7 +74,7 @@ namespace VBG.Extensions
         }
     }
 
-    public static class Long
+    public static class LongExtension
     {
         public static bool IsBetween(this long thisLong, long minimum, long maximum, bool minimumInclusive = true, bool maximumInclusive = true)
         {
@@ -84,7 +84,7 @@ namespace VBG.Extensions
         }
     }
 
-    public static class List
+    public static class ListExtension
     {
         /// <summary>
         /// Returns a new list without duplicates
@@ -242,7 +242,7 @@ namespace VBG.Extensions
         }
     }
 
-    public static class Array
+    public static class ArrayExtension
     {
         public static T[] Add<T>(this T[] array, T item)
         {
@@ -463,7 +463,7 @@ namespace VBG.Extensions
         }
     }
 
-    public static class Dictionary
+    public static class DictionaryExtension
     {
         public static void AddRange<TKey, TValue>(this Dictionary<TKey, TValue> dict, Dictionary<TKey, TValue> dictToAdd)
         {
@@ -602,6 +602,100 @@ namespace VBG.Extensions
         public static int IndexOfKey<TKey, TValue>(this Dictionary<TKey, TValue> dict, TKey key)
         {
             return dict.ToKeyList().IndexOf(key);
+        }
+    }
+
+    public static class GameObjectExtension
+    {
+        /// <summary>
+        /// Checks if the GameObject is in Camera.main's viewport
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static bool IsInCameraViewport(this GameObject obj)
+        {
+            return IsInCameraViewport(obj, Camera.main);
+        }
+
+        /// <summary>
+        /// Checks if the GameObject is in Camera's viewport
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="camera"></param>
+        /// <returns>True if the GameObject is in camera's viewport, otherwise false</returns>
+        public static bool IsInCameraViewport(this GameObject obj, Camera camera)
+        {
+            //Works with camera.rotation = Vector3.zero and gameobject.rotation = Vector3.zero;
+            Debug.LogWarning("Currently only correct without rotations");
+            if (camera == null) { camera = Camera.main; }
+            if (camera == null) return false;
+            Transform camTf = camera.transform;
+            Transform objTf = obj.transform;
+            if (camera.orthographic)
+            {
+                if (camTf.eulerAngles == Vector3.zero)
+                {
+                    if ((objTf.position.z - (objTf.lossyScale.z / 2f)).IsBetween(camTf.position.z + camera.nearClipPlane, camTf.position.z + camera.farClipPlane, true, false))
+                    {
+                        if (camTf.position.y + camera.orthographicSize > objTf.position.y - objTf.localScale.y / 2f && camTf.position.y - camera.orthographicSize < objTf.position.y + objTf.localScale.y / 2f)
+                        {
+                            if (camTf.position.x + camera.orthographicSize * camera.aspect > objTf.position.x - (objTf.localScale.x / 2f) && camTf.position.x - camera.orthographicSize * camera.aspect < objTf.position.x + objTf.localScale.x / 2f)
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (camTf.eulerAngles == Vector3.zero)
+                {
+                    if ((objTf.position.z - (objTf.lossyScale.z / 2f)).IsBetween(camTf.position.z + camera.nearClipPlane, camTf.position.z + camera.farClipPlane, true, false))
+                    {
+                        Debug.LogWarning("Rotation through perspective view has not yet been included.");
+                        //Pretty much correct. Only the rotation through perspective view has not yet been included.
+                        //1 / Mathf.Tan(camera.fieldOfView / 2f * Mathf.PI / 180f) -> https://www.scratchapixel.com/lessons/3d-basic-rendering/perspective-and-orthographic-projection-matrix/building-basic-perspective-projection-matrix
+                        float fovUnits = Mathf.Tan(camera.fieldOfView / 2f * Mathf.PI / 180f) / 50f * (objTf.position.z - camTf.position.z) * 100f;
+                        if (objTf.position.y + (objTf.localScale.y / 2f) > camTf.position.y - fovUnits / 2f && objTf.position.y - (objTf.localScale.y / 2f) < camTf.position.y + fovUnits / 2f)
+                        {
+                            if (objTf.position.x + (objTf.localScale.x / 2f) > camTf.position.x - fovUnits * camera.aspect / 2f && objTf.position.x - (objTf.localScale.x / 2f) < camTf.position.x + fovUnits * camera.aspect / 2f)
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="camera"></param>
+        /// <returns>0 = completely outside camera view, 1 = completely inside camera view</returns>
+        public static float PercentageInCameraView(this GameObject obj, Camera camera)
+        {
+            Transform camTf = camera.transform;
+            Transform objTf = obj.transform;
+            Debug.Log(camTf + " " + objTf);
+            return 1;
+        }
+    }
+
+    public static  class Vector3Extension
+    {
+        /// <summary>
+        /// Compares two Vector3 values and returns true if they are similar.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static bool Approximately(this Vector3 a, Vector3 b)
+        {
+            return Mathf.Approximately(a.x, b.x) && Mathf.Approximately(a.y, b.y) && Mathf.Approximately(a.z, b.z);
         }
     }
 }
