@@ -58,7 +58,7 @@ public class KaartSleepScript : MonoBehaviour
     
     private void OnMouseDown()
     {
-        if(gameObject.transform.parent.localEulerAngles == achterkantboven) return;
+        if (gameObject.transform.parent.localEulerAngles == achterkantboven || Input.touchCount == 0) return;
         Vector3 muisPositie = Camera.main.ScreenToWorldPoint(Input.GetTouch(0).position);
         positieMuis = muisPositie;
         deTeVerplaatsenKaarten.Clear();

@@ -49,7 +49,7 @@ public class OpenAppScript : MonoBehaviour
     private bool animatieWasKlaar = false;
     private void Update()
     {
-        if (eersteFrame && (fireBaseSetup.ready || fireBaseSetup.offline) && saveScript.ready)
+        if (eersteFrame && fireBaseSetup != null && (fireBaseSetup.ready || fireBaseSetup.offline) && saveScript.ready)
         {
             eersteFrame = false;
             if (SceneManager.GetActiveScene().name.Equals("LogoEnAppOpstart"))

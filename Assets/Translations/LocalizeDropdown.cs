@@ -4,6 +4,7 @@ using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
 using TMPro;
 
+[RequireComponent(typeof(TMP_Dropdown))]
 public class LocalizeDropdown : MonoBehaviour
 {
     [SerializeField] private List<LocalizedString> dropdownOptions;
