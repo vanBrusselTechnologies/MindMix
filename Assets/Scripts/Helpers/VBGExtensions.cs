@@ -139,7 +139,7 @@ namespace VBG.Extensions
             }
         }
 
-        public static void AddRange<T>(this List<T> list, T[] items)
+        public static void AddRange<T>(this List<T> list, params T[] items)
         {
             for (int i = 0; i < items.Length; i++)
             {
@@ -163,7 +163,7 @@ namespace VBG.Extensions
             }
         }
 
-        public static void InsertRange<T>(this List<T> list, int index, T[] items)
+        public static void InsertRange<T>(this List<T> list, int index, params T[] items)
         {
             list.AddRange(items);
             for (int i = index; i < list.Count - items.Length; i++)
@@ -230,7 +230,7 @@ namespace VBG.Extensions
             return dict;
         }
 
-        public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(List<TKey> keys, TValue[] values)
+        public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(List<TKey> keys, params TValue[] values)
         {
             Dictionary<TKey, TValue> dict = new Dictionary<TKey, TValue>();
             int count = Mathf.Min(keys.Count, values.Length);
@@ -251,7 +251,7 @@ namespace VBG.Extensions
             return array;
         }
 
-        public static T[] AddRange<T>(this T[] array, T[] items)
+        public static T[] AddRange<T>(this T[] array, params T[] items)
         {
             System.Array.Resize(ref array, array.Length + items.Length);
             for (int i = 0; i < items.Length; i++)
@@ -287,7 +287,7 @@ namespace VBG.Extensions
             }
         }
 
-        public static void InsertRange<T>(this T[] array, int index, T[] items)
+        public static void InsertRange<T>(this T[] array, int index, params T[] items)
         {
             array.AddRange(items);
             for (int i = index; i < array.Length - items.Length; i++)
@@ -451,7 +451,7 @@ namespace VBG.Extensions
             return dict;
         }
 
-        public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(TKey[] keys, TValue[] values)
+        public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(TKey[] keys, params TValue[] values)
         {
             Dictionary<TKey, TValue> dict = new Dictionary<TKey, TValue>();
             int count = Mathf.Min(keys.Length, values.Length);
@@ -482,7 +482,7 @@ namespace VBG.Extensions
             }
         }
 
-        public static void AddRange<TKey, TValue>(this Dictionary<TKey, TValue> dict, List<TKey> keys, TValue[] values)
+        public static void AddRange<TKey, TValue>(this Dictionary<TKey, TValue> dict, List<TKey> keys, params TValue[] values)
         {
             int count = Mathf.Min(keys.Count, values.Length);
             for (int i = 0; i < count; i++)
@@ -491,7 +491,7 @@ namespace VBG.Extensions
             }
         }
 
-        public static void AddRange<TKey, TValue>(this Dictionary<TKey, TValue> dict, TKey[] keys, TValue[] values)
+        public static void AddRange<TKey, TValue>(this Dictionary<TKey, TValue> dict, TKey[] keys, params TValue[] values)
         {
             int count = Mathf.Min(keys.Length, values.Length);
             for (int i = 0; i < count; i++)
@@ -537,7 +537,7 @@ namespace VBG.Extensions
             }
         }
 
-        public static void RemoveRange<TKey, TValue>(this Dictionary<TKey, TValue> dict, TKey[] keys)
+        public static void RemoveRange<TKey, TValue>(this Dictionary<TKey, TValue> dict, params TKey[] keys)
         {
             if (keys.Length > dict.Count)
             {
