@@ -15,6 +15,10 @@ public class AdsInitializer : MonoBehaviour, IUnityAdsInitializationListener
 
     public void InitializeAds()
     {
+        MetaData metaData = new MetaData("privacy");
+        metaData.Set("mode", "none");
+        Advertisement.SetMetaData(metaData);
+
         _gameId = (Application.platform == RuntimePlatform.IPhonePlayer)
             ? _iOsGameId
             : _androidGameId;

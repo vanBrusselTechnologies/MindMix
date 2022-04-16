@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace VBG.Extensions
 {
-    public static class IntExtension
+    public static class IntExt
     {
         public static bool IsBetween(this int i, int minimum, int maximum, bool minimumInclusive = true, bool maximumInclusive = true)
         {
@@ -13,7 +13,7 @@ namespace VBG.Extensions
         }
     }
 
-    public static class FloatExtension
+    public static class FloatExt
     {
         public static double Round(this float f, int decimals = 0)
         {
@@ -42,7 +42,7 @@ namespace VBG.Extensions
         //public static 
     }
 
-    public static class DoubleExtension
+    public static class DoubleExt
     {
         public static double Round(this double d, int decimals = 0)
         {
@@ -74,7 +74,7 @@ namespace VBG.Extensions
         }
     }
 
-    public static class LongExtension
+    public static class LongExt
     {
         public static bool IsBetween(this long thisLong, long minimum, long maximum, bool minimumInclusive = true, bool maximumInclusive = true)
         {
@@ -84,7 +84,7 @@ namespace VBG.Extensions
         }
     }
 
-    public static class ListExtension
+    public static class ListExt
     {
         /// <summary>
         /// Returns a new list without duplicates
@@ -242,7 +242,7 @@ namespace VBG.Extensions
         }
     }
 
-    public static class ArrayExtension
+    public static class ArrayExt
     {
         public static T[] Add<T>(this T[] array, T item)
         {
@@ -463,7 +463,7 @@ namespace VBG.Extensions
         }
     }
 
-    public static class DictionaryExtension
+    public static class DictionaryExt
     {
         public static void AddRange<TKey, TValue>(this Dictionary<TKey, TValue> dict, Dictionary<TKey, TValue> dictToAdd)
         {
@@ -605,7 +605,7 @@ namespace VBG.Extensions
         }
     }
 
-    public static class GameObjectExtension
+    public static class GameObjectExt
     {
         /// <summary>
         /// Checks if the GameObject is in Camera.main's viewport
@@ -685,7 +685,7 @@ namespace VBG.Extensions
         }
     }
 
-    public static  class Vector3Extension
+    public static class Vector3Ext
     {
         /// <summary>
         /// Compares two Vector3 values and returns true if they are similar.
@@ -697,5 +697,40 @@ namespace VBG.Extensions
         {
             return Mathf.Approximately(a.x, b.x) && Mathf.Approximately(a.y, b.y) && Mathf.Approximately(a.z, b.z);
         }
+    }
+
+    /// <summary>
+    /// Extension for everything related to UnityEngine.Screen
+    /// </summary>
+    public static class ScreenExt
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pixels">Screenpixels you want to convert to Units</param>
+        /// <param name="orthograficCam">Orthografic camera used. If empty Camera.main will be used</param>
+        /// <returns></returns>
+        public static float PixelsToUnits(float pixels, Camera orthograficCam = null)
+        {
+            if (orthograficCam == null)
+            {
+                orthograficCam = Camera.main;
+            }
+            return orthograficCam.orthographicSize * 2 * pixels / Screen.height;
+        }
+        public static float BottomOutsideSafezone { get { return Screen.safeArea.y; } }
+        public static float LeftOutsideSafezone { get { return Screen.safeArea.x; } }
+        public static float RightOutsideSafezone { get { return Screen.width - Screen.safeArea.width - Screen.safeArea.x; } }
+        public static float TopOutsideSafezone { get { return Screen.height - Screen.safeArea.height - Screen.safeArea.y; } }
+
+        public static float WidthInUnits { get { return PixelsToUnits(Screen.width); } }
+        public static float HeightInUnits { get { return PixelsToUnits(Screen.height); } }
+        public static float SafeAreaWidthInUnits { get { return PixelsToUnits(Screen.safeArea.width); } }
+        public static float SafeAreaHeightInUnits { get { return PixelsToUnits(Screen.safeArea.height); } }
+
+        /// <summary>
+        /// Returns Screen.width divided by Screen.height as float
+        /// </summary>
+        public static float aspect { get { return Screen.width * 1f / Screen.height; } }
     }
 }
