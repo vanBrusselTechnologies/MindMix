@@ -66,7 +66,7 @@ public class KnoppenScript : MonoBehaviour
             return;
         }
         SudokuMenu.SetActive(false);
-        if(saveScript.intDict["dubbelGetalWarningIsOn"] == 1)
+        if (saveScript.intDict["dubbelGetalWarningIsOn"] == 1)
         {
             CheckVoorDubbelGetal();
         }
@@ -171,10 +171,6 @@ public class KnoppenScript : MonoBehaviour
                 {
                     WerkNotitiesBij(dei);
                 }
-                if (saveScript.intDict["dubbelGetalWarningIsOn"] == 1)
-                {
-                    CheckVoorDubbelGetal();
-                }
             }
             else if (!plaatsScript.NormaalGetal)
             {
@@ -184,25 +180,25 @@ public class KnoppenScript : MonoBehaviour
                 TMP_Text text = knoppen[dei].transform.GetChild(0).GetComponent<TMP_Text>();
                 text.alignment = TextAlignmentOptions.Left;
                 text.fontSize = 80;
-                string een   = saveScript.stringDict["Button " + dei + " notitie1"];
-                string twee  = saveScript.stringDict["Button " + dei + " notitie2"];
-                string drie  = saveScript.stringDict["Button " + dei + " notitie3"];
-                string vier  = saveScript.stringDict["Button " + dei + " notitie4"];
-                string vijf  = saveScript.stringDict["Button " + dei + " notitie5"];
-                string zes   = saveScript.stringDict["Button " + dei + " notitie6"];
+                string een = saveScript.stringDict["Button " + dei + " notitie1"];
+                string twee = saveScript.stringDict["Button " + dei + " notitie2"];
+                string drie = saveScript.stringDict["Button " + dei + " notitie3"];
+                string vier = saveScript.stringDict["Button " + dei + " notitie4"];
+                string vijf = saveScript.stringDict["Button " + dei + " notitie5"];
+                string zes = saveScript.stringDict["Button " + dei + " notitie6"];
                 string zeven = saveScript.stringDict["Button " + dei + " notitie7"];
-                string acht  = saveScript.stringDict["Button " + dei + " notitie8"];
+                string acht = saveScript.stringDict["Button " + dei + " notitie8"];
                 string negen = saveScript.stringDict["Button " + dei + " notitie9"];
                 switch (selectedNumber)
                 {
-                    case "1": een   = (een   == "  ") ? "1" : "  "; break;
-                    case "2": twee  = (twee  == "  ") ? "2" : "  "; break;
-                    case "3": drie  = (drie  == "  ") ? "3" : "  "; break;
-                    case "4": vier  = (vier  == "  ") ? "4" : "  "; break;
-                    case "5": vijf  = (vijf  == "  ") ? "5" : "  "; break;
-                    case "6": zes   = (zes   == "  ") ? "6" : "  "; break;
+                    case "1": een = (een == "  ") ? "1" : "  "; break;
+                    case "2": twee = (twee == "  ") ? "2" : "  "; break;
+                    case "3": drie = (drie == "  ") ? "3" : "  "; break;
+                    case "4": vier = (vier == "  ") ? "4" : "  "; break;
+                    case "5": vijf = (vijf == "  ") ? "5" : "  "; break;
+                    case "6": zes = (zes == "  ") ? "6" : "  "; break;
                     case "7": zeven = (zeven == "  ") ? "7" : "  "; break;
-                    case "8": acht  = (acht  == "  ") ? "8" : "  "; break;
+                    case "8": acht = (acht == "  ") ? "8" : "  "; break;
                     case "9": negen = (negen == "  ") ? "9" : "  "; break;
                 }
                 saveScript.stringDict["Button " + dei + " notitie1"] = een;
@@ -214,10 +210,16 @@ public class KnoppenScript : MonoBehaviour
                 saveScript.stringDict["Button " + dei + " notitie7"] = zeven;
                 saveScript.stringDict["Button " + dei + " notitie8"] = acht;
                 saveScript.stringDict["Button " + dei + " notitie9"] = negen;
-                string a = een + "  " + twee + "  " + drie + "\n" + vier + "  " + vijf + "  " + zes + "\n" + zeven + "  " + acht + "  " + negen;
+                string a = een + "  " + twee + "  " + drie + "\n" +
+                           vier + "  " + vijf + "  " + zes + "\n" +
+                           zeven + "  " + acht + "  " + negen;
                 text.text = a;
                 saveScript.intDict["DoorSpelerIngevuldBij" + dei] = 0;
                 afScript.getallen[dei] = 0;
+            }
+            if (saveScript.intDict["dubbelGetalWarningIsOn"] == 1)
+            {
+                CheckVoorDubbelGetal();
             }
         }
         afScript.ietsVeranderd = true;
@@ -440,10 +442,11 @@ public class KnoppenScript : MonoBehaviour
         }
         foreach (int getal in kolomGetallen)
         {
-            if (getal != dei) {
-                if(afScript.getallen[getal] == 0)
+            if (getal != dei)
+            {
+                if (afScript.getallen[getal] == 0)
                 {
-                    if(saveScript.stringDict["Button " + getal + " notitie" + afScript.getallen[dei]] != "  ")
+                    if (saveScript.stringDict["Button " + getal + " notitie" + afScript.getallen[dei]] != "  ")
                     {
                         saveScript.stringDict["Button " + getal + " notitie" + afScript.getallen[dei]] = "  ";
                         string een = saveScript.stringDict["Button " + getal + " notitie1"];
@@ -455,7 +458,9 @@ public class KnoppenScript : MonoBehaviour
                         string zeven = saveScript.stringDict["Button " + getal + " notitie7"];
                         string acht = saveScript.stringDict["Button " + getal + " notitie8"];
                         string negen = saveScript.stringDict["Button " + getal + " notitie9"];
-                        string a = een + "  " + twee + "  " + drie + "\n" + vier + "  " + vijf + "  " + zes + "\n" + zeven + "  " + acht + "  " + negen;
+                        string a = een + "  " + twee + "  " + drie + "\n" +
+                                   vier + "  " + vijf + "  " + zes + "\n" +
+                                   zeven + "  " + acht + "  " + negen;
                         TMP_Text text = knoppen[getal].transform.GetChild(0).GetComponent<TMP_Text>();
                         text.text = a;
                     }
@@ -480,7 +485,9 @@ public class KnoppenScript : MonoBehaviour
                         string zeven = saveScript.stringDict["Button " + getal + " notitie7"];
                         string acht = saveScript.stringDict["Button " + getal + " notitie8"];
                         string negen = saveScript.stringDict["Button " + getal + " notitie9"];
-                        string a = een + "  " + twee + "  " + drie + "\n" + vier + "  " + vijf + "  " + zes + "\n" + zeven + "  " + acht + "  " + negen;
+                        string a = een + "  " + twee + "  " + drie + "\n" +
+                                   vier + "  " + vijf + "  " + zes + "\n" +
+                                   zeven + "  " + acht + "  " + negen;
                         TMP_Text text = knoppen[getal].transform.GetChild(0).GetComponent<TMP_Text>();
                         text.text = a;
                     }
@@ -505,7 +512,9 @@ public class KnoppenScript : MonoBehaviour
                         string zeven = saveScript.stringDict["Button " + getal + " notitie7"];
                         string acht = saveScript.stringDict["Button " + getal + " notitie8"];
                         string negen = saveScript.stringDict["Button " + getal + " notitie9"];
-                        string a = een + "  " + twee + "  " + drie + "\n" + vier + "  " + vijf + "  " + zes + "\n" + zeven + "  " + acht + "  " + negen;
+                        string a = een + "  " + twee + "  " + drie + "\n" +
+                                   vier + "  " + vijf + "  " + zes + "\n" +
+                                   zeven + "  " + acht + "  " + negen;
                         TMP_Text text = knoppen[getal].transform.GetChild(0).GetComponent<TMP_Text>();
                         text.text = a;
                     }
@@ -532,7 +541,25 @@ public class KnoppenScript : MonoBehaviour
         ColorBlock colorBlock = knop.colors;
         foreach (int getal2 in kolomGetallen)
         {
-            if (dei == getal2 || afScript.getallen[dei] == 0) {; }
+            if (dei == getal2) {; }
+            else if (afScript.getallen[dei] == 0)
+            {
+                for (int i = 1; i <= 9; i++)
+                {
+                    string _ = saveScript.stringDict["Button " + dei + " notitie" + i];
+                    if (!_.Equals("  "))
+                    {
+                        int __ = int.Parse(_);
+                        if (__ == afScript.getallen[getal2])
+                        {
+                            colorBlock.normalColor = dubbelGetalKleurRood;
+                            knop.colors = colorBlock;
+                            CheckVoorDubbelGetal(dei + 1);
+                            return;
+                        }
+                    }
+                }
+            }
             else if (afScript.getallen[dei] == afScript.getallen[getal2])
             {
                 colorBlock.normalColor = dubbelGetalKleurRood;
@@ -543,7 +570,25 @@ public class KnoppenScript : MonoBehaviour
         }
         foreach (int getal2 in rijGetallen)
         {
-            if (dei == getal2 || afScript.getallen[dei] == 0) {; }
+            if (dei == getal2) {; }
+            else if (afScript.getallen[dei] == 0)
+            {
+                for (int i = 1; i <= 9; i++)
+                {
+                    string _ = saveScript.stringDict["Button " + dei + " notitie" + i];
+                    if (!_.Equals("  "))
+                    {
+                        int __ = int.Parse(_);
+                        if (__ == afScript.getallen[getal2])
+                        {
+                            colorBlock.normalColor = dubbelGetalKleurRood;
+                            knop.colors = colorBlock;
+                            CheckVoorDubbelGetal(dei + 1);
+                            return;
+                        }
+                    }
+                }
+            }
             else if (afScript.getallen[dei] == afScript.getallen[getal2])
             {
                 colorBlock.normalColor = dubbelGetalKleurRood;
@@ -554,7 +599,25 @@ public class KnoppenScript : MonoBehaviour
         }
         foreach (int getal2 in vakGetallen)
         {
-            if (dei == getal2 || afScript.getallen[dei] == 0) {; }
+            if (dei == getal2) {; }
+            else if (afScript.getallen[dei] == 0)
+            {
+                for (int i = 1; i <= 9; i++)
+                {
+                    string _ = saveScript.stringDict["Button " + dei + " notitie" + i];
+                    if (!_.Equals("  "))
+                    {
+                        int __ = int.Parse(_);
+                        if (__ == afScript.getallen[getal2])
+                        {
+                            colorBlock.normalColor = dubbelGetalKleurRood;
+                            knop.colors = colorBlock;
+                            CheckVoorDubbelGetal(dei + 1);
+                            return;
+                        }
+                    }
+                }
+            }
             else if (afScript.getallen[dei] == afScript.getallen[getal2])
             {
                 colorBlock.normalColor = dubbelGetalKleurRood;
