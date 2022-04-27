@@ -22,6 +22,8 @@ public class SolitaireLayout : MonoBehaviour
     [SerializeField] private List<Transform> Stapels = new List<Transform>();
     [SerializeField] private List<Transform> EindStapels = new List<Transform>();
     [SerializeField] private Transform RestStapel;
+    [SerializeField] private RectTransform instellingenOpenKnopRect;
+    [SerializeField] private GameObject instellingenObj;
 
     // Start is called before the first frame update
     private void Start()
@@ -67,6 +69,8 @@ public class SolitaireLayout : MonoBehaviour
             solitaireMenu.SetActive(false);
             uitlegOpenKnopRect.sizeDelta = new Vector2(Screen.safeArea.width / 12, Screen.safeArea.width / 12);
             uitlegOpenKnopRect.anchoredPosition = new Vector2(-Screen.safeArea.width / 12 * 0.6f, -(Screen.height - Screen.safeArea.height - Screen.safeArea.y) - (Screen.safeArea.width / 12 * 0.6f));
+            instellingenOpenKnopRect.sizeDelta = uitlegOpenKnopRect.sizeDelta;
+            instellingenOpenKnopRect.anchoredPosition = new Vector2(-Screen.safeArea.width / 12 * 0.6f, -(Screen.height - Screen.safeArea.height - Screen.safeArea.y) - (Screen.safeArea.width / 12 * 0.6f) - (2f * Screen.safeArea.width / 12f * 0.6f));
             menuShowKnopRect.anchoredPosition = new Vector2(0, Screen.safeArea.y + menuShowKnopRect.sizeDelta.y / 2f);
             menuShowKnopRect.sizeDelta = new Vector2(Screen.safeArea.height * 0.1f, Screen.safeArea.height * 0.04f);
             menuShowKnopRect.localEulerAngles = new Vector3(0, 0, 180);
@@ -99,6 +103,8 @@ public class SolitaireLayout : MonoBehaviour
             solitaireGrootte = Mathf.Min(Mathf.Min(schermHoogte, schermWijdte), Mathf.Max(schermHoogte, schermWijdte) * 0.80f);
             uitlegOpenKnopRect.sizeDelta = new Vector2(Screen.safeArea.height / 12, Screen.safeArea.height / 12);
             uitlegOpenKnopRect.anchoredPosition = new Vector2(-(Screen.width - Screen.safeArea.width - Screen.safeArea.x) - (Screen.safeArea.height / 12 * 0.6f), -(Screen.height - Screen.safeArea.height - Screen.safeArea.y) - (Screen.safeArea.height / 12 * 0.6f));
+            instellingenOpenKnopRect.sizeDelta = uitlegOpenKnopRect.sizeDelta;
+            instellingenOpenKnopRect.anchoredPosition = new Vector2(-(Screen.width - Screen.safeArea.width - Screen.safeArea.x) - (Screen.safeArea.height / 12 * 0.6f) - (2f * Screen.safeArea.height / 12f * 0.6f), -(Screen.height - Screen.safeArea.height - Screen.safeArea.y) - (Screen.safeArea.height / 12 * 0.6f));
             menuShowKnopRect.anchoredPosition = new Vector2(Screen.safeArea.x - (Screen.width / 2f) + menuShowKnopRect.sizeDelta.y / 2f, Screen.height / 2f);
             menuShowKnopRect.sizeDelta = new Vector2(Screen.safeArea.width * 0.1f, Screen.safeArea.width * 0.04f);
             menuShowKnopRect.localEulerAngles = new Vector3(0, 0, 90);
@@ -155,6 +161,11 @@ public class SolitaireLayout : MonoBehaviour
                 solitaireKnoppenScript.OpenUitleg();
                 solitaireKnoppenScript.OpenUitleg();
             }
+            else if (instellingenObj.activeInHierarchy)
+            {
+                solitaireKnoppenScript.OpenSettings();
+                solitaireKnoppenScript.OpenSettings();
+            }
             else
             {
                 SetLayout(true);
@@ -169,6 +180,11 @@ public class SolitaireLayout : MonoBehaviour
                 {
                     solitaireKnoppenScript.OpenUitleg();
                     solitaireKnoppenScript.OpenUitleg();
+                }
+                else if (instellingenObj.activeInHierarchy)
+                {
+                    solitaireKnoppenScript.OpenSettings();
+                    solitaireKnoppenScript.OpenSettings();
                 }
                 else
                 {

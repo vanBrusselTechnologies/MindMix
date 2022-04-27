@@ -546,8 +546,8 @@ public class KnoppenScript : MonoBehaviour
             {
                 for (int i = 1; i <= 9; i++)
                 {
-                    string _ = saveScript.stringDict["Button " + dei + " notitie" + i];
-                    if (!_.Equals("  "))
+                    string _ = saveScript.stringDict["Button " + dei + " notitie" + i].Trim();
+                    if (!_.Equals(""))
                     {
                         int __ = int.Parse(_);
                         if (__ == afScript.getallen[getal2])
@@ -575,8 +575,8 @@ public class KnoppenScript : MonoBehaviour
             {
                 for (int i = 1; i <= 9; i++)
                 {
-                    string _ = saveScript.stringDict["Button " + dei + " notitie" + i];
-                    if (!_.Equals("  "))
+                    string _ = saveScript.stringDict["Button " + dei + " notitie" + i].Trim();
+                    if (!_.Equals(""))
                     {
                         int __ = int.Parse(_);
                         if (__ == afScript.getallen[getal2])
@@ -604,8 +604,8 @@ public class KnoppenScript : MonoBehaviour
             {
                 for (int i = 1; i <= 9; i++)
                 {
-                    string _ = saveScript.stringDict["Button " + dei + " notitie" + i];
-                    if (!_.Equals("  "))
+                    string _ = saveScript.stringDict["Button " + dei + " notitie" + i].Trim();
+                    if (!_.Equals(""))
                     {
                         int __ = int.Parse(_);
                         if (__ == afScript.getallen[getal2])

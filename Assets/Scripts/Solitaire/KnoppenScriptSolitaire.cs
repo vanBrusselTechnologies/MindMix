@@ -39,6 +39,10 @@ public class KnoppenScriptSolitaire : MonoBehaviour
     private bool klaar = false;
     private SaveScript saveScript;
     private bool omdraaiKnopGedeactiveerd = false;
+    [SerializeField] private GameObject instellingenObj;
+    [SerializeField] private RectTransform instellingenSluitKnopRect;
+    [SerializeField] private RectTransform instellingenScrolldown;
+    [SerializeField] private RectTransform instellingenScrolldownContent;
 
     private void Awake()
     {
@@ -166,7 +170,7 @@ public class KnoppenScriptSolitaire : MonoBehaviour
         }
         if (een && twee && drie && vier && vijf && zes && zeven)
         {
-            maakAfKnop.transform.localPosition = new Vector3(0, 0f, -1f);
+            maakAfKnop.SetActive(true);
             klaar = true;
         }
     }
@@ -249,7 +253,7 @@ public class KnoppenScriptSolitaire : MonoBehaviour
                 ScriptSolitaire.kaarten[i].transform.SetPositionAndRotation(new Vector3(2.25f, 3f, -2f), new Quaternion(0, 0, 0, 1));
             }
         }
-        maakAfKnop.transform.localPosition = new Vector3(0, -10000000f, -9.45f);
+        maakAfKnop.SetActive(false);
         float safeZoneAntiY = (Screen.safeArea.y - (Screen.height - Screen.safeArea.height - Screen.safeArea.y)) / 2f;
         float safeZoneAntiX = (Screen.safeArea.x - (Screen.width - Screen.safeArea.width - Screen.safeArea.x)) / 2f;
         gehaaldCanvas.SetActive(true);
@@ -455,5 +459,35 @@ public class KnoppenScriptSolitaire : MonoBehaviour
         }
         saveScript.intDict["ReststapelGrootte"] = 0;
         saveScript.intDict["ReststapelOmgekeerdGrootte"] = 0;
+    }
+
+    public void OpenSettings()
+    {
+        if (instellingenObj.activeSelf)
+        {
+            ScriptSolitaire.uitlegActief = false;
+            instellingenObj.SetActive(false);
+            solitaire.SetActive(true);
+            overigCanvas.SetActive(true);
+            solitaireLayout.StartLayout();
+        }
+        else
+        {
+            ScriptSolitaire.uitlegActief = true;
+            solitaire.SetActive(false);
+            overigCanvas.SetActive(false);
+            instellingenObj.SetActive(true);
+            instellingenSluitKnopRect.anchoredPosition = new Vector2(-(Screen.width - Screen.safeArea.width - Screen.safeArea.x) - (Mathf.Min(Screen.safeArea.height, Screen.safeArea.width) * 0.1f * 0.6f), -(Screen.height - Screen.safeArea.height - Screen.safeArea.y) - (Mathf.Min(Screen.safeArea.height, Screen.safeArea.width) * 0.1f * 0.6f));
+            instellingenSluitKnopRect.localScale = new Vector2(Mathf.Min(Screen.safeArea.height, Screen.safeArea.width) * 0.1f, Mathf.Min(Screen.safeArea.height, Screen.safeArea.width) * 0.1f) / 108f;
+            float safeZoneAntiY = (Screen.safeArea.y - (Screen.height - Screen.safeArea.height - Screen.safeArea.y)) / 2f;
+            float safeZoneAntiX = (Screen.safeArea.x - (Screen.width - Screen.safeArea.width - Screen.safeArea.x)) / 2f;
+            Vector3 scrollDownScale = new Vector3(Screen.safeArea.width * 0.98f / 2250f, Screen.safeArea.height * 0.85f / 950f, 1);
+            instellingenScrolldown.localScale = scrollDownScale;
+            float minScaleDeel = Mathf.Min(scrollDownScale.x, scrollDownScale.y);
+            Vector3 scrollDownContentScale = new Vector3(minScaleDeel / scrollDownScale.x, minScaleDeel / scrollDownScale.y, 1);
+            instellingenScrolldownContent.localScale = scrollDownContentScale;
+            Vector3 scrollDownPosition = new Vector3(safeZoneAntiX, safeZoneAntiY + (Screen.safeArea.height * 0.15f / -2f), 0);
+            instellingenScrolldown.anchoredPosition = scrollDownPosition;
+        }
     }
 }

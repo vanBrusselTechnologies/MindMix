@@ -19,6 +19,7 @@ public class KaartSleepScript : MonoBehaviour
     private SaveScript saveScript;
     [SerializeField] private GameObject eventSystem;
     private Vector3 achterkantboven = new Vector3(0, 180, 0);
+    Transform tf;
 
     // Use this for initialization
     private void Start()
@@ -31,6 +32,7 @@ public class KaartSleepScript : MonoBehaviour
             return;
         }
         saveScript = gegevensHouder.GetComponent<SaveScript>();
+        tf = transform;
     }
 
     // Update is called once per frame
@@ -41,7 +43,7 @@ public class KaartSleepScript : MonoBehaviour
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             Vector3 rayPoint = ray.GetPoint(distance);
             rayPoint.z = -7f;
-            gameObject.transform.parent.gameObject.transform.position = rayPoint;
+            tf.parent.gameObject.transform.position = rayPoint;
             if (deTeVerplaatsenKaarten.Count != 0 && KrijgStapelBijPositie(positieMuis) >= 1 && KrijgStapelBijPositie(positieMuis) <= 7)
             {
                 for (int i = 0; i < deTeVerplaatsenKaarten.Count; i++)
@@ -55,10 +57,10 @@ public class KaartSleepScript : MonoBehaviour
             }
         }
     }
-    
+
     private void OnMouseDown()
     {
-        if (gameObject.transform.parent.localEulerAngles == achterkantboven || Input.touchCount == 0) return;
+        if (tf.parent.localEulerAngles == achterkantboven || Input.touchCount == 0) return;
         Vector3 muisPositie = Camera.main.ScreenToWorldPoint(Input.GetTouch(0).position);
         positieMuis = muisPositie;
         deTeVerplaatsenKaarten.Clear();
@@ -66,7 +68,7 @@ public class KaartSleepScript : MonoBehaviour
         aantalKaartenTeVerplaatsen = 1;
         if (stapelInt.IsBetween(1, 7))
         {
-            GameObject parent = gameObject.transform.parent.gameObject;
+            GameObject parent = tf.parent.gameObject;
             List<GameObject> stapel = stapelInt == 1 ? ScriptSolitaire.Stapel1 : stapelInt == 2 ? ScriptSolitaire.Stapel2 : stapelInt == 3 ? ScriptSolitaire.Stapel3 : stapelInt == 4 ? ScriptSolitaire.Stapel4 : stapelInt == 5 ? ScriptSolitaire.Stapel5 : stapelInt == 6 ? ScriptSolitaire.Stapel6 : stapelInt == 7 ? ScriptSolitaire.Stapel7 : null;
             int parentIndex = stapel.IndexOf(parent);
             aantalKaartenTeVerplaatsen = stapel.Count - parentIndex - 1;
@@ -79,7 +81,7 @@ public class KaartSleepScript : MonoBehaviour
                 }
             }
         }
-        kaartsoort_kaartX = gameObject.transform.parent.gameObject.name.Split('_');
+        kaartsoort_kaartX = tf.parent.gameObject.name.Split('_');
         voorsteKaarten = krijgVoorsteKaartvanStapels();
         if (kaartsoort_kaartX[0] == "Schoppe" || kaartsoort_kaartX[0] == "Klaver")
         {
@@ -131,7 +133,7 @@ public class KaartSleepScript : MonoBehaviour
             mogelijk.Add(a);
             Destroy(a);
         }
-        distance = Vector3.Distance(transform.position, Camera.main.transform.position);
+        distance = Vector3.Distance(tf.position, Camera.main.transform.position);
         dragging = true;
         mogelijk = mogelijk.GetDuplicates();
         for (int i = 0; i < mogelijk.Count; i++)
@@ -159,7 +161,7 @@ public class KaartSleepScript : MonoBehaviour
                 List<GameObject> stapel = stapelInt == 1 ? ScriptSolitaire.Stapel1 : stapelInt == 2 ? ScriptSolitaire.Stapel2 : stapelInt == 3 ? ScriptSolitaire.Stapel3 : stapelInt == 4 ? ScriptSolitaire.Stapel4 : stapelInt == 5 ? ScriptSolitaire.Stapel5 : stapelInt == 6 ? ScriptSolitaire.Stapel6 : stapelInt == 7 ? ScriptSolitaire.Stapel7 : null;
                 if(stapel.IndexOf(mogelijk[i]) != -1)
                 {
-                    GameObject parent = gameObject.transform.parent.gameObject;
+                    GameObject parent = tf.parent.gameObject;
                     HaalUitStapels(parent);
                     stapel.Add(parent);
                     saveScript.intDict["Stapel" + stapelInt + ":" + (stapel.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(parent);
@@ -180,7 +182,7 @@ public class KaartSleepScript : MonoBehaviour
             }
             if (!klaar && deTeVerplaatsenKaarten.Count == 0 && KanOpEindStapel())
             {
-                GameObject parent = gameObject.transform.parent.gameObject;
+                GameObject parent = tf.parent.gameObject;
                 HaalUitStapels(parent);
                 int eindStapelInt = kaartsoort_kaartX[0].Equals("Klaver") ? 1 : kaartsoort_kaartX[0].Equals("Ruiten") ? 2 : kaartsoort_kaartX[0].Equals("Harten") ? 3 : kaartsoort_kaartX[0].Equals("Schoppe") ? 4 : 0;
                 List<GameObject> eindStapel = eindStapelInt == 1 ? ScriptSolitaire.EindStapel1 : eindStapelInt == 2 ? ScriptSolitaire.EindStapel2 : eindStapelInt == 3 ? ScriptSolitaire.EindStapel3 : eindStapelInt == 4 ? ScriptSolitaire.EindStapel4 : null;
@@ -197,7 +199,7 @@ public class KaartSleepScript : MonoBehaviour
             if (mogelijk.Count != 0 && stapelInt.IsBetween(1, 7))
             {
                 List<GameObject> stapel = stapelInt == 1 ? ScriptSolitaire.Stapel1 : stapelInt == 2 ? ScriptSolitaire.Stapel2 : stapelInt == 3 ? ScriptSolitaire.Stapel3 : stapelInt == 4 ? ScriptSolitaire.Stapel4 : stapelInt == 5 ? ScriptSolitaire.Stapel5 : stapelInt == 6 ? ScriptSolitaire.Stapel6 : stapelInt == 7 ? ScriptSolitaire.Stapel7 : null;
-                GameObject parent = gameObject.transform.parent.gameObject;
+                GameObject parent = tf.parent.gameObject;
                 HaalUitStapels(parent);
                 stapel.Add(parent);
                 saveScript.intDict["Stapel" + stapelInt + ":" + (stapel.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(parent);

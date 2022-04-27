@@ -66,7 +66,7 @@ public class SolitaireScript : MonoBehaviour
         gegevensScript = gegevensHouder.GetComponent<GegevensHouder>();
         saveScript = gegevensHouder.GetComponent<SaveScript>();
         beloningScript = gegevensHouder.GetComponent<BeloningScript>();
-        maakAfKnop.transform.localPosition = new Vector3(0, -10000000f, -1f);
+        maakAfKnop.SetActive(false);
         knoppenScript = GetComponent<KnoppenScriptSolitaire>();
         if (gegevensScript.startNewSolitaire)
         {
@@ -114,7 +114,7 @@ public class SolitaireScript : MonoBehaviour
             {
                 if (EindStapel1[^1].name.EndsWith('K') && EindStapel2[^1].name.EndsWith('K') && EindStapel3[^1].name.EndsWith('K') && EindStapel4[^1].name.EndsWith('K')) {
                     voltooid = true;
-                    maakAfKnop.transform.localPosition = new Vector3(0, -10000000f, -1f);
+                    maakAfKnop.SetActive(false);
                     Scene scene = SceneManager.GetActiveScene();
                     float tijd = saveScript.floatDict["SolitaireTijd"];
                     saveScript.floatDict["SolitaireSnelsteTijd"] = Mathf.Min(saveScript.floatDict["SolitaireSnelsteTijd"], tijd);
@@ -313,9 +313,9 @@ public class SolitaireScript : MonoBehaviour
         float xStapel7 = saveZoneLinks - saveZoneRechts + (schermWijdte / 81f * 33f);
         float xRestStapelUI = Screen.safeArea.x + Mathf.Min(Screen.safeArea.width / 81f * 33f, Screen.safeArea.height / 81f * 33f * (8f / 4.5f)) + (Screen.safeArea.width / 2f);
         float basisY = saveZoneOnder - saveZoneBoven + (schermHoogte * -1f / 2f / 1.5f) + (schermHoogte / 35f / 1.5f * ((2f + (3f / 6f)) * 10f / 1.5f));
-        float basisYeind = saveZoneOnder - saveZoneBoven + (schermHoogte / 1.5f / 2f * -1f) + (schermHoogte / 35f / 1.5f * ((5f + (1f / 6f)) * 10f / 1.5f));
+        float basisYeind = saveZoneOnder - saveZoneBoven + (schermHoogte * -1f / 2f / 1.5f) + (schermHoogte / 35f / 1.5f * ((5f + (1f / 6f)) * 10f / 1.5f));
         float restStapelBasisYUI = Screen.safeArea.y + (Screen.safeArea.height / 2) + (Screen.safeArea.height / 1.5f / 2f * -1f) + (Screen.safeArea.height / 35f / 1.5f * ((5f + (1f / 6f)) * 10f / 1.5f));
-        float verschilY = 0.3f;
+        float verschilY = 0.3f * saveScript.floatDict["spaceBetweenCardsFactor"];
         float basisZ = -2f;
         float verschilZ = 0.1f;
         if (eersteKeer)

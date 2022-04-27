@@ -1,20 +1,18 @@
-using System.Collections;
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
+using TMPro;
+using UnityEngine.SceneManagement;
 
-public class SudokuInstellingen : MonoBehaviour
+public abstract class BaseSceneSettings : MonoBehaviour
 {
     Achtergrond achtergrondScript;
-    SaveScript saveScript;
+    protected SaveScript saveScript;
     GegevensHouder gegevensScript;
+    [Header("Background settings")]
     [SerializeField] TMP_Dropdown colorDropDown;
     [SerializeField] TMP_Dropdown imageDropDown;
     [SerializeField] TMP_Dropdown bgSoortDropDown;
-    [SerializeField] Toggle dubbelGetalWarningToggle;
-    [SerializeField] Toggle notitieBijwerkToggle;
     bool startValues = true;
+    string sceneName;
 
     // Start is called before the first frame update
     void Start()
@@ -27,8 +25,9 @@ public class SudokuInstellingen : MonoBehaviour
         saveScript = gegevensHouder.GetComponent<SaveScript>();
         achtergrondScript = gegevensHouder.GetComponent<Achtergrond>();
         gegevensScript = gegevensHouder.GetComponent<GegevensHouder>();
+        sceneName = SceneManager.GetActiveScene().name;
         SetBackgroundStartValues();
-        SetSudokuSettingStartValues();
+        SetSettingStartValues();
         startValues = false;
     }
 
@@ -38,12 +37,12 @@ public class SudokuInstellingen : MonoBehaviour
         colorDropDown.options.AddRange(achtergrondScript.gekochteColorOptionData);
         imageDropDown.options.Clear();
         imageDropDown.options.AddRange(achtergrondScript.gekochteImageOptionData);
-        int soort = saveScript.intDict["bgSoortSudoku"];
+        int soort = saveScript.intDict["bgSoort" + sceneName];
         bgSoortDropDown.value = soort;
         if (soort == 1)
         {
             imageDropDown.gameObject.SetActive(true);
-            int bgWaarde = saveScript.intDict["bgWaardeSudoku"];
+            int bgWaarde = saveScript.intDict["bgWaarde" + sceneName];
             int dropdownValue = bgWaarde >= 0 ? achtergrondScript.gekochteImageOptionData.IndexOf(achtergrondScript.imageOptionData[bgWaarde]) : -1;
             imageDropDown.value = dropdownValue;
             colorDropDown.gameObject.SetActive(false);
@@ -51,7 +50,7 @@ public class SudokuInstellingen : MonoBehaviour
         }
         else
         {
-            int bgWaarde = saveScript.intDict["bgWaardeSudoku"];
+            int bgWaarde = saveScript.intDict["bgWaarde" + sceneName];
             int dropdownValue = bgWaarde >= 0 ? achtergrondScript.gekochteColorOptionData.IndexOf(achtergrondScript.colorOptionData[bgWaarde]) : -1;
             imageDropDown.gameObject.SetActive(false);
             imageDropDown.value = 0;
@@ -60,13 +59,7 @@ public class SudokuInstellingen : MonoBehaviour
         }
     }
 
-    private void SetSudokuSettingStartValues()
-    {
-        notitieBijwerkToggle.isOn = saveScript.intDict["notitieBijwerkSettingIsOn"] == 1;
-        dubbelGetalWarningToggle.isOn = saveScript.intDict["dubbelGetalWarningIsOn"] == 1;
-    }
-
-    public void VeranderAchtergrondImg()
+    public void ChangeBackgroundImage()
     {
         if (startValues) return;
         if (imageDropDown.value == -1)
@@ -79,12 +72,12 @@ public class SudokuInstellingen : MonoBehaviour
         {
             saveScript.intDict["bgWaardeAll"] = -2;
         }
-        saveScript.intDict["bgSoortSudoku"] = 1;
-        saveScript.intDict["bgWaardeSudoku"] = bgWaarde;
-        gegevensScript.VeranderOpgeslagenAchtergrond("sudoku", 1, bgWaarde);
+        saveScript.intDict["bgSoort" + sceneName] = 1;
+        saveScript.intDict["bgWaarde" + sceneName] = bgWaarde;
+        gegevensScript.VeranderOpgeslagenAchtergrond(sceneName.ToLower(), 1, bgWaarde);
     }
 
-    public void VeranderAchtergrondKleur()
+    public void ChangeBackgroundColor()
     {
         if (startValues) return;
         if (colorDropDown.value == -1)
@@ -97,12 +90,12 @@ public class SudokuInstellingen : MonoBehaviour
         {
             saveScript.intDict["bgWaardeAll"] = -2;
         }
-        saveScript.intDict["bgSoortSudoku"] = 0;
-        saveScript.intDict["bgWaardeSudoku"] = bgWaarde;
-        gegevensScript.VeranderOpgeslagenAchtergrond("sudoku", 0, bgWaarde);
+        saveScript.intDict["bgSoort" + sceneName] = 0;
+        saveScript.intDict["bgWaarde" + sceneName] = bgWaarde;
+        gegevensScript.VeranderOpgeslagenAchtergrond(sceneName.ToLower(), 0, bgWaarde);
     }
 
-    public void VeranderAchtergrondSoort()
+    public void ChangeBackgroundType()
     {
         if (bgSoortDropDown.value == -1)
         {
@@ -122,13 +115,5 @@ public class SudokuInstellingen : MonoBehaviour
         }
     }
 
-    public void VeranderNotitieBijwerkSetting()
-    {
-        saveScript.intDict["notitieBijwerkSettingIsOn"] = notitieBijwerkToggle.isOn ? 1 : 0;
-    }
-
-    public void VeranderDubbelGetalWarningSetting()
-    {
-        saveScript.intDict["dubbelGetalWarningIsOn"] = dubbelGetalWarningToggle.isOn ? 1 : 0;
-    }
+    public abstract void SetSettingStartValues();
 }

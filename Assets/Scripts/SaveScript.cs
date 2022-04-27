@@ -109,6 +109,7 @@ public class SaveScript : MonoBehaviour
         //Float
         SolitaireFloatNames.Add("SolitaireTijd");
         SolitaireFloatNames.Add("SolitaireSnelsteTijd");
+        SolitaireFloatNames.Add("spaceBetweenCardsFactor");
 
         //Mijnenveger
         //Int

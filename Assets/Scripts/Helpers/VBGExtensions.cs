@@ -131,11 +131,14 @@ namespace VBG.Extensions
             return output;
         }
 
-        public static void AddRange<T>(this List<T> list, List<T> items)
+        public static void AddRange<T>(this List<T> list, params List<T>[] items)
         {
-            for (int i = 0; i < items.Count; i++)
+            foreach (List<T> _items in items)
             {
-                list.Add(items[i]);
+                foreach (T item in _items)
+                {
+                    list.Add(item);
+                }
             }
         }
 
