@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using VBG.Extensions;
 
@@ -58,9 +59,11 @@ public class KaartSleepScript : MonoBehaviour
         }
     }
 
-    private void OnMouseDown()
+    private IEnumerator OnMouseDown()
     {
-        if (tf.parent.localEulerAngles == achterkantboven || Input.touchCount == 0) return;
+        if (tf.parent.localEulerAngles == achterkantboven || Input.touchCount == 0) yield break;
+        yield return new WaitForEndOfFrame();
+        if (UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject != null) yield break;
         Vector3 muisPositie = Camera.main.ScreenToWorldPoint(Input.GetTouch(0).position);
         positieMuis = muisPositie;
         deTeVerplaatsenKaarten.Clear();

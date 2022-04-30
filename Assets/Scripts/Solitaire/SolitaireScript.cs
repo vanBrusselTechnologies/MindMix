@@ -315,7 +315,9 @@ public class SolitaireScript : MonoBehaviour
         float basisY = saveZoneOnder - saveZoneBoven + (schermHoogte * -1f / 2f / 1.5f) + (schermHoogte / 35f / 1.5f * ((2f + (3f / 6f)) * 10f / 1.5f));
         float basisYeind = saveZoneOnder - saveZoneBoven + (schermHoogte * -1f / 2f / 1.5f) + (schermHoogte / 35f / 1.5f * ((5f + (1f / 6f)) * 10f / 1.5f));
         float restStapelBasisYUI = Screen.safeArea.y + (Screen.safeArea.height / 2) + (Screen.safeArea.height / 1.5f / 2f * -1f) + (Screen.safeArea.height / 35f / 1.5f * ((5f + (1f / 6f)) * 10f / 1.5f));
-        float verschilY = 0.3f * saveScript.floatDict["spaceBetweenCardsFactor"];
+        float spaceBetweenCardsFactor = saveScript.floatDict["spaceBetweenCardsFactor"];
+        if (spaceBetweenCardsFactor == 0) spaceBetweenCardsFactor = 1;
+        float verschilY = 0.3f * spaceBetweenCardsFactor;
         float basisZ = -2f;
         float verschilZ = 0.1f;
         if (eersteKeer)
