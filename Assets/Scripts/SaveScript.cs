@@ -10,6 +10,7 @@ using VBG.Extensions;
 
 public class SaveScript : MonoBehaviour
 {
+    static public SaveScript instance;
     Achtergrond achtergrond;
     GegevensHouder gegevensHouder;
     [HideInInspector] public bool ready = false;
@@ -39,6 +40,11 @@ public class SaveScript : MonoBehaviour
     // Start is called before the first frame update
     private void Awake()
     {
+        if (instance != null)
+        {
+            Destroy(gameObject);
+        }
+        instance = this;
         gegevensHouder = GetComponent<GegevensHouder>();
         achtergrond = GetComponent<Achtergrond>();
         DontDestroyOnLoad(this);

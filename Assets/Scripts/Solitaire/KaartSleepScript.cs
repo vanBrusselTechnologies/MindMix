@@ -7,6 +7,7 @@ public class KaartSleepScript : MonoBehaviour
 {
     private SolitaireScript ScriptSolitaire;
     private KnoppenScriptSolitaire knoppenScript;
+    private SolitaireLayout solitaireLayout;
     private float distance;
     private bool dragging;
     private string[] kaartsoort_kaartX = new string[2];
@@ -27,6 +28,7 @@ public class KaartSleepScript : MonoBehaviour
     {
         ScriptSolitaire = eventSystem.GetComponent<SolitaireScript>();
         knoppenScript = eventSystem.GetComponent<KnoppenScriptSolitaire>();
+        solitaireLayout = eventSystem.GetComponent<SolitaireLayout>();
         GameObject gegevensHouder = GameObject.Find("gegevensHouder");
         if (gegevensHouder == null)
         {
@@ -180,7 +182,8 @@ public class KaartSleepScript : MonoBehaviour
                         saveScript.intDict["Stapel" + stapelInt + ":" + (stapel.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(deTeVerplaatsenKaarten[a]);
                     }
                     saveScript.intDict["Stapel" + stapelInt + "Grootte"] = stapel.Count;
-                    ScriptSolitaire.ZetKaartenOpGoedePlek(false);
+                    ScriptSolitaire.DraaiVoorsteKaartOm(false);
+                    solitaireLayout.PositionCards();
                 }
             }
             if (!klaar && deTeVerplaatsenKaarten.Count == 0 && KanOpEindStapel())
@@ -193,7 +196,8 @@ public class KaartSleepScript : MonoBehaviour
                 saveScript.intDict["Eindstapel" + eindStapelInt + ":" + (eindStapel.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(parent);
                 klaar = true;
                 saveScript.intDict["Eindstapel" + eindStapelInt + "Grootte"] = eindStapel.Count;
-                ScriptSolitaire.ZetKaartenOpGoedePlek(false);
+                ScriptSolitaire.DraaiVoorsteKaartOm(false);
+                solitaireLayout.PositionCards();
             }
         }
         if (!klaar)
@@ -217,12 +221,13 @@ public class KaartSleepScript : MonoBehaviour
                     saveScript.intDict["Stapel" + stapelInt + ":" + (stapel.Count - 1)] = ScriptSolitaire.kaarten.IndexOf(deTeVerplaatsenKaarten[a]);
                 }
                 saveScript.intDict["Stapel" + stapelInt + "Grootte"] = stapel.Count;
-                ScriptSolitaire.ZetKaartenOpGoedePlek(false);
+                ScriptSolitaire.DraaiVoorsteKaartOm(false);
+                solitaireLayout.PositionCards();
             }
             else
             {
                 ScriptSolitaire.TijdStraf();
-                ScriptSolitaire.ZetKaartenOpGoedePlek(false);
+                solitaireLayout.PositionCards();
             }
         }
     }

@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class SolitaireScript : MonoBehaviour
 {
+    SolitaireLayout solitaireLayout;
     public List<GameObject> kaarten = new List<GameObject>();
     private List<GameObject> kaartenGeschud = new List<GameObject>();
     [HideInInspector] public List<GameObject> Stapel1 = new List<GameObject>();
@@ -19,7 +20,7 @@ public class SolitaireScript : MonoBehaviour
     [HideInInspector] public List<GameObject> EindStapel2 = new List<GameObject>();
     [HideInInspector] public List<GameObject> EindStapel3 = new List<GameObject>();
     [HideInInspector] public List<GameObject> EindStapel4 = new List<GameObject>();
-    private KnoppenScriptSolitaire knoppenScript;
+    public KnoppenScriptSolitaire knoppenScript;
     private float tijd;
     private float startTijdSolitaire;
     [SerializeField] private TMP_Text tijdtijd;
@@ -66,7 +67,7 @@ public class SolitaireScript : MonoBehaviour
         gegevensScript = gegevensHouder.GetComponent<GegevensHouder>();
         saveScript = gegevensHouder.GetComponent<SaveScript>();
         beloningScript = gegevensHouder.GetComponent<BeloningScript>();
-        maakAfKnop.SetActive(false);
+        solitaireLayout = GetComponent<SolitaireLayout>();
         knoppenScript = GetComponent<KnoppenScriptSolitaire>();
         if (gegevensScript.startNewSolitaire)
         {
@@ -74,7 +75,7 @@ public class SolitaireScript : MonoBehaviour
             VindKaarten();
             SchudKaarten();
             ZetBeginKaartenInStapel(true);
-            ZetKaartenOpGoedePlek(true);
+            //ZetKaartenOpGoedePlek();
             DraaiVoorsteKaartOm(false);
             tijd = 0f;
             startTijdSolitaire = Time.time;
@@ -92,11 +93,12 @@ public class SolitaireScript : MonoBehaviour
             minAantalKaartenStapel6 = saveScript.intDict["Stapel6Gedraaid"];
             minAantalKaartenStapel7 = saveScript.intDict["Stapel7Gedraaid"];
             ZetBeginKaartenInStapel(false);
-            ZetKaartenOpGoedePlek(true);
+            //ZetKaartenOpGoedePlek();
             DraaiVoorsteKaartOm(true);
             tijd = saveScript.floatDict["SolitaireTijd"];
             startTijdSolitaire = Time.time - tijd;
         }
+        solitaireLayout.SetLayout();
     }
 
     // Update is called once per frame
@@ -109,8 +111,7 @@ public class SolitaireScript : MonoBehaviour
         }
         else
         {
-            DraaiVoorsteKaartOm(false);
-            if (EindStapel1.Count >= 13 && EindStapel2.Count >= 13 && EindStapel2.Count >= 13 && EindStapel2.Count >= 13)
+            if (EindStapel1.Count >= 13 && EindStapel2.Count >= 13 && EindStapel3.Count >= 13 && EindStapel4.Count >= 13)
             {
                 if (EindStapel1[^1].name.EndsWith('K') && EindStapel2[^1].name.EndsWith('K') && EindStapel3[^1].name.EndsWith('K') && EindStapel4[^1].name.EndsWith('K')) {
                     voltooid = true;
@@ -281,7 +282,7 @@ public class SolitaireScript : MonoBehaviour
         }
     }
 
-    public void ZetKaartenOpGoedePlek(bool eersteKeer)
+    public void DraaiVoorsteKaartOm(bool meerDraaienDoorGameResume)
     {
         minAantalKaartenStapel1 = Mathf.Min(minAantalKaartenStapel1, Stapel1.Count);
         minAantalKaartenStapel2 = Mathf.Min(minAantalKaartenStapel2, Stapel2.Count);
@@ -297,198 +298,100 @@ public class SolitaireScript : MonoBehaviour
         saveScript.intDict["Stapel5Gedraaid"] = minAantalKaartenStapel5;
         saveScript.intDict["Stapel6Gedraaid"] = minAantalKaartenStapel6;
         saveScript.intDict["Stapel7Gedraaid"] = minAantalKaartenStapel7;
-        float schermWijdte = Camera.main.orthographicSize * 2 * Screen.width / Screen.height / (Screen.width / Screen.safeArea.width);
-        float saveZoneLinks = Camera.main.orthographicSize * Screen.width / Screen.height / (Screen.width / Screen.safeArea.x);
-        float saveZoneRechts = Camera.main.orthographicSize * Screen.width / Screen.height / (Screen.width / (Screen.width - Screen.safeArea.width - Screen.safeArea.x));
-        float schermHoogte = Camera.main.orthographicSize * 2 / (Screen.height / Screen.safeArea.height);
-        float saveZoneOnder = Camera.main.orthographicSize / (Screen.height / Screen.safeArea.y);
-        float saveZoneBoven = Camera.main.orthographicSize / (Screen.height / (Screen.height - Screen.safeArea.height - Screen.safeArea.y));
-        schermWijdte = Mathf.Min(schermWijdte, schermHoogte * (8f / 4.5f));
-        float xStapel1 = saveZoneLinks - saveZoneRechts + (schermWijdte / 81f * -33f); 
-        float xStapel2 = saveZoneLinks - saveZoneRechts + (schermWijdte / 81f * -22f);
-        float xStapel3 = saveZoneLinks - saveZoneRechts + (schermWijdte / 81f * -11f);
-        float xStapel4 = saveZoneLinks - saveZoneRechts + (schermWijdte / 81f * -0f);
-        float xStapel5 = saveZoneLinks - saveZoneRechts + (schermWijdte / 81f * 11f);
-        float xStapel6 = saveZoneLinks - saveZoneRechts + (schermWijdte / 81f * 22f);
-        float xStapel7 = saveZoneLinks - saveZoneRechts + (schermWijdte / 81f * 33f);
-        float xRestStapelUI = Screen.safeArea.x + Mathf.Min(Screen.safeArea.width / 81f * 33f, Screen.safeArea.height / 81f * 33f * (8f / 4.5f)) + (Screen.safeArea.width / 2f);
-        float basisY = saveZoneOnder - saveZoneBoven + (schermHoogte * -1f / 2f / 1.5f) + (schermHoogte / 35f / 1.5f * ((2f + (3f / 6f)) * 10f / 1.5f));
-        float basisYeind = saveZoneOnder - saveZoneBoven + (schermHoogte * -1f / 2f / 1.5f) + (schermHoogte / 35f / 1.5f * ((5f + (1f / 6f)) * 10f / 1.5f));
-        float restStapelBasisYUI = Screen.safeArea.y + (Screen.safeArea.height / 2) + (Screen.safeArea.height / 1.5f / 2f * -1f) + (Screen.safeArea.height / 35f / 1.5f * ((5f + (1f / 6f)) * 10f / 1.5f));
-        float spaceBetweenCardsFactor = saveScript.floatDict["spaceBetweenCardsFactor"];
-        if (spaceBetweenCardsFactor == 0) spaceBetweenCardsFactor = 1;
-        float verschilY = 0.3f * spaceBetweenCardsFactor;
-        float basisZ = -2f;
-        float verschilZ = 0.1f;
-        if (eersteKeer)
-        {
-            Stapel1Houder.transform.position = new Vector3(xStapel1, basisY, -1f);
-            Stapel2Houder.transform.position = new Vector3(xStapel2, basisY, -1f);
-            Stapel3Houder.transform.position = new Vector3(xStapel3, basisY, -1f);
-            Stapel4Houder.transform.position = new Vector3(xStapel4, basisY, -1f);
-            Stapel5Houder.transform.position = new Vector3(xStapel5, basisY, -1f);
-            Stapel6Houder.transform.position = new Vector3(xStapel6, basisY, -1f);
-            Stapel7Houder.transform.position = new Vector3(xStapel7, basisY, -1f);
-            Eindstapel1Houder.transform.position = new Vector3(xStapel1, basisYeind, -1f);
-            Eindstapel2Houder.transform.position = new Vector3(xStapel2, basisYeind, -1f);
-            Eindstapel3Houder.transform.position = new Vector3(xStapel3, basisYeind, -1f);
-            Eindstapel4Houder.transform.position = new Vector3(xStapel4, basisYeind, -1f);
-            RestStapelOmdraaiKnop.transform.position = new Vector3(xRestStapelUI, restStapelBasisYUI, -1f);
-            RestStapelOmdraaiKnop.transform.localScale = new Vector3(1, 1, 1 / Mathf.Min(Screen.safeArea.width / 81f / 10, Screen.safeArea.height / 81f / 10 * (8f / 4.5f))) * Mathf.Min(Screen.safeArea.width / 81f / 10, Screen.safeArea.height / 81f / 10 * (8f / 4.5f));
-        }
-        for (int i = 0; i < Stapel1.Count; i++)
-        {
-            Stapel1[i].transform.position = new Vector3(xStapel1, basisY - (i * verschilY), basisZ - (verschilZ * i));
-        }
-        for (int i = 0; i < Stapel2.Count; i++)
-        {
-            Stapel2[i].transform.position = new Vector3(xStapel2, basisY - (i * verschilY), basisZ - (verschilZ * i));
-        }
-        for (int i = 0; i < Stapel3.Count; i++)
-        {
-            Stapel3[i].transform.position = new Vector3(xStapel3, basisY - (i * verschilY), basisZ - (verschilZ * i));
-        }
-        for (int i = 0; i < Stapel4.Count; i++)
-        {
-            Stapel4[i].transform.position = new Vector3(xStapel4, basisY - (i * verschilY), basisZ - (verschilZ * i));
-        }
-        for (int i = 0; i < Stapel5.Count; i++)
-        {
-            Stapel5[i].transform.position = new Vector3(xStapel5, basisY - (i * verschilY), basisZ - (verschilZ * i));
-        }
-        for (int i = 0; i < Stapel6.Count; i++)
-        {
-            Stapel6[i].transform.position = new Vector3(xStapel6, basisY - (i * verschilY), basisZ - (verschilZ * i));
-        }
-        for (int i = 0; i < Stapel7.Count; i++)
-        {
-            Stapel7[i].transform.position = new Vector3(xStapel7, basisY - (i * verschilY), basisZ - (verschilZ * i));
-        }
-        for (int i = 0; i < EindStapel1.Count; i++)
-        {
-            EindStapel1[i].transform.position = new Vector3(xStapel1, basisYeind, basisZ - (verschilZ * i));
-        }
-        for (int i = 0; i < EindStapel2.Count; i++)
-        {
-            EindStapel2[i].transform.position = new Vector3(xStapel2, basisYeind, basisZ - (verschilZ * i));
-        }
-        for (int i = 0; i < EindStapel3.Count; i++)
-        {
-            EindStapel3[i].transform.position = new Vector3(xStapel3, basisYeind, basisZ - (verschilZ * i));
-        }
-        for (int i = 0; i < EindStapel4.Count; i++)
-        {
-            EindStapel4[i].transform.position = new Vector3(xStapel4, basisYeind, basisZ - (verschilZ * i));
-        }
-        if (knoppenScript.OmgedraaideRest.Count != 0)
-        {
-            for (int i = 0; i < knoppenScript.OmgedraaideRest.Count; i++)
-            {
-                knoppenScript.OmgedraaideRest[i].transform.position = new Vector3(xStapel6, basisYeind, basisZ - (verschilZ * i));
-            }
-        }
-        for (int i = 0; i < StapelRest.Count; i++)
-        {
-            StapelRest[i].transform.position = new Vector3(xStapel7, basisYeind, basisZ - (verschilZ * i));
-        }
-    }
-
-    public void DraaiVoorsteKaartOm(bool meerDraaienDoorGameResume)
-    {
         if (Stapel1.Count != 0)
         {
             if (Stapel1[^1].transform.localEulerAngles == new Vector3(0, 180, 0))
             {
-                Stapel1[^1].transform.localEulerAngles = new Vector3(0, 0, 0);
+                Stapel1[^1].transform.localEulerAngles = Vector3.zero;
             }
         }
         if (Stapel2.Count != 0)
         {
             if (Stapel2[^1].transform.localEulerAngles == new Vector3(0, 180, 0))
             {
-                Stapel2[^1].transform.localEulerAngles = new Vector3(0, 0, 0);
+                Stapel2[^1].transform.localEulerAngles = Vector3.zero;
             }
         }
         if (Stapel3.Count != 0)
         {
             if (Stapel3[^1].transform.localEulerAngles == new Vector3(0, 180, 0))
             {
-                Stapel3[^1].transform.localEulerAngles = new Vector3(0, 0, 0);
+                Stapel3[^1].transform.localEulerAngles = Vector3.zero;
             }
         }
         if (Stapel4.Count != 0)
         {
             if (Stapel4[^1].transform.localEulerAngles == new Vector3(0, 180, 0))
             {
-                Stapel4[^1].transform.localEulerAngles = new Vector3(0, 0, 0);
+                Stapel4[^1].transform.localEulerAngles = Vector3.zero;
             }
         }
         if (Stapel5.Count != 0)
         {
             if (Stapel5[^1].transform.localEulerAngles == new Vector3(0, 180, 0))
             {
-                Stapel5[^1].transform.localEulerAngles = new Vector3(0, 0, 0);
+                Stapel5[^1].transform.localEulerAngles = Vector3.zero;
             }
         }
         if (Stapel6.Count != 0)
         {
             if (Stapel6[^1].transform.localEulerAngles == new Vector3(0, 180, 0))
             {
-                Stapel6[^1].transform.localEulerAngles = new Vector3(0, 0, 0);
+                Stapel6[^1].transform.localEulerAngles = Vector3.zero;
             }
         }
         if (Stapel7.Count != 0)
         {
             if (Stapel7[^1].transform.localEulerAngles == new Vector3(0, 180, 0))
             {
-                Stapel7[^1].transform.localEulerAngles = new Vector3(0, 0, 0);
+                Stapel7[^1].transform.localEulerAngles = Vector3.zero;
             }
         }
         if (meerDraaienDoorGameResume)
         {
             for(int i = 0; i < Stapel1.Count - Mathf.Max(minAantalKaartenStapel1, 1); i++)
             {
-                Stapel1[Stapel1.Count - i - 2].transform.localEulerAngles = new Vector3(0, 0, 0);
+                Stapel1[Stapel1.Count - i - 2].transform.localEulerAngles = Vector3.zero;
             }
             for (int i = 0; i < Stapel2.Count - Mathf.Max(minAantalKaartenStapel2, 1); i++)
             {
-                Stapel2[Stapel2.Count - i - 2].transform.localEulerAngles = new Vector3(0, 0, 0);
+                Stapel2[Stapel2.Count - i - 2].transform.localEulerAngles = Vector3.zero;
             }
             for (int i = 0; i < Stapel3.Count - Mathf.Max(minAantalKaartenStapel3, 1); i++)
             {
-                Stapel3[Stapel3.Count - i - 2].transform.localEulerAngles = new Vector3(0, 0, 0);
+                Stapel3[Stapel3.Count - i - 2].transform.localEulerAngles = Vector3.zero;
             }
             for (int i = 0; i < Stapel4.Count - Mathf.Max(minAantalKaartenStapel4, 1); i++)
             {
-                Stapel4[Stapel4.Count - i - 2].transform.localEulerAngles = new Vector3(0, 0, 0);
+                Stapel4[Stapel4.Count - i - 2].transform.localEulerAngles = Vector3.zero;
             }
             for (int i = 0; i < Stapel5.Count - Mathf.Max(minAantalKaartenStapel5, 1); i++)
             {
-                Stapel5[Stapel5.Count - i - 2].transform.localEulerAngles = new Vector3(0, 0, 0);
+                Stapel5[Stapel5.Count - i - 2].transform.localEulerAngles = Vector3.zero;
             }
             for (int i = 0; i < Stapel6.Count - Mathf.Max(minAantalKaartenStapel6, 1); i++)
             {
-                Stapel6[Stapel6.Count - i - 2].transform.localEulerAngles = new Vector3(0, 0, 0);
+                Stapel6[Stapel6.Count - i - 2].transform.localEulerAngles = Vector3.zero;
             }
             for (int i = 0; i < Stapel7.Count - Mathf.Max(minAantalKaartenStapel7, 1); i++)
             {
-                Stapel7[Stapel7.Count - i - 2].transform.localEulerAngles = new Vector3(0, 0, 0);
+                Stapel7[Stapel7.Count - i - 2].transform.localEulerAngles = Vector3.zero;
             }
             for (int i = 0; i < EindStapel1.Count; i++)
             {
-                EindStapel1[i].transform.localEulerAngles = new Vector3(0, 0, 0);
+                EindStapel1[i].transform.localEulerAngles = Vector3.zero;
             }
             for (int i = 0; i < EindStapel2.Count; i++)
             {
-                EindStapel2[i].transform.localEulerAngles = new Vector3(0, 0, 0);
+                EindStapel2[i].transform.localEulerAngles = Vector3.zero;
             }
             for (int i = 0; i < EindStapel3.Count; i++)
             {
-                EindStapel3[i].transform.localEulerAngles = new Vector3(0, 0, 0);
+                EindStapel3[i].transform.localEulerAngles = Vector3.zero;
             }
             for (int i = 0; i < EindStapel4.Count; i++)
             {
-                EindStapel4[i].transform.localEulerAngles = new Vector3(0, 0, 0);
+                EindStapel4[i].transform.localEulerAngles = Vector3.zero;
             }
             for(int i = 0; i < StapelRest.Count; i++)
             {
@@ -496,7 +399,7 @@ public class SolitaireScript : MonoBehaviour
             }
             for (int i = 0; i < knoppenScript.OmgedraaideRest.Count; i++)
             {
-                knoppenScript.OmgedraaideRest[i].transform.localEulerAngles = new Vector3(0, 0, 0);
+                knoppenScript.OmgedraaideRest[i].transform.localEulerAngles = Vector3.zero;
             }
         }
     }

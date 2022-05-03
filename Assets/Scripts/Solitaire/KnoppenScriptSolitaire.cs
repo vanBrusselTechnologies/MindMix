@@ -177,26 +177,15 @@ public class KnoppenScriptSolitaire : MonoBehaviour
 
     public void OnClickButtonStapelRest()
     {
-        float schermWijdte = Camera.main.orthographicSize * 2 * Screen.width / Screen.height / (Screen.width / Screen.safeArea.width);
-        float saveZoneLinks = Camera.main.orthographicSize * Screen.width / Screen.height / (Screen.width / Screen.safeArea.x);
-        float saveZoneRechts = Camera.main.orthographicSize * Screen.width / Screen.height / (Screen.width / (Screen.width - Screen.safeArea.width - Screen.safeArea.x));
-        float schermHoogte = Camera.main.orthographicSize * 2 / (Screen.height / Screen.safeArea.height);
-        float saveZoneOnder = Camera.main.orthographicSize / (Screen.height / Screen.safeArea.y);
-        float saveZoneBoven = Camera.main.orthographicSize / (Screen.height / (Screen.height - Screen.safeArea.height - Screen.safeArea.y));
-        schermWijdte = Mathf.Min(schermWijdte, schermHoogte * (8f / 4.5f));
-        float xStapel6 = saveZoneLinks - saveZoneRechts + (schermWijdte / 81f * 22f);
-        float xStapel7 = saveZoneLinks - saveZoneRechts + (schermWijdte / 81f * 33f);
-        float basisYeind = saveZoneOnder - saveZoneBoven + (schermHoogte / 1.5f / 2f * -1f) + (schermHoogte / 35f / 1.5f * ((5f + (1f / 6f)) * 10f / 1.5f));
         if (StapelRest.Count != 0)
         {
             OmgedraaideRest.Add(StapelRest[^1]);
             StapelRest.RemoveAt(StapelRest.Count - 1);
             for (int i = 0; i < OmgedraaideRest.Count; i++)
             {
-                OmgedraaideRest[i].transform.position = new Vector3(xStapel6, basisYeind, (-1f) - (i * 0.1f));
                 saveScript.intDict["ReststapelOmgekeerd:" + i] = ScriptSolitaire.kaarten.IndexOf(OmgedraaideRest[i]);
             }
-            OmgedraaideRest[^1].transform.localEulerAngles = new Vector3(0, 0, 0);
+            OmgedraaideRest[^1].transform.localEulerAngles = Vector3.zero;
             saveScript.intDict["ReststapelGrootte"] = StapelRest.Count;
             saveScript.intDict["ReststapelOmgekeerdGrootte"] = OmgedraaideRest.Count;
         }
@@ -211,12 +200,12 @@ public class KnoppenScriptSolitaire : MonoBehaviour
                 saveScript.intDict["Reststapel:" + i] = ScriptSolitaire.kaarten.IndexOf(OmgedraaideRest[totI - (i + 1)]);
                 OmgedraaideRest.RemoveAt(totI - (i + 1));
                 saveScript.intDict["ReststapelOmgekeerd:" + i] = 0;
-                StapelRest[i].transform.position = new Vector3(xStapel7, basisYeind, -1f - (i * 0.1f));
                 StapelRest[i].transform.localEulerAngles = new Vector3(0, 180, 0);
             }
             saveScript.intDict["ReststapelGrootte"] = StapelRest.Count;
             saveScript.intDict["ReststapelOmgekeerdGrootte"] = OmgedraaideRest.Count;
         }
+        solitaireLayout.SetLayout();
     }
 
     public void MaakSolitaireAf(GameObject knop = null)
@@ -254,45 +243,11 @@ public class KnoppenScriptSolitaire : MonoBehaviour
             }
         }
         maakAfKnop.SetActive(false);
-        float safeZoneAntiY = (Screen.safeArea.y - (Screen.height - Screen.safeArea.height - Screen.safeArea.y)) / 2f;
-        float safeZoneAntiX = (Screen.safeArea.x - (Screen.width - Screen.safeArea.width - Screen.safeArea.x)) / 2f;
         gehaaldCanvas.SetActive(true);
-        gehaaldCanvasTitelRect.anchoredPosition = new Vector2(safeZoneAntiX, safeZoneAntiY + (Screen.safeArea.height * (25f / 30f)) - (Screen.height / 2f));
-        gehaaldCanvasTitelRect.sizeDelta = new Vector2(Screen.safeArea.width * 0.85f, Screen.safeArea.height * (10f / 30f));
-        float kleinsteKant = Mathf.Min(Screen.safeArea.height, Screen.safeArea.width);
-        float grootsteKant = Mathf.Max(Screen.safeArea.height, Screen.safeArea.width);
-        if (kleinsteKant - 1440 > 0)
-        {
-            float factor = Mathf.Min(kleinsteKant / 1500f, grootsteKant / 2500f);
-            gehaaldCanvasTitelRect.localScale = Vector2.one * factor;
-            gehaaldCanvasTitelRect.sizeDelta /= factor;
-        }
-        gehaaldCanvasTekstRect.anchoredPosition = new Vector2(safeZoneAntiX, safeZoneAntiY + (Screen.safeArea.height * (17f / 30f)) - (Screen.height / 2f));
-        gehaaldCanvasTekstRect.sizeDelta = new Vector2(Screen.safeArea.width * 0.85f, Screen.safeArea.height * (8f / 30f));
-        gehaaldCanvasRewardRect.anchoredPosition = new Vector2(safeZoneAntiX, safeZoneAntiY + (Screen.safeArea.height * (10f / 30f)) - (Screen.height / 2f));
-        if (Application.internetReachability == NetworkReachability.NotReachable || !gehaaldCanvasRewardVerdubbelObj.activeInHierarchy)
-        {
-            gehaaldCanvasRewardVerdubbelObj.SetActive(false);
-            float scaleFactor = Mathf.Min(Screen.safeArea.width * 0.85f / 500, Screen.safeArea.height * (5f / 30f) / 175);
-            gehaaldCanvasRewardRect.localScale = new Vector3(scaleFactor, scaleFactor, 1);
-            gehaaldCanvasRewardRect.sizeDelta = new Vector2(500, 175);
-        }
-        else
-        {
-            float scaleFactor = Mathf.Min(Screen.safeArea.width * 0.85f / 1000, Screen.safeArea.height * (5f / 30f) / 175);
-            gehaaldCanvasRewardRect.localScale = new Vector3(scaleFactor, scaleFactor, 1);
-            gehaaldCanvasRewardRect.sizeDelta = new Vector2(1000, 175);
-        }
-        float sizeX = Screen.safeArea.width * 0.45f;
-        float sizeY = Screen.safeArea.height * (5f / 30f);
-        float posY = safeZoneAntiY + (Screen.safeArea.height * (3.5f / 30f)) - (Screen.height / 2f);
-        gehaaldCanvasStartNieuweKnopRect.anchoredPosition = new Vector2(safeZoneAntiX - (Screen.safeArea.width / 4f), posY);
-        gehaaldCanvasStartNieuweKnopRect.sizeDelta = new Vector2(sizeX, sizeY);
-        gehaaldCanvasNaarMenuKnopRect.anchoredPosition = new Vector2(safeZoneAntiX + (Screen.safeArea.width / 4f), posY);
-        gehaaldCanvasNaarMenuKnopRect.sizeDelta = new Vector2(sizeX, sizeY);
         solitaire.SetActive(false);
         overigCanvas.SetActive(false);
         uitlegUI.SetActive(false);
+        solitaireLayout.PositionCards();
         WisOudeGegevens();
         saveScript.intDict["aanSolitaireBegonnen"] = 0;
     }
@@ -312,7 +267,7 @@ public class KnoppenScriptSolitaire : MonoBehaviour
     {
         bool verticaal = Screen.safeArea.width < Screen.safeArea.height;
         bool openen;
-        if (showMenuKnop.transform.localEulerAngles == new Vector3(0, 0, 0) || showMenuKnop.transform.localEulerAngles == new Vector3(0, 0, 270))
+        if (showMenuKnop.transform.localEulerAngles == Vector3.zero || showMenuKnop.transform.localEulerAngles == new Vector3(0, 0, 270))
         {
             showMenuKnop.transform.localEulerAngles += new Vector3(0, 0, 180);
             openen = false;
@@ -408,35 +363,12 @@ public class KnoppenScriptSolitaire : MonoBehaviour
 
     public void OpenUitleg()
     {
-        if (uitlegUI.activeSelf)
-        {
-            ScriptSolitaire.uitlegActief = false;
-            uitlegUI.SetActive(false);
-            solitaire.SetActive(true);
-            overigCanvas.SetActive(true);
-            solitaireLayout.StartLayout();
-        }
-        else
-        {
-            ScriptSolitaire.uitlegActief = true;
-            solitaire.SetActive(false);
-            overigCanvas.SetActive(false);
-            uitlegUI.SetActive(true);
-            uitlegTitelRect.anchoredPosition = new Vector2(0, Screen.safeArea.height * (1f / 3f));
-            uitlegTitelRect.sizeDelta = new Vector2(Screen.safeArea.width * 0.75f, Screen.safeArea.height);
-            uitlegTekstRect.anchoredPosition = new Vector2(0, -Screen.safeArea.height / 8f);
-            uitlegTekstRect.sizeDelta = new Vector2(Screen.safeArea.width * 0.85f, Screen.safeArea.height / 2);
-            uitlegSluitKnopRect.anchoredPosition = new Vector2(-(Screen.width - Screen.safeArea.width - Screen.safeArea.x) - (Mathf.Min(Screen.safeArea.height, Screen.safeArea.width) * 0.1f * 0.6f), -(Screen.height - Screen.safeArea.height - Screen.safeArea.y) - (Mathf.Min(Screen.safeArea.height, Screen.safeArea.width) * 0.1f * 0.6f));
-            uitlegSluitKnopRect.localScale = new Vector2(Mathf.Min(Screen.safeArea.height, Screen.safeArea.width) * 0.1f, Mathf.Min(Screen.safeArea.height, Screen.safeArea.width) * 0.1f) / 108f;
-            float kleinsteKant = Mathf.Min(Screen.safeArea.height, Screen.safeArea.width);
-            float grootsteKant = Mathf.Max(Screen.safeArea.height, Screen.safeArea.width);
-            if (kleinsteKant - 1440 > 0)
-            {
-                float factor = Mathf.Min(kleinsteKant / 1500f, grootsteKant / 2500f);
-                uitlegTitelRect.localScale = Vector2.one * factor;
-                uitlegTitelRect.sizeDelta /= factor;
-            }
-        }
+        bool helpUIActive = uitlegUI.activeSelf;
+        ScriptSolitaire.uitlegActief = !helpUIActive;
+        uitlegUI.SetActive(!helpUIActive);
+        solitaire.SetActive(helpUIActive);
+        overigCanvas.SetActive(helpUIActive);
+        solitaireLayout.SetLayout();
     }
 
     public void WisOudeGegevens()
@@ -463,31 +395,11 @@ public class KnoppenScriptSolitaire : MonoBehaviour
 
     public void OpenSettings()
     {
-        if (instellingenObj.activeSelf)
-        {
-            ScriptSolitaire.uitlegActief = false;
-            instellingenObj.SetActive(false);
-            solitaire.SetActive(true);
-            overigCanvas.SetActive(true);
-            solitaireLayout.StartLayout();
-        }
-        else
-        {
-            ScriptSolitaire.uitlegActief = true;
-            solitaire.SetActive(false);
-            overigCanvas.SetActive(false);
-            instellingenObj.SetActive(true);
-            instellingenSluitKnopRect.anchoredPosition = new Vector2(-(Screen.width - Screen.safeArea.width - Screen.safeArea.x) - (Mathf.Min(Screen.safeArea.height, Screen.safeArea.width) * 0.1f * 0.6f), -(Screen.height - Screen.safeArea.height - Screen.safeArea.y) - (Mathf.Min(Screen.safeArea.height, Screen.safeArea.width) * 0.1f * 0.6f));
-            instellingenSluitKnopRect.localScale = new Vector2(Mathf.Min(Screen.safeArea.height, Screen.safeArea.width) * 0.1f, Mathf.Min(Screen.safeArea.height, Screen.safeArea.width) * 0.1f) / 108f;
-            float safeZoneAntiY = (Screen.safeArea.y - (Screen.height - Screen.safeArea.height - Screen.safeArea.y)) / 2f;
-            float safeZoneAntiX = (Screen.safeArea.x - (Screen.width - Screen.safeArea.width - Screen.safeArea.x)) / 2f;
-            Vector3 scrollDownScale = new Vector3(Screen.safeArea.width * 0.98f / 2250f, Screen.safeArea.height * 0.85f / 950f, 1);
-            instellingenScrolldown.localScale = scrollDownScale;
-            float minScaleDeel = Mathf.Min(scrollDownScale.x, scrollDownScale.y);
-            Vector3 scrollDownContentScale = new Vector3(minScaleDeel / scrollDownScale.x, minScaleDeel / scrollDownScale.y, 1);
-            instellingenScrolldownContent.localScale = scrollDownContentScale;
-            Vector3 scrollDownPosition = new Vector3(safeZoneAntiX, safeZoneAntiY + (Screen.safeArea.height * 0.15f / -2f), 0);
-            instellingenScrolldown.anchoredPosition = scrollDownPosition;
-        }
+        bool settingObjActive = instellingenObj.activeSelf;
+        ScriptSolitaire.uitlegActief = !settingObjActive;
+        instellingenObj.SetActive(!settingObjActive);
+        solitaire.SetActive(settingObjActive);
+        overigCanvas.SetActive(settingObjActive);
+        solitaireLayout.SetLayout();
     }
 }

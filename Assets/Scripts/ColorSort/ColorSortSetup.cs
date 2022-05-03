@@ -49,22 +49,21 @@ public class ColorSortSetup : BaseLayout
     }
 
     // Start is called before the first frame update
-    void Start()
+    protected override void Start()
     {
+        base.Start();
         InstantiateRingStack();
         InstantiateRings();
-        SetLayout();
-        ScreenRotated.AddListener(SetLayout);
     }
 
-    void SetLayout()
+    public override void SetLayout()
     {
         stapelsHouder.localPosition = Vector3.zero;
         stapelsHouder.localScale = Vector3.one;
-        int kolommenMogelijk = Mathf.FloorToInt(ScreenSafeAreaWidthInUnits / (2f * ruimteTussenStapels + breedteRing)) + Mathf.FloorToInt(ScreenSafeAreaWidthInUnits % (2f * ruimteTussenStapels + breedteRing) / breedteRing);
+        int kolommenMogelijk = Mathf.FloorToInt(screenSafeAreaWidthInUnits / (2f * ruimteTussenStapels + breedteRing)) + Mathf.FloorToInt(screenSafeAreaWidthInUnits % (2f * ruimteTussenStapels + breedteRing) / breedteRing);
         int columnsToUse = Mathf.CeilToInt((ringstapels[difficulty] + 1f) / Mathf.CeilToInt((ringstapels[difficulty] + 1f) / kolommenMogelijk));
         float hoogteStapel = hoogteRing * (ringenPerStapel[difficulty] + 1);
-        int rijenMogelijk = Mathf.FloorToInt(ScreenSafeAreaHeightInUnits / (ruimteTussenStapels * 2f + hoogteStapel)) + Mathf.FloorToInt(ScreenSafeAreaHeightInUnits % (ruimteTussenStapels * 2f + hoogteStapel) / hoogteStapel);
+        int rijenMogelijk = Mathf.FloorToInt(screenSafeAreaHeightInUnits / (ruimteTussenStapels * 2f + hoogteStapel)) + Mathf.FloorToInt(screenSafeAreaHeightInUnits % (ruimteTussenStapels * 2f + hoogteStapel) / hoogteStapel);
         int benodigdeRijen = 1;
         if (ringstapels[difficulty] + 1 > columnsToUse)
         {
@@ -78,10 +77,10 @@ public class ColorSortSetup : BaseLayout
         while (benodigdeRijen > rijenMogelijk)
         {
             scale -= 0.01f;
-            kolommenMogelijk = Mathf.FloorToInt(ScreenSafeAreaWidthInUnits / (scale * (2f * ruimteTussenStapels + breedteRing))) + Mathf.FloorToInt(ScreenSafeAreaWidthInUnits % (scale * (2f * ruimteTussenStapels + breedteRing)) / (scale * breedteRing));
+            kolommenMogelijk = Mathf.FloorToInt(screenSafeAreaWidthInUnits / (scale * (2f * ruimteTussenStapels + breedteRing))) + Mathf.FloorToInt(screenSafeAreaWidthInUnits % (scale * (2f * ruimteTussenStapels + breedteRing)) / (scale * breedteRing));
             columnsToUse = Mathf.CeilToInt((ringstapels[difficulty] + 1f) / Mathf.CeilToInt((ringstapels[difficulty] + 1f) / kolommenMogelijk));
             hoogteStapel = hoogteRing * (ringenPerStapel[difficulty] + 1);
-            rijenMogelijk = Mathf.FloorToInt(ScreenSafeAreaHeightInUnits / (scale * (ruimteTussenStapels * 2f + hoogteStapel))) + Mathf.FloorToInt(ScreenSafeAreaHeightInUnits % (scale * (ruimteTussenStapels * 2f + hoogteStapel)) / (scale * hoogteStapel));
+            rijenMogelijk = Mathf.FloorToInt(screenSafeAreaHeightInUnits / (scale * (ruimteTussenStapels * 2f + hoogteStapel))) + Mathf.FloorToInt(screenSafeAreaHeightInUnits % (scale * (ruimteTussenStapels * 2f + hoogteStapel)) / (scale * hoogteStapel));
             benodigdeRijen = 1;
             if (ringstapels[difficulty] + 1 > columnsToUse)
             {
@@ -99,8 +98,8 @@ public class ColorSortSetup : BaseLayout
                 yi = Mathf.FloorToInt(i / columnsToUse);
                 xi = i - yi * columnsToUse;
             }
-            float posX = -ScreenWidthInUnits / 2f + xi * (ruimteTussenStapels * 2f + breedteRing) + breedteRing / 2f;
-            float posY = ScreenHeightInUnits / 2f - (yi * ((ruimteTussenStapels * 2f) + hoogteStapel)) - hoogteStapel + hoogteRing / 2f;
+            float posX = -screenWidthInUnits / 2f + xi * (ruimteTussenStapels * 2f + breedteRing) + breedteRing / 2f;
+            float posY = screenHeightInUnits / 2f - (yi * ((ruimteTussenStapels * 2f) + hoogteStapel)) - hoogteStapel + hoogteRing / 2f;
             stapelTf.position = new Vector3(posX, posY, 0);
             for (int a = 0; a < stapelTf.childCount; a++)
             {
@@ -114,7 +113,7 @@ public class ColorSortSetup : BaseLayout
         }
         float spelBreedte = prefabInLaatsteKolom.position.x - stapels[0].transform.position.x + breedteRing;
         float spelHoogte = stapels[0].transform.position.y - stapels[^1].transform.position.y + hoogteStapel;
-        Vector3 positionChange = new Vector3((ScreenWidthInUnits - spelBreedte) / 2f, -(ScreenHeightInUnits - spelHoogte) / 2f, 0);
+        Vector3 positionChange = new Vector3((screenWidthInUnits - spelBreedte) / 2f, -(screenHeightInUnits - spelHoogte) / 2f, 0);
         foreach (Transform child in stapelsHouder)
         {
             child.position += positionChange;
