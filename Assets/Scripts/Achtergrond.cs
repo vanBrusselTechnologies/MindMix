@@ -11,6 +11,9 @@ public class Achtergrond : MonoBehaviour
     [SerializeField] private GameObject achtergrond;
     [SerializeField] private RectTransform achtergrondRect;
     [SerializeField] private Image achtergrondImg;
+    [SerializeField] private GameObject lightObj;
+    [SerializeField] private GameObject cameraObj;
+    [SerializeField] private GameObject backgroundCanvasObj;
     private Color wisselColor = Color.white;
     private int klaar = 0;
     private bool isPaused = false;
@@ -61,8 +64,9 @@ public class Achtergrond : MonoBehaviour
         }
         SceneManager.activeSceneChanged += OnSceneLoaded;
         DontDestroyOnLoad(this);
-        DontDestroyOnLoad(achtergrond.transform.parent.gameObject);
-        DontDestroyOnLoad(Camera.main.gameObject);
+        DontDestroyOnLoad(backgroundCanvasObj);
+        DontDestroyOnLoad(cameraObj);
+        DontDestroyOnLoad(lightObj);
         vorigeScreenWidth = Screen.width;
         vorigeSafezoneY = Screen.safeArea.y;
         vorigeSafezoneX = Screen.safeArea.x;

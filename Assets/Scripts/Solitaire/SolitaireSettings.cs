@@ -6,7 +6,7 @@ public class SolitaireSettings : BaseSceneSettings
     [Header("Other settings")]
     [SerializeField] Slider spaceBetweenCardsFactor;
 
-    public override void SetSettingStartValues()
+    protected override void SetSettingStartValues()
     {
         float value = saveScript.floatDict["spaceBetweenCardsFactor"];
         if (value == 0f) value = 1f;

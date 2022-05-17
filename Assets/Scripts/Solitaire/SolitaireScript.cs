@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class SolitaireScript : MonoBehaviour
 {
-    SolitaireLayout solitaireLayout;
+    private SolitaireLayout solitaireLayout;
     public List<GameObject> kaarten = new List<GameObject>();
     private List<GameObject> kaartenGeschud = new List<GameObject>();
     [HideInInspector] public List<GameObject> Stapel1 = new List<GameObject>();
@@ -20,7 +20,7 @@ public class SolitaireScript : MonoBehaviour
     [HideInInspector] public List<GameObject> EindStapel2 = new List<GameObject>();
     [HideInInspector] public List<GameObject> EindStapel3 = new List<GameObject>();
     [HideInInspector] public List<GameObject> EindStapel4 = new List<GameObject>();
-    public KnoppenScriptSolitaire knoppenScript;
+    private KnoppenScriptSolitaire knoppenScript;
     private float tijd;
     private float startTijdSolitaire;
     [SerializeField] private TMP_Text tijdtijd;
@@ -71,11 +71,8 @@ public class SolitaireScript : MonoBehaviour
         knoppenScript = GetComponent<KnoppenScriptSolitaire>();
         if (gegevensScript.startNewSolitaire)
         {
-            knoppenScript.WisOudeGegevens();
-            VindKaarten();
             SchudKaarten();
             ZetBeginKaartenInStapel(true);
-            //ZetKaartenOpGoedePlek();
             DraaiVoorsteKaartOm(false);
             tijd = 0f;
             startTijdSolitaire = Time.time;
@@ -84,7 +81,6 @@ public class SolitaireScript : MonoBehaviour
         }
         else
         {
-            VindKaarten();
             minAantalKaartenStapel1 = saveScript.intDict["Stapel1Gedraaid"];
             minAantalKaartenStapel2 = saveScript.intDict["Stapel2Gedraaid"];
             minAantalKaartenStapel3 = saveScript.intDict["Stapel3Gedraaid"];
@@ -93,7 +89,6 @@ public class SolitaireScript : MonoBehaviour
             minAantalKaartenStapel6 = saveScript.intDict["Stapel6Gedraaid"];
             minAantalKaartenStapel7 = saveScript.intDict["Stapel7Gedraaid"];
             ZetBeginKaartenInStapel(false);
-            //ZetKaartenOpGoedePlek();
             DraaiVoorsteKaartOm(true);
             tijd = saveScript.floatDict["SolitaireTijd"];
             startTijdSolitaire = Time.time - tijd;
@@ -127,32 +122,6 @@ public class SolitaireScript : MonoBehaviour
             }
             HoelangAlBezig();
         }
-    }
-
-    public void VindKaarten()
-    {
-        float schermWijdte = Camera.main.orthographicSize * 2 * Screen.width / Screen.height / (Screen.width / Screen.safeArea.width);
-        float schermHoogte = Camera.main.orthographicSize * 2 / (Screen.height / Screen.safeArea.height);
-        schermWijdte = Mathf.Min(schermWijdte, schermHoogte * (8f / 4.5f));
-        Vector3 scaleKaart = new Vector3(1, 1, 1 / (schermWijdte / 81f * 10)) * schermWijdte / 81f * 10;
-        for (int i = 0; i < 52; i++)
-        {
-            kaarten[i].transform.localScale = scaleKaart;
-            kaarten[i].transform.localEulerAngles = new Vector3(0, 180, 0);
-        }
-        Vector3 scaleStapel = new Vector3(1, 1, 1 / (schermWijdte / 81f * 10)) * (schermWijdte / 81f * 10);
-        Stapel1Houder.transform.localScale = scaleStapel;
-        Stapel2Houder.transform.localScale = scaleStapel;
-        Stapel3Houder.transform.localScale = scaleStapel;
-        Stapel4Houder.transform.localScale = scaleStapel;
-        Stapel5Houder.transform.localScale = scaleStapel;
-        Stapel6Houder.transform.localScale = scaleStapel;
-        Stapel7Houder.transform.localScale = scaleStapel;
-        Eindstapel1Houder.transform.localScale = scaleStapel;
-        Eindstapel2Houder.transform.localScale = scaleStapel;
-        Eindstapel3Houder.transform.localScale = scaleStapel;
-        Eindstapel4Houder.transform.localScale = scaleStapel;
-        RestStapelOmdraaiKnop.transform.localScale = new Vector3(1, 1, 1 / (Screen.safeArea.width / 81f / 10)) * (Screen.safeArea.width / 81f / 10);
     }
 
     public void SchudKaarten()

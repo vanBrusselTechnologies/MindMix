@@ -1,59 +1,43 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
 using UnityEngine.UI;
 
-public class KnoppenScript : MonoBehaviour
+public class KnoppenScript : BaseUIHandler
 {
-    public List<GameObject> knoppen;
-    private PlaatsGetallen plaatsScript;
-    private AfScript afScript;
-    private int gekozendifficulty;
-    public int knopIndex = -1;
-    public bool isButtonSelected = false;
-    private List<int> buttonsGehad = new List<int>();
-    //private bool eersteKeer = false;
-    [SerializeField] private GameObject showMenuKnop;
-    [SerializeField] private GameObject SudokuMenu;
-    [SerializeField] private RectTransform SudokuMenuRect;
-    [SerializeField] private RectTransform showMenuKnopRect;
-    [SerializeField] private RectTransform menuNieuweKnopRect;
-    [SerializeField] private RectTransform menuDifficultyRect;
-    [SerializeField] private RectTransform terugNaarMenuKnopRect;
+    [Header("Other scene specific")]
     [SerializeField] private GameObject achtergrondNormaalOfNotitieKnop;
-    [SerializeField] private GameObject uitlegUI;
-    [SerializeField] private RectTransform uitlegTitelRect;
-    [SerializeField] private RectTransform uitlegTekstRect;
-    [SerializeField] private RectTransform uitlegSluitKnopRect;
-    [SerializeField] private GameObject sudoku;
-    [SerializeField] private GameObject overigCanvas;
     [SerializeField] private TMP_Dropdown dropdown;
-    [SerializeField] private GameObject instellingenObj;
-    [SerializeField] private RectTransform instellingenSluitKnopRect;
-    [SerializeField] private RectTransform instellingenScrolldown;
-    [SerializeField] private RectTransform instellingenScrolldownContent;
-    private GegevensHouder gegevensScript;
-    private SaveScript saveScript;
     [SerializeField] private MeshRenderer normaalKnopMesh;
     [SerializeField] private MeshRenderer notitieKnopMesh;
+
+    [HideInInspector] public List<GameObject> knoppen;
+    private int gekozendifficulty;
+    [HideInInspector] public int knopIndex = -1;
+    [HideInInspector] public bool isButtonSelected = false;
+    private List<int> buttonsGehad = new List<int>();
     private bool naamIsEventSystem = true;
     Color dubbelGetalKleurRood = new Color(1f, 0, 0, 1f);
     Color normaalVakjesKleur = new Color(175f / 255f, 175f / 255f, 175f / 255f, 60f / 255f);
 
+    private PlaatsGetallen plaatsScript;
+    private AfScript afScript;
+    private SudokuLayout sudokuLayout;
+
+    protected override void SetLayout()
+    {
+        sudokuLayout.SetLayout();
+    }
+
     // Use this for initialization
     public void Startt()
     {
-        GameObject gegevensHouder = GameObject.Find("gegevensHouder");
-        if (gegevensHouder == null)
-        {
-            return;
-        }
-        gegevensScript = gegevensHouder.GetComponent<GegevensHouder>();
-        saveScript = gegevensHouder.GetComponent<SaveScript>();
+        if (saveScript == null) return;
         plaatsScript = GetComponent<PlaatsGetallen>();
         afScript = GetComponent<AfScript>();
+        sudokuLayout = GetComponent<SudokuLayout>();
+        dropdown.value = saveScript.intDict["difficulty"];
         buttonsGehad.Clear();
         for (int i = 1; i < 82; i++)
         {
@@ -65,7 +49,6 @@ public class KnoppenScript : MonoBehaviour
             naamIsEventSystem = false;
             return;
         }
-        SudokuMenu.SetActive(false);
         if (saveScript.intDict["dubbelGetalWarningIsOn"] == 1)
         {
             CheckVoorDubbelGetal();
@@ -75,15 +58,7 @@ public class KnoppenScript : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        if (!naamIsEventSystem)
-        {
-            return;
-        }
-        if (afScript.GehaaldCanvas.activeInHierarchy)
-        {
-            return;
-        }
-        if (gegevensScript == null)
+        if (!naamIsEventSystem || finishedGameUIObj.activeInHierarchy || saveScript == null)
         {
             return;
         }
@@ -110,13 +85,12 @@ public class KnoppenScript : MonoBehaviour
     {
         gekozendifficulty = dropdown.value;
         saveScript.intDict["difficulty"] = gekozendifficulty;
-        gegevensScript.startNewSudoku = true;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        nogEenSudoku();
     }
 
     public void nogEenSudoku()
     {
-        gegevensScript.startNewSudoku = true;
+        gegevensHouder.startNewSudoku = true;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
@@ -124,8 +98,7 @@ public class KnoppenScript : MonoBehaviour
     {
         int difficulty = saveScript.intDict["difficulty"];
         saveScript.intDict["difficulty"] = difficulty + 1;
-        gegevensScript.startNewSudoku = true;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        nogEenSudoku();
     }
 
     public void isSelected()
@@ -143,11 +116,6 @@ public class KnoppenScript : MonoBehaviour
                 saveScript.intDict["Button " + i] = 0;
             }
         }
-    }
-
-    public void terugNaarMenu()
-    {
-        SceneManager.LoadScene("SpellenOverzicht");
     }
 
     public void getalGeklikt()
@@ -172,7 +140,7 @@ public class KnoppenScript : MonoBehaviour
                     WerkNotitiesBij(dei);
                 }
             }
-            else if (!plaatsScript.NormaalGetal)
+            else
             {
                 RectTransform rect = knoppen[dei].transform.GetChild(0).GetComponent<RectTransform>();
                 rect.offsetMax = new Vector2(0, 0);
@@ -241,146 +209,12 @@ public class KnoppenScript : MonoBehaviour
         }
     }
 
-    public void OpenMenu()
+    public override void OpenSettings()
     {
-        bool verticaal = Screen.safeArea.width < Screen.safeArea.height;
-        bool openen;
-        if (showMenuKnop.transform.localEulerAngles == new Vector3(0, 0, 0) || showMenuKnop.transform.localEulerAngles == new Vector3(0, 0, 270))
+        bool settingObjActive = settingsCanvasObj.activeSelf;
+        base.OpenSettings();
+        if (settingObjActive)
         {
-            showMenuKnop.transform.localEulerAngles += new Vector3(0, 0, 180);
-            openen = false;
-        }
-        else
-        {
-            showMenuKnop.transform.localEulerAngles -= new Vector3(0, 0, 180);
-            openen = true;
-        }
-        SudokuMenu.SetActive(true);
-        if (openen)
-        {
-            if (verticaal)
-            {
-                SudokuMenuRect.sizeDelta = new Vector2(Screen.width, Screen.safeArea.y + Screen.safeArea.height * 0.15f);
-                SudokuMenuRect.anchoredPosition = new Vector2(0, -SudokuMenuRect.sizeDelta.y / 2f + Screen.safeArea.y);
-                float schaal = Mathf.Min(Mathf.Min(Screen.safeArea.height, Screen.safeArea.width) / 1080f * 1.1f, Mathf.Max(Screen.safeArea.height, Screen.safeArea.width) / 2520f * 1.1f);
-                menuNieuweKnopRect.anchoredPosition = new Vector2(SudokuMenuRect.sizeDelta.x / 4f, Screen.safeArea.y / 2f);
-                menuNieuweKnopRect.localScale = new Vector3(schaal, schaal, 1);
-                menuDifficultyRect.anchoredPosition = new Vector2(-SudokuMenuRect.sizeDelta.x / 4f, Screen.safeArea.y / 2f);
-                menuDifficultyRect.localScale = new Vector3(schaal, schaal, 1);
-            }
-            else
-            {
-                SudokuMenuRect.sizeDelta = new Vector2(Screen.safeArea.x + Screen.safeArea.width * 0.2f, Screen.height);
-                SudokuMenuRect.anchoredPosition = new Vector2(Screen.safeArea.x - SudokuMenuRect.sizeDelta.x / 2f - (Screen.width / 2), Screen.height / 2f);
-                float schaal = Mathf.Min(Mathf.Min(Screen.safeArea.height, Screen.safeArea.width) / 1080f * 1f, Mathf.Max(Screen.safeArea.height, Screen.safeArea.width) / 2520f * 1f);
-                terugNaarMenuKnopRect.transform.SetParent(SudokuMenu.transform);
-                terugNaarMenuKnopRect.sizeDelta = new Vector2(Screen.safeArea.height / 11, Screen.safeArea.height / 11);
-                terugNaarMenuKnopRect.anchoredPosition = new Vector2(Screen.safeArea.x - SudokuMenuRect.sizeDelta.x / 2f + terugNaarMenuKnopRect.sizeDelta.x / 2f, -Screen.safeArea.y / 2f + Screen.height / 2f - terugNaarMenuKnopRect.sizeDelta.y / 2f);
-                menuNieuweKnopRect.anchoredPosition = new Vector2(Screen.safeArea.x / 2f, -Screen.safeArea.height / 8f);
-                menuNieuweKnopRect.localScale = new Vector3(schaal, schaal, 1);
-                menuDifficultyRect.anchoredPosition = new Vector2(Screen.safeArea.x / 2f, Screen.safeArea.height / 8f);
-                menuDifficultyRect.localScale = new Vector3(schaal, schaal, 1);
-            }
-            dropdown.value = saveScript.intDict["difficulty"];
-        }
-        StartCoroutine(LaatMenuZien(openen, verticaal));
-    }
-
-    private IEnumerator LaatMenuZien(bool welLatenZien, bool verticaal)
-    {
-        float speed = 50f;
-        SudokuMenu.SetActive(true);
-        if (verticaal)
-        {
-            if (welLatenZien)
-            {
-                showMenuKnop.transform.Translate(Vector3.up * speed);
-                SudokuMenu.transform.Translate(Vector3.up * speed);
-                if (SudokuMenuRect.anchoredPosition.y > SudokuMenuRect.sizeDelta.y / 2f)
-                {
-                    showMenuKnopRect.anchoredPosition = new Vector2(0, SudokuMenuRect.sizeDelta.y + showMenuKnopRect.sizeDelta.y / 2f);
-                    SudokuMenuRect.anchoredPosition = new Vector2(0, SudokuMenuRect.sizeDelta.y / 2f);
-                    StopAllCoroutines();
-                }
-            }
-            else
-            {
-                showMenuKnop.transform.Translate(1.5f * speed * Vector3.up);
-                SudokuMenu.transform.Translate(1.5f * speed * Vector3.down);
-                if (SudokuMenuRect.anchoredPosition.y < -SudokuMenuRect.sizeDelta.y / 2f + Screen.safeArea.y)
-                {
-                    showMenuKnopRect.anchoredPosition = new Vector2(0, Screen.safeArea.y + showMenuKnopRect.sizeDelta.y / 2f);
-                    SudokuMenu.SetActive(false);
-                    StopAllCoroutines();
-                }
-            }
-        }
-        else
-        {
-            if (welLatenZien)
-            {
-                showMenuKnop.transform.Translate(Vector3.up * speed);
-                SudokuMenu.transform.Translate(Vector3.right * speed);
-                if (SudokuMenuRect.anchoredPosition.x > SudokuMenuRect.sizeDelta.x / 2f - (Screen.width / 2))
-                {
-                    showMenuKnopRect.anchoredPosition = new Vector2(SudokuMenuRect.sizeDelta.x - (Screen.width / 2f) + showMenuKnopRect.sizeDelta.y / 2f, Screen.height / 2f);
-                    SudokuMenuRect.anchoredPosition = new Vector2((SudokuMenuRect.sizeDelta.x / 2f) - (Screen.width / 2f), Screen.height / 2f);
-                    StopAllCoroutines();
-                }
-            }
-            else
-            {
-                showMenuKnop.transform.Translate(1.5f * speed * Vector3.up);
-                SudokuMenu.transform.Translate(1.5f * speed * Vector3.left);
-                if (SudokuMenuRect.anchoredPosition.x < -SudokuMenuRect.sizeDelta.x / 2f - (Screen.width / 2) + Screen.safeArea.x)
-                {
-                    showMenuKnopRect.anchoredPosition = new Vector2(Screen.safeArea.x - (Screen.width / 2f) + showMenuKnopRect.sizeDelta.y / 2f, Screen.height / 2f);
-                    SudokuMenu.SetActive(false);
-                    StopAllCoroutines();
-                }
-            }
-        }
-        yield return gegevensScript.wachtHonderdste;
-        StartCoroutine(LaatMenuZien(welLatenZien, verticaal));
-    }
-
-    public void OpenUitleg()
-    {
-        if (uitlegUI.activeSelf)
-        {
-            uitlegUI.SetActive(false);
-            sudoku.SetActive(true);
-            overigCanvas.SetActive(true);
-        }
-        else
-        {
-            uitlegUI.SetActive(true);
-            uitlegTitelRect.anchoredPosition = new Vector2(0, Screen.safeArea.height * (1f / 3f));
-            uitlegTitelRect.sizeDelta = new Vector2(Screen.safeArea.width * 0.75f, Screen.safeArea.height);
-            uitlegTekstRect.anchoredPosition = new Vector2(0, -Screen.safeArea.height / 8f);
-            uitlegTekstRect.sizeDelta = new Vector2(Screen.safeArea.width * 0.85f, Screen.safeArea.height / 2);
-            uitlegSluitKnopRect.anchoredPosition = new Vector2(-(Screen.width - Screen.safeArea.width - Screen.safeArea.x) - (Mathf.Min(Screen.safeArea.height, Screen.safeArea.width) * 0.1f * 0.6f), -(Screen.height - Screen.safeArea.height - Screen.safeArea.y) - (Mathf.Min(Screen.safeArea.height, Screen.safeArea.width) * 0.1f * 0.6f));
-            uitlegSluitKnopRect.localScale = new Vector2(Mathf.Min(Screen.safeArea.height, Screen.safeArea.width) * 0.1f, Mathf.Min(Screen.safeArea.height, Screen.safeArea.width) * 0.1f) / 108f;
-            sudoku.SetActive(false);
-            overigCanvas.SetActive(false);
-            float kleinsteKant = Mathf.Min(Screen.safeArea.height, Screen.safeArea.width);
-            float grootsteKant = Mathf.Max(Screen.safeArea.height, Screen.safeArea.width);
-            if (kleinsteKant - 1440 > 0)
-            {
-                float factor = Mathf.Min(kleinsteKant / 1500f, grootsteKant / 2500f);
-                uitlegTitelRect.localScale = Vector2.one * factor;
-                uitlegTitelRect.sizeDelta /= factor;
-            }
-        }
-    }
-
-    public void OpenSudokuSettings()
-    {
-        if (instellingenObj.activeSelf)
-        {
-            instellingenObj.SetActive(false);
-            sudoku.SetActive(true);
-            overigCanvas.SetActive(true);
             if (saveScript.intDict["dubbelGetalWarningIsOn"] == 1)
             {
                 CheckVoorDubbelGetal();
@@ -395,23 +229,6 @@ public class KnoppenScript : MonoBehaviour
                     knop.colors = colorBlock;
                 }
             }
-        }
-        else
-        {
-            float safeZoneAntiY = (Screen.safeArea.y - (Screen.height - Screen.safeArea.height - Screen.safeArea.y)) / 2f;
-            float safeZoneAntiX = (Screen.safeArea.x - (Screen.width - Screen.safeArea.width - Screen.safeArea.x)) / 2f;
-            instellingenObj.SetActive(true);
-            instellingenSluitKnopRect.anchoredPosition = new Vector2(-(Screen.width - Screen.safeArea.width - Screen.safeArea.x) - (Mathf.Min(Screen.safeArea.height, Screen.safeArea.width) * 0.1f * 0.6f), -(Screen.height - Screen.safeArea.height - Screen.safeArea.y) - (Mathf.Min(Screen.safeArea.height, Screen.safeArea.width) * 0.1f * 0.6f));
-            instellingenSluitKnopRect.localScale = new Vector2(Mathf.Min(Screen.safeArea.height, Screen.safeArea.width) * 0.1f, Mathf.Min(Screen.safeArea.height, Screen.safeArea.width) * 0.1f) / 108f;
-            sudoku.SetActive(false);
-            overigCanvas.SetActive(false);
-            Vector3 scrollDownScale = new Vector3(Screen.safeArea.width * 0.98f / 2250f, Screen.safeArea.height * 0.85f / 950f, 1);
-            instellingenScrolldown.localScale = scrollDownScale;
-            float minScaleDeel = Mathf.Min(scrollDownScale.x, scrollDownScale.y);
-            Vector3 scrollDownContentScale = new Vector3(minScaleDeel / scrollDownScale.x, minScaleDeel / scrollDownScale.y, 1);
-            instellingenScrolldownContent.localScale = scrollDownContentScale;
-            Vector3 scrollDownPosition = new Vector3(safeZoneAntiX, safeZoneAntiY + (Screen.safeArea.height * 0.15f / -2f), 0);
-            instellingenScrolldown.anchoredPosition = scrollDownPosition;
         }
     }
 

@@ -1,64 +1,37 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
 
-public class KnoppenScriptSolitaire : MonoBehaviour
+public class KnoppenScriptSolitaire : BaseUIHandler
 {
+    [Header("Other scene specific")]
+    [SerializeField] private TMP_Text beloningText;
+    [SerializeField] private GameObject maakAfKnop;
+    [SerializeField] private GameObject restStapelOmdraaiKnop;
     private List<GameObject> StapelRest = new List<GameObject>();
     [HideInInspector] public List<GameObject> OmgedraaideRest = new List<GameObject>();
-    private SolitaireScript ScriptSolitaire;
-    private SolitaireLayout solitaireLayout;
-    [SerializeField] private GameObject showMenuKnop;
-    [SerializeField] private RectTransform showMenuKnopRect;
-    [SerializeField] private RectTransform menuImageRect;
-    [SerializeField] private RectTransform menuNieuweKnopRect;
-    [SerializeField] private RectTransform terugNaarMenuKnopRect;
-    [SerializeField] private GameObject SolitaireMenu;
-    [SerializeField] private RectTransform SolitaireMenuRect;
-    [SerializeField] private GameObject uitlegUI;
-    [SerializeField] private RectTransform uitlegTitelRect;
-    [SerializeField] private RectTransform uitlegTekstRect;
-    [SerializeField] private RectTransform uitlegSluitKnopRect;
-    [SerializeField] private GameObject solitaire;
-    [SerializeField] private GameObject overigCanvas;
-    public GameObject gehaaldCanvas;
-    [SerializeField] private TMP_Text beloningText;
-    [SerializeField] private RectTransform gehaaldCanvasTitelRect;
-    [SerializeField] private RectTransform gehaaldCanvasTekstRect;
-    [SerializeField] private RectTransform gehaaldCanvasStartNieuweKnopRect;
-    [SerializeField] private RectTransform gehaaldCanvasNaarMenuKnopRect;
-    [SerializeField] private RectTransform gehaaldCanvasRewardRect;
-    [SerializeField] private GameObject gehaaldCanvasRewardVerdubbelObj;
-    [SerializeField] private GameObject maakAfKnop;
-    [SerializeField] private GameObject terugNaarMenuKnop;
-    [SerializeField] private GameObject restStapelOmdraaiKnop;
-    private GegevensHouder gegevensScript;
-    private BeloningScript beloningScript;
-    private bool klaar = false;
-    private SaveScript saveScript;
+    private bool canBeFinished = false;
     private bool omdraaiKnopGedeactiveerd = false;
-    [SerializeField] private GameObject instellingenObj;
-    [SerializeField] private RectTransform instellingenSluitKnopRect;
-    [SerializeField] private RectTransform instellingenScrolldown;
-    [SerializeField] private RectTransform instellingenScrolldownContent;
 
-    private void Awake()
+    private SolitaireScript solitaireScript;
+    private SolitaireLayout solitaireLayout;
+    private BeloningScript beloningScript;
+
+    protected override void SetLayout()
     {
+        solitaireLayout.SetLayout();
+    }
+
+    protected override void Start()
+    {
+        base.Start();
+        if (saveScript == null) return;
         solitaireLayout = GetComponent<SolitaireLayout>();
-        ScriptSolitaire = GetComponent<SolitaireScript>();
-        StapelRest = ScriptSolitaire.StapelRest;
-        SolitaireMenu.SetActive(false);
-        GameObject gegevensHouder = GameObject.Find("gegevensHouder");
-        if (gegevensHouder == null)
-        {
-            return;
-        }
-        gegevensScript = gegevensHouder.GetComponent<GegevensHouder>();
-        beloningScript = gegevensHouder.GetComponent<BeloningScript>();
-        saveScript = gegevensHouder.GetComponent<SaveScript>();
-        if (gegevensScript.startNewSolitaire)
+        solitaireScript = GetComponent<SolitaireScript>();
+        StapelRest = solitaireScript.StapelRest;
+        beloningScript = gegevensHouder.gameObject.GetComponent<BeloningScript>();
+        if (gegevensHouder.startNewSolitaire)
         {
             WisOudeGegevens();
         }
@@ -67,7 +40,7 @@ public class KnoppenScriptSolitaire : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        if (gehaaldCanvas.activeInHierarchy)
+        if (finishedGameUIObj.activeInHierarchy)
         {
             return;
         }
@@ -76,7 +49,7 @@ public class KnoppenScriptSolitaire : MonoBehaviour
             omdraaiKnopGedeactiveerd = true;
             restStapelOmdraaiKnop.SetActive(false);
         }
-        if (klaar) return;
+        if (canBeFinished) return;
         bool een = false;
         bool twee = false;
         bool drie = false;
@@ -84,94 +57,94 @@ public class KnoppenScriptSolitaire : MonoBehaviour
         bool vijf = false;
         bool zes = false;
         bool zeven = false;
-        if (ScriptSolitaire.Stapel1.Count == 0)
+        if (solitaireScript.Stapel1.Count == 0)
         {
             een = true;
         }
-        else if (ScriptSolitaire.Stapel1[0].name == "leeg_leeg")
+        else if (solitaireScript.Stapel1[0].name == "leeg_leeg")
         {
             een = true;
         }
-        else if (ScriptSolitaire.Stapel1[0].transform.localEulerAngles != new Vector3(0, 180, 0))
+        else if (solitaireScript.Stapel1[0].transform.localEulerAngles != new Vector3(0, 180, 0))
         {
             een = true;
         }
-        if (ScriptSolitaire.Stapel2.Count == 0)
+        if (solitaireScript.Stapel2.Count == 0)
         {
             twee = true;
         }
-        else if (ScriptSolitaire.Stapel2[0].name == "leeg_leeg")
+        else if (solitaireScript.Stapel2[0].name == "leeg_leeg")
         {
             twee = true;
         }
-        else if (ScriptSolitaire.Stapel2[0].transform.localEulerAngles != new Vector3(0, 180, 0))
+        else if (solitaireScript.Stapel2[0].transform.localEulerAngles != new Vector3(0, 180, 0))
         {
             twee = true;
         }
-        if (ScriptSolitaire.Stapel3.Count == 0)
+        if (solitaireScript.Stapel3.Count == 0)
         {
             drie = true;
         }
-        else if (ScriptSolitaire.Stapel3[0].name == "leeg_leeg")
+        else if (solitaireScript.Stapel3[0].name == "leeg_leeg")
         {
             drie = true;
         }
-        else if (ScriptSolitaire.Stapel3[0].transform.localEulerAngles != new Vector3(0, 180, 0))
+        else if (solitaireScript.Stapel3[0].transform.localEulerAngles != new Vector3(0, 180, 0))
         {
             drie = true;
         }
-        if (ScriptSolitaire.Stapel4.Count == 0)
+        if (solitaireScript.Stapel4.Count == 0)
         {
             vier = true;
         }
-        else if (ScriptSolitaire.Stapel4[0].name == "leeg_leeg")
+        else if (solitaireScript.Stapel4[0].name == "leeg_leeg")
         {
             vier = true;
         }
-        else if (ScriptSolitaire.Stapel4[0].transform.localEulerAngles != new Vector3(0, 180, 0))
+        else if (solitaireScript.Stapel4[0].transform.localEulerAngles != new Vector3(0, 180, 0))
         {
             vier = true;
         }
-        if (ScriptSolitaire.Stapel5.Count == 0)
+        if (solitaireScript.Stapel5.Count == 0)
         {
             vijf = true;
         }
-        else if (ScriptSolitaire.Stapel5[0].name == "leeg_leeg")
+        else if (solitaireScript.Stapel5[0].name == "leeg_leeg")
         {
             vijf = true;
         }
-        else if (ScriptSolitaire.Stapel5[0].transform.localEulerAngles != new Vector3(0, 180, 0))
+        else if (solitaireScript.Stapel5[0].transform.localEulerAngles != new Vector3(0, 180, 0))
         {
             vijf = true;
         }
-        if (ScriptSolitaire.Stapel6.Count == 0)
+        if (solitaireScript.Stapel6.Count == 0)
         {
             zes = true;
         }
-        else if (ScriptSolitaire.Stapel6[0].name == "leeg_leeg")
+        else if (solitaireScript.Stapel6[0].name == "leeg_leeg")
         {
             zes = true;
         }
-        else if (ScriptSolitaire.Stapel6[0].transform.localEulerAngles != new Vector3(0, 180, 0))
+        else if (solitaireScript.Stapel6[0].transform.localEulerAngles != new Vector3(0, 180, 0))
         {
             zes = true;
         }
-        if (ScriptSolitaire.Stapel7.Count == 0)
+        if (solitaireScript.Stapel7.Count == 0)
         {
             zeven = true;
         }
-        else if (ScriptSolitaire.Stapel7[0].name == "leeg_leeg")
+        else if (solitaireScript.Stapel7[0].name == "leeg_leeg")
         {
             zeven = true;
         }
-        else if (ScriptSolitaire.Stapel7[0].transform.localEulerAngles != new Vector3(0, 180, 0))
+        else if (solitaireScript.Stapel7[0].transform.localEulerAngles != new Vector3(0, 180, 0))
         {
             zeven = true;
         }
         if (een && twee && drie && vier && vijf && zes && zeven)
         {
             maakAfKnop.SetActive(true);
-            klaar = true;
+            canBeFinished = true;
         }
     }
 
@@ -183,7 +156,7 @@ public class KnoppenScriptSolitaire : MonoBehaviour
             StapelRest.RemoveAt(StapelRest.Count - 1);
             for (int i = 0; i < OmgedraaideRest.Count; i++)
             {
-                saveScript.intDict["ReststapelOmgekeerd:" + i] = ScriptSolitaire.kaarten.IndexOf(OmgedraaideRest[i]);
+                saveScript.intDict["ReststapelOmgekeerd:" + i] = solitaireScript.kaarten.IndexOf(OmgedraaideRest[i]);
             }
             OmgedraaideRest[^1].transform.localEulerAngles = Vector3.zero;
             saveScript.intDict["ReststapelGrootte"] = StapelRest.Count;
@@ -197,7 +170,7 @@ public class KnoppenScriptSolitaire : MonoBehaviour
             for (int i = 0; i < totI; i++)
             {
                 StapelRest.Add(OmgedraaideRest[totI - (i + 1)]);
-                saveScript.intDict["Reststapel:" + i] = ScriptSolitaire.kaarten.IndexOf(OmgedraaideRest[totI - (i + 1)]);
+                saveScript.intDict["Reststapel:" + i] = solitaireScript.kaarten.IndexOf(OmgedraaideRest[totI - (i + 1)]);
                 OmgedraaideRest.RemoveAt(totI - (i + 1));
                 saveScript.intDict["ReststapelOmgekeerd:" + i] = 0;
                 StapelRest[i].transform.localEulerAngles = new Vector3(0, 180, 0);
@@ -218,157 +191,52 @@ public class KnoppenScriptSolitaire : MonoBehaviour
             saveScript.intDict["SolitairesGespeeld"] += 1;
             beloningText.text = beloningScript.Beloning(scene: scene, score: tijd, doelwitText: beloningText).ToString();
         }
-        ScriptSolitaire.voltooid = true;
-        for (int i = 0; i < ScriptSolitaire.kaarten.Count; i++)
+        solitaireScript.voltooid = true;
+        for (int i = 0; i < solitaireScript.kaarten.Count; i++)
         {
-            if (ScriptSolitaire.kaarten[i].name.Split('_')[1] != "K")
+            if (solitaireScript.kaarten[i].name.Split('_')[1] != "K")
             {
-                ScriptSolitaire.kaarten[i].transform.position = new Vector3(0, 0, 10);
+                solitaireScript.kaarten[i].transform.position = new Vector3(0, 0, 10);
             }
-            else if (ScriptSolitaire.kaarten[i].name.Split('_')[0] == "Klaver")
+            else if (solitaireScript.kaarten[i].name.Split('_')[0] == "Klaver")
             {
-                ScriptSolitaire.kaarten[i].transform.SetPositionAndRotation(new Vector3(-3f, 3f, -2f), new Quaternion(0, 0, 0, 1));
+                solitaireScript.kaarten[i].transform.SetPositionAndRotation(new Vector3(-3f, 3f, -2f), new Quaternion(0, 0, 0, 1));
             }
-            else if (ScriptSolitaire.kaarten[i].name.Split('_')[0] == "Ruiten")
+            else if (solitaireScript.kaarten[i].name.Split('_')[0] == "Ruiten")
             {
-                ScriptSolitaire.kaarten[i].transform.SetPositionAndRotation(new Vector3(-1.25f, 3f, -2f), new Quaternion(0, 0, 0, 1));
+                solitaireScript.kaarten[i].transform.SetPositionAndRotation(new Vector3(-1.25f, 3f, -2f), new Quaternion(0, 0, 0, 1));
             }
-            else if (ScriptSolitaire.kaarten[i].name.Split('_')[0] == "Harten")
+            else if (solitaireScript.kaarten[i].name.Split('_')[0] == "Harten")
             {
-                ScriptSolitaire.kaarten[i].transform.SetPositionAndRotation(new Vector3(0.5f, 3f, -2f), new Quaternion(0, 0, 0, 1));
+                solitaireScript.kaarten[i].transform.SetPositionAndRotation(new Vector3(0.5f, 3f, -2f), new Quaternion(0, 0, 0, 1));
             }
-            else if (ScriptSolitaire.kaarten[i].name.Split('_')[0] == "Schoppe")
+            else if (solitaireScript.kaarten[i].name.Split('_')[0] == "Schoppe")
             {
-                ScriptSolitaire.kaarten[i].transform.SetPositionAndRotation(new Vector3(2.25f, 3f, -2f), new Quaternion(0, 0, 0, 1));
+                solitaireScript.kaarten[i].transform.SetPositionAndRotation(new Vector3(2.25f, 3f, -2f), new Quaternion(0, 0, 0, 1));
             }
         }
         maakAfKnop.SetActive(false);
-        gehaaldCanvas.SetActive(true);
-        solitaire.SetActive(false);
-        overigCanvas.SetActive(false);
-        uitlegUI.SetActive(false);
-        solitaireLayout.PositionCards();
+        finishedGameUIObj.SetActive(true);
+        gameSpecificRootObj.SetActive(false);
+        generalCanvasObj.SetActive(false);
+        menuCanvasObj.SetActive(false);
+        helpUICanvasObj.SetActive(false);
+        settingsCanvasObj.SetActive(false);
+        solitaireLayout.SetLayout();
         WisOudeGegevens();
         saveScript.intDict["aanSolitaireBegonnen"] = 0;
     }
 
     public void nieuweSolitaire()
     {
-        gegevensScript.startNewSolitaire = true;
+        gegevensHouder.startNewSolitaire = true;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-    public void terugNaarMenu()
+    public override void OpenHelpUI()
     {
-        SceneManager.LoadScene("SpellenOverzicht");
-    }
-
-    public void OpenMenu()
-    {
-        bool verticaal = Screen.safeArea.width < Screen.safeArea.height;
-        bool openen;
-        if (showMenuKnop.transform.localEulerAngles == Vector3.zero || showMenuKnop.transform.localEulerAngles == new Vector3(0, 0, 270))
-        {
-            showMenuKnop.transform.localEulerAngles += new Vector3(0, 0, 180);
-            openen = false;
-        }
-        else
-        {
-            showMenuKnop.transform.localEulerAngles -= new Vector3(0, 0, 180);
-            openen = true;
-        }
-        SolitaireMenu.SetActive(true);
-        if (openen)
-        {
-            if (verticaal)
-            {
-                SolitaireMenuRect.sizeDelta = new Vector2(Screen.width, Screen.safeArea.y + Screen.safeArea.height * 0.15f);
-                SolitaireMenuRect.anchoredPosition = new Vector2(0, -SolitaireMenuRect.sizeDelta.y / 2f + Screen.safeArea.y);
-                float schaal = Mathf.Min(Mathf.Min(Screen.safeArea.height, Screen.safeArea.width) / 1080f * 1.1f, Mathf.Max(Screen.safeArea.height, Screen.safeArea.width) / 2520f * 1.1f);
-                menuNieuweKnopRect.anchoredPosition = new Vector2(0, Screen.safeArea.y / 2f);
-                menuNieuweKnopRect.localScale = new Vector3(schaal, schaal, 1);
-            }
-            else
-            {
-                SolitaireMenuRect.sizeDelta = new Vector2(Screen.safeArea.x + Screen.safeArea.width * 0.2f, Screen.height);
-                SolitaireMenuRect.anchoredPosition = new Vector2(Screen.safeArea.x - SolitaireMenuRect.sizeDelta.x / 2f - (Screen.width / 2), Screen.height / 2f);
-                float schaal = Mathf.Min(Mathf.Min(Screen.safeArea.height, Screen.safeArea.width) / 1080f * 1f, Mathf.Max(Screen.safeArea.height, Screen.safeArea.width) / 2520f * 1f);
-                terugNaarMenuKnopRect.transform.SetParent(SolitaireMenu.transform);
-                terugNaarMenuKnopRect.sizeDelta = new Vector2(Screen.safeArea.height / 11, Screen.safeArea.height / 11);
-                terugNaarMenuKnopRect.anchoredPosition = new Vector2(Screen.safeArea.x - SolitaireMenuRect.sizeDelta.x / 2f + terugNaarMenuKnopRect.sizeDelta.x / 2f, -Screen.safeArea.y / 2f + Screen.height / 2f - terugNaarMenuKnopRect.sizeDelta.y / 2f);
-                menuNieuweKnopRect.anchoredPosition = new Vector2(Screen.safeArea.x / 2f, 0);
-                menuNieuweKnopRect.localScale = new Vector3(schaal, schaal, 1);
-            }
-        }
-        StartCoroutine(LaatMenuZien(openen, verticaal));
-    }
-
-    private IEnumerator LaatMenuZien(bool welLatenZien, bool verticaal)
-    {
-        float speed = 50f;
-        SolitaireMenu.SetActive(true);
-        if (verticaal)
-        {
-            if (welLatenZien)
-            {
-                showMenuKnop.transform.Translate(Vector3.up * speed);
-                SolitaireMenu.transform.Translate(Vector3.up * speed);
-                if (SolitaireMenuRect.anchoredPosition.y > SolitaireMenuRect.sizeDelta.y / 2f)
-                {
-                    showMenuKnopRect.anchoredPosition = new Vector2(0, SolitaireMenuRect.sizeDelta.y + showMenuKnopRect.sizeDelta.y / 2f);
-                    SolitaireMenuRect.anchoredPosition = new Vector2(0, SolitaireMenuRect.sizeDelta.y / 2f);
-                    StopAllCoroutines();
-                }
-            }
-            else
-            {
-                showMenuKnop.transform.Translate(1.5f * speed * Vector3.up);
-                SolitaireMenu.transform.Translate(1.5f * speed * Vector3.down);
-                if (SolitaireMenuRect.anchoredPosition.y < -SolitaireMenuRect.sizeDelta.y / 2f + Screen.safeArea.y)
-                {
-                    showMenuKnopRect.anchoredPosition = new Vector2(0, Screen.safeArea.y + showMenuKnopRect.sizeDelta.y / 2f);
-                    SolitaireMenu.SetActive(false);
-                    StopAllCoroutines();
-                }
-            }
-        }
-        else
-        {
-            if (welLatenZien)
-            {
-                showMenuKnop.transform.Translate(Vector3.up * speed);
-                SolitaireMenu.transform.Translate(Vector3.right * speed);
-                if (SolitaireMenuRect.anchoredPosition.x > SolitaireMenuRect.sizeDelta.x / 2f - (Screen.width / 2))
-                {
-                    showMenuKnopRect.anchoredPosition = new Vector2(SolitaireMenuRect.sizeDelta.x - (Screen.width / 2f) + showMenuKnopRect.sizeDelta.y / 2f, Screen.height / 2f);
-                    SolitaireMenuRect.anchoredPosition = new Vector2((SolitaireMenuRect.sizeDelta.x / 2f) - (Screen.width / 2f), Screen.height / 2f);
-                    StopAllCoroutines();
-                }
-            }
-            else
-            {
-                showMenuKnop.transform.Translate(1.5f * speed * Vector3.up);
-                SolitaireMenu.transform.Translate(1.5f * speed * Vector3.left);
-                if (SolitaireMenuRect.anchoredPosition.x < -SolitaireMenuRect.sizeDelta.x / 2f - (Screen.width / 2) + Screen.safeArea.x)
-                {
-                    showMenuKnopRect.anchoredPosition = new Vector2(Screen.safeArea.x - (Screen.width / 2f) + showMenuKnopRect.sizeDelta.y / 2f, Screen.height / 2f);
-                    SolitaireMenu.SetActive(false);
-                    StopAllCoroutines();
-                }
-            }
-        }
-        yield return gegevensScript.wachtHonderdste;
-        StartCoroutine(LaatMenuZien(welLatenZien, verticaal));
-    }
-
-    public void OpenUitleg()
-    {
-        bool helpUIActive = uitlegUI.activeSelf;
-        ScriptSolitaire.uitlegActief = !helpUIActive;
-        uitlegUI.SetActive(!helpUIActive);
-        solitaire.SetActive(helpUIActive);
-        overigCanvas.SetActive(helpUIActive);
-        solitaireLayout.SetLayout();
+        base.OpenHelpUI();
+        solitaireScript.uitlegActief = helpUICanvasObj.activeSelf;
     }
 
     public void WisOudeGegevens()
@@ -393,13 +261,9 @@ public class KnoppenScriptSolitaire : MonoBehaviour
         saveScript.intDict["ReststapelOmgekeerdGrootte"] = 0;
     }
 
-    public void OpenSettings()
+    public override void OpenSettings()
     {
-        bool settingObjActive = instellingenObj.activeSelf;
-        ScriptSolitaire.uitlegActief = !settingObjActive;
-        instellingenObj.SetActive(!settingObjActive);
-        solitaire.SetActive(settingObjActive);
-        overigCanvas.SetActive(settingObjActive);
-        solitaireLayout.SetLayout();
+        base.OpenSettings();
+        solitaireScript.uitlegActief = settingsCanvasObj.activeSelf;
     }
 }

@@ -1,210 +1,191 @@
 using UnityEngine;
 
-public class MijnenVegerLayout : MonoBehaviour
+public class MijnenVegerLayout : BaseLayout
 {
-    private bool isPaused = false;
-    private bool wasPaused = false;
-    private KnoppenScriptMijnenVeger MVKnoppenScript;
+    [Header("Other scene specific")]
+    [SerializeField] private RectTransform finishedGameUIWinTextRect;
+    [SerializeField] private RectTransform finishedGameUILossTextRect;
+    [SerializeField] private Transform gridTransform;
+    [SerializeField] private Transform mvField;
+    [SerializeField] private GameObject line;
+    [SerializeField] private RectTransform flagOrShovelButtonRect;
+    [SerializeField] private Transform bombsToGoTransform;
+    [SerializeField] private Transform minesweeperRootObjTransform;
+
+    [HideInInspector] public int verticalSideBoxCount = 22;
+    [HideInInspector] public int horizontalSideBoxCount = 16;
+    [HideInInspector] public float mvButtonSize = 0.0003726f;
+
     private MijnenVegerScript mvScript;
-    private int klaar = 0;
-    private float vorigeScreenWidth;
-    private float vorigeSafezoneY;
-    private float vorigeSafezoneX;
-    [SerializeField] private GameObject mijnenVegerMenu;
-    [SerializeField] private RectTransform menuShowKnopRect;
-    [SerializeField] private GameObject raster;
-    [SerializeField] private GameObject lijn;
-    [SerializeField] private GameObject uitlegUI;
-    [SerializeField] private RectTransform uitlegOpenKnopRect;
-    [SerializeField] private Transform terugNaarMenuKnopCanvas;
-    [SerializeField] private RectTransform terugNaarMenuKnopRect;
-    [SerializeField] private RectTransform vlagOfSchepKnop;
-    [SerializeField] private GameObject bommenTeGaanObj;
-    [HideInInspector] public int langeKant = 22;
-    [HideInInspector] public int korteKant = 16;
-    [HideInInspector] public float breedteMvKnop = 0.0003726f;
 
     // Start is called before the first frame update
-    private void Start()
+    protected override void Start()
     {
-        GameObject gegevensHouder = GameObject.Find("gegevensHouder");
-        if (gegevensHouder == null)
-        {
-            return;
-        }
-        MVKnoppenScript = GetComponent<KnoppenScriptMijnenVeger>();
         mvScript = GetComponent<MijnenVegerScript>();
-        vorigeScreenWidth = Screen.width;
-        vorigeSafezoneY = Screen.safeArea.y;
-        vorigeSafezoneX = Screen.safeArea.x;
-        SetLayout();
+        base.Start();
     }
 
-    private void SetLayout()
+    public override void SetLayout()
     {
-        for (int i = 0; i < raster.transform.childCount; i++)
+        base.SetLayout();
+    }
+
+    protected override void SetLayoutBasic()
+    {
+        base.SetLayoutBasic();
+        float cornerButtonSize = Mathf.Min(Mathf.Max(screenSafeAreaWidth, screenSafeAreaHeight) / 12f, Mathf.Min(screenSafeAreaWidth, screenSafeAreaHeight) / 10f);
+        float cornerButtonYPos = -screenSafeAreaYUp - (cornerButtonSize * 0.6f);
+        float cornerButtonXPos = -screenSafeAreaXRight - (cornerButtonSize * 0.6f);
+        if (screenOrientation == ScreenOrientation.Portrait || screenOrientation == ScreenOrientation.PortraitUpsideDown)
+            settingsUIOpenButtonRect.anchoredPosition = new Vector2(cornerButtonXPos - cornerButtonSize, cornerButtonYPos);
+        else
+            settingsUIOpenButtonRect.anchoredPosition = new Vector2(cornerButtonXPos, cornerButtonYPos - cornerButtonSize);
+        SetSideBoxCount();
+        if (gridTransform.childCount == 0) { CreateGridLines(); }
+        SetLinesLayout();
+        SetButtonsLayout();
+        cornerButtonSize = 1.1f * Mathf.Min(Mathf.Max(screenSafeAreaWidthInUnits, screenSafeAreaHeightInUnits) / 12f, Mathf.Min(screenSafeAreaWidthInUnits, screenSafeAreaHeightInUnits) / 10f);
+        SetMineSweeperFieldLayout(cornerButtonSize);
+    }
+    
+    protected override void SetLayoutFinishedGameUI()
+    {
+        bool gameOver = mvScript.GameOver;
+        finishedGameUIRewardDoubleButtonObj.SetActive(!gameOver);
+        finishedGameUIRewardRect.gameObject.SetActive(!gameOver);
+        finishedGameUIWinTextRect.gameObject.SetActive(!gameOver);
+        finishedGameUILossTextRect.gameObject.SetActive(gameOver);
+        finishedGameUITextRect = gameOver ? finishedGameUILossTextRect : finishedGameUIWinTextRect;
+        RectTransform _ = finishedGameUINewMoreDifficultGameButtonRect;
+        if (gameOver || saveScript.intDict["difficultyMijnenVeger"] >= 3)
         {
-            Destroy(raster.transform.GetChild(raster.transform.childCount - i - 1).gameObject);
+            finishedGameUINewMoreDifficultGameButtonRect.gameObject.SetActive(false);
+            finishedGameUINewMoreDifficultGameButtonRect = null;
         }
-        mijnenVegerMenu.SetActive(false);
-        klaar += 1;
-        float schermWijdte = Camera.main.orthographicSize * 2 * Screen.width / Screen.height / (Screen.width / Screen.safeArea.width);
-        float schermHoogte = Camera.main.orthographicSize * 2 / (Screen.height / Screen.safeArea.height);
-        float buitenSafezoneLinks = Camera.main.orthographicSize * 2 * Screen.width / Screen.height / (Screen.width / Screen.safeArea.x);
-        float buitenSafezoneOnder = Camera.main.orthographicSize * 2 / (Screen.height / Screen.safeArea.y);
-        float buitenSafezoneRechts = Camera.main.orthographicSize * 2 * Screen.width / Screen.height / (Screen.width / (Screen.width - Screen.safeArea.width - Screen.safeArea.x));
-        float buitenSafezoneBoven = Camera.main.orthographicSize * 2 / (Screen.height / (Screen.height - Screen.safeArea.height - Screen.safeArea.y));
-        ScreenOrientation orientation = Screen.orientation;
-        float uitlegKnopGrootte = Screen.safeArea.height / 12f / 1000f * 2f;
-        Transform MVvak = raster.transform.parent.parent;
-        float breedteMvVakje = Mathf.Min(Mathf.Min(schermHoogte, schermWijdte) * .95f / 16f, ((Mathf.Max(schermHoogte, schermWijdte) * 0.80f) - uitlegKnopGrootte) / 22f);
-        Vector3 localScaleHorzLijn = new Vector3(100, 1f / (langeKant - 3) * 4f, 1);
-        Vector3 localScaleVertLijn = new Vector3(1f / (langeKant - 3) * 4f, 100, 1);
-        if (schermHoogte > schermWijdte)
+        base.SetLayoutFinishedGameUI();
+        finishedGameUINewMoreDifficultGameButtonRect = _;
+    }
+
+    private void SetSideBoxCount()
+    {
+        if (screenHeight > screenWidth)
         {
-            korteKant = 22;
-            langeKant = 16;
+            horizontalSideBoxCount = 16;
+            verticalSideBoxCount = 22;
         }
         else
         {
-            korteKant = 16;
-            langeKant = 22;
+            horizontalSideBoxCount = 22;
+            verticalSideBoxCount = 16;
         }
-        for (int i = 1; i < Mathf.Max(langeKant, korteKant); i++)
+    }
+
+    private void CreateGridLines()
+    {
+        for (int i = 1; i < Mathf.Max(verticalSideBoxCount, horizontalSideBoxCount); i++)
         {
-            if (i < korteKant)
+            Instantiate(line, gridTransform);
+            if(i < Mathf.Min(verticalSideBoxCount, horizontalSideBoxCount))
             {
-                GameObject templijnHorz = Instantiate(lijn);
-                templijnHorz.transform.parent = raster.transform;
-                templijnHorz.transform.localPosition = new Vector3(0, -50f + (i * 100f / korteKant), -2f) / 100f;
-                templijnHorz.transform.localScale = localScaleHorzLijn / 100f;
-            }
-            if (i < langeKant)
-            {
-                GameObject templijnVert = Instantiate(lijn);
-                templijnVert.transform.parent = raster.transform;
-                templijnVert.transform.localPosition = new Vector3(-50f + (i * 100f / langeKant), 0, -2f) / 100f;
-                templijnVert.transform.localScale = localScaleVertLijn / 100f;
+                Instantiate(line, gridTransform);
             }
         }
+    }
+
+    private void SetLinesLayout()
+    {
+        Vector3 horzLineScale = new Vector3(1f, 1f / (verticalSideBoxCount - 3f) * 0.04f, 0.01f);
+        Vector3 vertLineScale = new Vector3(1f / (horizontalSideBoxCount - 3f) * 0.04f, 1f, 0.01f);
+        for (int i = 0; i < gridTransform.childCount; i++)
+        {
+            Transform line = gridTransform.GetChild(i);
+            float iHorizontal = i + 1f;
+            if (iHorizontal < horizontalSideBoxCount)
+            {
+                line.localPosition = new Vector3(-0.5f + (iHorizontal / horizontalSideBoxCount), 0, -0.02f);
+                line.localScale = vertLineScale;
+            }
+            else
+            {
+                float iVertical = iHorizontal - horizontalSideBoxCount + 1f;
+                line.localPosition = new Vector3(0, -0.5f + (iVertical / verticalSideBoxCount), -0.02f);
+                line.localScale = horzLineScale;
+            }
+        }
+    }
+
+    public void SetButtonsLayout()
+    {
         for (int i = 0; i < mvScript.buttons.Count; i++)
         {
-            GameObject knop = mvScript.buttons[i].gameObject;
-            int vakjesGehadNummer = int.Parse(knop.name);
-            int kolom = vakjesGehadNummer % 100;
-            int rij = (vakjesGehadNummer - kolom) / 100;
-            if (korteKant > langeKant)
+            Transform button = mvScript.buttons[i].transform;
+            int boxNumber = int.Parse(button.gameObject.name);
+            if (boxNumber == -1) boxNumber = 0;
+            int column = boxNumber % 100;
+            int row = (boxNumber - column) / 100;
+            float xScale = mvButtonSize / 2f;
+            float yScale = mvButtonSize / 2f;
+            float xPos, yPos;
+            if (verticalSideBoxCount > horizontalSideBoxCount)
             {
-                knop.transform.localPosition = new Vector3((breedteMvKnop * 75f) + (10.5f * langeKant * kolom * breedteMvKnop), (breedteMvKnop * 60f) + (korteKant * 5.55f * rij * breedteMvKnop), -0.45f);
+                xPos = (mvButtonSize * 75f) + (10.5f * horizontalSideBoxCount * column * mvButtonSize);
+                yPos = (mvButtonSize * 60f) + (verticalSideBoxCount * 5.55f * row * mvButtonSize);
+                xScale *= (float)verticalSideBoxCount / horizontalSideBoxCount;
             }
             else
             {
-                knop.transform.localPosition = new Vector3((breedteMvKnop * 60f) + (langeKant * 5.55f * (21 - rij) * breedteMvKnop), (breedteMvKnop * 75f) + (10.5f * korteKant * kolom * breedteMvKnop), -0.45f);
+                xPos = (mvButtonSize * 60f) + (horizontalSideBoxCount * 5.55f * (21f - row) * mvButtonSize);
+                yPos = (mvButtonSize * 75f) + (10.5f * verticalSideBoxCount * column * mvButtonSize);
+                yScale *= (float)horizontalSideBoxCount / verticalSideBoxCount;
             }
-            knop.transform.localScale = new Vector3(breedteMvKnop * .5f, breedteMvKnop * .5f, 1f);
+            button.localPosition = new Vector3(xPos, yPos, -0.45f);
+            button.localScale = new Vector3(xScale, yScale, 1f);
         }
-        if (orientation == ScreenOrientation.Portrait || orientation == ScreenOrientation.PortraitUpsideDown)
+    }
+
+    private void SetMineSweeperFieldLayout(float cornerButtonSize)
+    {
+        float longSideBoxCount = Mathf.Max(horizontalSideBoxCount, verticalSideBoxCount);
+        float shortSideBoxCount = Mathf.Min(horizontalSideBoxCount, verticalSideBoxCount);
+        float smallestSideInUnits = Mathf.Min(screenSafeAreaHeightInUnits, screenSafeAreaWidthInUnits);
+        float biggestSideInUnits = Mathf.Max(screenSafeAreaHeightInUnits, screenSafeAreaWidthInUnits);
+        float boxSize = Mathf.Min(smallestSideInUnits * .95f / shortSideBoxCount, ((biggestSideInUnits * 0.75f) - cornerButtonSize) / longSideBoxCount);
+        float scaleHorizontal = boxSize * horizontalSideBoxCount;
+        float scaleVertical = boxSize * verticalSideBoxCount;
+        float scale = Mathf.Max(biggestSideInUnits * .05f, smallestSideInUnits * 0.175f);
+        float mvFieldPosX, mvFieldPosY, xPosRootObj, yPosRootObj;
+        if (screenOrientation == ScreenOrientation.Portrait || screenOrientation == ScreenOrientation.PortraitUpsideDown)
         {
-            terugNaarMenuKnopRect.transform.SetParent(terugNaarMenuKnopCanvas);
-            terugNaarMenuKnopRect.sizeDelta = new Vector2(Screen.safeArea.width / 11, Screen.safeArea.width / 11);
-            terugNaarMenuKnopRect.anchoredPosition = new Vector2((-Screen.safeArea.width / 2) + (Screen.safeArea.width / 11 * 0.6f), (Screen.height / 2) - (Screen.height - Screen.safeArea.y - Screen.safeArea.height) - (Screen.safeArea.width / 11 * 0.6f));
-            uitlegOpenKnopRect.sizeDelta = new Vector2(Screen.safeArea.width / 12, Screen.safeArea.width / 12);
-            uitlegOpenKnopRect.anchoredPosition = new Vector2(-Screen.safeArea.width / 12 * 0.6f, -(Screen.height - Screen.safeArea.height - Screen.safeArea.y) - (Screen.safeArea.width / 12 * 0.6f));
-            menuShowKnopRect.anchoredPosition = new Vector2(0, Screen.safeArea.y + menuShowKnopRect.sizeDelta.y / 2f);
-            menuShowKnopRect.sizeDelta = new Vector2(Screen.safeArea.height * 0.1f, Screen.safeArea.height * 0.04f);
-            menuShowKnopRect.localEulerAngles = new Vector3(0, 0, 180);
-            MVvak.transform.position = new Vector3((buitenSafezoneLinks - buitenSafezoneRechts) / 2f, ((buitenSafezoneOnder - buitenSafezoneBoven) / 2f) + (schermHoogte * .1f) - (uitlegKnopGrootte * 1.25f), -0.5f);
-            MVvak.transform.localScale = new Vector3(breedteMvVakje * 16, breedteMvVakje * 22, 1);
-            float menuutjeY = (schermHoogte * 0.1f) - (schermHoogte / 2f);
-            vlagOfSchepKnop.transform.position = new Vector3((schermWijdte * 0.2f) + ((buitenSafezoneLinks - buitenSafezoneRechts) / 2f), ((buitenSafezoneOnder - buitenSafezoneBoven) / 2f) + menuutjeY, -5);
-            bommenTeGaanObj.transform.position = new Vector3((schermWijdte * -0.2f) + ((buitenSafezoneLinks - buitenSafezoneRechts) / 2f), ((buitenSafezoneOnder - buitenSafezoneBoven) / 2f) + menuutjeY, 0);
+            mvFieldPosX = screenSafeAreaCenterXInUnits;
+            mvFieldPosY = screenSafeAreaCenterYInUnits + (screenSafeAreaHeightInUnits - scaleVertical) / 2f - cornerButtonSize;
+            mvField.localPosition = new Vector3(mvFieldPosX, mvFieldPosY, -0.5f);
+            float yPos = mvFieldPosY - (scaleVertical / 2f) - (scale / 2f * 1.5f);
+            flagOrShovelButtonRect.localPosition = new Vector3(mvFieldPosX + (2f / 3f) * scale, yPos, -5);
+            bombsToGoTransform.localPosition = new Vector3(mvFieldPosX - (2f / 3f) * scale, yPos, -5);
+            xPosRootObj = 0;
+            yPosRootObj = -(screenSafeAreaHeightInUnits - ((mvFieldPosY + scaleVertical * 0.5f) - (yPos - scale * 0.5f) + cornerButtonSize + screenSafeAreaHeightInUnits * 0.04f)) / 2f;
         }
         else
         {
-            uitlegOpenKnopRect.sizeDelta = new Vector2(Screen.safeArea.height / 12, Screen.safeArea.height / 12);
-            uitlegOpenKnopRect.anchoredPosition = new Vector2(-(Screen.width - Screen.safeArea.width - Screen.safeArea.x) - (Screen.safeArea.height / 12 * 0.6f), -(Screen.height - Screen.safeArea.height - Screen.safeArea.y) - (Screen.safeArea.height / 12 * 0.6f));
-            menuShowKnopRect.anchoredPosition = new Vector2(Screen.safeArea.x - (Screen.width / 2f) + menuShowKnopRect.sizeDelta.y / 2f, Screen.height / 2f);
-            menuShowKnopRect.sizeDelta = new Vector2(Screen.safeArea.width * 0.1f, Screen.safeArea.width * 0.04f);
-            menuShowKnopRect.localEulerAngles = new Vector3(0, 0, 90);
-            terugNaarMenuKnopRect.anchoredPosition = new Vector2(10000000, 1000000);
-            MVvak.transform.position = new Vector3((schermWijdte * 0.1f) - (uitlegKnopGrootte * 1.25f) + ((buitenSafezoneLinks - buitenSafezoneRechts) / 2f), (buitenSafezoneOnder - buitenSafezoneBoven) / 2f, -0.5f);
-            MVvak.transform.localScale = new Vector3(breedteMvVakje * 22, breedteMvVakje * 16, 1);
-            float menuutjeX = (schermWijdte * 0.1f) - (schermWijdte / 2f);
-            vlagOfSchepKnop.transform.position = new Vector3(menuutjeX + ((buitenSafezoneLinks - buitenSafezoneRechts) / 2f), ((buitenSafezoneOnder - buitenSafezoneBoven) / 2f) + (schermHoogte * -0.2f), -5);
-            bommenTeGaanObj.transform.position = new Vector3(menuutjeX + ((buitenSafezoneLinks - buitenSafezoneRechts) / 2f), ((buitenSafezoneOnder - buitenSafezoneBoven) / 2f) + (schermHoogte * 0.2f), 0);
+            mvFieldPosX = (screenSafeAreaWidthInUnits - scaleHorizontal) / 2f + screenSafeAreaCenterXInUnits - cornerButtonSize;
+            mvFieldPosY = screenSafeAreaCenterYInUnits;
+            mvField.localPosition = new Vector3(mvFieldPosX, mvFieldPosY, -0.5f);
+            float xPos = mvFieldPosX - (scaleHorizontal / 2f) - (scale / 2f * 1.5f);
+            flagOrShovelButtonRect.localPosition = new Vector3(xPos, mvFieldPosY + (2f / 3f) * scale, -5);
+            bombsToGoTransform.localPosition = new Vector3(xPos, mvFieldPosY - (2f / 3f) * scale, -5);
+            xPosRootObj = -(screenSafeAreaWidthInUnits - ((mvFieldPosX + scaleHorizontal * 0.5f) - (xPos - scale * 0.5f) + cornerButtonSize + screenSafeAreaWidthInUnits * 0.04f)) / 2f;
+            yPosRootObj = 0;
         }
-        float scale = Mathf.Min(Mathf.Max(schermHoogte, schermWijdte) * .5f, Mathf.Min(schermHoogte, schermWijdte)) * 0.025f * 0.9f;
+        mvField.localScale = new Vector3(scaleHorizontal, scaleVertical, 1);
         Vector3 lScale = new Vector3(scale, scale, 1);
-        vlagOfSchepKnop.localScale = lScale;
-        bommenTeGaanObj.transform.localScale = lScale / 2f;
-        mvScript.mvSpeelveldLinks = MVvak.position.x - (breedteMvVakje * langeKant / 2);
-        mvScript.mvSpeelveldRechts = MVvak.position.x + (breedteMvVakje * langeKant / 2);
-        mvScript.mvSpeelveldBoven = MVvak.position.y + (breedteMvVakje * korteKant / 2);
-        mvScript.mvSpeelveldOnder = MVvak.position.y - (breedteMvVakje * korteKant / 2);
-    }
-
-    // Update is called once per frame
-    private void Update()
-    {
-        if (mvScript.gehaaldCanvas.activeInHierarchy)
-        {
-            if (vorigeScreenWidth == Screen.width && vorigeSafezoneY == Screen.safeArea.y && vorigeSafezoneX == Screen.safeArea.x)
-            {
-                if (klaar < 3)
-                {
-                    mvScript.OpenGehaaldCanvas(!mvScript.GameOver);
-                    klaar += 1;
-                }
-                return;
-            }
-            klaar = 0;
-            vorigeScreenWidth = Screen.width;
-            vorigeSafezoneY = Screen.safeArea.y;
-            vorigeSafezoneX = Screen.safeArea.x;
-            return;
-        }
-        if (!isPaused && wasPaused)
-        {
-            if (uitlegUI.activeInHierarchy)
-            {
-                MVKnoppenScript.OpenUitleg();
-                MVKnoppenScript.OpenUitleg();
-            }
-            else
-            {
-                SetLayout();
-            }
-        }
-        wasPaused = isPaused;
-        if (vorigeScreenWidth == Screen.width && vorigeSafezoneY == Screen.safeArea.y && vorigeSafezoneX == Screen.safeArea.x)
-        {
-            if (klaar < 3)
-            {
-                if (uitlegUI.activeInHierarchy)
-                {
-                    MVKnoppenScript.OpenUitleg();
-                    MVKnoppenScript.OpenUitleg();
-                }
-                else
-                {
-                    SetLayout();
-                }
-            }
-            return;
-        }
-        klaar = 0;
-        vorigeScreenWidth = Screen.width;
-        vorigeSafezoneY = Screen.safeArea.y;
-        vorigeSafezoneX = Screen.safeArea.x;
-    }
-
-    private void OnApplicationFocus(bool hasFocus)
-    {
-        isPaused = !hasFocus;
-    }
-
-    private void OnApplicationPause(bool pauseStatus)
-    {
-        isPaused = pauseStatus;
+        flagOrShovelButtonRect.localScale = lScale;
+        bombsToGoTransform.localScale = lScale;
+        float halfHorizontalSizeGrid = scaleHorizontal / 2f;
+        float halfVerticalSizeGrid = scaleVertical / 2f;
+        minesweeperRootObjTransform.position = new Vector3(xPosRootObj, yPosRootObj, 0);
+        mvScript.mvSpeelveldLinks = mvFieldPosX + xPosRootObj - halfHorizontalSizeGrid;
+        mvScript.mvSpeelveldRechts = mvFieldPosX + xPosRootObj + halfHorizontalSizeGrid;
+        mvScript.mvSpeelveldBoven = mvFieldPosY + yPosRootObj + halfVerticalSizeGrid;
+        mvScript.mvSpeelveldOnder = mvFieldPosY + yPosRootObj - halfVerticalSizeGrid;
     }
 }

@@ -6,7 +6,7 @@ public abstract class BaseSceneSettings : MonoBehaviour
 {
     Achtergrond achtergrondScript;
     protected SaveScript saveScript;
-    GegevensHouder gegevensScript;
+    protected GegevensHouder gegevensScript;
     [Header("Background settings")]
     [SerializeField] TMP_Dropdown colorDropDown;
     [SerializeField] TMP_Dropdown imageDropDown;
@@ -115,5 +115,5 @@ public abstract class BaseSceneSettings : MonoBehaviour
         }
     }
 
-    public abstract void SetSettingStartValues();
+    protected abstract void SetSettingStartValues();
 }

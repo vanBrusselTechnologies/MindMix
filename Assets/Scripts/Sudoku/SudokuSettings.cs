@@ -7,7 +7,7 @@ public class SudokuSettings : BaseSceneSettings
     [SerializeField] Toggle dubbelGetalWarningToggle;
     [SerializeField] Toggle notitieBijwerkToggle;
 
-    public override void SetSettingStartValues()
+    protected override void SetSettingStartValues()
     {
         notitieBijwerkToggle.isOn = saveScript.intDict["notitieBijwerkSettingIsOn"] == 1;
         dubbelGetalWarningToggle.isOn = saveScript.intDict["dubbelGetalWarningIsOn"] == 1;
