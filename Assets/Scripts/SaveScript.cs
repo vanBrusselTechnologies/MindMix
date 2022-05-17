@@ -3,19 +3,17 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.IO;
 using System.Text;
-using System;
 using Firebase.Storage;
 using Firebase.Auth;
 using VBG.Extensions;
 
 public class SaveScript : MonoBehaviour
 {
-    static public SaveScript instance;
+    public static SaveScript Instance;
     Achtergrond achtergrond;
     GegevensHouder gegevensHouder;
     [HideInInspector] public bool ready = false;
-    private List<string> sceneNames = new List<string>() { "Sudoku", "Solitaire", "2048", "Mijnenveger", "Menu" };
-
+    private List<string> sceneNames = new List<string>() { "Sudoku", "Solitaire", "2048", "Mijnenveger", "Menu", "ColorSort" };
     [HideInInspector]
     public Dictionary<string, int> intDict = new Dictionary<string, int>();
     [HideInInspector]
@@ -40,11 +38,12 @@ public class SaveScript : MonoBehaviour
     // Start is called before the first frame update
     private void Awake()
     {
-        if (instance != null)
+        if (Instance != null)
         {
             Destroy(gameObject);
+            return;
         }
-        instance = this;
+        Instance = this;
         gegevensHouder = GetComponent<GegevensHouder>();
         achtergrond = GetComponent<Achtergrond>();
         DontDestroyOnLoad(this);
@@ -161,7 +160,7 @@ public class SaveScript : MonoBehaviour
         //String
         SettingsStringNames.Add("taal");
         //Int
-        List<string> sceneNames = new List<string>() { "All", "Sudoku", "Solitaire", "2048", "Mijnenveger", "Menu" };
+        List<string> sceneNames = new List<string>() { "All", "Sudoku", "Solitaire", "2048", "Mijnenveger", "Menu", "ColorSort" };
         foreach (string sceneName in sceneNames)
         {
             SettingsIntNames.Add("bgSoort" + sceneName);
@@ -318,10 +317,13 @@ public class SaveScript : MonoBehaviour
                 SaveSolitaire();
                 break;
             case "instellingen":
-                SaveSettings();
+                SaveNull();
                 break;
             case "shop":
                 SaveShop();
+                break;
+            case "colorsort":
+                SaveColorSort();
                 break;
             default:
                 quitting = false;
@@ -356,6 +358,20 @@ public class SaveScript : MonoBehaviour
         foreach (string name in AchtergrondFloatNames)
         {
             data.Append(",,,float" + "///" + name + ":::" + floatDict[name]);
+        }
+        return data;
+    }
+
+    private StringBuilder SaveSettings()
+    {
+        StringBuilder data = new StringBuilder("@@@instellingen");
+        foreach (string name in SettingsIntNames)
+        {
+            data.Append(",,,int" + "///" + name + ":::" + intDict[name]);
+        }
+        foreach (string name in SettingsStringNames)
+        {
+            data.Append(",,,string" + "///" + name + ":::" + stringDict[name]);
         }
         return data;
     }
@@ -414,20 +430,6 @@ public class SaveScript : MonoBehaviour
         SaveData(data);
     }
 
-    private void SaveSettings()
-    {
-        StringBuilder data = new StringBuilder("@@@instellingen");
-        foreach (string name in SettingsIntNames)
-        {
-            data.Append(",,,int" + "///" + name + ":::" + intDict[name]);
-        }
-        foreach (string name in SettingsStringNames)
-        {
-            data.Append(",,,string" + "///" + name + ":::" + stringDict[name]);
-        }
-        SaveData(data);
-    }
-
     private void SaveShop()
     {
         StringBuilder data = new StringBuilder("@@@shop");
@@ -436,6 +438,10 @@ public class SaveScript : MonoBehaviour
             data.Append(",,,int" + "///" + name + ":::" + intDict[name]);
         }
         SaveData(data);
+    }
+    private void SaveColorSort()
+    {
+        SaveNull();
     }
 
     private void SaveData(StringBuilder data)
@@ -452,6 +458,7 @@ public class SaveScript : MonoBehaviour
             string sceneName = data.ToString().Split(",,,")[0][3..];
             bool vorigeDataGevonden = false;
             bool userDataGevonden = false;
+            bool settingsDataFound = false;
             for (int i = 1; i < oldDataParts.Length; i++)
             {
                 if (oldDataParts[i].StartsWith(sceneName))
@@ -468,6 +475,11 @@ public class SaveScript : MonoBehaviour
                 {
                     oldDataParts[i] = SaveAchtergrond().ToString()[3..];
                 }
+                else if (oldDataParts[i].StartsWith("instellingen"))
+                {
+                    settingsDataFound = true;
+                    oldDataParts[i] = SaveSettings().ToString()[3..];
+                }
             }
             if (!vorigeDataGevonden && !sceneName.Equals("nul"))
             {
@@ -476,6 +488,11 @@ public class SaveScript : MonoBehaviour
             if (!userDataGevonden)
             {
                 List<string> tmp = new List<string>() { SaveUserData().ToString()[3..], SaveAchtergrond().ToString()[3..] };
+                oldDataParts = oldDataParts.AddRange(tmp);
+            }
+            if (!settingsDataFound)
+            {
+                List<string> tmp = new List<string> { SaveSettings().ToString()[3..] };
                 oldDataParts = oldDataParts.AddRange(tmp);
             }
             for (int i = 1; i < oldDataParts.Length; i++)

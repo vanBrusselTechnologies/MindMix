@@ -711,7 +711,7 @@ namespace VBG.Extensions
         /// 
         /// </summary>
         /// <param name="pixels">Screenpixels you want to convert to Units</param>
-        /// <param name="orthograficCam">Orthografic camera used. If empty Camera.main will be used</param>
+        /// <param name="orthograficCam">Orthografic camera used. If not set Camera.main will be used</param>
         /// <returns></returns>
         public static float PixelsToUnits(float pixels, Camera orthograficCam = null)
         {
@@ -721,6 +721,20 @@ namespace VBG.Extensions
             }
             return orthograficCam.orthographicSize * 2 * pixels / Screen.height;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="units">Units you want to convert to Screenpixels</param>
+        /// <param name="orthograficCam">Orthografic camera used. If not set Camera.main will be used</param>
+        /// <returns></returns>
+        public static float UnitsToPixels(float units, Camera orthograficCam = null)
+        {
+            if (orthograficCam == null)
+                orthograficCam = Camera.main;
+            return units * Screen.height / orthograficCam.orthographicSize / 2;
+        }
+
         public static float BottomOutsideSafezone { get { return Screen.safeArea.y; } }
         public static float LeftOutsideSafezone { get { return Screen.safeArea.x; } }
         public static float RightOutsideSafezone { get { return Screen.width - Screen.safeArea.width - Screen.safeArea.x; } }

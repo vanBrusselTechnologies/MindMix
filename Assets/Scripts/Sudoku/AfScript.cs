@@ -8,24 +8,18 @@ public class AfScript : MonoBehaviour
     private PlaatsGetallen plaatsScript;
     private HaalGetallenWeg weghaalScript;
     private KnoppenScript knoppenScript;
+    private SudokuLayout sudokuLayout;
     private BeloningScript beloningScript;
     [HideInInspector] public List<int> getallen;
     private GegevensHouder gegevensScript;
-    public GameObject GehaaldCanvas;
+    [SerializeField] private GameObject GehaaldCanvas;
     [SerializeField] private GameObject SudokuCanvas;
     [SerializeField] private GameObject OverigCanvas;
+    [SerializeField] private GameObject MenuUICanvasObj;
     [SerializeField] private List<GameObject> knoppen = new List<GameObject>();
     [HideInInspector] public bool ietsVeranderd = true;
     private SaveScript saveScript;
-    public Transform buttonHouder;
     [SerializeField] private TMP_Text beloningText;
-    [SerializeField] private RectTransform gehaaldCanvasTitelRect;
-    [SerializeField] private RectTransform gehaaldCanvasTekstRect;
-    [SerializeField] private RectTransform gehaaldCanvasStartNieuweKnopRect;
-    [SerializeField] private RectTransform gehaaldCanvasStartMoeilijkerKnopRect;
-    [SerializeField] private RectTransform gehaaldCanvasNaarMenuKnopRect;
-    [SerializeField] private RectTransform gehaaldCanvasRewardRect;
-    [SerializeField] private GameObject gehaaldCanvasRewardVerdubbelObj;
 
     private void Start()
     {
@@ -48,20 +42,12 @@ public class AfScript : MonoBehaviour
         plaatsScript = GetComponent<PlaatsGetallen>();
         weghaalScript = GetComponent<HaalGetallenWeg>();
         knoppenScript = GetComponent<KnoppenScript>();
+        sudokuLayout = GetComponent<SudokuLayout>();
         weghaalScript.knoppen = knoppen;
         knoppenScript.knoppen = knoppen;
         if (gegevensScript.startNewSudoku)
         {
-            for (int i = 0; i < 81; i++)
-            {
-                saveScript.intDict["kloppendCijferBijInt" + i] = 0;
-                saveScript.intDict["Button " + i] = 0;
-                saveScript.intDict["DoorSpelerIngevuldBij" + i] = 0;
-                for (int ii = 1; ii < 10; ii++)
-                {
-                    saveScript.stringDict["Button " + i + " notitie" + ii] = "  ";
-                }
-            }
+            ClearProgress();
             plaatsScript.Start0();
             weghaalScript.Start1a();
         }
@@ -170,6 +156,16 @@ public class AfScript : MonoBehaviour
 
     public void OpenGehaaldCanvas()
     {
+        ClearProgress();
+        GehaaldCanvas.SetActive(true);
+        SudokuCanvas.SetActive(false);
+        OverigCanvas.SetActive(false);
+        MenuUICanvasObj.SetActive(false);
+        sudokuLayout.SetLayout();
+    }
+
+    private void ClearProgress()
+    {
         for (int i = 0; i < 81; i++)
         {
             saveScript.intDict["kloppendCijferBijInt" + i] = 0;
@@ -180,59 +176,5 @@ public class AfScript : MonoBehaviour
                 saveScript.stringDict["Button " + i + " notitie" + ii] = "  ";
             }
         }
-        float safeZoneAntiY = (Screen.safeArea.y - (Screen.height - Screen.safeArea.height - Screen.safeArea.y)) / 2f;
-        float safeZoneAntiX = (Screen.safeArea.x - (Screen.width - Screen.safeArea.width - Screen.safeArea.x)) / 2f;
-        GehaaldCanvas.SetActive(true);
-        gehaaldCanvasTitelRect.anchoredPosition = new Vector2(safeZoneAntiX, safeZoneAntiY + (Screen.safeArea.height * (25f / 30f)) - (Screen.height / 2f));
-        gehaaldCanvasTitelRect.sizeDelta = new Vector2(Screen.safeArea.width * 0.85f, Screen.safeArea.height * (10f / 30f));
-        float kleinsteKant = Mathf.Min(Screen.safeArea.height, Screen.safeArea.width);
-        float grootsteKant = Mathf.Max(Screen.safeArea.height, Screen.safeArea.width);
-        if (kleinsteKant - 1440 > 0)
-        {
-            float factor = Mathf.Min(kleinsteKant / 1500f, grootsteKant / 2500f);
-            gehaaldCanvasTitelRect.localScale = Vector2.one * factor;
-            gehaaldCanvasTitelRect.sizeDelta /= factor;
-        }
-        gehaaldCanvasTekstRect.anchoredPosition = new Vector2(safeZoneAntiX, safeZoneAntiY + (Screen.safeArea.height * (17f / 30f)) - (Screen.height / 2f));
-        gehaaldCanvasTekstRect.sizeDelta = new Vector2(Screen.safeArea.width * 0.85f, Screen.safeArea.height * (8f / 30f));
-        gehaaldCanvasRewardRect.anchoredPosition = new Vector2(safeZoneAntiX, safeZoneAntiY + (Screen.safeArea.height * (10f / 30f)) - (Screen.height / 2f));
-        if (Application.internetReachability == NetworkReachability.NotReachable || !gehaaldCanvasRewardVerdubbelObj.activeInHierarchy)
-        {
-            gehaaldCanvasRewardVerdubbelObj.SetActive(false);
-            float scaleFactor = Mathf.Min(Screen.safeArea.width * 0.85f / 500, Screen.safeArea.height * (5f / 30f) / 175);
-            gehaaldCanvasRewardRect.localScale = new Vector3(scaleFactor, scaleFactor, 1);
-            gehaaldCanvasRewardRect.sizeDelta = new Vector2(500, 175);
-        }
-        else
-        {
-            float scaleFactor = Mathf.Min(Screen.safeArea.width * 0.85f / 1000, Screen.safeArea.height * (5f / 30f) / 175);
-            gehaaldCanvasRewardRect.localScale = new Vector3(scaleFactor, scaleFactor, 1);
-            gehaaldCanvasRewardRect.sizeDelta = new Vector2(1000, 175);
-        }
-        if (saveScript.intDict["difficulty"] < 3)
-        {
-            float sizeX = Screen.safeArea.width * 0.3f;
-            float sizeY = Screen.safeArea.height * (5f / 30f);
-            float posY = safeZoneAntiY + (Screen.safeArea.height * (3.5f / 30f)) - (Screen.height / 2f);
-            gehaaldCanvasStartNieuweKnopRect.anchoredPosition = new Vector2(safeZoneAntiX - (Screen.safeArea.width / 3f), posY);
-            gehaaldCanvasStartNieuweKnopRect.sizeDelta = new Vector2(sizeX, sizeY);
-            gehaaldCanvasStartMoeilijkerKnopRect.anchoredPosition = new Vector2(safeZoneAntiX, posY);
-            gehaaldCanvasStartMoeilijkerKnopRect.sizeDelta = new Vector2(sizeX, sizeY);
-            gehaaldCanvasNaarMenuKnopRect.anchoredPosition = new Vector2(safeZoneAntiX + (Screen.safeArea.width / 3f), posY);
-            gehaaldCanvasNaarMenuKnopRect.sizeDelta = new Vector2(sizeX, sizeY);
-        }
-        else
-        {
-            float sizeX = Screen.safeArea.width * 0.45f;
-            float sizeY = Screen.safeArea.height * (5f / 30f);
-            float posY = safeZoneAntiY + (Screen.safeArea.height * (3.5f / 30f)) - (Screen.height / 2f);
-            gehaaldCanvasStartNieuweKnopRect.anchoredPosition = new Vector2(safeZoneAntiX - (Screen.safeArea.width / 4f), posY);
-            gehaaldCanvasStartNieuweKnopRect.sizeDelta = new Vector2(sizeX, sizeY);
-            gehaaldCanvasStartMoeilijkerKnopRect.gameObject.SetActive(false);
-            gehaaldCanvasNaarMenuKnopRect.anchoredPosition = new Vector2(safeZoneAntiX + (Screen.safeArea.width / 4f), posY);
-            gehaaldCanvasNaarMenuKnopRect.sizeDelta = new Vector2(sizeX, sizeY);
-        }
-        SudokuCanvas.SetActive(false);
-        OverigCanvas.SetActive(false);
     }
 }

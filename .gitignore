@@ -75,3 +75,5 @@ Assets/Firebase/Plugins/x86_64/FirebaseCppApp-8_7_0.so
 
 ignore.conf
 .plastic
+*.jks
+*.keystore

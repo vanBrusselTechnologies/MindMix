@@ -6,11 +6,13 @@ using UnityEngine.Localization.Settings;
 
 public class GegevensHouder : MonoBehaviour
 {
+    public static GegevensHouder Instance;
     bool testBuild = false;
     [HideInInspector] public bool startNewSudoku = false;
     [HideInInspector] public bool startNewSolitaire = false;
     [HideInInspector] public bool startNew2048 = false;
     [HideInInspector] public bool startNewMV = false;
+    [HideInInspector] public bool startNewGame = false;
     public Texture2D zwart;
     private bool isPaused = false;
     private bool wasPaused = false;
@@ -23,12 +25,19 @@ public class GegevensHouder : MonoBehaviour
     private List<int> achtergrond2048 = new List<int>() { 0, -2 };
     private List<int> achtergrondMV = new List<int>() { 0, -2 };
     private List<int> achtergrondSolitaire = new List<int>() { 0, -2 };
+    private List<int> achtergrondColorSort = new List<int>() { 0, -2 };
     private Achtergrond bgScript;
     private SaveScript saveScript;
     [HideInInspector] public bool loginWarningGehad;
 
     private void Awake()
     {
+        if(Instance != null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
         if(Application.platform == RuntimePlatform.WindowsEditor)
         {
             testBuild = true;
@@ -79,6 +88,7 @@ public class GegevensHouder : MonoBehaviour
             case "2048": list = achtergrond2048; break;
             case "mijnenveger": list = achtergrondMV; break;
             case "solitaire": list = achtergrondSolitaire; break;
+            case "colorsort": list = achtergrondColorSort; break;
             case "inlogenvoorplaatapp": list = new List<int>() { 1, -1 }; break;
             case "instellingen": list = achtergrondMenu; break;
             case "shop": list = achtergrondMenu; break;
@@ -110,6 +120,10 @@ public class GegevensHouder : MonoBehaviour
             case "solitaire":
                 achtergrondSolitaire[0] = bgSoort;
                 achtergrondSolitaire[1] = waarde;
+                break;
+            case "colorsort":
+                achtergrondColorSort[0] = bgSoort;
+                achtergrondColorSort[1] = waarde;
                 break;
             default: break;
         }
@@ -170,7 +184,7 @@ public class GegevensHouder : MonoBehaviour
 
     public void ZetAchtergronden()
     {
-        List<string> sceneNames = new List<string>() { "All", "Sudoku", "Solitaire", "2048", "Mijnenveger", "Menu" };
+        List<string> sceneNames = new List<string>() { "All", "Sudoku", "Solitaire", "2048", "Mijnenveger", "Menu", "ColorSort" };
         foreach (string sceneName in sceneNames)
         {
             VeranderOpgeslagenAchtergrond(sceneName.ToLower(), saveScript.intDict["bgSoort" + sceneName], saveScript.intDict["bgWaarde" + sceneName]);
