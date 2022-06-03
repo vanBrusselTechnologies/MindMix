@@ -24,7 +24,8 @@ public class HaalGetallenWeg : MonoBehaviour
 
     public void Start1a()
     {
-        saveScript = GameObject.Find("gegevensHouder").GetComponent<SaveScript>();
+        saveScript = SaveScript.Instance;
+        difficulty = saveScript.intDict["difficulty"];
         plaatsScript = GetComponent<PlaatsGetallen>();
         for (int i = 0; i < 81; i++)
         {
@@ -56,7 +57,8 @@ public class HaalGetallenWeg : MonoBehaviour
 
     public void Start1b()
     {
-        saveScript = GameObject.Find("gegevensHouder").GetComponent<SaveScript>();
+        saveScript = SaveScript.Instance;
+        difficulty = saveScript.intDict["difficulty"];
         int getalTot81 = 0;
         for (int i = 0; i < 9; i++)
         {

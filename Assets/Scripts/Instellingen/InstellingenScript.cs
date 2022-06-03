@@ -4,36 +4,24 @@ using TMPro;
 using System.Collections.Generic;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
-using UnityEngine.Audio;
 using UnityEngine.UI;
 
 public class InstellingenScript : MonoBehaviour
 {
     private GegevensHouder gegevensScript;
-    [SerializeField] private TMP_Dropdown taalDropdown;
-    private bool isPaused = false;
-    private bool wasPaused = false;
-    private int klaar = 0;
-    private float vorigeScreenWidth;
-    private float vorigeSafezoneY;
-    private float vorigeSafezoneX;
-    [SerializeField] private RectTransform terugNaarMenuKnop;
-    [SerializeField] private GameObject bgInstelingen;
-    [SerializeField] private RectTransform bgInstellingScrolldown;
-    [SerializeField] private RectTransform bgInstellingScrolldownContent;
-    [SerializeField] private GameObject overigeInstellingen;
-    [SerializeField] private RectTransform overigeInstellingScrolldown;
-    [SerializeField] private RectTransform overigeInstellingScrolldownContent;
-    [SerializeField] private RectTransform instellingPaginaWisselKnoppenHouder;
-    [SerializeField] private RectTransform naarAlgemeenSettingPaginaRect;
-    private List<string> sceneNames = new List<string>(){ "Sudoku", "Solitaire", "2048", "Mijnenveger", "Menu" };
     private SaveScript saveScript;
     private Achtergrond achtergrondScript;
-    private bool startValues = true;
+    private AudioHandler audioHandler;
+
+    [SerializeField] private TMP_Dropdown taalDropdown;
+    [SerializeField] private GameObject bgInstelingen;
+    [SerializeField] private RectTransform bgInstellingScrolldownContent;
+    [SerializeField] private GameObject overigeInstellingen;
     [SerializeField] private Slider muziekVolumeSlider;
-    [SerializeField] private AudioMixer audioMixer;
-    bool volumeSetInStart = false;
-    private AudioSource muziek;
+
+    private List<string> sceneNames = new List<string>(){ "Sudoku", "Solitaire", "2048", "Mijnenveger", "Menu" };
+    private bool startValues = true;
+    private bool volumeSetInStart = false;
 
     // Start is called before the first frame update
     private void Start()
@@ -44,42 +32,15 @@ public class InstellingenScript : MonoBehaviour
             SceneManager.LoadScene("LogoEnAppOpstart");
             return;
         }
-        gegevensScript = gegevensHouder.GetComponent<GegevensHouder>();
-        saveScript = gegevensHouder.GetComponent<SaveScript>();
+        gegevensScript = GegevensHouder.Instance;
+        saveScript = SaveScript.Instance;
         achtergrondScript = gegevensHouder.GetComponent<Achtergrond>();
+        audioHandler = GameObject.Find("AchtergrondMuziek").GetComponent<AudioHandler>();
         SetTaalStartWaarde();
         SetBackgroundStartValues();
         startValues = false;
-        SetLayout();
-        vorigeScreenWidth = Screen.width;
-        vorigeSafezoneY = Screen.safeArea.y;
-        vorigeSafezoneX = Screen.safeArea.x;
         volumeSetInStart = true;
         muziekVolumeSlider.value = PlayerPrefs.GetFloat("achtergrondMuziekVolume", 0.25f);
-        muziek = GameObject.Find("AchtergrondMuziek").GetComponent<AudioSource>();
-    }
-
-    // Update is called once per frame
-    private void Update()
-    {
-        if (!isPaused && wasPaused)
-        {
-            SetLayout();
-        }
-        wasPaused = isPaused;
-        if (vorigeScreenWidth == Screen.width && vorigeSafezoneY == Screen.safeArea.y && vorigeSafezoneX == Screen.safeArea.x)
-        {
-            if (klaar < 3)
-            {
-                SetLayout();
-            }
-            return;
-        }
-        klaar = 0;
-        SetLayout();
-        vorigeScreenWidth = Screen.width;
-        vorigeSafezoneY = Screen.safeArea.y;
-        vorigeSafezoneX = Screen.safeArea.x;
     }
 
     private void SetTaalStartWaarde()
@@ -132,39 +93,13 @@ public class InstellingenScript : MonoBehaviour
             {
                 int bgWaarde = saveScript.intDict["bgWaarde" + sceneNaam];
                 int dropdownValue = bgWaarde >= 0 ? achtergrondScript.gekochteColorOptionData.IndexOf(achtergrondScript.colorOptionData[bgWaarde]) : -1;
+                if (bgWaarde == -1) dropdownValue = 0;
                 imageDropdownObj.gameObject.SetActive(false);
                 imageDropDown.value = 0;
                 colorDropdownObj.gameObject.SetActive(true);
                 colorDropDown.value = dropdownValue;
             }
         }
-    }
-
-    private void SetLayout()
-    {
-        float safeZoneAntiY = (Screen.safeArea.y - (Screen.height - Screen.safeArea.height - Screen.safeArea.y)) / 2f;
-        float safeZoneAntiX = (Screen.safeArea.x - (Screen.width - Screen.safeArea.width - Screen.safeArea.x)) / 2f;
-        klaar += 1;
-        terugNaarMenuKnop.sizeDelta = Vector2.one * Mathf.Min(Screen.safeArea.width, Screen.safeArea.height) / 11f;
-        terugNaarMenuKnop.anchoredPosition = new Vector2((-Screen.width / 2) + Screen.safeArea.x + (Mathf.Min(Screen.safeArea.width, Screen.safeArea.height) / 11f * 0.6f), (Screen.height / 2) - (Screen.height - Screen.safeArea.height - Screen.safeArea.y) - (Mathf.Min(Screen.safeArea.width, Screen.safeArea.height) / 11 * 0.6f));
-        Vector3 scrollDownScale = new Vector3(Screen.safeArea.width * 0.98f / 2250f, Screen.safeArea.height * 0.85f / 950f, 1);
-        bgInstellingScrolldown.localScale = scrollDownScale;
-        overigeInstellingScrolldown.localScale = scrollDownScale;
-        float minScaleDeel = Mathf.Min(scrollDownScale.x, scrollDownScale.y);
-        Vector3 scrollDownContentScale = new Vector3(minScaleDeel / scrollDownScale.x, minScaleDeel / scrollDownScale.y, 1);
-        bgInstellingScrolldownContent.localScale = scrollDownContentScale;
-        overigeInstellingScrolldownContent.localScale = scrollDownContentScale;
-        Vector3 scrollDownPosition = new Vector3(safeZoneAntiX, safeZoneAntiY + (Screen.safeArea.height * 0.15f / -2f), 0);
-        bgInstellingScrolldown.anchoredPosition = scrollDownPosition;
-        overigeInstellingScrolldown.anchoredPosition = scrollDownPosition;
-        int aantalSettingPages = instellingPaginaWisselKnoppenHouder.childCount;
-        float scaleKnoppenHouder1 = Screen.safeArea.width * 0.5f * 0.8f / (naarAlgemeenSettingPaginaRect.sizeDelta.x * 0.5f * aantalSettingPages);
-        float scaleKnoppenHouder2 = Screen.safeArea.height * 0.5f * 0.2f / naarAlgemeenSettingPaginaRect.sizeDelta.y;
-        float scaleKnoppenHouder = Mathf.Min(scaleKnoppenHouder1, scaleKnoppenHouder2);
-        instellingPaginaWisselKnoppenHouder.localScale = new Vector3(scaleKnoppenHouder, scaleKnoppenHouder, 1);
-        float yPosKnoppenHouder = scrollDownPosition.y + (scrollDownScale.y * bgInstellingScrolldown.sizeDelta.y / 2f) + (scaleKnoppenHouder * naarAlgemeenSettingPaginaRect.sizeDelta.y * 0.5f);
-        float xPosKnoppenHouder = (Screen.safeArea.width * (((0.95f + 0.2f) / 2) - 0.5f)) + safeZoneAntiX;
-        instellingPaginaWisselKnoppenHouder.anchoredPosition = new Vector3(xPosKnoppenHouder, yPosKnoppenHouder, 0);
     }
 
     public void TerugNaarMenu()
@@ -190,12 +125,9 @@ public class InstellingenScript : MonoBehaviour
     public void VeranderAchtergrondImg(GameObject obj)
     {
         if (startValues) return;
-        string sceneNaam = obj.transform.parent.name[2..];
         TMP_Dropdown dropdown = obj.GetComponent<TMP_Dropdown>();
-        if (dropdown.value == -1)
-        {
-            return;
-        }
+        if (dropdown.value == -1) return;
+        string sceneNaam = obj.transform.parent.name[2..];
         if (sceneNaam.ToLower().Equals("all"))
         {
             int dropdownValue = dropdown.value;
@@ -234,12 +166,9 @@ public class InstellingenScript : MonoBehaviour
     public void VeranderAchtergrondKleur(GameObject obj)
     {
         if (startValues) return;
-        string sceneNaam = obj.transform.parent.name[2..];
         TMP_Dropdown dropdown = obj.GetComponent<TMP_Dropdown>();
-        if(dropdown.value == -1)
-        {
-            return;
-        }
+        if (dropdown.value == -1) return;
+        string sceneNaam = obj.transform.parent.name[2..];
         if (sceneNaam.ToLower() == "all")
         {
             int dropdownValue = dropdown.value;
@@ -321,7 +250,6 @@ public class InstellingenScript : MonoBehaviour
             return;
         }
         PlayerPrefs.SetFloat("achtergrondMuziekVolume", sterkte);
-        muziek.mute = sterkte == 0.001f;
-        audioMixer.SetFloat("Muziek", Mathf.Log10(sterkte) * 20f);
+        audioHandler.SetVolume(sterkte);
     }
 }

@@ -8,10 +8,6 @@ public class GegevensHouder : MonoBehaviour
 {
     public static GegevensHouder Instance;
     bool testBuild = false;
-    [HideInInspector] public bool startNewSudoku = false;
-    [HideInInspector] public bool startNewSolitaire = false;
-    [HideInInspector] public bool startNew2048 = false;
-    [HideInInspector] public bool startNewMV = false;
     [HideInInspector] public bool startNewGame = false;
     public Texture2D zwart;
     private bool isPaused = false;
@@ -189,10 +185,5 @@ public class GegevensHouder : MonoBehaviour
         {
             VeranderOpgeslagenAchtergrond(sceneName.ToLower(), saveScript.intDict["bgSoort" + sceneName], saveScript.intDict["bgWaarde" + sceneName]);
         }
-    }
-
-    public void ShowUpdateWindow(string nieuwsteVersie)
-    {
-        Debug.LogWarning("UPDATE APP FOR NEWEST VERSION: " + nieuwsteVersie);
     }
 }

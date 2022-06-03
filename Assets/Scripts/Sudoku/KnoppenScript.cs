@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using TMPro;
 using UnityEngine.UI;
 
@@ -23,11 +22,11 @@ public class KnoppenScript : BaseUIHandler
 
     private PlaatsGetallen plaatsScript;
     private AfScript afScript;
-    private SudokuLayout sudokuLayout;
 
-    protected override void SetLayout()
+    protected override void Start()
     {
-        sudokuLayout.SetLayout();
+        baseLayout = GetComponent<SudokuLayout>();
+        base.Start();
     }
 
     // Use this for initialization
@@ -36,7 +35,6 @@ public class KnoppenScript : BaseUIHandler
         if (saveScript == null) return;
         plaatsScript = GetComponent<PlaatsGetallen>();
         afScript = GetComponent<AfScript>();
-        sudokuLayout = GetComponent<SudokuLayout>();
         dropdown.value = saveScript.intDict["difficulty"];
         buttonsGehad.Clear();
         for (int i = 1; i < 82; i++)
@@ -56,8 +54,9 @@ public class KnoppenScript : BaseUIHandler
     }
 
     // Update is called once per frame
-    private void Update()
+    protected override void Update()
     {
+        base.Update();
         if (!naamIsEventSystem || finishedGameUIObj.activeInHierarchy || saveScript == null)
         {
             return;
@@ -85,20 +84,14 @@ public class KnoppenScript : BaseUIHandler
     {
         gekozendifficulty = dropdown.value;
         saveScript.intDict["difficulty"] = gekozendifficulty;
-        nogEenSudoku();
-    }
-
-    public void nogEenSudoku()
-    {
-        gegevensHouder.startNewSudoku = true;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        StartNewGame();
     }
 
     public void moeilijkerSudoku()
     {
         int difficulty = saveScript.intDict["difficulty"];
         saveScript.intDict["difficulty"] = difficulty + 1;
-        nogEenSudoku();
+        StartNewGame();
     }
 
     public void isSelected()

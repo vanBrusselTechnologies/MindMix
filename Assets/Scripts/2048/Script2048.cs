@@ -8,7 +8,12 @@ using UnityEngine.Localization.SmartFormat.PersistentVariables;
 
 public class Script2048 : MonoBehaviour
 {
-    private int grootte;
+    private Layout2048 layout2048;
+    private GegevensHouder gegevensHouder;
+    private SaveScript saveScript;
+    private BeloningScript beloningScript;
+
+    [SerializeField] private Transform speelVeld;
     [SerializeField] private Button button;
     [SerializeField] private GameObject lijn;
     [SerializeField] private LocalizeStringEvent scoreText;
@@ -16,6 +21,12 @@ public class Script2048 : MonoBehaviour
     [SerializeField] private GameObject uitlegCanvas;
     [SerializeField] private GameObject overigCanvas;
     [SerializeField] private GameObject obj2048;
+    [SerializeField] private GameObject menuUICanvasObj;
+
+    [SerializeField] private LocalizeStringEvent a;
+    [SerializeField] private TMP_Text beloningText;
+
+    private int grootte;
     private Vector3 fp;
     private Vector3 lp;
     private float dragDistanceVert;
@@ -24,7 +35,6 @@ public class Script2048 : MonoBehaviour
     private List<GameObject> knoppenGesorteerd = new List<GameObject>();
     private List<int> knoppenX = new List<int>();
     private List<int> possiblePlekken = new List<int>();
-    [SerializeField] private Transform speelVeld;
     private List<GameObject> buttonsOmTeWissen = new List<GameObject>();
     private List<GameObject> knoppenRij1 = new List<GameObject>();
     private List<GameObject> knoppenRij2 = new List<GameObject>();
@@ -45,36 +55,25 @@ public class Script2048 : MonoBehaviour
     private List<GameObject> GevuldVeldKnoppen = new List<GameObject>();
     private Vector3 knopPositie = Vector3.zero;
     private bool heeftSpelBewogen = true;
-    private GegevensHouder gegevensScript;
-    private SaveScript saveScript;
-    private BeloningScript beloningScript;
-    [SerializeField] private LocalizeStringEvent a;
-    [SerializeField] private TMP_Text beloningText;
-    [SerializeField] private RectTransform gehaaldCanvasTitelRect;
-    [SerializeField] private RectTransform gehaaldCanvasTekstRect;
-    [SerializeField] private RectTransform gehaaldCanvasStartNieuweKnopRect;
-    [SerializeField] private RectTransform gehaaldCanvasNaarMenuKnopRect;
-    [SerializeField] private RectTransform gehaaldCanvasRewardRect;
-    [SerializeField] private GameObject gehaaldCanvasRewardVerdubbelObj;
 
     // Use this for initialization
     private void Start()
     {
-        GameObject gegevensHouder = GameObject.Find("gegevensHouder");
+        gegevensHouder = GegevensHouder.Instance;
         if (gegevensHouder == null)
         {
             SceneManager.LoadScene("LogoEnAppOpstart");
             return;
         }
-        gegevensScript = gegevensHouder.GetComponent<GegevensHouder>();
-        saveScript = gegevensHouder.GetComponent<SaveScript>();
-        beloningScript = gegevensHouder.GetComponent<BeloningScript>();
+        saveScript = SaveScript.Instance;
+        beloningScript = BeloningScript.Instance;
+        layout2048 = GetComponent<Layout2048>();
         Physics.autoSimulation = false;
         Physics.Simulate(1000000f);
         dragDistanceVert = Screen.height * 10 / 100;
         dragDistanceHorz = Screen.width * 10 / 100;
         grootte = saveScript.intDict["grootte2048"] + 4;
-        if (gegevensScript.startNew2048)
+        if (gegevensHouder.startNewGame)
         {
             WisOudeGegevens();
             saveScript.intDict["begonnenAan2048"] = 1;
@@ -119,10 +118,7 @@ public class Script2048 : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        if (gehaaldCanvas.activeInHierarchy)
-        {
-            return; 
-        }
+        if (gehaaldCanvas.activeInHierarchy) return;
         if (heeftSpelBewogen)
         {
             checkGevuldVeld = true;
@@ -595,47 +591,14 @@ public class Script2048 : MonoBehaviour
     {
         a.StringReference.Clear();
         a.StringReference.Add("score", new IntVariable { Value = ((IntVariable)scoreText.StringReference["score"]).Value });
+        WisOudeGegevens();
+        saveScript.intDict["begonnenAan2048"] = 0;
         obj2048.SetActive(false);
         overigCanvas.SetActive(false);
         uitlegCanvas.SetActive(false);
-        float safeZoneAntiY = (Screen.safeArea.y - (Screen.height - Screen.safeArea.height - Screen.safeArea.y)) / 2f;
-        float safeZoneAntiX = (Screen.safeArea.x - (Screen.width - Screen.safeArea.width - Screen.safeArea.x)) / 2f;
+        menuUICanvasObj.SetActive(false);
         gehaaldCanvas.SetActive(true);
-        gehaaldCanvasTitelRect.anchoredPosition = new Vector2(safeZoneAntiX, safeZoneAntiY + (Screen.safeArea.height * (25f / 30f)) - (Screen.height / 2f));
-        gehaaldCanvasTitelRect.sizeDelta = new Vector2(Screen.safeArea.width * 0.85f, Screen.safeArea.height * (10f / 30f));
-        float kleinsteKant = Mathf.Min(Screen.safeArea.height, Screen.safeArea.width);
-        float grootsteKant = Mathf.Max(Screen.safeArea.height, Screen.safeArea.width);
-        if (kleinsteKant - 1440 > 0)
-        {
-            float factor = Mathf.Min(kleinsteKant / 1500f, grootsteKant / 2500f);
-            gehaaldCanvasTitelRect.localScale = Vector2.one * factor;
-            gehaaldCanvasTitelRect.sizeDelta /= factor;
-        }
-        gehaaldCanvasTekstRect.anchoredPosition = new Vector2(safeZoneAntiX, safeZoneAntiY + (Screen.safeArea.height * (17f / 30f)) - (Screen.height / 2f));
-        gehaaldCanvasTekstRect.sizeDelta = new Vector2(Screen.safeArea.width * 0.85f, Screen.safeArea.height * (8f / 30f));
-        gehaaldCanvasRewardRect.anchoredPosition = new Vector2(safeZoneAntiX, safeZoneAntiY + (Screen.safeArea.height * (10f / 30f)) - (Screen.height / 2f));
-        if (Application.internetReachability == NetworkReachability.NotReachable || !gehaaldCanvasRewardVerdubbelObj.activeInHierarchy)
-        {
-            gehaaldCanvasRewardVerdubbelObj.SetActive(false);
-            float scaleFactor = Mathf.Min(Screen.safeArea.width * 0.85f / 500, Screen.safeArea.height * (5f / 30f) / 175);
-            gehaaldCanvasRewardRect.localScale = new Vector3(scaleFactor, scaleFactor, 1);
-            gehaaldCanvasRewardRect.sizeDelta = new Vector2(500, 175);
-        }
-        else
-        {
-            float scaleFactor = Mathf.Min(Screen.safeArea.width * 0.85f / 1000, Screen.safeArea.height * (5f / 30f) / 175);
-            gehaaldCanvasRewardRect.localScale = new Vector3(scaleFactor, scaleFactor, 1);
-            gehaaldCanvasRewardRect.sizeDelta = new Vector2(1000, 175);
-        }
-        float sizeX = Screen.safeArea.width * 0.45f;
-        float sizeY = Screen.safeArea.height * (5f / 30f);
-        float posY = safeZoneAntiY + (Screen.safeArea.height * (3.5f / 30f)) - (Screen.height / 2f);
-        gehaaldCanvasStartNieuweKnopRect.anchoredPosition = new Vector2(safeZoneAntiX - (Screen.safeArea.width / 4f), posY);
-        gehaaldCanvasStartNieuweKnopRect.sizeDelta = new Vector2(sizeX, sizeY);
-        gehaaldCanvasNaarMenuKnopRect.anchoredPosition = new Vector2(safeZoneAntiX + (Screen.safeArea.width / 4f), posY);
-        gehaaldCanvasNaarMenuKnopRect.sizeDelta = new Vector2(sizeX, sizeY);
-        WisOudeGegevens();
-        saveScript.intDict["begonnenAan2048"] = 0;
+        layout2048.SetLayout();
     }
 
     private void WisOudeGegevens()

@@ -5,6 +5,7 @@ using Firebase.Analytics;
 
 public class BeloningScript : MonoBehaviour
 {
+    public static BeloningScript Instance;
     private int klaar = 0;
     private float vorigeScreenWidth;
     private float vorigeSafezoneY;
@@ -23,10 +24,21 @@ public class BeloningScript : MonoBehaviour
     [SerializeField] private TMP_Text muntenText;
     ShopScript shopScript;
 
+    private void Awake()
+    {
+        if (Instance != null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+    }
+
     private void Start()
     {
         SceneManager.sceneLoaded += SceneLoaded;
-        saveScript = GetComponent<SaveScript>();
+        saveScript = SaveScript.Instance;
+        DontDestroyOnLoad(this);
     }
 
     public int Beloning(Scene scene, int difficulty = 0, float score = 0, TMP_Text doelwitText = null)
@@ -42,11 +54,13 @@ public class BeloningScript : MonoBehaviour
             case "2048":
                 float max = Mathf.Pow(2, ((difficulty + 4) * (difficulty + 4)) - 1);
                 munten = Mathf.CeilToInt(score / max * maxMunten2048);
+                munten = Mathf.Max(1, munten);
                 VoegMuntenToe(munten);
                 break;
             case "solitaire":
                 float minuten = Mathf.Max(1, score / 60);
                 munten = Mathf.FloorToInt(maxMuntenSolitaire / minuten);
+                munten = Mathf.Max(1, munten);
                 VoegMuntenToe(munten);
                 break;
             case "mijnenveger":
@@ -59,22 +73,22 @@ public class BeloningScript : MonoBehaviour
             FirebaseAnalytics.EventLevelEnd,
             new Parameter[]{
                 new Parameter(FirebaseAnalytics.ParameterLevelName, scene.name),
-                new Parameter(FirebaseAnalytics.ParameterSuccess, 1)
+                new Parameter(FirebaseAnalytics.ParameterSuccess, 1),
             }
         );
         laatstVerdiendeMunten = munten;
         return munten;
     }
 
-    private void VoegMuntenToe(int muntenToAdd)
+    private void VoegMuntenToe(int coinsToAdd)
     {
-        saveScript.intDict["munten"] += muntenToAdd;
+        saveScript.intDict["munten"] += coinsToAdd;
         ShowHuidigAantalMunten();
         FirebaseAnalytics.LogEvent(
             FirebaseAnalytics.EventEarnVirtualCurrency,
             new Parameter[] {
-                new Parameter(FirebaseAnalytics.ParameterValue, muntenToAdd),
-                new Parameter(FirebaseAnalytics.ParameterVirtualCurrencyName, "Coin")
+                new Parameter(FirebaseAnalytics.ParameterVirtualCurrencyName, "Coin"),
+                new Parameter(FirebaseAnalytics.ParameterValue, coinsToAdd),
             }
         );
     }
@@ -87,14 +101,15 @@ public class BeloningScript : MonoBehaviour
             FirebaseAnalytics.EventSpendVirtualCurrency,
             new Parameter[] {
                 new Parameter(FirebaseAnalytics.ParameterItemName, shopScript.naam),
+                new Parameter(FirebaseAnalytics.ParameterValue, muntenToSpend),
                 new Parameter(FirebaseAnalytics.ParameterVirtualCurrencyName, "Coin"),
-                new Parameter(FirebaseAnalytics.ParameterValue, muntenToSpend)
             }
         );
     }
 
     public void VerdubbelCoins()
     {
+        if (laatsteDoelwitText == null) return;
         int factor = 3;
         VoegMuntenToe(laatstVerdiendeMunten * (factor - 1));
         laatsteDoelwitText.text = (laatstVerdiendeMunten * factor).ToString();

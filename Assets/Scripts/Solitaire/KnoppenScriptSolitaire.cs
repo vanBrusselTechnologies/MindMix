@@ -9,37 +9,34 @@ public class KnoppenScriptSolitaire : BaseUIHandler
     [SerializeField] private TMP_Text beloningText;
     [SerializeField] private GameObject maakAfKnop;
     [SerializeField] private GameObject restStapelOmdraaiKnop;
+
     private List<GameObject> StapelRest = new List<GameObject>();
     [HideInInspector] public List<GameObject> OmgedraaideRest = new List<GameObject>();
+
     private bool canBeFinished = false;
     private bool omdraaiKnopGedeactiveerd = false;
 
     private SolitaireScript solitaireScript;
-    private SolitaireLayout solitaireLayout;
     private BeloningScript beloningScript;
-
-    protected override void SetLayout()
-    {
-        solitaireLayout.SetLayout();
-    }
 
     protected override void Start()
     {
+        baseLayout = GetComponent<SolitaireLayout>();
         base.Start();
         if (saveScript == null) return;
-        solitaireLayout = GetComponent<SolitaireLayout>();
         solitaireScript = GetComponent<SolitaireScript>();
         StapelRest = solitaireScript.StapelRest;
-        beloningScript = gegevensHouder.gameObject.GetComponent<BeloningScript>();
-        if (gegevensHouder.startNewSolitaire)
+        beloningScript = BeloningScript.Instance;
+        if (gegevensHouder.startNewGame)
         {
             WisOudeGegevens();
         }
     }
 
     // Update is called once per frame
-    private void Update()
+    protected override void Update()
     {
+        base.Update();
         if (finishedGameUIObj.activeInHierarchy)
         {
             return;
@@ -57,87 +54,31 @@ public class KnoppenScriptSolitaire : BaseUIHandler
         bool vijf = false;
         bool zes = false;
         bool zeven = false;
-        if (solitaireScript.Stapel1.Count == 0)
+        if (solitaireScript.Stapel1.Count == 0 || solitaireScript.Stapel1[0].name == "leeg_leeg" || solitaireScript.Stapel1[0].transform.localEulerAngles != new Vector3(0, 180, 0))
         {
             een = true;
         }
-        else if (solitaireScript.Stapel1[0].name == "leeg_leeg")
-        {
-            een = true;
-        }
-        else if (solitaireScript.Stapel1[0].transform.localEulerAngles != new Vector3(0, 180, 0))
-        {
-            een = true;
-        }
-        if (solitaireScript.Stapel2.Count == 0)
+        if (solitaireScript.Stapel2.Count == 0 || solitaireScript.Stapel2[0].name == "leeg_leeg" || solitaireScript.Stapel2[0].transform.localEulerAngles != new Vector3(0, 180, 0))
         {
             twee = true;
         }
-        else if (solitaireScript.Stapel2[0].name == "leeg_leeg")
-        {
-            twee = true;
-        }
-        else if (solitaireScript.Stapel2[0].transform.localEulerAngles != new Vector3(0, 180, 0))
-        {
-            twee = true;
-        }
-        if (solitaireScript.Stapel3.Count == 0)
+        if (solitaireScript.Stapel3.Count == 0 || solitaireScript.Stapel3[0].name == "leeg_leeg" || solitaireScript.Stapel3[0].transform.localEulerAngles != new Vector3(0, 180, 0))
         {
             drie = true;
         }
-        else if (solitaireScript.Stapel3[0].name == "leeg_leeg")
-        {
-            drie = true;
-        }
-        else if (solitaireScript.Stapel3[0].transform.localEulerAngles != new Vector3(0, 180, 0))
-        {
-            drie = true;
-        }
-        if (solitaireScript.Stapel4.Count == 0)
+        if (solitaireScript.Stapel4.Count == 0 || solitaireScript.Stapel4[0].name == "leeg_leeg" || solitaireScript.Stapel4[0].transform.localEulerAngles != new Vector3(0, 180, 0))
         {
             vier = true;
         }
-        else if (solitaireScript.Stapel4[0].name == "leeg_leeg")
-        {
-            vier = true;
-        }
-        else if (solitaireScript.Stapel4[0].transform.localEulerAngles != new Vector3(0, 180, 0))
-        {
-            vier = true;
-        }
-        if (solitaireScript.Stapel5.Count == 0)
+        if (solitaireScript.Stapel5.Count == 0 || solitaireScript.Stapel5[0].name == "leeg_leeg" || solitaireScript.Stapel5[0].transform.localEulerAngles != new Vector3(0, 180, 0))
         {
             vijf = true;
         }
-        else if (solitaireScript.Stapel5[0].name == "leeg_leeg")
-        {
-            vijf = true;
-        }
-        else if (solitaireScript.Stapel5[0].transform.localEulerAngles != new Vector3(0, 180, 0))
-        {
-            vijf = true;
-        }
-        if (solitaireScript.Stapel6.Count == 0)
+        if (solitaireScript.Stapel6.Count == 0 || solitaireScript.Stapel6[0].name == "leeg_leeg" || solitaireScript.Stapel6[0].transform.localEulerAngles != new Vector3(0, 180, 0))
         {
             zes = true;
         }
-        else if (solitaireScript.Stapel6[0].name == "leeg_leeg")
-        {
-            zes = true;
-        }
-        else if (solitaireScript.Stapel6[0].transform.localEulerAngles != new Vector3(0, 180, 0))
-        {
-            zes = true;
-        }
-        if (solitaireScript.Stapel7.Count == 0)
-        {
-            zeven = true;
-        }
-        else if (solitaireScript.Stapel7[0].name == "leeg_leeg")
-        {
-            zeven = true;
-        }
-        else if (solitaireScript.Stapel7[0].transform.localEulerAngles != new Vector3(0, 180, 0))
+        if (solitaireScript.Stapel7.Count == 0 || solitaireScript.Stapel7[0].name == "leeg_leeg" || solitaireScript.Stapel7[0].transform.localEulerAngles != new Vector3(0, 180, 0))
         {
             zeven = true;
         }
@@ -178,7 +119,7 @@ public class KnoppenScriptSolitaire : BaseUIHandler
             saveScript.intDict["ReststapelGrootte"] = StapelRest.Count;
             saveScript.intDict["ReststapelOmgekeerdGrootte"] = OmgedraaideRest.Count;
         }
-        solitaireLayout.SetLayout();
+        baseLayout.SetLayout();
     }
 
     public void MaakSolitaireAf(GameObject knop = null)
@@ -222,15 +163,9 @@ public class KnoppenScriptSolitaire : BaseUIHandler
         menuCanvasObj.SetActive(false);
         helpUICanvasObj.SetActive(false);
         settingsCanvasObj.SetActive(false);
-        solitaireLayout.SetLayout();
+        baseLayout.SetLayout();
         WisOudeGegevens();
         saveScript.intDict["aanSolitaireBegonnen"] = 0;
-    }
-
-    public void nieuweSolitaire()
-    {
-        gegevensHouder.startNewSolitaire = true;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     public override void OpenHelpUI()

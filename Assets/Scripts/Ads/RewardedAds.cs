@@ -9,12 +9,8 @@ public class RewardedAds : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowLi
 
     private void Awake()
     {
-        GameObject gegevensHouder = GameObject.Find("gegevensHouder");
-        if(gegevensHouder == null)
-        {
-            return;
-        }
-        beloningScript = gegevensHouder.GetComponent<BeloningScript>();
+        beloningScript = BeloningScript.Instance;
+        if (beloningScript == null) return;
         _adUnitId = (Application.platform == RuntimePlatform.IPhonePlayer)
             ? "iOS_Rewarded"
             : "Android_Rewarded";

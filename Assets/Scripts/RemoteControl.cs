@@ -9,11 +9,8 @@ public class RemoteControl : MonoBehaviour
 
     string nieuwsteVersie;
 
-    private GegevensHouder gegevensHouder;
-
     private void Start()
     {
-        gegevensHouder = GetComponent<GegevensHouder>();
         ConfigManager.FetchCompleted += ApplyRemoteSettings;
         ConfigManager.FetchConfigs(new userAttributes(), new appAttributes());
     }
@@ -34,13 +31,6 @@ public class RemoteControl : MonoBehaviour
                 nieuwsteVersie = ConfigManager.appConfig.GetString("nieuwsteVersie");
                 break;
         }
-        if (Application.version.StartsWith(nieuwsteVersie))
-        {
-            Debug.Log("Nieuwste versie van app");
-        }
-        else
-        {
-            gegevensHouder.ShowUpdateWindow(nieuwsteVersie);
-        }
+        if (Application.version.StartsWith(nieuwsteVersie)) Debug.Log("Nieuwste versie van app");
     }
 }

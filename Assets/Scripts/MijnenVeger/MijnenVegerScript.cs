@@ -40,25 +40,24 @@ public class MijnenVegerScript : MonoBehaviour
     [SerializeField] private GameObject MenuUICanvasObj;
     [SerializeField] private TMP_Text beloningText;
     private SaveScript saveScript;
-    private GegevensHouder gegevensScript;
+    private GegevensHouder gegevensHouder;
     private BeloningScript beloningScript;
     private MijnenVegerLayout mvLayout;
 
     private void Start()
     {
-        GameObject gegevensHouder = GameObject.Find("gegevensHouder");
+        gegevensHouder = GegevensHouder.Instance;
         if (gegevensHouder == null)
         {
             SceneManager.LoadScene("LogoEnAppOpstart");
             return;
         }
-        gegevensScript = GegevensHouder.Instance;
         saveScript = SaveScript.Instance;
-        beloningScript = gegevensHouder.GetComponent<BeloningScript>();
+        beloningScript = BeloningScript.Instance;
         mvLayout = GetComponent<MijnenVegerLayout>();
         int shortSide = Mathf.Min(mvLayout.horizontalSideBoxCount, mvLayout.verticalSideBoxCount);
         int longSide = Mathf.Max(mvLayout.horizontalSideBoxCount, mvLayout.verticalSideBoxCount);
-        if (gegevensScript.startNewMV)
+        if (gegevensHouder.startNewGame)
         {
             DeleteProgress();
             for (int i = 0; i < longSide; i++)
@@ -86,7 +85,7 @@ public class MijnenVegerScript : MonoBehaviour
         aantalBommen = 25 + (int)(10f * Mathf.Pow(1.75f, saveScript.intDict["difficultyMijnenVeger"]));
         for (int i = 0; i < aantalBommen; i++)
         {
-            if (gegevensScript.startNewMV)
+            if (gegevensHouder.startNewGame)
             {
                 int getal = randVakjes[Random.Range(0, randVakjes.Count)];
                 randVakjes.Remove(getal);
@@ -100,7 +99,7 @@ public class MijnenVegerScript : MonoBehaviour
                 bommenList.Add(saveScript.intDict["mijnenvegerBom" + i]);
             }
         }
-        if (!gegevensScript.startNewMV)
+        if (!gegevensHouder.startNewGame)
         {
             for (int i = 0; i < vakjesGehad.Count; i++)
             {

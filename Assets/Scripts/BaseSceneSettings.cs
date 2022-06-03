@@ -4,27 +4,24 @@ using UnityEngine.SceneManagement;
 
 public abstract class BaseSceneSettings : MonoBehaviour
 {
-    Achtergrond achtergrondScript;
+    private Achtergrond achtergrondScript;
     protected SaveScript saveScript;
     protected GegevensHouder gegevensScript;
     [Header("Background settings")]
-    [SerializeField] TMP_Dropdown colorDropDown;
-    [SerializeField] TMP_Dropdown imageDropDown;
-    [SerializeField] TMP_Dropdown bgSoortDropDown;
-    bool startValues = true;
-    string sceneName;
+    [SerializeField] private TMP_Dropdown colorDropDown;
+    [SerializeField] private TMP_Dropdown imageDropDown;
+    [SerializeField] private TMP_Dropdown bgSoortDropDown;
+    private bool startValues = true;
+    private string sceneName;
 
     // Start is called before the first frame update
     void Start()
     {
         GameObject gegevensHouder = GameObject.Find("gegevensHouder");
-        if (gegevensHouder == null)
-        {
-            return;
-        }
-        saveScript = gegevensHouder.GetComponent<SaveScript>();
+        if (gegevensHouder == null) return;
+        saveScript = SaveScript.Instance;
         achtergrondScript = gegevensHouder.GetComponent<Achtergrond>();
-        gegevensScript = gegevensHouder.GetComponent<GegevensHouder>();
+        gegevensScript = GegevensHouder.Instance;
         sceneName = SceneManager.GetActiveScene().name;
         SetBackgroundStartValues();
         SetSettingStartValues();
@@ -52,6 +49,7 @@ public abstract class BaseSceneSettings : MonoBehaviour
         {
             int bgWaarde = saveScript.intDict["bgWaarde" + sceneName];
             int dropdownValue = bgWaarde >= 0 ? achtergrondScript.gekochteColorOptionData.IndexOf(achtergrondScript.colorOptionData[bgWaarde]) : -1;
+            if (bgWaarde == -1) dropdownValue = 0;
             imageDropDown.gameObject.SetActive(false);
             imageDropDown.value = 0;
             colorDropDown.gameObject.SetActive(true);

@@ -25,11 +25,6 @@ public class MijnenVegerLayout : BaseLayout
         base.Start();
     }
 
-    public override void SetLayout()
-    {
-        base.SetLayout();
-    }
-
     protected override void SetLayoutBasic()
     {
         base.SetLayoutBasic();
@@ -163,7 +158,7 @@ public class MijnenVegerLayout : BaseLayout
             flagOrShovelButtonRect.localPosition = new Vector3(mvFieldPosX + (2f / 3f) * scale, yPos, -5);
             bombsToGoTransform.localPosition = new Vector3(mvFieldPosX - (2f / 3f) * scale, yPos, -5);
             xPosRootObj = 0;
-            yPosRootObj = -(screenSafeAreaHeightInUnits - ((mvFieldPosY + scaleVertical * 0.5f) - (yPos - scale * 0.5f) + cornerButtonSize + screenSafeAreaHeightInUnits * 0.04f)) / 2f;
+            yPosRootObj = -(screenSafeAreaHeightInUnits - (mvFieldPosY + (scaleVertical * 0.5f) - (yPos - (scale * 0.5f)) + cornerButtonSize + (screenSafeAreaHeightInUnits * 0.04f))) / 2f;
         }
         else
         {
@@ -173,7 +168,7 @@ public class MijnenVegerLayout : BaseLayout
             float xPos = mvFieldPosX - (scaleHorizontal / 2f) - (scale / 2f * 1.5f);
             flagOrShovelButtonRect.localPosition = new Vector3(xPos, mvFieldPosY + (2f / 3f) * scale, -5);
             bombsToGoTransform.localPosition = new Vector3(xPos, mvFieldPosY - (2f / 3f) * scale, -5);
-            xPosRootObj = -(screenSafeAreaWidthInUnits - ((mvFieldPosX + scaleHorizontal * 0.5f) - (xPos - scale * 0.5f) + cornerButtonSize + screenSafeAreaWidthInUnits * 0.04f)) / 2f;
+            xPosRootObj = -(screenSafeAreaWidthInUnits - (mvFieldPosX + (scaleHorizontal * 0.5f) - (xPos - (scale * 0.5f)) + cornerButtonSize + (screenSafeAreaWidthInUnits * 0.04f))) / 2f;
             yPosRootObj = 0;
         }
         mvField.localScale = new Vector3(scaleHorizontal, scaleVertical, 1);

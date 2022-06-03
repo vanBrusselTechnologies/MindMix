@@ -29,14 +29,14 @@ public class OpenAppScript : MonoBehaviour
         voorplaatAnimatie = GetComponent<StartupAnimation>();
         Physics.autoSimulation = false;
         Physics.Simulate(1000000f);
-        GameObject gegevensHouder = GameObject.Find("gegevensHouder");
-        if (gegevensHouder == null)
+        GameObject googleScriptsObj = GameObject.Find("GoogleScriptsObj");
+        if (googleScriptsObj == null)
         {
             SceneManager.LoadScene("LogoEnAppOpstart");
             return;
         }
-        fireBaseSetup = gegevensHouder.GetComponent<FireBaseSetup>();
-        fireBaseAuth = gegevensHouder.GetComponent<FireBaseAuth>();
+        fireBaseSetup = googleScriptsObj.GetComponent<FireBaseSetup>();
+        fireBaseAuth = googleScriptsObj.GetComponent<FireBaseAuth>();
         saveScript = SaveScript.Instance;
         gegevensScript = GegevensHouder.Instance;
         if (SceneManager.GetActiveScene().name == "inlogEnVoorplaatApp")

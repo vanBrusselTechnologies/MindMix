@@ -26,15 +26,11 @@ public class KaartSleepScript : MonoBehaviour
     // Use this for initialization
     private void Start()
     {
+        saveScript = SaveScript.Instance;
+        if (saveScript == null) return;
         solitaireScript = eventSystem.GetComponent<SolitaireScript>();
         knoppenScript = eventSystem.GetComponent<KnoppenScriptSolitaire>();
         solitaireLayout = eventSystem.GetComponent<SolitaireLayout>();
-        GameObject gegevensHouder = GameObject.Find("gegevensHouder");
-        if (gegevensHouder == null)
-        {
-            return;
-        }
-        saveScript = gegevensHouder.GetComponent<SaveScript>();
         tf = transform;
     }
 

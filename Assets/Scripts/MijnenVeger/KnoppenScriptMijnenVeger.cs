@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.SceneManagement;
 using TMPro;
 
 public class KnoppenScriptMijnenVeger : BaseUIHandler
@@ -9,20 +8,14 @@ public class KnoppenScriptMijnenVeger : BaseUIHandler
     [SerializeField] private TMP_Dropdown difficultyDropdown;
 
     private MijnenVegerScript mvScript;
-    private MijnenVegerLayout mvLayout;
-
-    protected override void SetLayout()
-    {
-        mvLayout.SetLayout();
-    }
 
     // Use this for initialization
     protected override void Start()
     {
         base.Start();
         if (saveScript == null) return;
+        baseLayout = GetComponent<MijnenVegerLayout>();
         mvScript = GetComponent<MijnenVegerScript>();
-        mvLayout = GetComponent<MijnenVegerLayout>();
         difficultyDropdown.value = saveScript.intDict["difficultyMijnenVeger"];
     }
 
@@ -37,7 +30,6 @@ public class KnoppenScriptMijnenVeger : BaseUIHandler
         int chosenDiff = difficultyDropdown.value;
         if (moreDifficult) chosenDiff += 1;
         saveScript.intDict["difficultyMijnenVeger"] = chosenDiff;
-        gegevensHouder.startNewMV = true;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        StartNewGame();
     }
 }

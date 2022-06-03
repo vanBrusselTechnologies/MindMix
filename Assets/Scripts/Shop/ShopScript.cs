@@ -7,49 +7,43 @@ using UnityEngine.Localization;
 
 public class ShopScript : MonoBehaviour
 {
-    private bool isPaused = false;
-    private bool wasPaused = false;
-    private int klaar = 3;
-    private float vorigeScreenWidth;
-    private float vorigeSafezoneY;
-    private float vorigeSafezoneX;
     private BeloningScript beloningScript;
     private GegevensHouder gegevensScript;
     private SaveScript saveScript;
     private Achtergrond achtergrondScript;
-    [SerializeField] private RectTransform infoEnKoopDeeltje;
-    private int prijs;
-    [HideInInspector] public string naam;
-    [SerializeField] private RectTransform achtergrondKleurenScrolldown;
-    [SerializeField] private RectTransform achtergrondKleurenScrolldownContent;
-    [SerializeField] private RectTransform achtergrondAfbeeldingenScrolldown;
-    [SerializeField] private RectTransform achtergrondAfbeeldingenScrolldownContent;
-    [SerializeField] private RectTransform spelModiScrolldown;
-    [SerializeField] private RectTransform spelModiScrolldownContent;
+    private ShopLayout shopLayout;
+
+    [SerializeField] private GameObject infoEnKoopDeelObj;
+    [SerializeField] private GameObject bgColorObj;
+    [SerializeField] private GameObject bgColorScrolldownObj;
+    [SerializeField] private Transform bgColorScrolldownContentTransform;
+    [SerializeField] private GameObject bgImgObj;
+    [SerializeField] private GameObject bgImgScrolldownObj;
+    [SerializeField] private Transform bgImgScrolldownContentTransform;
+    [SerializeField] private GameObject spelModiObj;
+    [SerializeField] private GameObject spelModiScrolldownObj;
     [SerializeField] private GameObject textButtonPrefab;
     [SerializeField] private GameObject imageButtonPrefab;
-    [SerializeField] private RectTransform terugNaarMenuKnop;
-    [SerializeField] private RectTransform shopPaginaWisselKnoppenHouder;
-    [SerializeField] private RectTransform naarSpelModiKnopRect;
-    private List<RectTransform> achtergrondKleurItems = new List<RectTransform>();
-    private List<RectTransform> achtergrondAfbeeldingItems = new List<RectTransform>();
     [SerializeField] private TMP_Text infoDeelItemNaam;
     [SerializeField] private Image infoDeelItemAfbeelding;
     [SerializeField] private Image infoDeelItemAfbeeldingMidden;
     [SerializeField] private TMP_Text infoDeelItemPrijs;
     [SerializeField] private GameObject testKnop;
-    private bool wisselKleurVoorbeeld = false;
     [SerializeField] private LocalizedString wisselKleurString;
     [SerializeField] private GameObject gekochtSchermObj;
-    [SerializeField] private RectTransform gekochtSchermSafezoneRect;
-    [SerializeField] private RectTransform gekochtSchermAfbeeldingRect;
     [SerializeField] private Image gekochtSchermAfbeeldingImg;
-    [SerializeField] private RectTransform gekochtSchermNameRect;
     [SerializeField] private TMP_Text gekochtSchermNameText;
-    [SerializeField] private RectTransform gekochtSchermGekochtRect;
+
+    [HideInInspector] public List<RectTransform> bgColorItems = new List<RectTransform>();
+    [HideInInspector] public List<RectTransform> bgImgItems = new List<RectTransform>();
+
     private GameObject bg;
     private Image bgImg;
     private RectTransform bgRect;
+
+    private int prijs;
+    [HideInInspector] public string naam;
+    [HideInInspector] public bool wisselKleurVoorbeeld = false;
 
     private void Start()
     {
@@ -59,41 +53,15 @@ public class ShopScript : MonoBehaviour
             SceneManager.LoadScene("LogoEnAppOpstart");
             return;
         }
-        gegevensScript = gegevensHouder.GetComponent<GegevensHouder>();
-        saveScript = gegevensHouder.GetComponent<SaveScript>();
-        beloningScript = gegevensHouder.GetComponent<BeloningScript>();
+        gegevensScript = GegevensHouder.Instance;
+        saveScript = SaveScript.Instance;
+        beloningScript = BeloningScript.Instance;
         achtergrondScript = gegevensHouder.GetComponent<Achtergrond>();
+        shopLayout = GetComponent<ShopLayout>();
         ZetShopItems();
-        SetLayout(true);
-        vorigeScreenWidth = Screen.width;
-        vorigeSafezoneY = Screen.safeArea.y;
-        vorigeSafezoneX = Screen.safeArea.x;
         bg = GameObject.Find("BackGround");
         bgImg = bg.GetComponent<Image>();
         bgRect = bg.GetComponent<RectTransform>();
-    }
-
-    // Update is called once per frame
-    private void Update()
-    {
-        if (!isPaused && wasPaused)
-        {
-            SetLayout();
-        }
-        wasPaused = isPaused;
-        if (vorigeScreenWidth == Screen.width && vorigeSafezoneY == Screen.safeArea.y && vorigeSafezoneX == Screen.safeArea.x)
-        {
-            if (klaar < 3)
-            {
-                SetLayout();
-            }
-            return;
-        }
-        klaar = 0;
-        SetLayout();
-        vorigeScreenWidth = Screen.width;
-        vorigeSafezoneY = Screen.safeArea.y;
-        vorigeSafezoneX = Screen.safeArea.x;
     }
 
     private void FixedUpdate()
@@ -106,139 +74,46 @@ public class ShopScript : MonoBehaviour
 
     private void ZetShopItems()
     {
-        int itemsPerRij = Mathf.Max(Mathf.FloorToInt(Screen.safeArea.width / 350), 4);
-        int i = 0;
-        if (saveScript.intDict["kleur-1gekocht"] == 0)
-        {
-            int rij = Mathf.FloorToInt(i / itemsPerRij);
-            int kolom = i - (rij * itemsPerRij);
-            GameObject button = Instantiate(textButtonPrefab, achtergrondKleurenScrolldownContent.transform, false);
-            RectTransform buttonRect = button.GetComponent<RectTransform>();
-            float xSize = Screen.safeArea.width * 0.98f / (itemsPerRij + 1f);
-            buttonRect.sizeDelta = new Vector2(xSize, xSize / 2f);
-            buttonRect.anchoredPosition = new Vector2((xSize / (itemsPerRij + 1f)) + (((xSize / (itemsPerRij + 1f)) + xSize) * kolom), (-xSize / (itemsPerRij + 1f) / 2f) - (((xSize / (itemsPerRij + 1f)) + (xSize / 2f)) * rij));
-            achtergrondKleurItems.Add(buttonRect);
-            TMP_Text buttonText = button.GetComponentInChildren<TMP_Text>();
-            buttonText.text = wisselKleurString.GetLocalizedString();
-            button.name = "kleur-1";
-            button.GetComponent<Button>().onClick.AddListener(() => Selecteer(button.transform));
-            i += 1;
-        }
-        for (int ii = 0; ii < achtergrondScript.colorOptionData.Count; ii++)
+        for (int ii = -1; ii < achtergrondScript.colorOptionData.Count; ii++)
         {
             if (saveScript.intDict["kleur" + ii + "gekocht"] == 0)
             {
-                int rij = Mathf.FloorToInt(i / itemsPerRij);
-                int kolom = i - (rij * itemsPerRij);
-                GameObject button = Instantiate(textButtonPrefab, achtergrondKleurenScrolldownContent.transform, false);
+                GameObject button = Instantiate(textButtonPrefab, bgColorScrolldownContentTransform, false);
                 RectTransform buttonRect = button.GetComponent<RectTransform>();
-                float xSize = Screen.safeArea.width * 0.98f / (itemsPerRij + 1f);
-                buttonRect.sizeDelta = new Vector2(xSize, xSize / 2f);
-                buttonRect.anchoredPosition = new Vector2((xSize / (itemsPerRij + 1f)) + (((xSize / (itemsPerRij + 1f)) + xSize) * kolom), (-xSize / (itemsPerRij + 1f) / 2f) - (((xSize / (itemsPerRij + 1f)) + (xSize / 2f)) * rij));
-                achtergrondKleurItems.Add(buttonRect);
+                bgColorItems.Add(buttonRect);
                 TMP_Text buttonText = button.GetComponentInChildren<TMP_Text>();
-                buttonText.text = achtergrondScript.colorOptionData[ii].text;
+                buttonText.text = ii == -1 ? wisselKleurString.GetLocalizedString() : achtergrondScript.colorOptionData[ii].text;
                 button.name = "kleur" + ii;
                 button.GetComponent<Button>().onClick.AddListener(() => Selecteer(button.transform));
-                i += 1;
             }
         }
-        itemsPerRij = Mathf.Max(Mathf.FloorToInt(Screen.safeArea.width / 450), 4);
-        i = 0;
         for (int ii = 0; ii < achtergrondScript.imageOptionData.Count; ii++)
         {
             if (saveScript.intDict["afbeelding" + ii + "gekocht"] == 0)
             {
-                int rij = Mathf.FloorToInt(i / itemsPerRij);
-                int kolom = i - (rij * itemsPerRij);
-                GameObject button = Instantiate(imageButtonPrefab, achtergrondAfbeeldingenScrolldownContent.transform, false);
+                GameObject button = Instantiate(imageButtonPrefab, bgImgScrolldownContentTransform, false);
                 RectTransform buttonRect = button.GetComponent<RectTransform>();
-                float xSize = Screen.safeArea.width * 0.98f / (itemsPerRij + 1f);
-                buttonRect.sizeDelta = new Vector2(xSize, xSize);
-                buttonRect.anchoredPosition = new Vector2((xSize / (itemsPerRij + 1f)) + (((xSize / (itemsPerRij + 1f)) + xSize) * kolom), (-xSize / (itemsPerRij + 1f)) - (((xSize / (itemsPerRij + 1f)) + xSize) * rij));
-                achtergrondAfbeeldingItems.Add(buttonRect);
+                bgImgItems.Add(buttonRect);
                 Image buttonImg = button.GetComponent<Image>();
                 buttonImg.sprite = achtergrondScript.imageOptionData[ii].image;
                 button.name = "afbeelding" + ii;
                 button.GetComponent<Button>().onClick.AddListener(() => Selecteer(button.transform));
-                i += 1;
             }
         }
-    }
-
-    private void SetLayout(bool inStart = false)
-    {
-        if (!inStart)
-        {
-            int itemsPerRij = Mathf.Max(Mathf.FloorToInt(Screen.safeArea.width / 350), 4);
-            for (int i = 0; i < achtergrondKleurItems.Count; i++)
-            {
-                int rij = Mathf.FloorToInt(i / itemsPerRij);
-                int kolom = i - (rij * itemsPerRij);
-                float xSize = Screen.safeArea.width * 0.98f / (itemsPerRij + 1f);
-                RectTransform buttonRect = achtergrondKleurItems[i];
-                buttonRect.sizeDelta = new Vector2(xSize, xSize / 2f);
-                buttonRect.anchoredPosition = new Vector2((xSize / (itemsPerRij + 1f)) + (((xSize / (itemsPerRij + 1f)) + xSize) * kolom), (-xSize / (itemsPerRij + 1f) / 2f) - (((xSize / (itemsPerRij + 1f)) + (xSize / 2f)) * rij));
-            }
-            itemsPerRij = Mathf.Max(Mathf.FloorToInt(Screen.safeArea.width / 450), 4);
-            for (int i = 0; i < achtergrondAfbeeldingItems.Count; i++)
-            {
-                int rij = Mathf.FloorToInt(i / itemsPerRij);
-                int kolom = i - (rij * itemsPerRij);
-                float xSize = Screen.safeArea.width * 0.98f / (itemsPerRij + 1f);
-                RectTransform buttonRect = achtergrondAfbeeldingItems[i];
-                buttonRect.sizeDelta = new Vector2(xSize, xSize);
-                buttonRect.anchoredPosition = new Vector2((xSize / (itemsPerRij + 1f)) + (((xSize / (itemsPerRij + 1f)) + xSize) * kolom), (-xSize / (itemsPerRij + 1f)) - (((xSize / (itemsPerRij + 1f)) + xSize) * rij));
-            }
-        }
-        klaar += 1;
-        float safeZoneAntiY = (Screen.safeArea.y - (Screen.height - Screen.safeArea.height - Screen.safeArea.y)) / 2f;
-        float safeZoneAntiX = (Screen.safeArea.x - (Screen.width - Screen.safeArea.width - Screen.safeArea.x)) / 2f;
-        terugNaarMenuKnop.sizeDelta = Vector2.one * Mathf.Min(Screen.safeArea.width, Screen.safeArea.height) / 11f;
-        terugNaarMenuKnop.anchoredPosition = new Vector2((-Screen.width / 2) + Screen.safeArea.x + (Mathf.Min(Screen.safeArea.width, Screen.safeArea.height) / 11f * 0.6f), (Screen.height / 2) - (Screen.height - Screen.safeArea.height - Screen.safeArea.y) - (Mathf.Min(Screen.safeArea.width, Screen.safeArea.height) / 11 * 0.6f));
-        Vector3 scrollDownSize = new Vector2(Screen.safeArea.width * 0.98f, Screen.safeArea.height * 0.85f);
-        achtergrondAfbeeldingenScrolldown.sizeDelta = scrollDownSize;
-        achtergrondKleurenScrolldown.sizeDelta = scrollDownSize;
-        spelModiScrolldown.sizeDelta = scrollDownSize;
-        Vector3 scrollDownContentSize = scrollDownSize;
-        achtergrondAfbeeldingenScrolldownContent.sizeDelta = scrollDownContentSize;
-        if (achtergrondKleurItems.Count > 0)
-        {
-            achtergrondKleurenScrolldownContent.sizeDelta = new Vector2(0, Mathf.Max(scrollDownSize.y, 25f - achtergrondKleurItems[^1].anchoredPosition.y + achtergrondKleurItems[^1].sizeDelta.y));
-        }
-        if (achtergrondAfbeeldingItems.Count > 0)
-        {
-            achtergrondAfbeeldingenScrolldownContent.sizeDelta = new Vector2(0, Mathf.Max(scrollDownSize.y, 25f - achtergrondAfbeeldingItems[^1].anchoredPosition.y + achtergrondAfbeeldingItems[^1].sizeDelta.y));
-        }
-        spelModiScrolldownContent.sizeDelta = scrollDownContentSize;
-        Vector3 scrollDownPosition = new Vector3(safeZoneAntiX, safeZoneAntiY + (scrollDownSize.y / 2f) - (Screen.safeArea.height / 2f), 0);
-        achtergrondAfbeeldingenScrolldown.anchoredPosition = scrollDownPosition;
-        achtergrondKleurenScrolldown.anchoredPosition = scrollDownPosition;
-        spelModiScrolldown.anchoredPosition = scrollDownPosition;
-        int aantalSettingPages = shopPaginaWisselKnoppenHouder.childCount;
-        float scaleKnoppenHouder1 = Screen.safeArea.width * 0.5f * 0.8f / (naarSpelModiKnopRect.sizeDelta.x * 0.5f * aantalSettingPages);
-        float scaleKnoppenHouder2 = Screen.safeArea.height * 0.5f * 0.2f / naarSpelModiKnopRect.sizeDelta.y;
-        float scaleKnoppenHouder = Mathf.Min(scaleKnoppenHouder1, scaleKnoppenHouder2);
-        shopPaginaWisselKnoppenHouder.localScale = new Vector3(scaleKnoppenHouder, scaleKnoppenHouder, 1);
-        float yPosKnoppenHouder = scrollDownPosition.y + (scrollDownSize.y / 2f) + (scaleKnoppenHouder * naarSpelModiKnopRect.sizeDelta.y / 2f);
-        float xPosKnoppenHouder = (Screen.safeArea.width * (((0.95f + 0.2f) / 2) - 0.5f)) + safeZoneAntiX;
-        shopPaginaWisselKnoppenHouder.anchoredPosition = new Vector3(xPosKnoppenHouder, yPosKnoppenHouder, 0);
-        infoEnKoopDeeltje.gameObject.SetActive(false);
-        SluitGekochtScherm();
-        wisselKleurVoorbeeld = false;
+        shopLayout.SetLayoutShopItemButtons();
     }
 
     public void Selecteer(Transform dezeKnop)
     {
         wisselKleurVoorbeeld = false;
-        if (!infoEnKoopDeeltje.gameObject.activeInHierarchy)
+        if (!infoEnKoopDeelObj.activeInHierarchy)
         {
-            infoEnKoopDeeltje.gameObject.SetActive(true);
+            infoEnKoopDeelObj.SetActive(true);
             float scaleFactor = Screen.safeArea.width * 0.9f / 2000;
-            infoEnKoopDeeltje.localScale = new Vector3(scaleFactor, scaleFactor, 1);
+            infoEnKoopDeelObj.transform.localScale = new Vector3(scaleFactor, scaleFactor, 1);
         }
-        naam = dezeKnop.name; 
-        if (achtergrondKleurenScrolldown.gameObject.activeInHierarchy)
+        naam = dezeKnop.name;
+        if (bgColorScrolldownObj.activeInHierarchy)
         {
             prijs = 100;
             infoDeelItemNaam.text = dezeKnop.GetComponentInChildren<TMP_Text>().text;
@@ -258,7 +133,7 @@ public class ShopScript : MonoBehaviour
             testKnop.SetActive(false);
             infoDeelItemAfbeelding.sprite = null;
         }
-        else if(achtergrondAfbeeldingenScrolldown.gameObject.activeInHierarchy)
+        else if (bgImgScrolldownObj.activeInHierarchy)
         {
             prijs = 2025;
             Sprite dezeKnopSprite = dezeKnop.GetComponentInChildren<Image>().sprite;
@@ -269,32 +144,33 @@ public class ShopScript : MonoBehaviour
             infoDeelItemAfbeeldingMidden.color = Color.white;
             testKnop.SetActive(true);
         }
-        else if (spelModiScrolldown.gameObject.activeInHierarchy)
+        else if (spelModiScrolldownObj.activeInHierarchy)
         {
-            prijs = 2500;
+            prijs = 4500;
         }
         infoDeelItemPrijs.text = prijs.ToString();
+        shopLayout.SetPositionInfoDeeltje();
     }
 
     public void Koop()
     {
-        if(saveScript.intDict["munten"] >= prijs)
+        if (saveScript.intDict["munten"] >= prijs)
         {
             beloningScript.GeefMuntenUit(prijs);
-            infoEnKoopDeeltje.gameObject.SetActive(false);
+            infoEnKoopDeelObj.SetActive(false);
             if (naam.StartsWith("kleur"))
             {
                 int kleurIndex = int.Parse(naam.Split("kleur")[1]);
                 achtergrondScript.KleurGekocht(kleurIndex);
                 saveScript.intDict["kleur" + kleurIndex + "gekocht"] = 1;
-                for (int i = 0; i < achtergrondKleurItems.Count; i++)
+                for (int i = 0; i < bgColorItems.Count; i++)
                 {
-                    GameObject button = achtergrondKleurItems[i].gameObject;
+                    GameObject button = bgColorItems[i].gameObject;
                     if (button.name == naam)
                     {
-                        achtergrondKleurItems.RemoveAt(i);
+                        bgColorItems.RemoveAt(i);
                         Destroy(button);
-                        SetLayout();
+                        shopLayout.SetLayout();
                         break;
                     }
                 }
@@ -304,14 +180,14 @@ public class ShopScript : MonoBehaviour
                 int afbeeldingIndex = int.Parse(naam.Split("afbeelding")[1]);
                 achtergrondScript.AfbeeldingGekocht(afbeeldingIndex);
                 saveScript.intDict["afbeelding" + afbeeldingIndex + "gekocht"] = 1;
-                for (int i = 0; i < achtergrondAfbeeldingItems.Count; i++)
+                for (int i = 0; i < bgImgItems.Count; i++)
                 {
-                    GameObject button = achtergrondAfbeeldingItems[i].gameObject;
+                    GameObject button = bgImgItems[i].gameObject;
                     if (button.name == naam)
                     {
-                        achtergrondAfbeeldingItems.RemoveAt(i);
+                        bgImgItems.RemoveAt(i);
                         Destroy(button);
-                        SetLayout();
+                        shopLayout.SetLayout();
                         break;
                     }
                 }
@@ -327,28 +203,28 @@ public class ShopScript : MonoBehaviour
 
     public void SluitInfoEnKoopDeeltje()
     {
-        infoEnKoopDeeltje.gameObject.SetActive(false);
+        infoEnKoopDeelObj.SetActive(false);
     }
 
     public void WisselShopPagina(int i)
     {
-        infoEnKoopDeeltje.gameObject.SetActive(false);
+        infoEnKoopDeelObj.SetActive(false);
         switch (i)
         {
             case 0:
-                achtergrondKleurenScrolldown.parent.gameObject.SetActive(true);
-                achtergrondAfbeeldingenScrolldown.parent.gameObject.SetActive(false);
-                spelModiScrolldown.parent.gameObject.SetActive(false);
+                bgColorObj.SetActive(true);
+                bgImgObj.SetActive(false);
+                spelModiObj.SetActive(false);
                 break;
             case 1:
-                achtergrondKleurenScrolldown.parent.gameObject.SetActive(false);
-                achtergrondAfbeeldingenScrolldown.parent.gameObject.SetActive(true);
-                spelModiScrolldown.parent.gameObject.SetActive(false);
+                bgColorObj.SetActive(false);
+                bgImgObj.SetActive(true);
+                spelModiObj.SetActive(false);
                 break;
             case 2:
-                achtergrondKleurenScrolldown.parent.gameObject.SetActive(false);
-                achtergrondAfbeeldingenScrolldown.parent.gameObject.SetActive(false);
-                spelModiScrolldown.parent.gameObject.SetActive(true);
+                bgColorObj.SetActive(false);
+                bgImgObj.SetActive(false);
+                spelModiObj.SetActive(true);
                 break;
             default: break;
         }
@@ -428,30 +304,21 @@ public class ShopScript : MonoBehaviour
         saveScript.floatDict["color.b"] = nextColor.b;
     }
 
-    private void OpenGekochtScherm()
+    public void OpenGekochtScherm()
     {
         gekochtSchermObj.SetActive(true);
-        gekochtSchermSafezoneRect.offsetMin = new Vector2(Screen.safeArea.x, Screen.safeArea.y);
-        gekochtSchermSafezoneRect.offsetMax = -new Vector2(Screen.width - Screen.safeArea.width - Screen.safeArea.x, Screen.height - Screen.safeArea.height - Screen.safeArea.y);
-        if (achtergrondKleurenScrolldown.gameObject.activeInHierarchy)
+        gekochtSchermNameText.text = infoDeelItemNaam.text;
+        if (bgColorScrolldownObj.activeInHierarchy)
         {
             gekochtSchermAfbeeldingImg.sprite = null;
             gekochtSchermAfbeeldingImg.color = infoDeelItemAfbeelding.color;
-            gekochtSchermAfbeeldingRect.sizeDelta = new Vector2(-Screen.safeArea.width / 10f, Screen.safeArea.height / 3f);
         }
-        else if (achtergrondAfbeeldingenScrolldown.gameObject.activeInHierarchy)
+        else if (bgImgScrolldownObj.activeInHierarchy)
         {
             gekochtSchermAfbeeldingImg.sprite = infoDeelItemAfbeeldingMidden.sprite;
             gekochtSchermAfbeeldingImg.color = Color.white;
-            gekochtSchermAfbeeldingRect.sizeDelta = new Vector2(-Screen.safeArea.width / 10f, Screen.safeArea.height / 2f);
         }
-        gekochtSchermNameText.text = infoDeelItemNaam.text;
-        gekochtSchermNameRect.sizeDelta = new Vector2(-Screen.safeArea.width / 10f, Screen.safeArea.height / 4f);
-        gekochtSchermGekochtRect.sizeDelta = new Vector2(-Screen.safeArea.width / 10f, Screen.safeArea.height / 4f);
-        float totaleHoogte = Screen.safeArea.height * (1f / 3f + 0.5f);
-        gekochtSchermAfbeeldingRect.anchoredPosition = new Vector2(0, totaleHoogte - Screen.safeArea.height / 2f - gekochtSchermAfbeeldingRect.sizeDelta.y / 2f + (Screen.height - totaleHoogte) / 2f);
-        gekochtSchermNameRect.anchoredPosition = new Vector2(0, totaleHoogte - Screen.safeArea.height / 2f - gekochtSchermAfbeeldingRect.sizeDelta.y - gekochtSchermNameRect.sizeDelta.y / 2f + (Screen.height - totaleHoogte) / 2f);
-        gekochtSchermGekochtRect.anchoredPosition = new Vector2(0, -Screen.safeArea.height / 2f + gekochtSchermGekochtRect.sizeDelta.y / 2f + (Screen.height - totaleHoogte) / 2f);
+        shopLayout.OpenGekochtScherm();
     }
 
     public void SluitGekochtScherm()

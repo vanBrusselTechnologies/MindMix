@@ -5,35 +5,15 @@ using UnityEngine.SceneManagement;
 
 public class SolitaireScript : MonoBehaviour
 {
-    private SolitaireLayout solitaireLayout;
-    public List<GameObject> kaarten = new List<GameObject>();
-    private List<GameObject> kaartenGeschud = new List<GameObject>();
-    [HideInInspector] public List<GameObject> Stapel1 = new List<GameObject>();
-    [HideInInspector] public List<GameObject> Stapel2 = new List<GameObject>();
-    [HideInInspector] public List<GameObject> Stapel3 = new List<GameObject>();
-    [HideInInspector] public List<GameObject> Stapel4 = new List<GameObject>();
-    [HideInInspector] public List<GameObject> Stapel5 = new List<GameObject>();
-    [HideInInspector] public List<GameObject> Stapel6 = new List<GameObject>();
-    [HideInInspector] public List<GameObject> Stapel7 = new List<GameObject>();
-    [HideInInspector] public List<GameObject> StapelRest = new List<GameObject>();
-    [HideInInspector] public List<GameObject> EindStapel1 = new List<GameObject>();
-    [HideInInspector] public List<GameObject> EindStapel2 = new List<GameObject>();
-    [HideInInspector] public List<GameObject> EindStapel3 = new List<GameObject>();
-    [HideInInspector] public List<GameObject> EindStapel4 = new List<GameObject>();
-    private KnoppenScriptSolitaire knoppenScript;
-    private float tijd;
-    private float startTijdSolitaire;
-    [SerializeField] private TMP_Text tijdtijd;
-    [HideInInspector] public bool voltooid = false;
-    private GegevensHouder gegevensScript;
+    private GegevensHouder gegevensHouder;
     private BeloningScript beloningScript;
-    private int minAantalKaartenStapel1 = 10;
-    private int minAantalKaartenStapel2 = 10;
-    private int minAantalKaartenStapel3 = 10;
-    private int minAantalKaartenStapel4 = 10;
-    private int minAantalKaartenStapel5 = 10;
-    private int minAantalKaartenStapel6 = 10;
-    private int minAantalKaartenStapel7 = 10;
+    private SaveScript saveScript;
+    private SolitaireLayout solitaireLayout;
+    private KnoppenScriptSolitaire knoppenScript;
+
+    public List<GameObject> kaarten = new List<GameObject>();
+    
+    [SerializeField] private TMP_Text tijdtijd;
     [SerializeField] private GameObject Stapel1Houder;
     [SerializeField] private GameObject Stapel2Houder;
     [SerializeField] private GameObject Stapel3Houder;
@@ -48,28 +28,51 @@ public class SolitaireScript : MonoBehaviour
     [SerializeField] private GameObject RestStapelOmdraaiKnop;
     [SerializeField] private GameObject maakAfKnop;
     [SerializeField] private TMP_Text beloningText;
-    private SaveScript saveScript;
+
+    private List<GameObject> kaartenGeschud = new List<GameObject>();
+    [HideInInspector] public List<GameObject> Stapel1 = new List<GameObject>();
+    [HideInInspector] public List<GameObject> Stapel2 = new List<GameObject>();
+    [HideInInspector] public List<GameObject> Stapel3 = new List<GameObject>();
+    [HideInInspector] public List<GameObject> Stapel4 = new List<GameObject>();
+    [HideInInspector] public List<GameObject> Stapel5 = new List<GameObject>();
+    [HideInInspector] public List<GameObject> Stapel6 = new List<GameObject>();
+    [HideInInspector] public List<GameObject> Stapel7 = new List<GameObject>();
+    [HideInInspector] public List<GameObject> StapelRest = new List<GameObject>();
+    [HideInInspector] public List<GameObject> EindStapel1 = new List<GameObject>();
+    [HideInInspector] public List<GameObject> EindStapel2 = new List<GameObject>();
+    [HideInInspector] public List<GameObject> EindStapel3 = new List<GameObject>();
+    [HideInInspector] public List<GameObject> EindStapel4 = new List<GameObject>();
+
+    [HideInInspector] public bool uitlegActief = false;
+    [HideInInspector] public bool voltooid = false;
+    private float tijd;
+    private float startTijdSolitaire;
     private float totaleTijdstraf = 0f;
     private float tijdstraf = 5f;
-    [HideInInspector] public bool uitlegActief = false;
+    private int minAantalKaartenStapel1 = 10;
+    private int minAantalKaartenStapel2 = 10;
+    private int minAantalKaartenStapel3 = 10;
+    private int minAantalKaartenStapel4 = 10;
+    private int minAantalKaartenStapel5 = 10;
+    private int minAantalKaartenStapel6 = 10;
+    private int minAantalKaartenStapel7 = 10;
 
     // Use this for initialization
     private void Start()
     {
         Physics.autoSimulation = false;
         Physics.Simulate(1000000f);
-        GameObject gegevensHouder = GameObject.Find("gegevensHouder");
+        gegevensHouder = GegevensHouder.Instance;
         if (gegevensHouder == null)
         {
             SceneManager.LoadScene("LogoEnAppOpstart");
             return;
         }
-        gegevensScript = gegevensHouder.GetComponent<GegevensHouder>();
-        saveScript = gegevensHouder.GetComponent<SaveScript>();
-        beloningScript = gegevensHouder.GetComponent<BeloningScript>();
+        saveScript = SaveScript.Instance;
+        beloningScript = BeloningScript.Instance;
         solitaireLayout = GetComponent<SolitaireLayout>();
         knoppenScript = GetComponent<KnoppenScriptSolitaire>();
-        if (gegevensScript.startNewSolitaire)
+        if (gegevensHouder.startNewGame)
         {
             SchudKaarten();
             ZetBeginKaartenInStapel(true);

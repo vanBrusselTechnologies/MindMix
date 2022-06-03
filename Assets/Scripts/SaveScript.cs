@@ -48,7 +48,7 @@ public class SaveScript : MonoBehaviour
         achtergrond = GetComponent<Achtergrond>();
         DontDestroyOnLoad(this);
         VulNames();
-        LaadGegevens();
+        LoadData();
         SceneManager.sceneUnloaded += SaveSceneData;
         Application.quitting += Quitting;
     }
@@ -210,11 +210,6 @@ public class SaveScript : MonoBehaviour
         {
             intDict["bgWaarde" + sceneName] = 9;
         }
-    }
-
-    private void LaadGegevens()
-    {
-        LoadData();
     }
 
     private bool updateData = false;
@@ -439,6 +434,7 @@ public class SaveScript : MonoBehaviour
         }
         SaveData(data);
     }
+
     private void SaveColorSort()
     {
         SaveNull();

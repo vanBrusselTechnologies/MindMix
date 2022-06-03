@@ -4,8 +4,9 @@ using VBG.Extensions;
 [DefaultExecutionOrder(-50)]
 public class BaseLayout : MonoBehaviour
 {
-    [HideInInspector] public static BaseLayout Instance { get; private set; }
     protected SaveScript saveScript;
+
+    private Camera _camera;
 
     [HideInInspector] public float screenWidth = 0;
     [HideInInspector] public float screenHeight;
@@ -15,8 +16,8 @@ public class BaseLayout : MonoBehaviour
     [HideInInspector] public float screenSafeAreaY;
     [HideInInspector] public float screenSafeAreaXRight;
     [HideInInspector] public float screenSafeAreaYUp;
-    [HideInInspector] public float screenSafeAreaCenterXInUnits;
     [HideInInspector] public float screenSafeAreaCenterX;
+    [HideInInspector] public float screenSafeAreaCenterY;
 
     [HideInInspector] public float screenWidthInUnits;
     [HideInInspector] public float screenHeightInUnits;
@@ -26,8 +27,8 @@ public class BaseLayout : MonoBehaviour
     [HideInInspector] public float screenSafeAreaYInUnits;
     [HideInInspector] public float screenSafeAreaXRightInUnits;
     [HideInInspector] public float screenSafeAreaYUpInUnits;
+    [HideInInspector] public float screenSafeAreaCenterXInUnits;
     [HideInInspector] public float screenSafeAreaCenterYInUnits;
-    [HideInInspector] public float screenSafeAreaCenterY;
 
     protected ScreenOrientation screenOrientation;
 
@@ -75,7 +76,7 @@ public class BaseLayout : MonoBehaviour
     {
         saveScript = SaveScript.Instance;
         if (saveScript == null) return;
-        Instance = this;
+        _camera = Camera.main;
         SetScreenValues();
         SetLayout();
     }
@@ -111,7 +112,7 @@ public class BaseLayout : MonoBehaviour
         _lastSafezoneX = Screen.safeArea.x;
     }
 
-    void SetScreenValues()
+    private void SetScreenValues()
     {
         screenWidth = Screen.width;
         screenHeight = Screen.height;
@@ -125,14 +126,14 @@ public class BaseLayout : MonoBehaviour
         screenSafeAreaCenterX = (screenSafeAreaX - screenSafeAreaXRight) / 2f;
         screenSafeAreaCenterY = (screenSafeAreaY - screenSafeAreaYUp) / 2f;
 
-        screenWidthInUnits = ScreenExt.PixelsToUnits(screenWidth);
-        screenHeightInUnits = ScreenExt.PixelsToUnits(screenHeight);
-        screenSafeAreaWidthInUnits = ScreenExt.PixelsToUnits(screenSafeAreaWidth);
-        screenSafeAreaHeightInUnits = ScreenExt.PixelsToUnits(screenSafeAreaHeight);
-        screenSafeAreaXInUnits = ScreenExt.PixelsToUnits(screenSafeAreaX);
-        screenSafeAreaYInUnits = ScreenExt.PixelsToUnits(screenSafeAreaY);
-        screenSafeAreaXRightInUnits = ScreenExt.PixelsToUnits(screenSafeAreaXRight);
-        screenSafeAreaYUpInUnits = ScreenExt.PixelsToUnits(screenSafeAreaYUp);
+        screenWidthInUnits = ScreenExt.PixelsToUnits(screenWidth, _camera);
+        screenHeightInUnits = ScreenExt.PixelsToUnits(screenHeight, _camera);
+        screenSafeAreaWidthInUnits = ScreenExt.PixelsToUnits(screenSafeAreaWidth, _camera);
+        screenSafeAreaHeightInUnits = ScreenExt.PixelsToUnits(screenSafeAreaHeight, _camera);
+        screenSafeAreaXInUnits = ScreenExt.PixelsToUnits(screenSafeAreaX, _camera);
+        screenSafeAreaYInUnits = ScreenExt.PixelsToUnits(screenSafeAreaY, _camera);
+        screenSafeAreaXRightInUnits = ScreenExt.PixelsToUnits(screenSafeAreaXRight, _camera);
+        screenSafeAreaYUpInUnits = ScreenExt.PixelsToUnits(screenSafeAreaYUp, _camera);
         screenSafeAreaCenterXInUnits = (screenSafeAreaXInUnits - screenSafeAreaXRightInUnits) / 2f;
         screenSafeAreaCenterYInUnits = (screenSafeAreaYInUnits - screenSafeAreaYUpInUnits) / 2f;
 

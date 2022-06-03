@@ -11,11 +11,11 @@ public class AfScript : MonoBehaviour
     private SudokuLayout sudokuLayout;
     private BeloningScript beloningScript;
     [HideInInspector] public List<int> getallen;
-    private GegevensHouder gegevensScript;
-    [SerializeField] private GameObject GehaaldCanvas;
-    [SerializeField] private GameObject SudokuCanvas;
-    [SerializeField] private GameObject OverigCanvas;
-    [SerializeField] private GameObject MenuUICanvasObj;
+    private GegevensHouder gegevensHouder;
+    [SerializeField] private GameObject gehaaldCanvas;
+    [SerializeField] private GameObject sudokuCanvas;
+    [SerializeField] private GameObject overigCanvas;
+    [SerializeField] private GameObject menuUICanvasObj;
     [SerializeField] private List<GameObject> knoppen = new List<GameObject>();
     [HideInInspector] public bool ietsVeranderd = true;
     private SaveScript saveScript;
@@ -25,15 +25,14 @@ public class AfScript : MonoBehaviour
     {
         Physics.autoSimulation = false;
         Physics.Simulate(1000000f);
-        GameObject gegevensHouder = GameObject.Find("gegevensHouder");
+        gegevensHouder = GegevensHouder.Instance;
         if (gegevensHouder == null)
         {
             SceneManager.LoadScene("LogoEnAppOpstart");
             return;
         }
-        gegevensScript = gegevensHouder.GetComponent<GegevensHouder>();
-        saveScript = gegevensHouder.GetComponent<SaveScript>();
-        beloningScript = gegevensHouder.GetComponent<BeloningScript>();
+        saveScript = SaveScript.Instance;
+        beloningScript = BeloningScript.Instance;
         getallen = new List<int>();
         for (int i = 0; i < 81; i++)
         {
@@ -45,7 +44,7 @@ public class AfScript : MonoBehaviour
         sudokuLayout = GetComponent<SudokuLayout>();
         weghaalScript.knoppen = knoppen;
         knoppenScript.knoppen = knoppen;
-        if (gegevensScript.startNewSudoku)
+        if (gegevensHouder.startNewGame)
         {
             ClearProgress();
             plaatsScript.Start0();
@@ -64,7 +63,7 @@ public class AfScript : MonoBehaviour
 
     private void Update()
     {
-        if (GehaaldCanvas.activeInHierarchy)
+        if (gehaaldCanvas.activeInHierarchy)
         {
             return;
         }
@@ -157,10 +156,10 @@ public class AfScript : MonoBehaviour
     public void OpenGehaaldCanvas()
     {
         ClearProgress();
-        GehaaldCanvas.SetActive(true);
-        SudokuCanvas.SetActive(false);
-        OverigCanvas.SetActive(false);
-        MenuUICanvasObj.SetActive(false);
+        gehaaldCanvas.SetActive(true);
+        sudokuCanvas.SetActive(false);
+        overigCanvas.SetActive(false);
+        menuUICanvasObj.SetActive(false);
         sudokuLayout.SetLayout();
     }
 

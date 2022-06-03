@@ -14,6 +14,11 @@ public class AudioHandler : MonoBehaviour
     private void Start()
     {
         float volume = PlayerPrefs.GetFloat("achtergrondMuziekVolume", 0.25f);
+        SetVolume(volume);
+    }
+
+    public void SetVolume(float volume)
+    {
         audioSource.mute = volume == 0.001f;
         audioMixerGroup.audioMixer.SetFloat("Muziek", Mathf.Log10(volume) * 20f);
     }

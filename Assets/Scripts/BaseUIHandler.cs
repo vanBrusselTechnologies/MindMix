@@ -7,6 +7,7 @@ public abstract class BaseUIHandler : MonoBehaviour
 {
     protected GegevensHouder gegevensHouder;
     protected SaveScript saveScript;
+
     protected BaseLayout baseLayout;
 
     [Header("Menu UI")]
@@ -32,10 +33,17 @@ public abstract class BaseUIHandler : MonoBehaviour
         saveScript = SaveScript.Instance;
         if (saveScript == null) return;
         gegevensHouder = GegevensHouder.Instance;
-        baseLayout = BaseLayout.Instance;
     }
 
-    protected abstract void SetLayout();
+    protected virtual void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (settingsCanvasObj != null && settingsCanvasObj.activeInHierarchy) OpenSettings();
+            else if (helpUICanvasObj != null && helpUICanvasObj.activeInHierarchy) OpenHelpUI();
+            else BackToMenu();
+        }
+    }
 
     public void BackToMenu()
     {
@@ -78,9 +86,9 @@ public abstract class BaseUIHandler : MonoBehaviour
                 menuUIRect.sizeDelta = new Vector2(baseLayout.screenSafeAreaX + baseLayout.screenSafeAreaWidth * 0.2f, baseLayout.screenHeight);
                 menuUIRect.anchoredPosition = new Vector2(baseLayout.screenSafeAreaX - menuUIRect.sizeDelta.x / 2f - (baseLayout.screenWidth / 2f), baseLayout.screenHeight / 2f);
                 backToMenuButtonRect.transform.SetParent(menuUITransform);
-                float size = Mathf.Min(baseLayout.screenSafeAreaWidth / 12f, baseLayout.screenSafeAreaHeight / 12f);
+                float size = Mathf.Min(Mathf.Max(baseLayout.screenSafeAreaWidth, baseLayout.screenSafeAreaHeight) / 12f, Mathf.Min(baseLayout.screenSafeAreaWidth, baseLayout.screenSafeAreaHeight) / 10f);
                 backToMenuButtonRect.sizeDelta = Vector2.one * size;
-                backToMenuButtonRect.anchoredPosition = new Vector2(baseLayout.screenSafeAreaX - menuUIRect.sizeDelta.x / 2f + size / 2f, -baseLayout.screenSafeAreaY / 2f + baseLayout.screenHeight / 2f - size / 2f);
+                backToMenuButtonRect.anchoredPosition = new Vector2((size * 0.6f) - (menuUIRect.sizeDelta.x / 2f) + baseLayout.screenSafeAreaX, (baseLayout.screenHeight / 2f) - (baseLayout.screenSafeAreaY / 2f) - (size * 0.6f));
                 float yNewGameButton = 0;
                 if (menuNewGameOptionRect != null)
                 {
@@ -161,7 +169,7 @@ public abstract class BaseUIHandler : MonoBehaviour
         gameSpecificRootObj.SetActive(helpUIActive);
         generalCanvasObj.SetActive(helpUIActive);
         menuCanvasObj.SetActive(helpUIActive);
-        SetLayout();
+        baseLayout.SetLayout();
     }
 
     public virtual void OpenSettings()
@@ -171,6 +179,28 @@ public abstract class BaseUIHandler : MonoBehaviour
         gameSpecificRootObj.SetActive(settingObjActive);
         generalCanvasObj.SetActive(settingObjActive);
         menuCanvasObj.SetActive(settingObjActive);
-        SetLayout();
+        baseLayout.SetLayout();
+    }
+
+    public virtual void StartNewGame()
+    {
+        gegevensHouder.startNewGame = true;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    private void OnApplicationPause(bool pause)
+    {
+        if (!pause)
+        {
+            if (helpUICanvasObj != null && gameSpecificRootObj.activeInHierarchy) OpenHelpUI();
+        }
+    }
+
+    private void OnApplicationFocus(bool focus)
+    {
+        if (!focus)
+        {
+            if (helpUICanvasObj != null && gameSpecificRootObj.activeInHierarchy) OpenHelpUI();
+        }
     }
 }

@@ -3,8 +3,8 @@ using UnityEngine.Advertisements;
 
 public class AdsInitializer : MonoBehaviour, IUnityAdsInitializationListener
 {
-    [SerializeField] string _androidGameId;
-    [SerializeField] string _iOsGameId;
+    [SerializeField] private string _androidGameId;
+    [SerializeField] private string _iOsGameId;
     private bool _testMode = false;
     private string _gameId;
 

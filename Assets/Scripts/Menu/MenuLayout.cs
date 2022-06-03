@@ -38,7 +38,7 @@ public class MenuLayout : BaseLayout
     {
         float size = Mathf.Min(Mathf.Max(screenSafeAreaWidth, screenSafeAreaHeight) / 12f, Mathf.Min(screenSafeAreaWidth, screenSafeAreaHeight) / 10f);
         backToMenuButtonRect.sizeDelta = Vector2.one * size;
-        backToMenuButtonRect.anchoredPosition = new Vector2(screenSafeAreaX - (screenWidth / 2f) + (size * 0.6f), (screenHeight / 2f) - screenSafeAreaYUp - (size * 0.6f));
+        backToMenuButtonRect.anchoredPosition = new Vector2((size * 0.6f) - (screenSafeAreaWidth / 2f) + screenSafeAreaCenterX, (screenHeight / 2f) - screenSafeAreaYUp - (size * 0.6f));
         settingsUIOpenButtonRect.anchoredPosition = new Vector2(-screenSafeAreaXRight - (size * 0.6f), -screenSafeAreaYUp - (size * 0.6f));
         settingsUIOpenButtonRect.sizeDelta = Vector2.one * size;
         shopButtonRect.anchoredPosition = new Vector2(-screenSafeAreaXRight - (size * 0.6f) - size, -screenSafeAreaYUp - (size * 0.6f));
