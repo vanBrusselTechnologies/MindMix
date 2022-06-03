@@ -9,7 +9,7 @@ public class FireBaseAuth : MonoBehaviour
 
     private void Start()
     {
-        saveScript = GetComponent<SaveScript>();
+        saveScript = SaveScript.Instance;
         fireBaseSetup = GetComponent<FireBaseSetup>();
     }
 
@@ -51,14 +51,12 @@ public class FireBaseAuth : MonoBehaviour
 
     public void PlayGamesLogin(string authCode)
     {
-        Debug.Log("Get Credential: PlayGamesAuthProvider.GetCredential(authCode)");
         Credential credential = PlayGamesAuthProvider.GetCredential(authCode);
         auth.SignInWithCredentialAsync(credential).ContinueWith(task => {
             if (task.IsFaulted || task.IsCanceled)
             {
                 Debug.Log(task.Exception.InnerException.Message);
             }
-            Debug.Log("task succesfull");
             saveScript.intDict["laatsteXOffline"] = 0;
             saveScript.UpdateData();
         });

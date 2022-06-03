@@ -5,8 +5,7 @@ using Firebase.Auth;
 public class FireBaseSetup : MonoBehaviour
 {
     [HideInInspector]
-    public bool ready = false;
-    public bool offline = false;
+    public bool ready = false, offline = false;
     private bool eersteReadyFrame = true;
 
     // Start is called before the first frame update
@@ -24,6 +23,7 @@ public class FireBaseSetup : MonoBehaviour
             eersteReadyFrame = false;
             FireBaseSettings();
             GetComponent<PlayGamesSetup>().StartPlayGamesSetup();
+            GetComponent<FireBaseDynamicLinks>().DynamicLinkSetup();
         }
     }
 
