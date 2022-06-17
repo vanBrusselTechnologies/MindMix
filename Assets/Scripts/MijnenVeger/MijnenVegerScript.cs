@@ -178,7 +178,7 @@ public class MijnenVegerScript : MonoBehaviour
     private int GetMineCount(int kolom, int rij)
     {
         int shortSide = Mathf.Min(mvLayout.horizontalSideBoxCount, mvLayout.verticalSideBoxCount);
-        int longSide  = Mathf.Max(mvLayout.horizontalSideBoxCount, mvLayout.verticalSideBoxCount);
+        int longSide = Mathf.Max(mvLayout.horizontalSideBoxCount, mvLayout.verticalSideBoxCount);
         int aantalBommen = 0;
         if (bommenList.IndexOf(kolom + (rij * 100)) != -1)
         {
@@ -489,7 +489,7 @@ public class MijnenVegerScript : MonoBehaviour
         {
             a.GetComponentInChildren<TMP_Text>().text = "-";
             a.tag = "Untagged";
-            if(index == -100)
+            if (index == -100)
             {
                 VindMeerVakkenZonderBomBuren(kolom, rij);
             }
@@ -593,7 +593,7 @@ public class MijnenVegerScript : MonoBehaviour
                 {
                     if (!alreadyPressed)
                     {
-                        InstantiateButton(kolom: kolom,rij: rij);
+                        InstantiateButton(kolom: kolom, rij: rij);
                         mvLayout.SetButtonsLayout();
                     }
                 }

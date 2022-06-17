@@ -18,7 +18,7 @@ public class SudokuLayout : BaseLayout
     protected override void SetLayoutFinishedGameUI()
     {
         RectTransform _ = finishedGameUINewMoreDifficultGameButtonRect;
-        if(saveScript.intDict["difficulty"] >= 3)
+        if (saveScript.intDict["difficulty"] >= 3)
         {
             finishedGameUINewMoreDifficultGameButtonRect.gameObject.SetActive(false);
             finishedGameUINewMoreDifficultGameButtonRect = null;

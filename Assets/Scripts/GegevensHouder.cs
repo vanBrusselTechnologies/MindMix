@@ -28,13 +28,13 @@ public class GegevensHouder : MonoBehaviour
 
     private void Awake()
     {
-        if(Instance != null)
+        if (Instance != null)
         {
             Destroy(gameObject);
             return;
         }
         Instance = this;
-        if(Application.platform == RuntimePlatform.WindowsEditor)
+        if (Application.platform == RuntimePlatform.WindowsEditor)
         {
             testBuild = true;
         }
@@ -96,22 +96,23 @@ public class GegevensHouder : MonoBehaviour
     public void VeranderOpgeslagenAchtergrond(string sceneNaam, int bgSoort, int waarde)
     {
         gewisseldeKleur = true;
-        switch(sceneNaam){
+        switch (sceneNaam)
+        {
             case "sudoku":
                 achtergrondSudoku[0] = bgSoort;
-                achtergrondSudoku[1] = waarde; 
+                achtergrondSudoku[1] = waarde;
                 break;
             case "menu":
                 achtergrondMenu[0] = bgSoort;
-                achtergrondMenu[1] = waarde; 
+                achtergrondMenu[1] = waarde;
                 break;
             case "2048":
                 achtergrond2048[0] = bgSoort;
-                achtergrond2048[1] = waarde; 
+                achtergrond2048[1] = waarde;
                 break;
             case "mijnenveger":
                 achtergrondMV[0] = bgSoort;
-                achtergrondMV[1] = waarde; 
+                achtergrondMV[1] = waarde;
                 break;
             case "solitaire":
                 achtergrondSolitaire[0] = bgSoort;

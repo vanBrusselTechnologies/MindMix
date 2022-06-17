@@ -34,13 +34,10 @@ public class ShopLayout : BaseLayout
         float size = Mathf.Min(Mathf.Max(screenSafeAreaWidth, screenSafeAreaHeight) / 12f, Mathf.Min(screenSafeAreaWidth, screenSafeAreaHeight) / 10f);
         backToMenuButtonRect.sizeDelta = Vector2.one * size;
         backToMenuButtonRect.anchoredPosition = new Vector2((size * 0.6f) - (screenSafeAreaWidth / 2f) + screenSafeAreaCenterX, (screenHeight / 2f) - screenSafeAreaYUp - (size * 0.6f));
-        Vector3 scrollDownSize = new Vector2(Screen.safeArea.width * 0.98f, Screen.safeArea.height * 0.85f);
+        Vector3 scrollDownSize = new Vector2(screenSafeAreaWidth * 0.98f, screenSafeAreaHeight * 0.85f);
         bgImgScrolldown.sizeDelta = scrollDownSize;
         bgColorScrolldown.sizeDelta = scrollDownSize;
         spelModiScrolldown.sizeDelta = scrollDownSize;
-        Vector3 scrollDownContentSize = scrollDownSize;
-        bgImgScrolldownContent.sizeDelta = scrollDownContentSize;
-        spelModiScrolldownContent.sizeDelta = scrollDownContentSize;
         Vector3 scrollDownPosition = new Vector3(safeZoneAntiX, safeZoneAntiY + (scrollDownSize.y / 2f) - (Screen.safeArea.height / 2f), 0);
         bgImgScrolldown.anchoredPosition = scrollDownPosition;
         bgColorScrolldown.anchoredPosition = scrollDownPosition;
@@ -80,8 +77,10 @@ public class ShopLayout : BaseLayout
 
     public void SetLayoutShopItemButtons()
     {
+        Vector3 scrollDownSize = new Vector2(screenSafeAreaWidth * 0.98f, screenSafeAreaHeight * 0.85f);
         int itemsPerRij;
-        if (shopScript.bgColorItems.Count != 0) {
+        if (shopScript.bgColorItems.Count != 0)
+        {
             itemsPerRij = Mathf.Max(Mathf.FloorToInt(screenSafeAreaWidth / 350), 4);
             for (int i = 0; i < shopScript.bgColorItems.Count; i++)
             {
@@ -94,6 +93,8 @@ public class ShopLayout : BaseLayout
             }
             bgColorScrolldownContent.sizeDelta = new Vector2(0, Mathf.Max(screenSafeAreaHeight * 0.85f, 25f - shopScript.bgColorItems[^1].anchoredPosition.y + shopScript.bgColorItems[^1].sizeDelta.y));
         }
+        else
+            bgColorScrolldownContent.sizeDelta = scrollDownSize;
         if (shopScript.bgImgItems.Count != 0)
         {
             itemsPerRij = Mathf.Max(Mathf.FloorToInt(screenSafeAreaWidth / 450), 4);
@@ -108,6 +109,24 @@ public class ShopLayout : BaseLayout
             }
             bgImgScrolldownContent.sizeDelta = new Vector2(0, Mathf.Max(screenSafeAreaHeight * 0.85f, 25f - shopScript.bgImgItems[^1].anchoredPosition.y + shopScript.bgImgItems[^1].sizeDelta.y));
         }
+        else
+            bgImgScrolldownContent.sizeDelta = scrollDownSize;
+        if (shopScript.gameModiItems.Count != 0)
+        {
+            itemsPerRij = Mathf.Max(Mathf.FloorToInt(screenSafeAreaWidth / 450), 4);
+            for (int i = 0; i < shopScript.gameModiItems.Count; i++)
+            {
+                int rij = Mathf.FloorToInt(i / itemsPerRij);
+                int kolom = i - (rij * itemsPerRij);
+                float xSize = screenSafeAreaWidth * 0.98f / (itemsPerRij + 1f);
+                RectTransform buttonRect = shopScript.gameModiItems[i];
+                buttonRect.sizeDelta = new Vector2(xSize, xSize);
+                buttonRect.anchoredPosition = new Vector2((xSize / (itemsPerRij + 1f)) + (((xSize / (itemsPerRij + 1f)) + xSize) * kolom), (-xSize / (itemsPerRij + 1f)) - (((xSize / (itemsPerRij + 1f)) + xSize) * rij));
+            }
+            bgImgScrolldownContent.sizeDelta = new Vector2(0, Mathf.Max(screenSafeAreaHeight * 0.85f, 25f - shopScript.gameModiItems[^1].anchoredPosition.y + shopScript.gameModiItems[^1].sizeDelta.y));
+        }
+        else
+            spelModiScrolldownContent.sizeDelta = scrollDownSize;
     }
 
     public void SetPositionInfoDeeltje()

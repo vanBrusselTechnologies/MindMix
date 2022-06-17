@@ -42,7 +42,7 @@ public class MijnenVegerLayout : BaseLayout
         cornerButtonSize = 1.1f * Mathf.Min(Mathf.Max(screenSafeAreaWidthInUnits, screenSafeAreaHeightInUnits) / 12f, Mathf.Min(screenSafeAreaWidthInUnits, screenSafeAreaHeightInUnits) / 10f);
         SetMineSweeperFieldLayout(cornerButtonSize);
     }
-    
+
     protected override void SetLayoutFinishedGameUI()
     {
         bool gameOver = mvScript.GameOver;
@@ -80,7 +80,7 @@ public class MijnenVegerLayout : BaseLayout
         for (int i = 1; i < Mathf.Max(verticalSideBoxCount, horizontalSideBoxCount); i++)
         {
             Instantiate(line, gridTransform);
-            if(i < Mathf.Min(verticalSideBoxCount, horizontalSideBoxCount))
+            if (i < Mathf.Min(verticalSideBoxCount, horizontalSideBoxCount))
             {
                 Instantiate(line, gridTransform);
             }

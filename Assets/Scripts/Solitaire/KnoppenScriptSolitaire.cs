@@ -124,7 +124,7 @@ public class KnoppenScriptSolitaire : BaseUIHandler
 
     public void MaakSolitaireAf(GameObject knop = null)
     {
-        if(knop != null)
+        if (knop != null)
         {
             Scene scene = SceneManager.GetActiveScene();
             float tijd = saveScript.floatDict["SolitaireTijd"];

@@ -111,6 +111,7 @@ public class SaveScript : MonoBehaviour
             SolitaireIntNames.Add("Reststapel:" + ii);
             SolitaireIntNames.Add("ReststapelOmgekeerd:" + ii);
         }
+        SolitaireIntNames.Add("solitaireCardsSpriteType");
         //Float
         SolitaireFloatNames.Add("SolitaireTijd");
         SolitaireFloatNames.Add("SolitaireSnelsteTijd");
@@ -179,7 +180,7 @@ public class SaveScript : MonoBehaviour
         {
             gekochteItems.Add("kleur" + i + "gekocht");
         }
-        for(int i = 0; i < 50; i++)
+        for (int i = 0; i < 50; i++)
         {
             gekochteItems.Add("afbeelding" + i + "gekocht");
         }

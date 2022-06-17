@@ -36,6 +36,7 @@ public class ShopScript : MonoBehaviour
 
     [HideInInspector] public List<RectTransform> bgColorItems = new List<RectTransform>();
     [HideInInspector] public List<RectTransform> bgImgItems = new List<RectTransform>();
+    [HideInInspector] public List<RectTransform> gameModiItems = new List<RectTransform>();
 
     private GameObject bg;
     private Image bgImg;

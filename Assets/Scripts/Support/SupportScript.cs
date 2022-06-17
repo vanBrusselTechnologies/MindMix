@@ -12,7 +12,7 @@ public class SupportScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if(GegevensHouder.Instance == null)
+        if (GegevensHouder.Instance == null)
         {
             SceneManager.LoadScene("LogoEnAppOpstart");
             return;

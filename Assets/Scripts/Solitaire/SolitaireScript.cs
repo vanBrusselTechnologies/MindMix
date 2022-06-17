@@ -12,7 +12,7 @@ public class SolitaireScript : MonoBehaviour
     private KnoppenScriptSolitaire knoppenScript;
 
     public List<GameObject> kaarten = new List<GameObject>();
-    
+
     [SerializeField] private TMP_Text tijdtijd;
     [SerializeField] private GameObject Stapel1Houder;
     [SerializeField] private GameObject Stapel2Houder;
@@ -104,14 +104,15 @@ public class SolitaireScript : MonoBehaviour
     {
         if (voltooid || uitlegActief)
         {
-            if(uitlegActief) startTijdSolitaire = Time.time - tijd;
+            if (uitlegActief) startTijdSolitaire = Time.time - tijd;
             return;
         }
         else
         {
             if (EindStapel1.Count >= 13 && EindStapel2.Count >= 13 && EindStapel3.Count >= 13 && EindStapel4.Count >= 13)
             {
-                if (EindStapel1[^1].name.EndsWith('K') && EindStapel2[^1].name.EndsWith('K') && EindStapel3[^1].name.EndsWith('K') && EindStapel4[^1].name.EndsWith('K')) {
+                if (EindStapel1[^1].name.EndsWith('K') && EindStapel2[^1].name.EndsWith('K') && EindStapel3[^1].name.EndsWith('K') && EindStapel4[^1].name.EndsWith('K'))
+                {
                     voltooid = true;
                     maakAfKnop.SetActive(false);
                     Scene scene = SceneManager.GetActiveScene();
@@ -144,7 +145,8 @@ public class SolitaireScript : MonoBehaviour
 
     public void ZetBeginKaartenInStapel(bool eersteKeer)
     {
-        if (eersteKeer) {
+        if (eersteKeer)
+        {
             for (int i = 0; i < 52; i++)
             {
                 if (i == 0)
@@ -199,7 +201,7 @@ public class SolitaireScript : MonoBehaviour
         }
         else
         {
-            for(int i = 0; i < saveScript.intDict["Stapel1Grootte"]; i++)
+            for (int i = 0; i < saveScript.intDict["Stapel1Grootte"]; i++)
             {
                 Stapel1.Add(kaarten[saveScript.intDict["Stapel1:" + i]]);
             }
@@ -321,7 +323,7 @@ public class SolitaireScript : MonoBehaviour
         }
         if (meerDraaienDoorGameResume)
         {
-            for(int i = 0; i < Stapel1.Count - Mathf.Max(minAantalKaartenStapel1, 1); i++)
+            for (int i = 0; i < Stapel1.Count - Mathf.Max(minAantalKaartenStapel1, 1); i++)
             {
                 Stapel1[Stapel1.Count - i - 2].transform.localEulerAngles = Vector3.zero;
             }
@@ -365,7 +367,7 @@ public class SolitaireScript : MonoBehaviour
             {
                 EindStapel4[i].transform.localEulerAngles = Vector3.zero;
             }
-            for(int i = 0; i < StapelRest.Count; i++)
+            for (int i = 0; i < StapelRest.Count; i++)
             {
                 StapelRest[i].transform.localEulerAngles = new Vector3(0, 180, 0);
             }

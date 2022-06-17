@@ -14,9 +14,9 @@ public class BeloningScript : MonoBehaviour
     private bool wasPaused = false;
     private SaveScript saveScript;
     private int[] sudokuBeloningen = { 5, 11, 18, 27 };
-    private int[] mvBeloningen = { 5, 10, 17, 25};
+    private int[] mvBeloningen = { 5, 10, 17, 25 };
     private int maxMunten2048 = 33;
-    private int maxMuntenSolitaire = 25;
+    private int maxMuntenSolitaire = 35;
     private int laatstVerdiendeMunten = 0;
     private TMP_Text laatsteDoelwitText = null;
     public RectTransform muntenObj;
@@ -52,7 +52,7 @@ public class BeloningScript : MonoBehaviour
                 VoegMuntenToe(munten);
                 break;
             case "2048":
-                float max = Mathf.Pow(2, ((difficulty + 4) * (difficulty + 4)) - 1);
+                float max = Mathf.Pow(2, ((difficulty + 4) * (difficulty + 4)) - 2);
                 munten = Mathf.CeilToInt(score / max * maxMunten2048);
                 munten = Mathf.Max(1, munten);
                 VoegMuntenToe(munten);
@@ -87,8 +87,9 @@ public class BeloningScript : MonoBehaviour
         FirebaseAnalytics.LogEvent(
             FirebaseAnalytics.EventEarnVirtualCurrency,
             new Parameter[] {
-                new Parameter(FirebaseAnalytics.ParameterVirtualCurrencyName, "Coin"),
                 new Parameter(FirebaseAnalytics.ParameterValue, coinsToAdd),
+                new Parameter(FirebaseAnalytics.ParameterVirtualCurrencyName, "Coin"),
+                new Parameter(FirebaseAnalytics.ParameterCurrency, "EUR"),
             }
         );
     }
@@ -138,7 +139,7 @@ public class BeloningScript : MonoBehaviour
 
     private void SceneLoaded(Scene scene, LoadSceneMode _)
     {
-        if(scene.name == "Shop")
+        if (scene.name == "Shop")
         {
             shopScript = GameObject.Find("EventSystem").GetComponent<ShopScript>();
             ShowHuidigAantalMunten();

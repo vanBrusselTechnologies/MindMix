@@ -83,7 +83,7 @@ public class KnoppenScriptMenu : MonoBehaviour
                     confirmTitelText.text = KnopMijnenvegerText.text;
                     break;
                 case "colorsort":
-                    if(true)
+                    if (true)
                     {
                         OpenGameScene(sceneName, true);
                         return;

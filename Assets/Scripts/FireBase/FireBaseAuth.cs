@@ -52,7 +52,8 @@ public class FireBaseAuth : MonoBehaviour
     public void PlayGamesLogin(string authCode)
     {
         Credential credential = PlayGamesAuthProvider.GetCredential(authCode);
-        auth.SignInWithCredentialAsync(credential).ContinueWith(task => {
+        auth.SignInWithCredentialAsync(credential).ContinueWith(task =>
+        {
             if (task.IsFaulted || task.IsCanceled)
             {
                 Debug.Log(task.Exception.InnerException.Message);

@@ -58,7 +58,7 @@ public class Achtergrond : MonoBehaviour
                 }
             }
         }
-        foreach(Sprite afbeelding in gegevensScript.achtergronden)
+        foreach (Sprite afbeelding in gegevensScript.achtergronden)
         {
             imageOptionData.Add(new TMP_Dropdown.OptionData(afbeelding));
         }
@@ -213,7 +213,7 @@ public class Achtergrond : MonoBehaviour
 
     private void WisselKleur(Image achtergrondImg, Color oldColor)
     {
-        if(oldColor.Equals(Color.white))
+        if (oldColor.Equals(Color.white))
         {
             float tmpR = saveScript.floatDict["color.r"];
             float tmpG = saveScript.floatDict["color.g"];

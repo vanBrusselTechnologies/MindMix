@@ -192,7 +192,7 @@ namespace VBG.Extensions
             string output = "";
             if (typeof(T).Equals(typeof(string)))
             {
-                for (int i  = 0; i < list.Count; i++)
+                for (int i = 0; i < list.Count; i++)
                 {
                     T item = list[i];
                     if (output.Trim().Length != 0)
@@ -322,7 +322,7 @@ namespace VBG.Extensions
             int itemCountInArray = 0;
             for (int i = 0; i < array.Length; i++)
             {
-                if(array[i].Equals(item))
+                if (array[i].Equals(item))
                 {
                     itemCountInArray += 1;
                     for (int ii = i; ii < array.Length; ii++)
@@ -375,7 +375,7 @@ namespace VBG.Extensions
 
         public static bool Contains<T>(this T[] array, T item)
         {
-            foreach(T value in array)
+            foreach (T value in array)
             {
                 if (value.Equals(item)) return true;
             }
@@ -415,7 +415,7 @@ namespace VBG.Extensions
         public static List<T> ToList<T>(this T[] array)
         {
             List<T> output = new List<T>();
-            foreach(T item in array)
+            foreach (T item in array)
             {
                 output.Add(item);
             }
@@ -470,7 +470,7 @@ namespace VBG.Extensions
     {
         public static void AddRange<TKey, TValue>(this Dictionary<TKey, TValue> dict, Dictionary<TKey, TValue> dictToAdd)
         {
-            foreach(KeyValuePair<TKey, TValue> item in dictToAdd)
+            foreach (KeyValuePair<TKey, TValue> item in dictToAdd)
             {
                 dict.Add(item.Key, item.Value);
             }
@@ -533,7 +533,7 @@ namespace VBG.Extensions
             }
             else
             {
-                foreach(TKey key in keys)
+                foreach (TKey key in keys)
                 {
                     dict.Remove(key);
                 }
@@ -566,7 +566,7 @@ namespace VBG.Extensions
             index = Mathf.Max(0, index);
             List<TKey> keyList = dict.ToKeyList();
             count = Mathf.Clamp(count, 0, keyList.Count - index);
-            for(int i = 0; i < count; i++)
+            for (int i = 0; i < count; i++)
             {
                 dict.Remove(keyList[i + index]);
             }
@@ -592,7 +592,7 @@ namespace VBG.Extensions
             return list;
         }
 
-        public static List<KeyValuePair<TKey,TValue>> ToList<TKey, TValue>(this Dictionary<TKey, TValue> dict)
+        public static List<KeyValuePair<TKey, TValue>> ToList<TKey, TValue>(this Dictionary<TKey, TValue> dict)
         {
             List<KeyValuePair<TKey, TValue>> list = new List<KeyValuePair<TKey, TValue>>();
             foreach (KeyValuePair<TKey, TValue> item in dict)

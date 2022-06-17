@@ -96,11 +96,11 @@ public class AfScript : MonoBehaviour
             }
             else
             {
-                for(int i = 1; i <= 9; i++)
+                for (int i = 1; i <= 9; i++)
                 {
                     List<int> rijNummers = plaatsScript.KrijgGetallenTot81(0, i, 1, 1);
                     List<int> rijWaardes = new List<int>();
-                    foreach(int nummer in rijNummers)
+                    foreach (int nummer in rijNummers)
                     {
                         rijWaardes.Add(getallen[nummer]);
                     }

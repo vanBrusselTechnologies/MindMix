@@ -353,7 +353,7 @@ public class Script2048 : MonoBehaviour
             else if (getal < grootte * 7) knoppenRij7.Add(knoppenGesorteerd[i]);
             else if (getal < grootte * 8) knoppenRij8.Add(knoppenGesorteerd[i]);
         }
-        for(int i = 1; i <= grootte; i++)
+        for (int i = 1; i <= grootte; i++)
         {
             bool magDezeOok = true;
             List<GameObject> list = i == 1 ? knoppenRij1 : i == 2 ? knoppenRij2 : i == 3 ? knoppenRij3 : i == 4 ? knoppenRij4 : i == 5 ? knoppenRij5 : i == 6 ? knoppenRij6 : i == 7 ? knoppenRij7 : i == 8 ? knoppenRij8 : null;

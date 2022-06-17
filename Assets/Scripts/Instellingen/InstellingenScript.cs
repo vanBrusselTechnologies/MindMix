@@ -19,7 +19,7 @@ public class InstellingenScript : MonoBehaviour
     [SerializeField] private GameObject overigeInstellingen;
     [SerializeField] private Slider muziekVolumeSlider;
 
-    private List<string> sceneNames = new List<string>(){ "Sudoku", "Solitaire", "2048", "Mijnenveger", "Menu" };
+    private List<string> sceneNames = new List<string>() { "Sudoku", "Solitaire", "2048", "Mijnenveger", "Menu", "ColorSort" };
     private bool startValues = true;
     private bool volumeSetInStart = false;
 
@@ -181,7 +181,7 @@ public class InstellingenScript : MonoBehaviour
                 saveScript.intDict["bgWaarde" + sceneNames[i]] = bgWaarde;
                 gegevensScript.VeranderOpgeslagenAchtergrond(sceneNames[i].ToLower(), 0, bgWaarde);
             }
-            foreach(Transform andereDropdown in obj.transform.parent.parent)
+            foreach (Transform andereDropdown in obj.transform.parent.parent)
             {
                 andereDropdown.Find("BGSoort").GetComponent<TMP_Dropdown>().value = 0;
                 andereDropdown.Find("BGColor").GetComponent<TMP_Dropdown>().value = dropdownValue;
@@ -230,12 +230,12 @@ public class InstellingenScript : MonoBehaviour
 
     public void WisselInstellingPagina(int paginaIndex)
     {
-        if(paginaIndex == 0)
+        if (paginaIndex == 0)
         {
             overigeInstellingen.SetActive(true);
             bgInstelingen.SetActive(false);
         }
-        else if(paginaIndex == 1)
+        else if (paginaIndex == 1)
         {
             overigeInstellingen.SetActive(false);
             bgInstelingen.SetActive(true);

@@ -141,7 +141,7 @@ public class HaalGetallenWeg : MonoBehaviour
             else
             {
                 tot81.Clear();
-                for(int i = 0; i < diff[difficulty] - removedNumbers; i++)
+                for (int i = 0; i < diff[difficulty] - removedNumbers; i++)
                 {
                     int rand = Random.Range(0, notYetRemovedNumbers.Count);
                     cijfers[notYetRemovedNumbers[rand]] = 0;
@@ -160,7 +160,7 @@ public class HaalGetallenWeg : MonoBehaviour
         if (difficulty >= 2) if (HardCombinationPossible(boxNumbers, rowNumbers, columnNumbers)) return true;
         if (difficulty >= 1) if (NormalCombinationPossible(rowNumbers, columnNumbers)) return true;
         if (EasyCombinationPossible(boxNumbers, rowNumbers, columnNumbers)) return true;
-        if(EasyFillPossible(boxNumbers, rowNumbers, columnNumbers)) return true;
+        if (EasyFillPossible(boxNumbers, rowNumbers, columnNumbers)) return true;
         return false;
     }
 
@@ -279,7 +279,7 @@ public class HaalGetallenWeg : MonoBehaviour
     {
         return FillCombinationPossible(rowNumbers, columnNumbers, GetEmptyCells(boxNumbers), FillCombinationType.Box);
     }
-    
+
     private bool RowFillCombinationPossible(List<int> rowNumbers, List<int> columnNumbers)
     {
         return FillCombinationPossible(rowNumbers, columnNumbers, GetEmptyCells(rowNumbers), FillCombinationType.Row);
@@ -305,7 +305,7 @@ public class HaalGetallenWeg : MonoBehaviour
             {
                 if (list1[j] != cellNumber)
                 {
-                    if(cijfers[list1[j]] != 0)
+                    if (cijfers[list1[j]] != 0)
                     {
                         if (cijfers[list1[j]] == cellValue)
                         {
@@ -334,7 +334,7 @@ public class HaalGetallenWeg : MonoBehaviour
     private bool OnlyOnePossible(List<int> boxNumbers, List<int> rowNumbers, List<int> columnNumbers)
     {
         int cellValue = GetCellValue(rowNumbers, columnNumbers);
-        List<int> till9 = new List<int>() { 1,2,3,4,5,6,7,8,9};
+        List<int> till9 = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         till9.Remove(cellValue);
         for (int i = 0; i < 9; i++)
         {

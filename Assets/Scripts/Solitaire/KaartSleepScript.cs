@@ -160,7 +160,7 @@ public class KaartSleepScript : MonoBehaviour
             if (stapelInt.IsBetween(1, 7))
             {
                 List<GameObject> stapel = stapelInt == 1 ? solitaireScript.Stapel1 : stapelInt == 2 ? solitaireScript.Stapel2 : stapelInt == 3 ? solitaireScript.Stapel3 : stapelInt == 4 ? solitaireScript.Stapel4 : stapelInt == 5 ? solitaireScript.Stapel5 : stapelInt == 6 ? solitaireScript.Stapel6 : stapelInt == 7 ? solitaireScript.Stapel7 : null;
-                if(stapel.IndexOf(mogelijk[i]) != -1)
+                if (stapel.IndexOf(mogelijk[i]) != -1)
                 {
                     GameObject parent = tf.parent.gameObject;
                     HaalUitStapels(parent);
@@ -248,21 +248,18 @@ public class KaartSleepScript : MonoBehaviour
     {
         float _screenSafeAreaWidthInUnits = Mathf.Min(solitaireLayout.screenSafeAreaWidthInUnits, solitaireLayout.screenSafeAreaHeightInUnits * (8f / 4.5f));
         float halfCardsScale = _screenSafeAreaWidthInUnits / 81f * 10f * 0.5f;
-        List<float> xPositions = new List<float>();
-        float _screenWidthInUnits = Mathf.Min(solitaireLayout.screenWidthInUnits, solitaireLayout.screenHeightInUnits * (8f / 4.5f));
-        float baseY = solitaireLayout.screenSafeAreaCenterYInUnits + (solitaireLayout.screenHeightInUnits * (-1f / 3f)) + (solitaireLayout.screenHeightInUnits / 35f / 1.5f * (25f / 1.5f));
-        float baseYFoundation = solitaireLayout.screenSafeAreaCenterYInUnits + (solitaireLayout.screenHeightInUnits * (-1f / 3f)) + (solitaireLayout.screenHeightInUnits / 35f / 1.5f * (34f + (4f / 9f)));
+        float baseYFoundation = solitaireLayout.baseYFoundation;
+        float baseY = solitaireLayout.baseY;
+        List<float> xPositions = solitaireLayout.xPositions;
         for (int i = 0; i < 7; i++)
         {
-            float xPos = solitaireLayout.screenSafeAreaCenterXInUnits + (_screenWidthInUnits / 81f * (-33f + (i * 11f)));
-            if (positie.x.IsBetween(xPos - halfCardsScale, xPos + halfCardsScale))
+            if (positie.x.IsBetween(xPositions[i] - halfCardsScale, xPositions[i] + halfCardsScale))
             {
                 if (positie.y <= baseY + (halfCardsScale * 1.5f))
                 {
                     return (i + 1);
                 }
             }
-            xPositions.Add(xPos);
         }
         if (positie.x.IsBetween(xPositions[0] - halfCardsScale, xPositions[3] + halfCardsScale))
         {
@@ -278,7 +275,7 @@ public class KaartSleepScript : MonoBehaviour
     {
         if (solitaireScript.Stapel1.Remove(kaartDieWegMoet))
         {
-            for(int i = 0; i < solitaireScript.Stapel1.Count; i++)
+            for (int i = 0; i < solitaireScript.Stapel1.Count; i++)
             {
                 saveScript.intDict["Stapel1:" + i] = solitaireScript.kaarten.IndexOf(solitaireScript.Stapel1[i]);
             }

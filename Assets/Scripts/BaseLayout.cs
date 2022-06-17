@@ -138,7 +138,7 @@ public class BaseLayout : MonoBehaviour
         screenSafeAreaCenterYInUnits = (screenSafeAreaYInUnits - screenSafeAreaYUpInUnits) / 2f;
 
         screenOrientation = Screen.orientation;
-        
+
     }
 
     public virtual void SetLayout()
@@ -166,7 +166,7 @@ public class BaseLayout : MonoBehaviour
     {
         helpUITitleRect.anchoredPosition = new Vector2(screenSafeAreaCenterX, screenSafeAreaCenterY + screenSafeAreaHeight * (1f / 3f));
         helpUITitleRect.sizeDelta = new Vector2(screenSafeAreaWidth * 0.75f, screenSafeAreaHeight);
-        helpUITextRect.anchoredPosition = new Vector2(screenSafeAreaCenterX, screenSafeAreaCenterY -screenSafeAreaHeight / 8f);
+        helpUITextRect.anchoredPosition = new Vector2(screenSafeAreaCenterX, screenSafeAreaCenterY - screenSafeAreaHeight / 8f);
         helpUITextRect.sizeDelta = new Vector2(screenSafeAreaWidth * 0.85f, screenSafeAreaHeight / 2);
         helpUICloseButtonRect.anchoredPosition = new Vector2(-screenSafeAreaXRight - (Mathf.Min(screenSafeAreaHeight, screenSafeAreaWidth) * 0.1f * 0.6f), -screenSafeAreaYUp - (Mathf.Min(screenSafeAreaHeight, screenSafeAreaWidth) * 0.1f * 0.6f));
         helpUICloseButtonRect.localScale = new Vector2(Mathf.Min(screenSafeAreaHeight, screenSafeAreaWidth) * 0.1f, Mathf.Min(screenSafeAreaHeight, screenSafeAreaWidth) * 0.1f) / 108f;

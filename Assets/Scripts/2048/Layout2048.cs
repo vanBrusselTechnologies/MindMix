@@ -18,7 +18,7 @@ public class Layout2048 : BaseLayout
             settingsUIOpenButtonRect.anchoredPosition = new Vector2(cornerButtonXPos, cornerButtonYPos - cornerButtonSize);
         SetLayout2048();
     }
-    
+
     protected void SetLayout2048()
     {
         float schaal2048 = Mathf.Min(Mathf.Min(screenSafeAreaHeight, screenSafeAreaWidth), Mathf.Max(screenSafeAreaHeight, screenSafeAreaWidth) * 0.75f) * 0.95f;
