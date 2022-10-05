@@ -4,6 +4,9 @@ using VBG.Extensions;
 
 public class SolitaireLayout : BaseLayout
 {
+    private SolitaireScript solitaireScript;
+    private KnoppenScriptSolitaire solitaireUIHandler;
+
     [Header("Other scene specific")]
     [SerializeField] private Transform solitaire;
     [SerializeField] private RectTransform finishGameButtonRect;
@@ -13,8 +16,9 @@ public class SolitaireLayout : BaseLayout
     [SerializeField] private Transform stockPileTransform;
     [SerializeField] private Transform stockPileTurnButtonTransform;
 
-    private SolitaireScript solitaireScript;
-    private KnoppenScriptSolitaire solitaireUIHandler;
+    [HideInInspector] public float baseY;
+    [HideInInspector] public float baseYFoundation;
+    [HideInInspector] public List<float> xPositions = new List<float>();
 
     // Start is called before the first frame update
     protected override void Start()
@@ -61,7 +65,11 @@ public class SolitaireLayout : BaseLayout
 
     public void PositionCards()
     {
-        List<float> xPositions = new List<float>();
+        float cardYScale = solitaireScript.kaarten[2].transform.localScale.y * 8.5f;
+        float spaceBetweenCardsFactor = saveScript.floatDict["spaceBetweenCardsFactor"];
+        if (spaceBetweenCardsFactor == 0) spaceBetweenCardsFactor = 1;
+        float diffY = 0.3f * spaceBetweenCardsFactor;
+        xPositions.Clear();
         float _screenWidthInUnits = Mathf.Min(screenWidthInUnits, screenHeightInUnits * (8f / 4.5f));
         float _screenWidth = Mathf.Min(screenWidth, screenHeight * (8f / 4.5f));
         for (int i = 0; i < 7; i++)
@@ -69,15 +77,12 @@ public class SolitaireLayout : BaseLayout
             xPositions.Add(screenSafeAreaCenterXInUnits + (_screenWidthInUnits / 81f * (-33f + (i * 11f))));
         }
         float stockPileBaseXUI = screenSafeAreaCenterX + (_screenWidth / 81f * 33f) + (screenWidth / 2f);
-        float baseY = screenSafeAreaCenterYInUnits + (screenHeightInUnits * (-1f / 3f)) + (screenHeightInUnits / 35f / 1.5f * (25f / 1.5f));
-        float baseYFoundation = screenSafeAreaCenterYInUnits + (screenHeightInUnits * (-1f / 3f)) + (screenHeightInUnits / 35f / 1.5f * (34f + (4f / 9f)));
-        float stockPileBaseYUI = screenSafeAreaCenterY + (screenHeight * (-1f / 3f)) + (screenHeight / 35f / 1.5f * (34f + (4f / 9f))) + (screenHeight / 2f);
-        float spaceBetweenCardsFactor = saveScript.floatDict["spaceBetweenCardsFactor"];
-        if (spaceBetweenCardsFactor == 0) spaceBetweenCardsFactor = 1;
-        float diffY = 0.3f * spaceBetweenCardsFactor;
+        baseYFoundation = Mathf.Min(screenSafeAreaCenterYInUnits + (13f * diffY + cardYScale) / 2f, screenSafeAreaCenterYInUnits + screenSafeAreaHeightInUnits / 2f - cardYScale / 2f);
+        float stockPileBaseYUI = ScreenExt.UnitsToPixels(baseYFoundation) + (screenHeight / 2f);
+        baseY = baseYFoundation - cardYScale - diffY;
         float baseZ = -2f;
         float diffZ = 0.1f;
-        for(int i = 0; i < 7; i++)
+        for (int i = 0; i < 7; i++)
         {
             cardColumns[i].position = new Vector3(xPositions[i], baseY, -1f);
             if (i < 4)
@@ -90,7 +95,7 @@ public class SolitaireLayout : BaseLayout
         CardsStocks.AddRange(solitaireScript.Stapel1, solitaireScript.Stapel2, solitaireScript.Stapel3, solitaireScript.Stapel4, solitaireScript.Stapel5, solitaireScript.Stapel6, solitaireScript.Stapel7);
         for (int i = 0; i < CardsStocks.Count; i++)
         {
-            for(int ii = 0; ii < CardsStocks[i].Count; ii++)
+            for (int ii = 0; ii < CardsStocks[i].Count; ii++)
             {
                 CardsStocks[i][ii].transform.position = new Vector3(xPositions[i], baseY - (ii * diffY), baseZ - (diffZ * ii));
             }
@@ -120,11 +125,63 @@ public class SolitaireLayout : BaseLayout
     private void SetLayoutOtherObjects()
     {
         float finishGameButtonYPos = screenSafeAreaCenterY - (screenSafeAreaHeight / 2f) + (screenSafeAreaHeight * 0.10f);
-        float finishGameButtonSize = Mathf.Min(screenSafeAreaHeight * 0.3f, screenSafeAreaWidth * 0.95f);
-        finishGameButtonRect.sizeDelta = new Vector2(finishGameButtonSize * 2f, finishGameButtonSize / 2f);
+        float finishGameButtonWidth = Mathf.Min(screenSafeAreaHeight * 0.6f, screenSafeAreaWidth * 0.95f);
+        finishGameButtonRect.sizeDelta = new Vector2(finishGameButtonWidth, finishGameButtonWidth / 4f);
         finishGameButtonRect.anchoredPosition = new Vector2(screenSafeAreaCenterX, finishGameButtonYPos);
         Vector2 clockSize = 0.2f * Mathf.Min(screenWidth / 240f, screenHeight / 160f) * new Vector2(320, 80);
         clockTextRect.sizeDelta = clockSize;
         clockTextRect.anchoredPosition = new Vector2(screenSafeAreaX + (clockSize.x * 0.625f), screenSafeAreaY + clockSize.y);
+    }
+
+    protected override void SetLayoutFinishedGameUI()
+    {
+        finishedGameUITitleRect.anchoredPosition = new Vector2(screenSafeAreaCenterX, screenSafeAreaCenterY + (screenSafeAreaHeight * (25f / 30f)) - (screenHeight / 2f));
+        finishedGameUITitleRect.sizeDelta = new Vector2(screenSafeAreaWidth * 0.85f, screenSafeAreaHeight * (10f / 30f));
+        float smallestSide = Mathf.Min(screenSafeAreaHeight, screenSafeAreaWidth);
+        float biggestSide = Mathf.Max(screenSafeAreaHeight, screenSafeAreaWidth);
+        if (smallestSide - 1440 > 0)
+        {
+            float factor = Mathf.Min(smallestSide / 1500f, biggestSide / 2500f);
+            finishedGameUITitleRect.localScale = Vector2.one * factor;
+            finishedGameUITitleRect.sizeDelta /= factor;
+        }
+        finishedGameUITextRect.anchoredPosition = new Vector2(screenSafeAreaCenterX, screenSafeAreaCenterY + (screenSafeAreaHeight * (17f / 30f)) - (screenHeight / 2f));
+        finishedGameUITextRect.sizeDelta = new Vector2(screenSafeAreaWidth * 0.85f, screenSafeAreaHeight * (8f / 30f));
+        if (finishedGameUIRewardRect != null)
+        {
+            finishedGameUIRewardRect.anchoredPosition = new Vector2(screenSafeAreaCenterX, screenSafeAreaCenterY + (screenSafeAreaHeight * (10f / 30f)) - (screenHeight / 2f));
+            if (Application.internetReachability == NetworkReachability.NotReachable || !finishedGameUIRewardDoubleButtonObj.activeInHierarchy)
+            {
+                finishedGameUIRewardDoubleButtonObj.SetActive(false);
+                float scaleFactor = Mathf.Min(screenSafeAreaWidth * 0.85f / 500, screenSafeAreaHeight * (5f / 30f) / 175);
+                finishedGameUIRewardRect.localScale = new Vector3(scaleFactor, scaleFactor, 1);
+                finishedGameUIRewardRect.sizeDelta = new Vector2(500, 175);
+            }
+            else
+            {
+                float scaleFactor = Mathf.Min(screenSafeAreaWidth * 0.85f / 1000, screenSafeAreaHeight * (5f / 30f) / 175);
+                finishedGameUIRewardRect.localScale = new Vector3(scaleFactor, scaleFactor, 1);
+                finishedGameUIRewardRect.sizeDelta = new Vector2(1000, 175);
+            }
+        }
+        Vector2 size = new Vector2(screenSafeAreaWidth * 0.45f, screenSafeAreaHeight * (5f / 30f));
+        float posY = screenSafeAreaCenterY + screenSafeAreaYUp + (screenSafeAreaHeight * (3.5f / 30f)) - (screenHeight / 2f);
+        if (finishedGameUINewMoreDifficultGameButtonRect == null)
+        {
+            finishedGameUINewGameButtonRect.anchoredPosition = new Vector2(screenSafeAreaCenterX - (screenSafeAreaWidth / 4f), posY);
+            finishedGameUINewGameButtonRect.sizeDelta = size;
+            finishedGameUIToMenuButtonRect.anchoredPosition = new Vector2(screenSafeAreaCenterX + (screenSafeAreaWidth / 4f), posY);
+            finishedGameUIToMenuButtonRect.sizeDelta = size;
+        }
+        else
+        {
+            size.x = screenSafeAreaWidth * 0.3f;
+            finishedGameUINewGameButtonRect.anchoredPosition = new Vector2(screenSafeAreaCenterX - (screenSafeAreaWidth / 3f), posY);
+            finishedGameUINewGameButtonRect.sizeDelta = size;
+            finishedGameUINewMoreDifficultGameButtonRect.anchoredPosition = new Vector2(screenSafeAreaCenterX, posY);
+            finishedGameUINewMoreDifficultGameButtonRect.sizeDelta = size;
+            finishedGameUIToMenuButtonRect.anchoredPosition = new Vector2(screenSafeAreaCenterX + (screenSafeAreaWidth / 3f), posY);
+            finishedGameUIToMenuButtonRect.sizeDelta = size;
+        }
     }
 }
