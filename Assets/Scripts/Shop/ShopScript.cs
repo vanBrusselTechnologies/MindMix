@@ -1,9 +1,9 @@
-using UnityEngine;
-using UnityEngine.SceneManagement;
-using TMPro;
 using System.Collections.Generic;
-using UnityEngine.UI;
+using TMPro;
+using UnityEngine;
 using UnityEngine.Localization;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class ShopScript : MonoBehaviour
 {
@@ -34,9 +34,9 @@ public class ShopScript : MonoBehaviour
     [SerializeField] private Image gekochtSchermAfbeeldingImg;
     [SerializeField] private TMP_Text gekochtSchermNameText;
 
-    [HideInInspector] public List<RectTransform> bgColorItems = new List<RectTransform>();
-    [HideInInspector] public List<RectTransform> bgImgItems = new List<RectTransform>();
-    [HideInInspector] public List<RectTransform> gameModiItems = new List<RectTransform>();
+    [HideInInspector] public List<RectTransform> bgColorItems = new();
+    [HideInInspector] public List<RectTransform> bgImgItems = new();
+    [HideInInspector] public List<RectTransform> gameModiItems = new();
 
     private GameObject bg;
     private Image bgImg;
@@ -44,7 +44,7 @@ public class ShopScript : MonoBehaviour
 
     private int prijs;
     [HideInInspector] public string naam;
-    [HideInInspector] public bool wisselKleurVoorbeeld = false;
+    [HideInInspector] public bool wisselKleurVoorbeeld;
 
     private void Start()
     {
@@ -227,7 +227,6 @@ public class ShopScript : MonoBehaviour
                 bgImgObj.SetActive(false);
                 spelModiObj.SetActive(true);
                 break;
-            default: break;
         }
     }
 
@@ -247,7 +246,6 @@ public class ShopScript : MonoBehaviour
             width = 1000 * height;
         }
         bgRect.sizeDelta = new Vector2(width, height);
-        return;
     }
 
     private void WisselKleur()

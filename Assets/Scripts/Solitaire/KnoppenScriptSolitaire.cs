@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using TMPro;
 
 public class KnoppenScriptSolitaire : BaseUIHandler
 {
@@ -10,11 +10,11 @@ public class KnoppenScriptSolitaire : BaseUIHandler
     [SerializeField] private GameObject maakAfKnop;
     [SerializeField] private GameObject restStapelOmdraaiKnop;
 
-    private List<GameObject> StapelRest = new List<GameObject>();
-    [HideInInspector] public List<GameObject> OmgedraaideRest = new List<GameObject>();
+    private List<GameObject> StapelRest = new();
+    [HideInInspector] public List<GameObject> OmgedraaideRest = new();
 
-    private bool canBeFinished = false;
-    private bool omdraaiKnopGedeactiveerd = false;
+    private bool canBeFinished;
+    private bool omdraaiKnopGedeactiveerd;
 
     private SolitaireScript solitaireScript;
     private BeloningScript beloningScript;

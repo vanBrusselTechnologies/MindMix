@@ -14,10 +14,10 @@
 //    limitations under the License.
 // </copyright>
 
+using GooglePlayGames.OurUtils;
+
 namespace GooglePlayGames.BasicApi.Nearby
 {
-    using GooglePlayGames.OurUtils;
-
     public struct EndpointDetails
     {
         private readonly string mEndpointId;

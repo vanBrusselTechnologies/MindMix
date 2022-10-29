@@ -14,12 +14,10 @@
 //    limitations under the License.
 // </copyright>
 
+using GooglePlayGames.OurUtils;
+
 namespace GooglePlayGames.BasicApi.Nearby
 {
-    using System;
-    using System.Collections.Generic;
-    using GooglePlayGames.OurUtils;
-
     public struct AdvertisingResult
     {
         private readonly ResponseStatus mStatus;

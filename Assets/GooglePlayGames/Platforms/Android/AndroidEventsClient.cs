@@ -1,14 +1,15 @@
+using System;
+using System.Collections.Generic;
+using GooglePlayGames.BasicApi;
+using GooglePlayGames.BasicApi.Events;
+using GooglePlayGames.OurUtils;
+using UnityEngine;
+using Event = GooglePlayGames.BasicApi.Events.Event;
+
 #if UNITY_ANDROID
 
 namespace GooglePlayGames.Android
 {
-    using System;
-    using System.Collections.Generic;
-    using GooglePlayGames.BasicApi;
-    using GooglePlayGames.BasicApi.Events;
-    using GooglePlayGames.OurUtils;
-    using UnityEngine;
-
     internal class AndroidEventsClient : IEventsClient
     {
         private volatile AndroidJavaObject mEventsClient;
@@ -125,7 +126,7 @@ namespace GooglePlayGames.Android
             return (val1, val2) => PlayGamesHelperObject.RunOnGameThread(() => toConvert(val1, val2));
         }
 
-        private static BasicApi.Events.Event CreateEvent(AndroidJavaObject eventJava)
+        private static Event CreateEvent(AndroidJavaObject eventJava)
         {
             string id = eventJava.Call<string>("getEventId");
             string name = eventJava.Call<string>("getName");
@@ -135,7 +136,7 @@ namespace GooglePlayGames.Android
             EventVisibility visibility = eventJava.Call<bool>("isVisible")
                 ? EventVisibility.Revealed
                 : EventVisibility.Hidden;
-            return new BasicApi.Events.Event(id, name, description, imageUrl, currentCount, visibility);
+            return new Event(id, name, description, imageUrl, currentCount, visibility);
         }
     }
 }

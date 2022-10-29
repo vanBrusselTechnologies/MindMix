@@ -14,22 +14,20 @@
 //  limitations under the License.
 // </copyright>
 
+using System;
+using System.Collections.Generic;
+using GooglePlayGames.BasicApi;
+using UnityEngine;
+using UnityEngine.SocialPlatforms;
+
 #if UNITY_ANDROID
 namespace GooglePlayGames.Android
 {
-    using GooglePlayGames.BasicApi;
-    using GooglePlayGames.BasicApi.SavedGame;
-    using OurUtils;
-    using UnityEngine;
-    using UnityEngine.SocialPlatforms;
-    using System;
-    using System.Collections.Generic;
-
     internal class AndroidJavaConverter
     {
-        internal static System.DateTime ToDateTime(long milliseconds)
+        internal static DateTime ToDateTime(long milliseconds)
         {
-            System.DateTime result = new System.DateTime(1970, 1, 1, 0, 0, 0, 0);
+            DateTime result = new DateTime(1970, 1, 1, 0, 0, 0, 0);
             return result.AddMilliseconds(milliseconds);
         }
 
@@ -153,7 +151,7 @@ namespace GooglePlayGames.Android
           IUserProfile[] users = new IUserProfile[count];
           for (int i = 0; i < count; ++i) {
             using (var player = playersBuffer.Call<AndroidJavaObject>("get", i)) {
-              users[i] = AndroidJavaConverter.ToPlayerProfile(player);
+              users[i] = ToPlayerProfile(player);
             }
           }
 

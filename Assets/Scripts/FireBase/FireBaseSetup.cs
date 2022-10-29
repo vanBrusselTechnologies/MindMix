@@ -1,11 +1,12 @@
-using UnityEngine;
 using Firebase;
 using Firebase.Auth;
+using UnityEngine;
+using UnityEngine.Localization.Settings;
 
 public class FireBaseSetup : MonoBehaviour
 {
     [HideInInspector]
-    public bool ready = false, offline = false;
+    public bool ready, offline;
     private bool eersteReadyFrame = true;
 
     // Start is called before the first frame update
@@ -47,6 +48,6 @@ public class FireBaseSetup : MonoBehaviour
     private void FireBaseSettings()
     {
         FirebaseAuth auth = FirebaseAuth.DefaultInstance;
-        auth.LanguageCode = UnityEngine.Localization.Settings.LocalizationSettings.SelectedLocale.Identifier.Code;
+        auth.LanguageCode = LocalizationSettings.SelectedLocale.Identifier.Code;
     }
 }

@@ -14,21 +14,21 @@
 //    limitations under the License.
 // </copyright>
 
+using System;
+using GooglePlayGames.BasicApi;
+using GooglePlayGames.BasicApi.Events;
+using GooglePlayGames.BasicApi.SavedGame;
+using GooglePlayGames.BasicApi.Video;
+using GooglePlayGames.OurUtils;
+using UnityEngine;
+using UnityEngine.SocialPlatforms;
+using Logger = GooglePlayGames.OurUtils.Logger;
+
 #if UNITY_ANDROID
 #pragma warning disable 0642 // Possible mistaken empty statement
 
 namespace GooglePlayGames.Android
 {
-    using GooglePlayGames.BasicApi;
-    using GooglePlayGames.BasicApi.SavedGame;
-    using GooglePlayGames.OurUtils;
-    using System;
-    using System.Collections.Generic;
-    using GooglePlayGames.BasicApi.Events;
-    using GooglePlayGames.BasicApi.Video;
-    using UnityEngine;
-    using UnityEngine.SocialPlatforms;
-
     public class AndroidClient : IPlayGamesClient
     {
         private enum AuthState
@@ -45,7 +45,7 @@ namespace GooglePlayGames.Android
         private volatile IEventsClient mEventsClient;
         private volatile IVideoClient mVideoClient;
         private volatile AndroidTokenClient mTokenClient;
-        private volatile Player mUser = null;
+        private volatile Player mUser;
         private volatile AuthState mAuthState = AuthState.Unauthenticated;
         private IUserProfile[] mFriends = new IUserProfile[0];
         private LoadFriendsStatus mLastLoadFriendsStatus = LoadFriendsStatus.Unknown;
@@ -53,7 +53,7 @@ namespace GooglePlayGames.Android
         AndroidJavaClass mGamesClass = new AndroidJavaClass("com.google.android.gms.games.Games");
         private static string TasksClassName = "com.google.android.gms.tasks.Tasks";
 
-        private AndroidJavaObject mFriendsResolutionException = null;
+        private AndroidJavaObject mFriendsResolutionException;
 
         private readonly int mLeaderboardMaxResults = 25; // can be from 1 to 25
 
@@ -84,7 +84,7 @@ namespace GooglePlayGames.Android
             InitializeTokenClient();
 
             Debug.Log("Starting Auth with token client.");
-            mTokenClient.FetchTokens(silent, (int result) =>
+            mTokenClient.FetchTokens(silent, result =>
             {
                 bool succeed = result == 0 /* CommonStatusCodes.SUCCEED */;
                 InitializeGameServices();
@@ -146,7 +146,7 @@ namespace GooglePlayGames.Android
 
                                         mAuthState = AuthState.Authenticated;
                                         InvokeCallbackOnGameThread(callback, SignInStatus.Success);
-                                        GooglePlayGames.OurUtils.Logger.d("Authentication succeeded");
+                                        Logger.d("Authentication succeeded");
                                         LoadAchievements(ignore => { });
                                     }
                                     else
@@ -160,7 +160,7 @@ namespace GooglePlayGames.Android
 
                                         using (var exception = completeTask.Call<AndroidJavaObject>("getException"))
                                         {
-                                            GooglePlayGames.OurUtils.Logger.e(
+                                            Logger.e(
                                                 "Authentication failed - " + exception.Call<string>("toString"));
                                             InvokeCallbackOnGameThread(callback, SignInStatus.InternalError);
                                         }
@@ -258,7 +258,7 @@ namespace GooglePlayGames.Android
             if (!GameInfo.WebClientIdInitialized() &&
                 (mConfiguration.IsRequestingIdToken || mConfiguration.IsRequestingAuthCode))
             {
-                OurUtils.Logger.e("Server Auth Code and ID Token require web clientId to configured.");
+                Logger.e("Server Auth Code and ID Token require web clientId to configured.");
             }
 
             string[] scopes = mConfiguration.Scopes;
@@ -375,7 +375,7 @@ namespace GooglePlayGames.Android
                         InvokeCallbackOnGameThread(callback, false);
                         break;
                     default:
-                        GooglePlayGames.OurUtils.Logger.d("There was an error when loading friends." + result);
+                        Logger.d("There was an error when loading friends." + result);
                         InvokeCallbackOnGameThread(callback, false);
                         break;
                 }
@@ -450,12 +450,11 @@ namespace GooglePlayGames.Android
                             }
 
                             mLastLoadFriendsStatus = LoadFriendsStatus.InternalError;
-                            OurUtils.Logger.e("LoadFriends failed: " +
-                                exception.Call<string>("toString"));
+                            Logger.e("LoadFriends failed: " +
+                                     exception.Call<string>("toString"));
                             InvokeCallbackOnGameThread(callback, LoadFriendsStatus.InternalError);
                         }
                     });
-                    return;
                 });
             }
         }
@@ -469,9 +468,9 @@ namespace GooglePlayGames.Android
         {
             if (mFriendsResolutionException == null)
             {
-                GooglePlayGames.OurUtils.Logger.d("The developer asked for access to the friends " +
-                                                  "list but there is no intent to trigger the UI. This may be because the user " +
-                                                  "has granted access already or the game has not called loadFriends() before.");
+                Logger.d("The developer asked for access to the friends " +
+                         "list but there is no intent to trigger the UI. This may be because the user " +
+                         "has granted access already or the game has not called loadFriends() before.");
                 using (var playersClient = getPlayersClient())
                 using (
                     var task = playersClient.Call<AndroidJavaObject>("loadFriends", /* pageSize= */ 1,
@@ -503,7 +502,6 @@ namespace GooglePlayGames.Android
                                 InvokeCallbackOnGameThread(callback, UIStatus.InternalError);
                             }
                         });
-                        return;
                     });
                 }
             }
@@ -544,7 +542,6 @@ namespace GooglePlayGames.Android
                 AndroidTaskUtils.AddOnFailureListener(task, exception =>
                 {
                     InvokeCallbackOnGameThread(callback, FriendsListVisibilityStatus.NetworkError);
-                    return;
                 });
             }
         }
@@ -620,7 +617,7 @@ namespace GooglePlayGames.Android
         {
             if (!IsAuthenticated())
             {
-                GooglePlayGames.OurUtils.Logger.d("Cannot call SetGravityForPopups when not authenticated");
+                Logger.d("Cannot call SetGravityForPopups when not authenticated");
             }
 
             using (var gamesClient = getGamesClient())
@@ -936,7 +933,7 @@ namespace GooglePlayGames.Android
 
         private Action<UIStatus> GetUiSignOutCallbackOnGameThread(Action<UIStatus> callback)
         {
-            Action<UIStatus> uiCallback = (status) =>
+            Action<UIStatus> uiCallback = status =>
             {
                 if (status == UIStatus.NotAuthorized)
                 {
@@ -1090,7 +1087,7 @@ namespace GooglePlayGames.Android
                 using (var leaderboardScore = scoresBuffer.Call<AndroidJavaObject>("get", i))
                 {
                     long timestamp = leaderboardScore.Call<long>("getTimestampMillis");
-                    System.DateTime date = AndroidJavaConverter.ToDateTime(timestamp);
+                    DateTime date = AndroidJavaConverter.ToDateTime(timestamp);
 
                     ulong rank = (ulong) leaderboardScore.Call<long>("getRank");
                     string scoreHolderId = "";
@@ -1119,7 +1116,7 @@ namespace GooglePlayGames.Android
                 leaderboardScoreData.Title = leaderboard.Call<string>("getDisplayName");
                 if (variant.Call<bool>("hasPlayerInfo"))
                 {
-                    System.DateTime date = AndroidJavaConverter.ToDateTime(0);
+                    DateTime date = AndroidJavaConverter.ToDateTime(0);
                     ulong rank = (ulong) variant.Call<long>("getPlayerRank");
                     ulong score = (ulong) variant.Call<long>("getRawPlayerScore");
                     string metadata = variant.Call<string>("getPlayerScoreTag");

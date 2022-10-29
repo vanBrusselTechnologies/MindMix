@@ -135,12 +135,11 @@ MonoBehaviour:
       Hiervan uitgaande kan men alle mijnen ontwijken door de nummers op de verschillende
       aangeklikte vlakjes logisch te combineren.
 
-      
 
-      Velden waarvan
-      men verwacht dat er een mijn achter zit, kan men markeren met een vlaggetje.
-      De vlag-modus kan je (de)activeren door op de knop met schep/vlag symbool te
-      klikken.'
+
+      Velden waarvan men verwacht
+      dat er een mijn achter zit, kan men markeren met een vlaggetje. De vlag-modus
+      kan je (de)activeren door op de knop met schep/vlag symbool te klikken.'
     m_Metadata:
       m_Items: []
   - m_Id: 399469311680512
@@ -341,6 +340,10 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 67478123149254656
     m_Localized: 'Download voortgang:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 115004167628251136
+    m_Localized: MindMix
     m_Metadata:
       m_Items: []
   references:

@@ -55,7 +55,9 @@ namespace Google.Play.Integrity
         NetworkError = 3,
 
         /// <summary>
-        /// No Play Store account is found on device.
+        /// No Play Store account is found on device. Note that the Play Integrity API now supports
+        /// unauthenticated requests. This error code is used only for older Play Store versions
+        /// that lack support.
         /// <para>
         /// Ask the user to authenticate in Play Store.
         /// </para>
@@ -151,6 +153,15 @@ namespace Google.Play.Integrity
         /// </para>
         /// </summary>
         PlayServicesVersionOutdated = 15,
+
+        /// <summary>
+        /// The provided cloud project number is invalid.
+        /// <para>
+        /// Use the cloud project number which can be found in Project info in your Google Cloud
+        /// Console for the cloud project where Play Integrity API is enabled.
+        /// </para>
+        /// </summary>
+        CloudProjectNumberIsInvalid = 16,
 
         /// <summary>
         /// Unknown internal error.

@@ -8,7 +8,7 @@ public class BaseLayout : MonoBehaviour
 
     private Camera _camera;
 
-    [HideInInspector] public float screenWidth = 0;
+    [HideInInspector] public float screenWidth;
     [HideInInspector] public float screenHeight;
     [HideInInspector] public float screenSafeAreaWidth;
     [HideInInspector] public float screenSafeAreaHeight;
@@ -149,12 +149,14 @@ public class BaseLayout : MonoBehaviour
             SetLayoutFinishedGameUI();
             return;
         }
-        else if (helpUIObj != null && helpUIObj.activeInHierarchy)
+
+        if (helpUIObj != null && helpUIObj.activeInHierarchy)
         {
             SetLayoutHelpUI();
             return;
         }
-        else if (settingsUIObj != null && settingsUIObj.activeInHierarchy)
+
+        if (settingsUIObj != null && settingsUIObj.activeInHierarchy)
         {
             SetLayoutSettingsUI();
             return;
@@ -184,12 +186,12 @@ public class BaseLayout : MonoBehaviour
     {
         settingsUICloseButtonRect.anchoredPosition = new Vector2(-screenSafeAreaXRight - (Mathf.Min(screenSafeAreaHeight, screenSafeAreaWidth) * 0.1f * 0.6f), -screenSafeAreaYUp - (Mathf.Min(screenSafeAreaHeight, screenSafeAreaWidth) * 0.1f * 0.6f));
         settingsUICloseButtonRect.localScale = new Vector2(Mathf.Min(screenSafeAreaHeight, screenSafeAreaWidth) * 0.1f, Mathf.Min(screenSafeAreaHeight, screenSafeAreaWidth) * 0.1f) / 108f;
-        Vector3 scrollDownScale = new Vector3(screenSafeAreaWidth * 0.98f / 2250f, screenSafeAreaHeight * 0.85f / 950f, 1);
+        Vector3 scrollDownScale = new(screenSafeAreaWidth * 0.98f / 2250f, screenSafeAreaHeight * 0.85f / 950f, 1);
         settingsUIScrolldownRect.localScale = scrollDownScale;
         float minScaleDeel = Mathf.Min(scrollDownScale.x, scrollDownScale.y);
-        Vector3 scrollDownContentScale = new Vector3(minScaleDeel / scrollDownScale.x, minScaleDeel / scrollDownScale.y, 1);
+        Vector3 scrollDownContentScale = new(minScaleDeel / scrollDownScale.x, minScaleDeel / scrollDownScale.y, 1);
         settingsUIScrolldownContentRect.localScale = scrollDownContentScale;
-        Vector3 scrollDownPosition = new Vector3(screenSafeAreaCenterX, screenSafeAreaCenterY + (screenSafeAreaHeight * 0.15f / -2f), 0);
+        Vector3 scrollDownPosition = new(screenSafeAreaCenterX, screenSafeAreaCenterY + (screenSafeAreaHeight * 0.15f / -2f), 0);
         settingsUIScrolldownRect.anchoredPosition = scrollDownPosition;
     }
 
@@ -224,7 +226,7 @@ public class BaseLayout : MonoBehaviour
                 finishedGameUIRewardRect.sizeDelta = new Vector2(1000, 175);
             }
         }
-        Vector2 size = new Vector2(screenSafeAreaWidth * 0.45f, screenSafeAreaHeight * (5f / 30f));
+        Vector2 size = new(screenSafeAreaWidth * 0.45f, screenSafeAreaHeight * (5f / 30f));
         float posY = screenSafeAreaCenterY + screenSafeAreaYUp + (screenSafeAreaHeight * (3.5f / 30f)) - (screenHeight / 2f);
         if (finishedGameUINewMoreDifficultGameButtonRect == null)
         {

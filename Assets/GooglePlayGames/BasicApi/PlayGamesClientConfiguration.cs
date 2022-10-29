@@ -14,14 +14,13 @@
 //    limitations under the License.
 // </copyright>
 
+using System.Collections.Generic;
+using System.Linq;
+
 #if UNITY_ANDROID
 
 namespace GooglePlayGames.BasicApi
 {
-    using GooglePlayGames.OurUtils;
-    using System.Collections.Generic;
-    using System.Linq;
-
     /// <summary>
     /// Provides configuration for <see cref="PlayGamesPlatform"/>. If you wish to use either Saved
     /// Games or Cloud Save, you must create an instance of this class with those features enabled.
@@ -171,37 +170,37 @@ namespace GooglePlayGames.BasicApi
             /// <summary>
             /// The flag to enable save games. Default is false.
             /// </summary>
-            private bool mEnableSaveGames = false;
+            private bool mEnableSaveGames;
 
             /// <summary>
             /// The scopes to request from the user. Default is none.
             /// </summary>
-            private List<string> mScopes = null;
+            private List<string> mScopes;
 
             /// <summary>
             /// The flag indicating that popup UI should be hidden.
             /// </summary>
-            private bool mHidePopups = false;
+            private bool mHidePopups;
 
             /// <summary>
             /// The flag to indicate a server auth code should be requested when authenticating.
             /// </summary>
-            private bool mRequestAuthCode = false;
+            private bool mRequestAuthCode;
 
             /// <summary>
             /// The flag indicating the auth code should be refresh, causing re-consent and issuing a new refresh token.
             /// </summary>
-            private bool mForceRefresh = false;
+            private bool mForceRefresh;
 
             /// <summary>
             /// The flag indicating the email address should returned when authenticating.
             /// </summary>
-            private bool mRequestEmail = false;
+            private bool mRequestEmail;
 
             /// <summary>
             /// The flag indicating the id token should be returned when authenticating.
             /// </summary>
-            private bool mRequestIdToken = false;
+            private bool mRequestIdToken;
 
             /// <summary>
             /// The account name to use as a default when authenticating.
@@ -209,7 +208,7 @@ namespace GooglePlayGames.BasicApi
             /// <remarks>
             /// This is only used when requesting auth code or id token.
             /// </remarks>
-            private string mAccountName = null;
+            private string mAccountName;
 
             /// <summary>
             /// Enables the saved games.

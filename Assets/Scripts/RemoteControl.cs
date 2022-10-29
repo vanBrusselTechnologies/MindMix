@@ -1,18 +1,41 @@
-﻿using UnityEngine;
-using Unity.RemoteConfig;
+﻿using System.Threading.Tasks;
+using Unity.Services.Authentication;
+using Unity.Services.Core;
+using Unity.Services.RemoteConfig;
+using UnityEngine;
 
 public class RemoteControl : MonoBehaviour
 {
 
-    public struct userAttributes { }
-    public struct appAttributes { }
+    private struct UserAttributes { }
+    private struct AppAttributes { }
 
     string nieuwsteVersie;
 
-    private void Start()
+    private async void Awake()
     {
-        ConfigManager.FetchCompleted += ApplyRemoteSettings;
-        ConfigManager.FetchConfigs(new userAttributes(), new appAttributes());
+        if (!Utilities.CheckForInternetConnection()) return;
+        await InitializeRemoteConfigAsync();
+        RemoteConfigService.Instance.FetchConfigs(new UserAttributes(), new AppAttributes());
+        RemoteConfigService.Instance.FetchCompleted += ApplyRemoteSettings;
+    }
+
+    async Task InitializeRemoteConfigAsync()
+    {
+        // initialize handlers for unity game services
+        await UnityServices.InitializeAsync();
+
+        // options can be passed in the initializer, e.g if you want to set analytics-user-id or an environment-name use the lines from below:
+        // var options = new InitializationOptions()
+        //   .SetOption("com.unity.services.core.analytics-user-id", "my-user-id-1234")
+        //   .SetOption("com.unity.services.core.environment-name", "production");
+        // await UnityServices.InitializeAsync(options);
+
+        // remote config requires authentication for managing environment information
+        if (!AuthenticationService.Instance.IsSignedIn)
+        {
+            await AuthenticationService.Instance.SignInAnonymouslyAsync();
+        }
     }
 
     void ApplyRemoteSettings(ConfigResponse configResponse)
@@ -28,7 +51,7 @@ public class RemoteControl : MonoBehaviour
                 break;
             case ConfigOrigin.Remote:
                 //Debug.Log("New settings loaded this session; update values accordingly.");
-                nieuwsteVersie = ConfigManager.appConfig.GetString("nieuwsteVersie");
+                nieuwsteVersie = RemoteConfigService.Instance.appConfig.GetString("nieuwsteVersie");
                 break;
         }
         if (Application.version.StartsWith(nieuwsteVersie)) Debug.Log("Nieuwste versie van app");

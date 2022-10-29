@@ -15,11 +15,12 @@
 // </copyright>
 
 #if UNITY_ANDROID
+#if !UNITY_EDITOR
+using System;
+using UnityEngine;
+#endif
 namespace GooglePlayGames.OurUtils
 {
-    using UnityEngine;
-    using System;
-
     public static class PlatformUtils
     {
         /// <summary>

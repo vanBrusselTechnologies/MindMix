@@ -1,15 +1,16 @@
+using System;
+using System.Collections.Generic;
+using GooglePlayGames.BasicApi;
+using GooglePlayGames.BasicApi.Nearby;
+using GooglePlayGames.OurUtils;
+using UnityEngine;
+using Logger = GooglePlayGames.OurUtils.Logger;
+
 #if UNITY_ANDROID
 #pragma warning disable 0642 // Possible mistaken empty statement
 
 namespace GooglePlayGames.Android
 {
-    using System;
-    using System.Collections.Generic;
-    using GooglePlayGames.BasicApi;
-    using GooglePlayGames.BasicApi.Nearby;
-    using GooglePlayGames.OurUtils;
-    using UnityEngine;
-
     public class AndroidNearbyConnectionClient : INearbyConnectionClient
     {
         private volatile AndroidJavaObject mClient;
@@ -423,7 +424,7 @@ namespace GooglePlayGames.Android
                 {
                     string sysId = bundle.Call<string>("getString",
                         "com.google.android.gms.nearby.connection.SERVICE_ID");
-                    OurUtils.Logger.d("SystemId from Manifest: " + sysId);
+                    Logger.d("SystemId from Manifest: " + sysId);
                     return sysId;
                 }
             }
@@ -431,7 +432,7 @@ namespace GooglePlayGames.Android
 
         private static Action<T> ToOnGameThread<T>(Action<T> toConvert)
         {
-            return (val) => PlayGamesHelperObject.RunOnGameThread(() => toConvert(val));
+            return val => PlayGamesHelperObject.RunOnGameThread(() => toConvert(val));
         }
 
         private static Action<T1, T2> ToOnGameThread<T1, T2>(Action<T1, T2> toConvert)

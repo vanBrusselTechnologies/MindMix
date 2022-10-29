@@ -13,14 +13,14 @@ public class PlaatsGetallen : MonoBehaviour
     private int zeven = 7;
     private int acht = 8;
     private int negen = 9;
-    private List<int> tot9 = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+    private List<int> tot9 = new() { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
     [HideInInspector] public List<int> allCijfers;
     private SaveScript saveScript;
 
     public void Start0()
     {
         saveScript = GameObject.Find("gegevensHouder").GetComponent<SaveScript>();
-        List<int> randTot9 = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+        List<int> randTot9 = new() { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         for (int i = 0; i < tot9.Count; i++)
         {
             tot9[i] = randTot9[Random.Range(0, randTot9.Count)];
@@ -36,8 +36,8 @@ public class PlaatsGetallen : MonoBehaviour
         acht = tot9[7];
         negen = tot9[8];
         int welkeGetallenVolgorde = Random.Range(0, 1);
-        if (welkeGetallenVolgorde == 0) allCijfers = new List<int>() { zes, drie, negen, vier, zeven, acht, twee, vijf, een, vijf, een, vier, twee, zes, drie, acht, zeven, negen, zeven, twee, acht, negen, een, vijf, drie, vier, zes, zeven, vier, zes, negen, twee, vijf, een, acht, drie, drie, negen, vijf, een, vier, acht, zeven, twee, zes, twee, acht, een, zes, zeven, drie, vier, vijf, negen, vijf, een, vier, drie, zes, zeven, acht, negen, twee, negen, drie, twee, vier, acht, een, zes, vijf, zeven, acht, zes, zeven, vijf, negen, twee, een, drie, vier };
-        else if (welkeGetallenVolgorde == 1) allCijfers = new List<int>() { zeven, zes, acht, drie, twee, een, vier, negen, vijf, twee, negen, vijf, acht, vier, zes, zeven, een, drie, een, vier, drie, vijf, zeven, negen, zes, acht, twee, twee, zeven, zes, vijf, een, negen, acht, vier, drie, negen, acht, een, drie, zeven, vier, zes, vijf, twee, drie, vijf, vier, twee, zes, acht, negen, een, zeven, zes, vijf, twee, een, acht, zeven, negen, drie, vier, vier, drie, acht, vijf, twee, negen, een, zes, zeven, zeven, negen, een, vier, drie, zes, acht, twee, vijf };
+        if (welkeGetallenVolgorde == 0) allCijfers = new List<int> { zes, drie, negen, vier, zeven, acht, twee, vijf, een, vijf, een, vier, twee, zes, drie, acht, zeven, negen, zeven, twee, acht, negen, een, vijf, drie, vier, zes, zeven, vier, zes, negen, twee, vijf, een, acht, drie, drie, negen, vijf, een, vier, acht, zeven, twee, zes, twee, acht, een, zes, zeven, drie, vier, vijf, negen, vijf, een, vier, drie, zes, zeven, acht, negen, twee, negen, drie, twee, vier, acht, een, zes, vijf, zeven, acht, zes, zeven, vijf, negen, twee, een, drie, vier };
+        else if (welkeGetallenVolgorde == 1) allCijfers = new List<int> { zeven, zes, acht, drie, twee, een, vier, negen, vijf, twee, negen, vijf, acht, vier, zes, zeven, een, drie, een, vier, drie, vijf, zeven, negen, zes, acht, twee, twee, zeven, zes, vijf, een, negen, acht, vier, drie, negen, acht, een, drie, zeven, vier, zes, vijf, twee, drie, vijf, vier, twee, zes, acht, negen, een, zeven, zes, vijf, twee, een, acht, zeven, negen, drie, vier, vier, drie, acht, vijf, twee, negen, een, zes, zeven, zeven, negen, een, vier, drie, zes, acht, twee, vijf };
         for (int x = 0; x < 2; x++)
         {
             for (int a = 1; a < 4; a++)
@@ -47,7 +47,7 @@ public class PlaatsGetallen : MonoBehaviour
                 {
                     List<int> tempWissel1 = KrijgGetallenTot81(1, 0, a, a);
                     List<int> tempWissel2 = KrijgGetallenTot81(2, 0, a, a);
-                    List<int> tempWissel1a = new List<int>() { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+                    List<int> tempWissel1a = new() { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
                     for (int i = 0; i < 9; i++)
                     {
                         tempWissel1a[i] = allCijfers[tempWissel1[i]];
@@ -59,7 +59,7 @@ public class PlaatsGetallen : MonoBehaviour
                 {
                     List<int> tempWissel1 = KrijgGetallenTot81(1, 0, a, a);
                     List<int> tempWissel2 = KrijgGetallenTot81(3, 0, a, a);
-                    List<int> tempWissel1a = new List<int>() { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+                    List<int> tempWissel1a = new() { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
                     for (int i = 0; i < 9; i++)
                     {
                         tempWissel1a[i] = allCijfers[tempWissel1[i]];
@@ -71,7 +71,7 @@ public class PlaatsGetallen : MonoBehaviour
                 {
                     List<int> tempWissel1 = KrijgGetallenTot81(2, 0, a, a);
                     List<int> tempWissel2 = KrijgGetallenTot81(3, 0, a, a);
-                    List<int> tempWissel1a = new List<int>() { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+                    List<int> tempWissel1a = new() { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
                     for (int i = 0; i < 9; i++)
                     {
                         tempWissel1a[i] = allCijfers[tempWissel1[i]];
@@ -84,8 +84,8 @@ public class PlaatsGetallen : MonoBehaviour
                     List<int> tempWissel1 = KrijgGetallenTot81(1, 0, a, a);
                     List<int> tempWissel2 = KrijgGetallenTot81(2, 0, a, a);
                     List<int> tempWissel3 = KrijgGetallenTot81(3, 0, a, a);
-                    List<int> tempWissel1a = new List<int>() { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-                    List<int> tempWissel2a = new List<int>() { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+                    List<int> tempWissel1a = new() { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+                    List<int> tempWissel2a = new() { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
                     for (int i = 0; i < 9; i++)
                     {
                         tempWissel1a[i] = allCijfers[tempWissel1[i]];
@@ -103,7 +103,7 @@ public class PlaatsGetallen : MonoBehaviour
                 {
                     List<int> tempWissel1 = KrijgGetallenTot81(0, 1, a, a);
                     List<int> tempWissel2 = KrijgGetallenTot81(0, 2, a, a);
-                    List<int> tempWissel1a = new List<int>() { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+                    List<int> tempWissel1a = new() { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
                     for (int i = 0; i < 9; i++)
                     {
                         tempWissel1a[i] = allCijfers[tempWissel1[i]];
@@ -115,7 +115,7 @@ public class PlaatsGetallen : MonoBehaviour
                 {
                     List<int> tempWissel1 = KrijgGetallenTot81(0, 1, a, a);
                     List<int> tempWissel2 = KrijgGetallenTot81(0, 3, a, a);
-                    List<int> tempWissel1a = new List<int>() { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+                    List<int> tempWissel1a = new() { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
                     for (int i = 0; i < 9; i++)
                     {
                         tempWissel1a[i] = allCijfers[tempWissel1[i]];
@@ -127,7 +127,7 @@ public class PlaatsGetallen : MonoBehaviour
                 {
                     List<int> tempWissel1 = KrijgGetallenTot81(0, 2, a, a);
                     List<int> tempWissel2 = KrijgGetallenTot81(0, 3, a, a);
-                    List<int> tempWissel1a = new List<int>() { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+                    List<int> tempWissel1a = new() { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
                     for (int i = 0; i < 9; i++)
                     {
                         tempWissel1a[i] = allCijfers[tempWissel1[i]];
@@ -140,8 +140,8 @@ public class PlaatsGetallen : MonoBehaviour
                     List<int> tempWissel1 = KrijgGetallenTot81(0, 1, a, a);
                     List<int> tempWissel2 = KrijgGetallenTot81(0, 2, a, a);
                     List<int> tempWissel3 = KrijgGetallenTot81(0, 3, a, a);
-                    List<int> tempWissel1a = new List<int>() { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-                    List<int> tempWissel2a = new List<int>() { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+                    List<int> tempWissel1a = new() { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+                    List<int> tempWissel2a = new() { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
                     for (int i = 0; i < 9; i++)
                     {
                         tempWissel1a[i] = allCijfers[tempWissel1[i]];
@@ -169,7 +169,7 @@ public class PlaatsGetallen : MonoBehaviour
         {
             rij += (rijGroep - 1) * 3;
         }
-        List<int> getallenTot81 = new List<int>();
+        List<int> getallenTot81 = new();
         if (kolom == 0 && rij != 0)
         {
             if (rij == 1)

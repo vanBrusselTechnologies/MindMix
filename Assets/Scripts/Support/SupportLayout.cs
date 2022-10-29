@@ -9,7 +9,7 @@ public class SupportLayout : BaseLayout
     public override void SetLayout()
     {
         float size = Mathf.Min(Mathf.Max(screenSafeAreaWidth, screenSafeAreaHeight) / 12f, Mathf.Min(screenSafeAreaWidth, screenSafeAreaHeight) / 10f);
-        Vector2 sizeDeltaSupportText = new Vector2(-screenSafeAreaWidth * 0.15f, screenSafeAreaHeight / 3f);
+        Vector2 sizeDeltaSupportText = new(-screenSafeAreaWidth * 0.15f, screenSafeAreaHeight / 3f);
         backToMenuButtonRect.sizeDelta = Vector2.one * size;
         backToMenuButtonRect.anchoredPosition = new Vector2((size * 0.6f) - (screenSafeAreaWidth / 2f) + screenSafeAreaCenterX, (screenHeight / 2f) - screenSafeAreaYUp - (size * 0.6f));
         SupportNameRect.anchoredPosition = new Vector2(screenSafeAreaCenterX, screenSafeAreaYUp + screenSafeAreaHeight / 3f);

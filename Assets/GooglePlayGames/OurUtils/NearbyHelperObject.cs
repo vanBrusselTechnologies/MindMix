@@ -1,22 +1,22 @@
+using System;
+using GooglePlayGames.BasicApi.Nearby;
+using UnityEngine;
+
 #if UNITY_ANDROID
 
 namespace GooglePlayGames.OurUtils
 {
-    using BasicApi.Nearby;
-    using System;
-    using UnityEngine;
-
     public class NearbyHelperObject : MonoBehaviour
     {
         // our (singleton) instance
-        private static NearbyHelperObject instance = null;
+        private static NearbyHelperObject instance;
 
         // timers to keep track of discovery and advertising
-        private static double mAdvertisingRemaining = 0;
-        private static double mDiscoveryRemaining = 0;
+        private static double mAdvertisingRemaining;
+        private static double mDiscoveryRemaining;
 
         // nearby client to stop discovery and to stop advertising
-        private static INearbyConnectionClient mClient = null;
+        private static INearbyConnectionClient mClient;
 
         public static void CreateObject(INearbyConnectionClient client)
         {

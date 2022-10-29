@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using TMPro;
 
 public class AfScript : MonoBehaviour
 {
@@ -16,7 +16,7 @@ public class AfScript : MonoBehaviour
     [SerializeField] private GameObject sudokuCanvas;
     [SerializeField] private GameObject overigCanvas;
     [SerializeField] private GameObject menuUICanvasObj;
-    [SerializeField] private List<GameObject> knoppen = new List<GameObject>();
+    [SerializeField] private List<GameObject> knoppen = new();
     [HideInInspector] public bool ietsVeranderd = true;
     private SaveScript saveScript;
     [SerializeField] private TMP_Text beloningText;
@@ -99,7 +99,7 @@ public class AfScript : MonoBehaviour
                 for (int i = 1; i <= 9; i++)
                 {
                     List<int> rijNummers = plaatsScript.KrijgGetallenTot81(0, i, 1, 1);
-                    List<int> rijWaardes = new List<int>();
+                    List<int> rijWaardes = new();
                     foreach (int nummer in rijNummers)
                     {
                         rijWaardes.Add(getallen[nummer]);
@@ -114,7 +114,7 @@ public class AfScript : MonoBehaviour
                         }
                     }
                     List<int> kolomNummers = plaatsScript.KrijgGetallenTot81(i, 0, 1, 1);
-                    List<int> kolomWaardes = new List<int>();
+                    List<int> kolomWaardes = new();
                     foreach (int nummer in kolomNummers)
                     {
                         kolomWaardes.Add(getallen[nummer]);
@@ -128,7 +128,7 @@ public class AfScript : MonoBehaviour
                             return;
                         }
                     }
-                    List<int> vakjeWaardes = new List<int>();
+                    List<int> vakjeWaardes = new();
                     for (int a = 0; a < 9; a++)
                     {
                         vakjeWaardes.Add(getallen[a + (i - 1) * 9]);

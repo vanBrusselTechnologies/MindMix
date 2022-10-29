@@ -1,5 +1,5 @@
-using UnityEngine;
 using Firebase.Auth;
+using UnityEngine;
 
 public class FireBaseAuth : MonoBehaviour
 {

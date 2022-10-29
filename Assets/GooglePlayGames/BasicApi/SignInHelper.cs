@@ -11,7 +11,7 @@ namespace GooglePlayGames.BasicApi
 
         public static SignInStatus ToSignInStatus(int code)
         {
-            Dictionary<int, SignInStatus> dictionary = new Dictionary<int, SignInStatus>()
+            Dictionary<int, SignInStatus> dictionary = new Dictionary<int, SignInStatus>
             {
                 {
                     /* CommonUIStatus.UI_BUSY */ -12, SignInStatus.AlreadyInProgress

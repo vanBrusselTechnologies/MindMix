@@ -1,10 +1,10 @@
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.SceneManagement;
 using System.IO;
 using System.Text;
-using Firebase.Storage;
 using Firebase.Auth;
+using Firebase.Storage;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 using VBG.Extensions;
 
 public class SaveScript : MonoBehaviour
@@ -12,28 +12,28 @@ public class SaveScript : MonoBehaviour
     public static SaveScript Instance;
     Achtergrond achtergrond;
     GegevensHouder gegevensHouder;
-    [HideInInspector] public bool ready = false;
-    private List<string> sceneNames = new List<string>() { "Sudoku", "Solitaire", "2048", "Mijnenveger", "Menu", "ColorSort" };
+    [HideInInspector] public bool ready;
+    private List<string> sceneNames = new() { "Sudoku", "Solitaire", "2048", "Mijnenveger", "Menu", "ColorSort" };
     [HideInInspector]
-    public Dictionary<string, int> intDict = new Dictionary<string, int>();
+    public Dictionary<string, int> intDict = new();
     [HideInInspector]
-    public Dictionary<string, string> stringDict = new Dictionary<string, string>();
+    public Dictionary<string, string> stringDict = new();
     [HideInInspector]
-    public Dictionary<string, float> floatDict = new Dictionary<string, float>();
+    public Dictionary<string, float> floatDict = new();
     [HideInInspector]
-    public Dictionary<string, long> longDict = new Dictionary<string, long>();
-    private List<string> userLongNames = new List<string>();
-    private List<string> userIntNames = new List<string>();
-    private List<string> SudokuIntNames = new List<string>();
-    private List<string> SudokuStringNames = new List<string>();
-    private List<string> SolitaireIntNames = new List<string>();
-    private List<string> SolitaireFloatNames = new List<string>();
-    private List<string> MijnenVegerIntNames = new List<string>();
-    private List<string> intNames2048 = new List<string>();
-    private List<string> SettingsStringNames = new List<string>();
-    private List<string> SettingsIntNames = new List<string>();
-    private List<string> AchtergrondFloatNames = new List<string>();
-    private List<string> gekochteItems = new List<string>();
+    public Dictionary<string, long> longDict = new();
+    private List<string> userLongNames = new();
+    private List<string> userIntNames = new();
+    private List<string> SudokuIntNames = new();
+    private List<string> SudokuStringNames = new();
+    private List<string> SolitaireIntNames = new();
+    private List<string> SolitaireFloatNames = new();
+    private List<string> MijnenVegerIntNames = new();
+    private List<string> intNames2048 = new();
+    private List<string> SettingsStringNames = new();
+    private List<string> SettingsIntNames = new();
+    private List<string> AchtergrondFloatNames = new();
+    private List<string> gekochteItems = new();
 
     // Start is called before the first frame update
     private void Awake()
@@ -161,7 +161,7 @@ public class SaveScript : MonoBehaviour
         //String
         SettingsStringNames.Add("taal");
         //Int
-        List<string> sceneNames = new List<string>() { "All", "Sudoku", "Solitaire", "2048", "Mijnenveger", "Menu", "ColorSort" };
+        List<string> sceneNames = new() { "All", "Sudoku", "Solitaire", "2048", "Mijnenveger", "Menu", "ColorSort" };
         foreach (string sceneName in sceneNames)
         {
             SettingsIntNames.Add("bgSoort" + sceneName);
@@ -213,9 +213,9 @@ public class SaveScript : MonoBehaviour
         }
     }
 
-    private bool updateData = false;
-    private bool dataGedownloaded = false;
-    private int frameNaDownload = 0;
+    private bool updateData;
+    private bool dataGedownloaded;
+    private int frameNaDownload;
 
     // Update is called once per frame
     private void Update()
@@ -281,7 +281,7 @@ public class SaveScript : MonoBehaviour
         Save(oudeScene);
     }
 
-    private bool quitting = false;
+    private bool quitting;
 
     private void Quitting()
     {
@@ -329,7 +329,7 @@ public class SaveScript : MonoBehaviour
 
     private StringBuilder SaveUserData()
     {
-        StringBuilder data = new StringBuilder("@@@data");
+        StringBuilder data = new("@@@data");
         foreach (string name in userLongNames)
         {
             data.Append(",,,long" + "///" + name + ":::" + longDict[name]);
@@ -350,7 +350,7 @@ public class SaveScript : MonoBehaviour
 
     private StringBuilder SaveAchtergrond()
     {
-        StringBuilder data = new StringBuilder("@@@achtergrond");
+        StringBuilder data = new("@@@achtergrond");
         foreach (string name in AchtergrondFloatNames)
         {
             data.Append(",,,float" + "///" + name + ":::" + floatDict[name]);
@@ -360,7 +360,7 @@ public class SaveScript : MonoBehaviour
 
     private StringBuilder SaveSettings()
     {
-        StringBuilder data = new StringBuilder("@@@instellingen");
+        StringBuilder data = new("@@@instellingen");
         foreach (string name in SettingsIntNames)
         {
             data.Append(",,,int" + "///" + name + ":::" + intDict[name]);
@@ -374,13 +374,13 @@ public class SaveScript : MonoBehaviour
 
     private void SaveNull()
     {
-        StringBuilder data = new StringBuilder("@@@nul,,,int///0:::0");
+        StringBuilder data = new("@@@nul,,,int///0:::0");
         SaveData(data);
     }
 
     private void SaveSudoku()
     {
-        StringBuilder data = new StringBuilder("@@@sudoku");
+        StringBuilder data = new("@@@sudoku");
         foreach (string name in SudokuIntNames)
         {
             data.Append(",,,int" + "///" + name + ":::" + intDict[name]);
@@ -394,7 +394,7 @@ public class SaveScript : MonoBehaviour
 
     private void SaveSolitaire()
     {
-        StringBuilder data = new StringBuilder("@@@solitaire");
+        StringBuilder data = new("@@@solitaire");
         foreach (string name in SolitaireIntNames)
         {
             data.Append(",,,int" + "///" + name + ":::" + intDict[name]);
@@ -408,7 +408,7 @@ public class SaveScript : MonoBehaviour
 
     private void SaveMijnenveger()
     {
-        StringBuilder data = new StringBuilder("@@@mijnenveger");
+        StringBuilder data = new("@@@mijnenveger");
         foreach (string name in MijnenVegerIntNames)
         {
             data.Append(",,,int" + "///" + name + ":::" + intDict[name]);
@@ -418,7 +418,7 @@ public class SaveScript : MonoBehaviour
 
     private void Save2048()
     {
-        StringBuilder data = new StringBuilder("@@@2048");
+        StringBuilder data = new("@@@2048");
         foreach (string name in intNames2048)
         {
             data.Append(",,,int" + "///" + name + ":::" + intDict[name]);
@@ -428,7 +428,7 @@ public class SaveScript : MonoBehaviour
 
     private void SaveShop()
     {
-        StringBuilder data = new StringBuilder("@@@shop");
+        StringBuilder data = new("@@@shop");
         foreach (string name in gekochteItems)
         {
             data.Append(",,,int" + "///" + name + ":::" + intDict[name]);
@@ -445,8 +445,8 @@ public class SaveScript : MonoBehaviour
     {
         string path = $"{Application.persistentDataPath}/save.vbg";
         FileStream file = File.Open(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-        StreamReader reader = new StreamReader(file);
-        string oldData = file.Length == 0 ? "." : reader.ReadToEnd().ToString();
+        StreamReader reader = new(file);
+        string oldData = file.Length == 0 ? "." : reader.ReadToEnd();
         reader.Close();
         string[] oldDataParts = oldData.Split("@@@");
         string dataNew = "";
@@ -484,25 +484,25 @@ public class SaveScript : MonoBehaviour
             }
             if (!userDataGevonden)
             {
-                List<string> tmp = new List<string>() { SaveUserData().ToString()[3..], SaveAchtergrond().ToString()[3..] };
+                List<string> tmp = new() { SaveUserData().ToString()[3..], SaveAchtergrond().ToString()[3..] };
                 oldDataParts = oldDataParts.AddRange(tmp);
             }
             if (!settingsDataFound)
             {
-                List<string> tmp = new List<string> { SaveSettings().ToString()[3..] };
+                List<string> tmp = new() { SaveSettings().ToString()[3..] };
                 oldDataParts = oldDataParts.AddRange(tmp);
             }
             for (int i = 1; i < oldDataParts.Length; i++)
             {
                 dataNew += ("@@@" + oldDataParts[i]).Trim();
             }
-            StreamWriter writer = new StreamWriter(path);
+            StreamWriter writer = new(path);
             writer.WriteLine(dataNew);
             writer.Close();
         }
         else
         {
-            StreamWriter writer = new StreamWriter(path);
+            StreamWriter writer = new(path);
             writer.WriteLine(data);
             writer.Close();
         }
@@ -526,7 +526,7 @@ public class SaveScript : MonoBehaviour
             return;
         }
         FileStream file = File.Open(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-        StreamReader reader = new StreamReader(file);
+        StreamReader reader = new(file);
         string oldData = file.Length == 0 ? "." : reader.ReadToEnd();
         reader.Close();
         if (oldData.Equals("."))
@@ -535,7 +535,7 @@ public class SaveScript : MonoBehaviour
             File.Delete(path);
             return;
         }
-        string data = oldData.ToString();
+        string data = oldData;
         string[] dataParts = data.Split("@@@");
         for (int i = 1; i < dataParts.Length; i++)
         {

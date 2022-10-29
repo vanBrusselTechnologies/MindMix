@@ -14,16 +14,17 @@
 //  limitations under the License.
 // </copyright>
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using GooglePlayGames.BasicApi;
+using GooglePlayGames.OurUtils;
+using UnityEngine;
+using Logger = GooglePlayGames.OurUtils.Logger;
+
 #if UNITY_ANDROID
 namespace GooglePlayGames.Android
 {
-    using System;
-    using System.Linq;
-    using BasicApi;
-    using OurUtils;
-    using UnityEngine;
-    using System.Collections.Generic;
-
     internal class AndroidTokenClient : TokenClient
     {
         private const string HelperFragmentClass = "com.google.games.bridge.HelperFragment";
@@ -161,13 +162,13 @@ namespace GooglePlayGames.Android
                 AndroidTaskUtils.AddOnFailureListener(task, e =>
                 {
                     if (!Misc.IsApiException(e)) {
-                        OurUtils.Logger.e("Exception requesting new permissions" +
-                            e.Call<string>("toString"));
+                        Logger.e("Exception requesting new permissions" +
+                                 e.Call<string>("toString"));
                         return;
                     }
 
                     var failCode = SignInHelper.ToSignInStatus(e.Call<int>("getStatusCode"));
-                    OurUtils.Logger.e("Exception requesting new permissions: " + failCode);
+                    Logger.e("Exception requesting new permissions: " + failCode);
                     callback(failCode);
                 });
             }
@@ -217,8 +218,8 @@ namespace GooglePlayGames.Android
             }
             catch (Exception e)
             {
-                OurUtils.Logger.e("Exception launching token request: " + e.Message);
-                OurUtils.Logger.e(e.ToString());
+                Logger.e("Exception launching token request: " + e.Message);
+                Logger.e(e.ToString());
             }
         }
 
@@ -268,8 +269,8 @@ namespace GooglePlayGames.Android
             }
             catch (Exception e)
             {
-                OurUtils.Logger.e("Exception launching token request: " + e.Message);
-                OurUtils.Logger.e(e.ToString());
+                Logger.e("Exception launching token request: " + e.Message);
+                Logger.e(e.ToString());
             }
         }
 

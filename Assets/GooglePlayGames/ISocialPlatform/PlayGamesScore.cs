@@ -14,21 +14,21 @@
 //    limitations under the License.
 // </copyright>
 
+using System;
+using UnityEngine.SocialPlatforms;
+
 #if UNITY_ANDROID
 
 namespace GooglePlayGames
 {
-    using System;
-    using UnityEngine.SocialPlatforms;
-
     /// <summary>
     /// Represents a Google Play Games score that can be sent to a leaderboard.
     /// </summary>
     public class PlayGamesScore : IScore
     {
-        private string mLbId = null;
-        private long mValue = 0;
-        private ulong mRank = 0;
+        private string mLbId;
+        private long mValue;
+        private ulong mRank;
         private string mPlayerId = string.Empty;
         private string mMetadata = string.Empty;
 

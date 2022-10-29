@@ -137,7 +137,7 @@ MonoBehaviour:
       A covered cell is blank and clickable, while an uncovered cell is exposed.
       Flagged cells are those marked by the player to indicate a potential mine location.
 
-      
+
 
       If
       a player uncovers a mined cell, the game ends, as there is only 1 life per
@@ -349,6 +349,10 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 67478123149254656
     m_Localized: 'Download progress:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 115004167628251136
+    m_Localized: MindMix
     m_Metadata:
       m_Items: []
   references:

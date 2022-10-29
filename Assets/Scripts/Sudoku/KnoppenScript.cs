@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
 using TMPro;
+using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class KnoppenScript : BaseUIHandler
@@ -14,11 +15,11 @@ public class KnoppenScript : BaseUIHandler
     [HideInInspector] public List<GameObject> knoppen;
     private int gekozendifficulty;
     [HideInInspector] public int knopIndex = -1;
-    [HideInInspector] public bool isButtonSelected = false;
-    private List<int> buttonsGehad = new List<int>();
+    [HideInInspector] public bool isButtonSelected;
+    private List<int> buttonsGehad = new();
     private bool naamIsEventSystem = true;
-    Color dubbelGetalKleurRood = new Color(1f, 0, 0, 1f);
-    Color normaalVakjesKleur = new Color(175f / 255f, 175f / 255f, 175f / 255f, 60f / 255f);
+    Color dubbelGetalKleurRood = new(1f, 0, 0, 1f);
+    Color normaalVakjesKleur = new(175f / 255f, 175f / 255f, 175f / 255f, 60f / 255f);
 
     private PlaatsGetallen plaatsScript;
     private AfScript afScript;
@@ -96,7 +97,7 @@ public class KnoppenScript : BaseUIHandler
 
     public void isSelected()
     {
-        GameObject selectedButton = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
+        GameObject selectedButton = EventSystem.current.currentSelectedGameObject;
         for (int i = 0; i < 81; i++)
         {
             if (knoppen[i] == selectedButton)
@@ -113,7 +114,7 @@ public class KnoppenScript : BaseUIHandler
 
     public void getalGeklikt()
     {
-        string selectedNumber = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.name;
+        string selectedNumber = EventSystem.current.currentSelectedGameObject.name;
         int dei = saveScript.intDict["DeI"];
         if (saveScript.intDict["Button " + dei] == 1)
         {
@@ -227,7 +228,7 @@ public class KnoppenScript : BaseUIHandler
 
     private List<int> KrijgVakEnRijEnKolomVanDeI(int dei)
     {
-        List<int> vakRijEnKolom = new List<int>();
+        List<int> vakRijEnKolom = new();
         int vak = dei / 9;
         int rij = vak / 3 * 3 + dei % 9 / 3 + 1;
         int kolom = vak % 3 * 3 + dei % 9 % 3 + 1;
@@ -245,7 +246,7 @@ public class KnoppenScript : BaseUIHandler
         int kolom = vakRijEnKolom[2];
         List<int> kolomGetallen = plaatsScript.KrijgGetallenTot81(kolom, 0, 1, 1);
         List<int> rijGetallen = plaatsScript.KrijgGetallenTot81(0, rij, 1, 1);
-        List<int> vakGetallen = new List<int>();
+        List<int> vakGetallen = new();
         for (int i = 0; i < 9; i++)
         {
             vakGetallen.Add((vak - 1) * 9 + i);
@@ -342,7 +343,7 @@ public class KnoppenScript : BaseUIHandler
         int kolom = vakRijEnKolom[2];
         List<int> kolomGetallen = plaatsScript.KrijgGetallenTot81(kolom, 0, 1, 1);
         List<int> rijGetallen = plaatsScript.KrijgGetallenTot81(0, rij, 1, 1);
-        List<int> vakGetallen = new List<int>();
+        List<int> vakGetallen = new();
         for (int i = 0; i < 9; i++)
         {
             vakGetallen.Add((vak - 1) * 9 + i);

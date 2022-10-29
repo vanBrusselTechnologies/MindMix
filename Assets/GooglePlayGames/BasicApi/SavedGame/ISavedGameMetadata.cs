@@ -14,10 +14,10 @@
 //    limitations under the License.
 // </copyright>
 
+using System;
+
 namespace GooglePlayGames.BasicApi.SavedGame
 {
-    using System;
-
     /// <summary>
     /// Interface representing the metadata for a saved game. These instances are also used as handles
     /// for reading and writing the content of the underlying file.

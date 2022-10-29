@@ -14,28 +14,28 @@
 //    limitations under the License.
 // </copyright>
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
 namespace GooglePlayGames.OurUtils
 {
-    using System;
-    using System.Collections;
-    using UnityEngine;
-    using System.Collections.Generic;
-
     public class PlayGamesHelperObject : MonoBehaviour
     {
         // our (singleton) instance
-        private static PlayGamesHelperObject instance = null;
+        private static PlayGamesHelperObject instance;
 
         // are we a dummy instance (used in the editor?)
-        private static bool sIsDummy = false;
+        private static bool sIsDummy;
 
         // queue of actions to run on the game thread
-        private static List<System.Action> sQueue = new List<Action>();
+        private static List<Action> sQueue = new List<Action>();
 
         // member variable used to copy actions from the sQueue and
         // execute them on the game thread.  It is a member variable
         // to help minimize memory allocations.
-        List<System.Action> localQueue = new List<System.Action>();
+        List<Action> localQueue = new List<Action>();
 
         // flag that alerts us that we should check the queue
         // (we do this just so we don't have to lock() the queue every
@@ -92,7 +92,7 @@ namespace GooglePlayGames.OurUtils
             }
         }
 
-        public static void RunOnGameThread(System.Action action)
+        public static void RunOnGameThread(Action action)
         {
             if (action == null)
             {

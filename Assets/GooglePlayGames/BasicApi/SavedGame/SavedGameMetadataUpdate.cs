@@ -14,11 +14,11 @@
 //    limitations under the License.
 // </copyright>
 
+using System;
+using GooglePlayGames.OurUtils;
+
 namespace GooglePlayGames.BasicApi.SavedGame
 {
-    using System;
-    using GooglePlayGames.OurUtils;
-
     /// <summary>
     /// A struct representing the mutation of saved game metadata. Fields can either have a new value
     /// or be untouched (in which case the corresponding field in the saved game metadata will be

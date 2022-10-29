@@ -14,12 +14,12 @@
 //    limitations under the License.
 // </copyright>
 
+using System;
+
 #if UNITY_ANDROID
 
 namespace GooglePlayGames.BasicApi
 {
-    using System;
-
     /// <summary>Data interface for retrieving achievement information.</summary>
     /// <remarks>
     /// There are 3 states an achievement can be in:
@@ -41,14 +41,14 @@ namespace GooglePlayGames.BasicApi
             new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
 
         private string mId = string.Empty;
-        private bool mIsIncremental = false;
-        private bool mIsRevealed = false;
-        private bool mIsUnlocked = false;
-        private int mCurrentSteps = 0;
-        private int mTotalSteps = 0;
+        private bool mIsIncremental;
+        private bool mIsRevealed;
+        private bool mIsUnlocked;
+        private int mCurrentSteps;
+        private int mTotalSteps;
         private string mDescription = string.Empty;
         private string mName = string.Empty;
-        private long mLastModifiedTime = 0;
+        private long mLastModifiedTime;
         private ulong mPoints;
         private string mRevealedImageUrl;
         private string mUnlockedImageUrl;
@@ -63,10 +63,6 @@ namespace GooglePlayGames.BasicApi
                 "[Achievement] id={0}, name={1}, desc={2}, type={3}, revealed={4}, unlocked={5}, steps={6}/{7}",
                 mId, mName, mDescription, mIsIncremental ? "INCREMENTAL" : "STANDARD",
                 mIsRevealed, mIsUnlocked, mCurrentSteps, mTotalSteps);
-        }
-
-        public Achievement()
-        {
         }
 
         /// <summary>

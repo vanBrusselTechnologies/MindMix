@@ -14,12 +14,11 @@
 //    limitations under the License.
 // </copyright>
 
+using System.Linq;
+using GooglePlayGames.OurUtils;
+
 namespace GooglePlayGames.BasicApi.Video
 {
-    using System.Collections.Generic;
-    using System.Linq;
-    using GooglePlayGames.OurUtils;
-
     /// <summary>
     /// Represents the video recording capabilities.
     /// </summary>
@@ -66,11 +65,9 @@ namespace GooglePlayGames.BasicApi.Video
             {
                 return mCaptureModesSupported[(int) captureMode];
             }
-            else
-            {
-                Logger.w("SupportsCaptureMode called with an unknown captureMode.");
-                return false;
-            }
+
+            Logger.w("SupportsCaptureMode called with an unknown captureMode.");
+            return false;
         }
 
         /// <summary>Returns whether the device supports the given quality level.</summary>
@@ -80,11 +77,9 @@ namespace GooglePlayGames.BasicApi.Video
             {
                 return mQualityLevelsSupported[(int) qualityLevel];
             }
-            else
-            {
-                Logger.w("SupportsCaptureMode called with an unknown qualityLevel.");
-                return false;
-            }
+
+            Logger.w("SupportsCaptureMode called with an unknown qualityLevel.");
+            return false;
         }
 
         public override string ToString()

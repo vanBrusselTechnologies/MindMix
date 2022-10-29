@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using TMPro;
+using UnityEngine;
 using UnityEngine.Localization.Components;
 using UnityEngine.Localization.SmartFormat.PersistentVariables;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class Script2048 : MonoBehaviour
 {
@@ -32,27 +32,27 @@ public class Script2048 : MonoBehaviour
     private float dragDistanceVert;
     private float dragDistanceHorz;
     private int randNum;
-    private List<GameObject> knoppenGesorteerd = new List<GameObject>();
-    private List<int> knoppenX = new List<int>();
-    private List<int> possiblePlekken = new List<int>();
-    private List<GameObject> buttonsOmTeWissen = new List<GameObject>();
-    private List<GameObject> knoppenRij1 = new List<GameObject>();
-    private List<GameObject> knoppenRij2 = new List<GameObject>();
-    private List<GameObject> knoppenRij3 = new List<GameObject>();
-    private List<GameObject> knoppenRij4 = new List<GameObject>();
-    private List<GameObject> knoppenRij5 = new List<GameObject>();
-    private List<GameObject> knoppenRij6 = new List<GameObject>();
-    private List<GameObject> knoppenRij7 = new List<GameObject>();
-    private List<GameObject> knoppenRij8 = new List<GameObject>();
-    private List<GameObject> knoppenKolom1 = new List<GameObject>();
-    private List<GameObject> knoppenKolom2 = new List<GameObject>();
-    private List<GameObject> knoppenKolom3 = new List<GameObject>();
-    private List<GameObject> knoppenKolom4 = new List<GameObject>();
-    private List<GameObject> knoppenKolom5 = new List<GameObject>();
-    private List<GameObject> knoppenKolom6 = new List<GameObject>();
-    private List<GameObject> knoppenKolom7 = new List<GameObject>();
-    private List<GameObject> knoppenKolom8 = new List<GameObject>();
-    private List<GameObject> GevuldVeldKnoppen = new List<GameObject>();
+    private List<GameObject> knoppenGesorteerd = new();
+    private List<int> knoppenX = new();
+    private List<int> possiblePlekken = new();
+    private List<GameObject> buttonsOmTeWissen = new();
+    private List<GameObject> knoppenRij1 = new();
+    private List<GameObject> knoppenRij2 = new();
+    private List<GameObject> knoppenRij3 = new();
+    private List<GameObject> knoppenRij4 = new();
+    private List<GameObject> knoppenRij5 = new();
+    private List<GameObject> knoppenRij6 = new();
+    private List<GameObject> knoppenRij7 = new();
+    private List<GameObject> knoppenRij8 = new();
+    private List<GameObject> knoppenKolom1 = new();
+    private List<GameObject> knoppenKolom2 = new();
+    private List<GameObject> knoppenKolom3 = new();
+    private List<GameObject> knoppenKolom4 = new();
+    private List<GameObject> knoppenKolom5 = new();
+    private List<GameObject> knoppenKolom6 = new();
+    private List<GameObject> knoppenKolom7 = new();
+    private List<GameObject> knoppenKolom8 = new();
+    private List<GameObject> GevuldVeldKnoppen = new();
     private Vector3 knopPositie = Vector3.zero;
     private bool heeftSpelBewogen = true;
 
@@ -98,8 +98,8 @@ public class Script2048 : MonoBehaviour
                 }
             }
         }
-        Vector3 localScaleHorzLijn = new Vector3(100, 1f / (grootte - 3) * 2f, 1);
-        Vector3 localScaleVertLijn = new Vector3(1f / (grootte - 3) * 2f, 100, 1);
+        Vector3 localScaleHorzLijn = new(100, 1f / (grootte - 3) * 2f, 1);
+        Vector3 localScaleVertLijn = new(1f / (grootte - 3) * 2f, 100, 1);
         for (int i = 1; i < grootte; i++)
         {
             GameObject templijnHorz = Instantiate(lijn);

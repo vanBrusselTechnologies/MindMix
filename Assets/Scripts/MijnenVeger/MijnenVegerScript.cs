@@ -1,10 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
+using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
-using VBG.Extensions;
+using UnityEngine.UI;
 
 public class MijnenVegerScript : MonoBehaviour
 {
@@ -17,20 +17,20 @@ public class MijnenVegerScript : MonoBehaviour
     [HideInInspector] public float mvKnopBoven;
     [HideInInspector] public float mvKnopOnder;
     private bool alreadyPressed;
-    private List<int> vakjesGehad = new List<int>();
-    [HideInInspector] public List<Button> buttons = new List<Button>();
+    private List<int> vakjesGehad = new();
+    [HideInInspector] public List<Button> buttons = new();
     private int kolom;
     private int rij;
     public Button knop;
     public Sprite vlag;
     public Sprite bom;
-    [HideInInspector] public bool vlagNietSchep = false;
-    private List<int> bommenList = new List<int>();
-    private List<int> randVakjes = new List<int>();
+    [HideInInspector] public bool vlagNietSchep;
+    private List<int> bommenList = new();
+    private List<int> randVakjes = new();
     private int aantalBommen;
     public TMP_Text bommenTeGaan;
-    [HideInInspector] public bool GameOver = false;
-    private bool gameIsFinished = false;
+    [HideInInspector] public bool GameOver;
+    private bool gameIsFinished;
     [SerializeField] private GameObject speelVeld;
     [SerializeField] private GameObject uitlegUI;
     [SerializeField] private GameObject settingsUIObj;
@@ -171,7 +171,7 @@ public class MijnenVegerScript : MonoBehaviour
             saveScript.intDict["mijnenvegerVakjesgehad" + (vakjesGehad.Count - 1)] = buttonNumber;
             alreadyPressed = false;
         }
-        List<int> outputlijst = new List<int> { kolom, rij };
+        List<int> outputlijst = new() { kolom, rij };
         return outputlijst;
     }
 
@@ -500,7 +500,6 @@ public class MijnenVegerScript : MonoBehaviour
             a.GetComponent<Image>().sprite = bom;
             ShowAllBombs();
             GameOver = true;
-            return;
         }
         else
         {
@@ -564,7 +563,7 @@ public class MijnenVegerScript : MonoBehaviour
     private IEnumerator OnTouch()
     {
         yield return new WaitForEndOfFrame();
-        GameObject selectedButton = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
+        GameObject selectedButton = EventSystem.current.currentSelectedGameObject;
         if (selectedButton != null)
         {
             if (int.TryParse(selectedButton.name, out int _))

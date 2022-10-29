@@ -1,12 +1,14 @@
-﻿#if UNITY_ANDROID && !UNITY_EDITOR
+﻿
+using TMPro;
+using UnityEngine;
+using UnityEngine.Localization;
+using UnityEngine.UI;
+#if UNITY_ANDROID && UNITY_EDITOR
+using System;
 using System.Collections;
 using Google.Play.AppUpdate;
 using Google.Play.Common;
 #endif
-using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
-using UnityEngine.Localization;
 
 public class InAppUpdate : MonoBehaviour
 {
@@ -15,27 +17,36 @@ public class InAppUpdate : MonoBehaviour
     [SerializeField] private Button completeUpdateButton;
     [SerializeField] private TMP_Text percentageText;
     [SerializeField] private LocalizedString finishedLocalizedString;
-#if UNITY_ANDROID && !UNITY_EDITOR
-    AppUpdateManager appUpdateManager;
-    float downloadProgress = 0;
+#if UNITY_ANDROID && UNITY_EDITOR
+    AppUpdateManager _appUpdateManager;
+    float _downloadProgress;
 
     private void Awake()
     {
+        try
+        {
+            _appUpdateManager = new AppUpdateManager();
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning(e.ToString());
+        }
+        return;
         DontDestroyOnLoad(updateHandlerBannerCanvas);
-        appUpdateManager = new AppUpdateManager();
+        
         StartCoroutine(CheckForUpdates());
     }
 
     private IEnumerator CheckForUpdates()
     {
-        PlayAsyncOperation<AppUpdateInfo, AppUpdateErrorCode> appUpdateInfoOperation = appUpdateManager.GetAppUpdateInfo();
+        PlayAsyncOperation<AppUpdateInfo, AppUpdateErrorCode> appUpdateInfoOperation = _appUpdateManager.GetAppUpdateInfo();
         yield return appUpdateInfoOperation;
         if (appUpdateInfoOperation.IsSuccessful)
         {
             AppUpdateInfo appUpdateInfoResult = appUpdateInfoOperation.GetResult();
             if (appUpdateInfoResult.UpdateAvailability == UpdateAvailability.UpdateNotAvailable) yield break;
             AppUpdateOptions appUpdateOptions = AppUpdateOptions.FlexibleAppUpdateOptions(allowAssetPackDeletion: true);
-            AppUpdateRequest startUpdateRequest = appUpdateManager.StartUpdate(appUpdateInfoResult, appUpdateOptions);
+            AppUpdateRequest startUpdateRequest = _appUpdateManager.StartUpdate(appUpdateInfoResult, appUpdateOptions);
             while (!startUpdateRequest.IsDone && (
                 startUpdateRequest.Status != AppUpdateStatus.Downloading || 
                 startUpdateRequest.Status != AppUpdateStatus.Downloaded))
@@ -52,11 +63,11 @@ public class InAppUpdate : MonoBehaviour
                     updateHandlerBannerCanvas.SetActive(false);
                     yield break;
                 }
-                float _downloadProgress = downloadProgress;
-                downloadProgress = Mathf.Floor(startUpdateRequest.DownloadProgress * 100f) / 100f;
-                if (downloadProgress != _downloadProgress)
+                float _downloadProgress = this._downloadProgress;
+                this._downloadProgress = Mathf.Floor(startUpdateRequest.DownloadProgress * 100f) / 100f;
+                if (this._downloadProgress != _downloadProgress)
                 {
-                    percentageText.text = downloadProgress + "%";
+                    percentageText.text = this._downloadProgress + "%";
                 }
                 yield return null;
             }
@@ -84,9 +95,10 @@ public class InAppUpdate : MonoBehaviour
 
     private IEnumerator CompleteUpdate()
     {
-        PlayAsyncOperation<VoidResult, AppUpdateErrorCode> result = appUpdateManager.CompleteUpdate();
+        PlayAsyncOperation<VoidResult, AppUpdateErrorCode> result = _appUpdateManager.CompleteUpdate();
         yield return result;
-        Debug.Log(result.Error);
+        if (result.Error != AppUpdateErrorCode.NoError)
+            Debug.Log(result.Error);
     }
 #endif
 }

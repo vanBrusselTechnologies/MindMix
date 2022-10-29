@@ -12,13 +12,13 @@ public class MenuLayout : BaseLayout
     [SerializeField] private RectTransform shopButtonRect;
     [SerializeField] private RectTransform supportButtonRect;
 
-    private List<RectTransform> buttonsSortedRect = new List<RectTransform>(0);
+    private List<RectTransform> buttonsSortedRect = new(0);
 
     // Start is called before the first frame update
     protected override void Start()
     {
-        List<string> knopNamen = new List<string>();
-        List<string> knopNamenNietSorted = new List<string>();
+        List<string> knopNamen = new();
+        List<string> knopNamenNietSorted = new();
         for (int i = 0; i < playGameButtonsText.Count; i++)
         {
             string knopNaam = playGameButtonsText[i].text;

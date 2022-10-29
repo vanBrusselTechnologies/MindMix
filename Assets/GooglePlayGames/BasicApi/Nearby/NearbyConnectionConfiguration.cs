@@ -14,11 +14,11 @@
 //    limitations under the License.
 // </copyright>
 
+using System;
+using GooglePlayGames.OurUtils;
+
 namespace GooglePlayGames.BasicApi.Nearby
 {
-    using System;
-    using GooglePlayGames.OurUtils;
-
     public enum InitializationStatus
     {
         Success,

@@ -14,12 +14,12 @@
 //  limitations under the License.
 // </copyright>
 
+using System;
+using GooglePlayGames.BasicApi;
+
 #if UNITY_ANDROID
 namespace GooglePlayGames
 {
-    using GooglePlayGames.BasicApi;
-    using System;
-
     internal interface TokenClient
     {
         /// <summary>

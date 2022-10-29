@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.SceneManagement;
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
 using TMPro;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using VBG.Extensions;
+using Color = UnityEngine.Color;
 
 public class Achtergrond : MonoBehaviour
 {
@@ -15,31 +18,31 @@ public class Achtergrond : MonoBehaviour
     [SerializeField] private GameObject cameraObj;
     [SerializeField] private GameObject backgroundCanvasObj;
     private Color wisselColor = Color.white;
-    private int klaar = 0;
-    private bool isPaused = false;
-    private bool wasPaused = false;
+    private int klaar;
+    private bool isPaused;
+    private bool wasPaused;
     private float vorigeScreenWidth;
     private float vorigeSafezoneY;
     private float vorigeSafezoneX;
     private GegevensHouder gegevensScript;
-    [HideInInspector] public List<Color> kleuren = new List<Color>();
+    [HideInInspector] public List<Color> kleuren = new();
     private bool wisselendeKleur;
-    [HideInInspector] public bool aangepasteKleur = false;
+    [HideInInspector] public bool aangepasteKleur;
     private SaveScript saveScript;
-    [HideInInspector] public List<TMP_Dropdown.OptionData> colorOptionData = new List<TMP_Dropdown.OptionData>();
-    private List<int> beschikbareKleuren = new List<int>();
-    [HideInInspector] public List<TMP_Dropdown.OptionData> gekochteColorOptionData = new List<TMP_Dropdown.OptionData>();
-    [HideInInspector] public List<TMP_Dropdown.OptionData> imageOptionData = new List<TMP_Dropdown.OptionData>();
-    private List<int> beschikbareAfbeeldingen = new List<int>();
-    [HideInInspector] public List<TMP_Dropdown.OptionData> gekochteImageOptionData = new List<TMP_Dropdown.OptionData>();
+    [HideInInspector] public List<TMP_Dropdown.OptionData> colorOptionData = new();
+    private List<int> beschikbareKleuren = new();
+    [HideInInspector] public List<TMP_Dropdown.OptionData> gekochteColorOptionData = new();
+    [HideInInspector] public List<TMP_Dropdown.OptionData> imageOptionData = new();
+    private List<int> beschikbareAfbeeldingen = new();
+    [HideInInspector] public List<TMP_Dropdown.OptionData> gekochteImageOptionData = new();
 
     private void Awake()
     {
         gegevensScript = GetComponent<GegevensHouder>();
         saveScript = GetComponent<SaveScript>();
-        List<System.Drawing.Color> listOfDrawingColours = new List<System.Drawing.Color>();
+        List<System.Drawing.Color> listOfDrawingColours = new();
         bool isKleur = false;
-        foreach (System.Drawing.KnownColor knownColor in System.Enum.GetValues(typeof(System.Drawing.KnownColor)))
+        foreach (KnownColor knownColor in Enum.GetValues(typeof(KnownColor)))
         {
             System.Drawing.Color col = System.Drawing.Color.FromKnownColor(knownColor);
             listOfDrawingColours.Add(col);
@@ -50,7 +53,7 @@ public class Achtergrond : MonoBehaviour
             if (isKleur)
             {
                 colorOptionData.Add(new TMP_Dropdown.OptionData(col.Name));
-                Color color = new Color(col.R / 256f, col.G / 256f, col.B / 256f, col.A / 256f);
+                Color color = new(col.R / 256f, col.G / 256f, col.B / 256f, col.A / 256f);
                 kleuren.Add(color);
                 if (col.Name.Equals("YellowGreen"))
                 {
@@ -206,7 +209,6 @@ public class Achtergrond : MonoBehaviour
                 int height = Screen.height;
                 int sizeFactor = width > height ? width : height;
                 achtergrondRect.sizeDelta = Vector2.one * sizeFactor;
-                return;
             }
         }
     }

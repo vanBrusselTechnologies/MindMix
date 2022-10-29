@@ -1,3 +1,4 @@
+using Firebase.Auth;
 using UnityEngine;
 using UnityEngine.Localization;
 using UnityEngine.Networking;
@@ -15,7 +16,6 @@ public class SupportScript : MonoBehaviour
         if (GegevensHouder.Instance == null)
         {
             SceneManager.LoadScene("LogoEnAppOpstart");
-            return;
         }
     }
 
@@ -31,7 +31,7 @@ public class SupportScript : MonoBehaviour
         string beginInhoud = beginInhoudLocalized.GetLocalizedString() + "\n";
         string lijn = "\n---------------------------------------------------\n";
         string ruimteVoorInput = "\n\n\n\n\n";
-        string persoonlijkeInfo = "\n" + extraInformatieLocalized.GetLocalizedString() + "\nuid=" + Firebase.Auth.FirebaseAuth.DefaultInstance.CurrentUser?.UserId;
+        string persoonlijkeInfo = "\n" + extraInformatieLocalized.GetLocalizedString() + "\nuid=" + FirebaseAuth.DefaultInstance.CurrentUser?.UserId;
         inhoud = beginInhoud + lijn + ruimteVoorInput + lijn + persoonlijkeInfo;
         string email = emailadres;
         string subject = EscapeURLFunction(onderwerp);

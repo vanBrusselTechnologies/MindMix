@@ -14,13 +14,13 @@
 //    limitations under the License.
 // </copyright>
 
+using System;
+using System.Collections.Generic;
+
 #if UNITY_ANDROID
 
 namespace GooglePlayGames.BasicApi.Events
 {
-    using System;
-    using System.Collections.Generic;
-
     /// <summary>
     /// An interface for interacting with events.
     ///

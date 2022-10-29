@@ -1,5 +1,5 @@
-using Firebase.DynamicLinks;
 using System;
+using Firebase.DynamicLinks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 

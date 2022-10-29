@@ -14,15 +14,17 @@
 //    limitations under the License.
 // </copyright>
 
+using System;
+using System.Collections.Generic;
+using GooglePlayGames.BasicApi;
+using GooglePlayGames.OurUtils;
+using UnityEngine.SocialPlatforms;
+using Range = UnityEngine.SocialPlatforms.Range;
+
 #if UNITY_ANDROID
 
 namespace GooglePlayGames
 {
-    using System.Collections.Generic;
-    using GooglePlayGames.BasicApi;
-    using UnityEngine;
-    using UnityEngine.SocialPlatforms;
-
     public class PlayGamesLeaderboard : ILeaderboard
     {
         private string mId;
@@ -49,7 +51,7 @@ namespace GooglePlayGames
             mFilteredUserIds = userIDs;
         }
 
-        public void LoadScores(System.Action<bool> callback)
+        public void LoadScores(Action<bool> callback)
         {
             PlayGamesPlatform.Instance.LoadScores(this, callback);
         }
@@ -115,7 +117,7 @@ namespace GooglePlayGames
         {
             if (data.Valid)
             {
-                OurUtils.Logger.d("Setting leaderboard from: " + data);
+                Logger.d("Setting leaderboard from: " + data);
                 SetMaxRange(data.ApproximateCount);
                 SetTitle(data.Title);
                 SetLocalUserScore((PlayGamesScore) data.PlayerScore);

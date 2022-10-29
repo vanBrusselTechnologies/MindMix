@@ -14,14 +14,14 @@
 //    limitations under the License.
 // </copyright>
 
+using System;
+using UnityEngine;
+
 namespace GooglePlayGames.OurUtils
 {
-    using System;
-    using UnityEngine;
-
     public class Logger
     {
-        private static bool debugLogEnabled = false;
+        private static bool debugLogEnabled;
 
         public static bool DebugLogEnabled
         {

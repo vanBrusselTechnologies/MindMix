@@ -15,14 +15,14 @@ public class SettingsLayout : BaseLayout
         float size = Mathf.Min(Mathf.Max(screenSafeAreaWidth, screenSafeAreaHeight) / 12f, Mathf.Min(screenSafeAreaWidth, screenSafeAreaHeight) / 10f);
         backToMenuButtonRect.sizeDelta = Vector2.one * size;
         backToMenuButtonRect.anchoredPosition = new Vector2((size * 0.6f) - (screenSafeAreaWidth / 2f) + screenSafeAreaCenterX, (screenHeight / 2f) - screenSafeAreaYUp - (size * 0.6f));
-        Vector3 scrollDownScale = new Vector3(screenSafeAreaWidth * 0.98f / 2250f, screenSafeAreaHeight * 0.85f / 950f, 1);
+        Vector3 scrollDownScale = new(screenSafeAreaWidth * 0.98f / 2250f, screenSafeAreaHeight * 0.85f / 950f, 1);
         bgInstellingScrolldown.localScale = scrollDownScale;
         overigeInstellingScrolldown.localScale = scrollDownScale;
         float minScaleDeel = Mathf.Min(scrollDownScale.x, scrollDownScale.y);
-        Vector3 scrollDownContentScale = new Vector3(minScaleDeel / scrollDownScale.x, minScaleDeel / scrollDownScale.y, 1);
+        Vector3 scrollDownContentScale = new(minScaleDeel / scrollDownScale.x, minScaleDeel / scrollDownScale.y, 1);
         bgInstellingScrolldownContent.localScale = scrollDownContentScale;
         overigeInstellingScrolldownContent.localScale = scrollDownContentScale;
-        Vector3 scrollDownPosition = new Vector3(screenSafeAreaCenterX, screenSafeAreaCenterY + (screenSafeAreaHeight * 0.15f / -2f), 0);
+        Vector3 scrollDownPosition = new(screenSafeAreaCenterX, screenSafeAreaCenterY + (screenSafeAreaHeight * 0.15f / -2f), 0);
         bgInstellingScrolldown.anchoredPosition = scrollDownPosition;
         overigeInstellingScrolldown.anchoredPosition = scrollDownPosition;
         int aantalSettingPages = instellingPaginaWisselKnoppenHouder.childCount;

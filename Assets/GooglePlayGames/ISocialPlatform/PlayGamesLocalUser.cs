@@ -14,14 +14,14 @@
 //    limitations under the License.
 // </copyright>
 
+using System;
+using GooglePlayGames.BasicApi;
+using UnityEngine.SocialPlatforms;
+
 #if UNITY_ANDROID
 
 namespace GooglePlayGames
 {
-    using System;
-    using GooglePlayGames.BasicApi;
-    using UnityEngine.SocialPlatforms;
-
     /// <summary>
     /// Represents the Google Play Games local user.
     /// </summary>

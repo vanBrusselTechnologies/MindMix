@@ -1,8 +1,8 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
-using TMPro;
 
 [RequireComponent(typeof(TMP_Dropdown))]
 public class LocalizeDropdown : MonoBehaviour

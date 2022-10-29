@@ -14,11 +14,11 @@
 //    limitations under the License.
 // </copyright>
 
+using System;
+using UnityEngine;
+
 namespace GooglePlayGames.OurUtils
 {
-    using System;
-    using UnityEngine;
-
     public static class Misc
     {
         public static bool BuffersAreIdentical(byte[] a, byte[] b)

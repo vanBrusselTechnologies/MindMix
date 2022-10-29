@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 public class ShopLayout : BaseLayout
@@ -38,7 +37,7 @@ public class ShopLayout : BaseLayout
         bgImgScrolldown.sizeDelta = scrollDownSize;
         bgColorScrolldown.sizeDelta = scrollDownSize;
         spelModiScrolldown.sizeDelta = scrollDownSize;
-        Vector3 scrollDownPosition = new Vector3(safeZoneAntiX, safeZoneAntiY + (scrollDownSize.y / 2f) - (Screen.safeArea.height / 2f), 0);
+        Vector3 scrollDownPosition = new(safeZoneAntiX, safeZoneAntiY + (scrollDownSize.y / 2f) - (Screen.safeArea.height / 2f), 0);
         bgImgScrolldown.anchoredPosition = scrollDownPosition;
         bgColorScrolldown.anchoredPosition = scrollDownPosition;
         spelModiScrolldown.anchoredPosition = scrollDownPosition;

@@ -25,7 +25,7 @@ public class StartupAnimation : MonoBehaviour
 
     private float tijdTeWachten = 0.025f;
     private WaitForSecondsRealtime wachtff;
-    [HideInInspector] public bool finished = false;
+    [HideInInspector] public bool finished;
 
     StartupScreenLayout screenLayout;
 
@@ -60,9 +60,9 @@ public class StartupAnimation : MonoBehaviour
         StartCoroutine(playAnimation());
     }
 
-    float i = 0f;
+    float i;
     float secPerAnim = .75f;
-    bool isActive = false;
+    bool isActive;
     IEnumerator playAnimation()
     {
         if (finished) i = float.MaxValue;

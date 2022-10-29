@@ -1,6 +1,8 @@
-using UnityEngine;
 using System.Collections;
+using UnityEngine;
 using UnityEngine.Localization;
+using UnityEngine.UI;
+using VBG.Extensions;
 
 public class ShareScreenshot : MonoBehaviour
 {
@@ -8,9 +10,9 @@ public class ShareScreenshot : MonoBehaviour
     [SerializeField] private LocalizedString shareMessage;
     [SerializeField] private LocalizedString sharePlatformChooserHelpText;
 
-    private bool isFocus = false;
+    private bool isFocus;
     private string m_shareSubject, m_shareMessage, m_sharePlatformChooserHelpText;
-    private bool isProcessing = false;
+    private bool isProcessing;
     private string screenshotName = "MindMix_highscore.png";
 
 
@@ -57,19 +59,19 @@ public class ShareScreenshot : MonoBehaviour
         if (!Application.isEditor)
         {
             //current activity context
-            AndroidJavaClass unity = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+            AndroidJavaClass unity = new("com.unity3d.player.UnityPlayer");
             AndroidJavaObject currentActivity = unity.GetStatic<AndroidJavaObject>("currentActivity");
 
             //Create intent for action send
-            AndroidJavaClass intentClass = new AndroidJavaClass("android.content.Intent");
-            AndroidJavaObject intentObject = new AndroidJavaObject("android.content.Intent");
+            AndroidJavaClass intentClass = new("android.content.Intent");
+            AndroidJavaObject intentObject = new("android.content.Intent");
             intentObject.Call<AndroidJavaObject>("setAction", intentClass.GetStatic<string>("ACTION_SEND"));
 
             //create file object of the screenshot captured
-            AndroidJavaObject fileObject = new AndroidJavaObject("java.io.File", screenShotPath);
+            AndroidJavaObject fileObject = new("java.io.File", screenShotPath);
 
             //create FileProvider class object
-            AndroidJavaClass fileProviderClass = new AndroidJavaClass("androidx.core.content.FileProvider");
+            AndroidJavaClass fileProviderClass = new("androidx.core.content.FileProvider");
 
             object[] providerParams = new object[3];
             providerParams[0] = currentActivity;
@@ -100,16 +102,16 @@ public class ShareScreenshot : MonoBehaviour
     private IEnumerable CreateScreenshotOfObject(GameObject objToCapture, GameObject objToRenderOn)
     {
         yield return new WaitForEndOfFrame();
-        Texture2D _texture = ScreenCapture.CaptureScreenshotAsTexture(1);
+        Texture2D texture = ScreenCapture.CaptureScreenshotAsTexture(1);
         Transform tf = objToCapture.transform;
         Vector3 scale = tf.localScale;
-        float scaleXInPixels = VBG.Extensions.ScreenExt.UnitsToPixels(scale.x);
-        float scaleYInPixels = VBG.Extensions.ScreenExt.UnitsToPixels(scale.y);
+        float scaleXInPixels = ScreenExt.UnitsToPixels(scale.x);
+        float scaleYInPixels = ScreenExt.UnitsToPixels(scale.y);
         Vector3 pos = tf.position;
-        float posXInPixels = VBG.Extensions.ScreenExt.UnitsToPixels(pos.x + VBG.Extensions.ScreenExt.PixelsToUnits(Screen.width) / 2f);
-        float posYInPixels = VBG.Extensions.ScreenExt.UnitsToPixels(pos.y + VBG.Extensions.ScreenExt.PixelsToUnits(Screen.height) / 2f);
-        Rect rect = new Rect(posXInPixels - (scaleXInPixels / 2f), posYInPixels - (scaleYInPixels / 2f), scaleXInPixels, scaleYInPixels);
-        Sprite _sprite = Sprite.Create(_texture, rect, Vector2.one / 2f);
-        objToRenderOn.GetComponent<UnityEngine.UI.Image>().sprite = _sprite;
+        float posXInPixels = ScreenExt.UnitsToPixels(pos.x + ScreenExt.PixelsToUnits(Screen.width) / 2f);
+        float posYInPixels = ScreenExt.UnitsToPixels(pos.y + ScreenExt.PixelsToUnits(Screen.height) / 2f);
+        Rect rect = new(posXInPixels - (scaleXInPixels / 2f), posYInPixels - (scaleYInPixels / 2f), scaleXInPixels, scaleYInPixels);
+        Sprite sprite = Sprite.Create(texture, rect, Vector2.one / 2f);
+        objToRenderOn.GetComponent<Image>().sprite = sprite;
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -94,7 +95,7 @@ namespace VBG.Extensions
         /// <returns></returns>
         public static List<T> RemoveDuplicates<T>(this List<T> list)
         {
-            List<T> output = new List<T>();
+            List<T> output = new();
             for (int i = 0; i < list.Count; i++)
             {
                 if (output.Count == 0)
@@ -111,8 +112,8 @@ namespace VBG.Extensions
 
         public static List<T> GetDuplicates<T>(this List<T> list)
         {
-            List<T> tmp = new List<T>();
-            List<T> output = new List<T>();
+            List<T> tmp = new();
+            List<T> output = new();
             for (int i = 0; i < list.Count; i++)
             {
                 if (tmp.Count == 0)
@@ -207,14 +208,14 @@ namespace VBG.Extensions
                 T item = list[i];
                 if (output.Trim().Length != 0)
                     output += ",\n";
-                output += "[" + i + "] " + item.ToString();
+                output += "[" + i + "] " + item;
             };
             Debug.Log(output);
         }
 
         public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(List<TKey> keys, TValue value)
         {
-            Dictionary<TKey, TValue> dict = new Dictionary<TKey, TValue>();
+            Dictionary<TKey, TValue> dict = new();
             foreach (TKey item in keys)
             {
                 dict.Add(item, value);
@@ -224,7 +225,7 @@ namespace VBG.Extensions
 
         public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(List<TKey> keys, List<TValue> values)
         {
-            Dictionary<TKey, TValue> dict = new Dictionary<TKey, TValue>();
+            Dictionary<TKey, TValue> dict = new();
             int count = Mathf.Min(keys.Count, values.Count);
             for (int i = 0; i < count; i++)
             {
@@ -235,7 +236,7 @@ namespace VBG.Extensions
 
         public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(List<TKey> keys, params TValue[] values)
         {
-            Dictionary<TKey, TValue> dict = new Dictionary<TKey, TValue>();
+            Dictionary<TKey, TValue> dict = new();
             int count = Mathf.Min(keys.Count, values.Length);
             for (int i = 0; i < count; i++)
             {
@@ -249,14 +250,14 @@ namespace VBG.Extensions
     {
         public static T[] Add<T>(this T[] array, T item)
         {
-            System.Array.Resize(ref array, array.Length + 1);
+            Array.Resize(ref array, array.Length + 1);
             array[^1] = item;
             return array;
         }
 
         public static T[] AddRange<T>(this T[] array, params T[] items)
         {
-            System.Array.Resize(ref array, array.Length + items.Length);
+            Array.Resize(ref array, array.Length + items.Length);
             for (int i = 0; i < items.Length; i++)
             {
                 array[array.Length - items.Length + i] = items[i];
@@ -266,7 +267,7 @@ namespace VBG.Extensions
 
         public static T[] AddRange<T>(this T[] array, List<T> items)
         {
-            System.Array.Resize(ref array, array.Length + items.Count);
+            Array.Resize(ref array, array.Length + items.Count);
             for (int i = 0; i < items.Count; i++)
             {
                 array[array.Length - items.Count + i] = items[i];
@@ -332,7 +333,7 @@ namespace VBG.Extensions
                     break;
                 }
             }
-            System.Array.Resize(ref array, array.Length - itemCountInArray);
+            Array.Resize(ref array, array.Length - itemCountInArray);
             return array;
         }
 
@@ -350,7 +351,7 @@ namespace VBG.Extensions
                     }
                 }
             }
-            System.Array.Resize(ref array, array.Length - itemCountInArray);
+            Array.Resize(ref array, array.Length - itemCountInArray);
             return array;
         }
 
@@ -363,13 +364,13 @@ namespace VBG.Extensions
             {
                 array[i] = array[i + itemsToRemove];
             }
-            System.Array.Resize(ref array, array.Length - itemsToRemove);
+            Array.Resize(ref array, array.Length - itemsToRemove);
             return array;
         }
 
         public static T[] Clear<T>(this T[] array)
         {
-            System.Array.Resize(ref array, 0);
+            Array.Resize(ref array, 0);
             return array;
         }
 
@@ -407,14 +408,14 @@ namespace VBG.Extensions
                 T item = array[i];
                 if (output.Trim().Length != 0)
                     output += ",\n";
-                output += "[" + i + "] " + item.ToString();
+                output += "[" + i + "] " + item;
             };
             Debug.Log(output);
         }
 
         public static List<T> ToList<T>(this T[] array)
         {
-            List<T> output = new List<T>();
+            List<T> output = new();
             foreach (T item in array)
             {
                 output.Add(item);
@@ -429,13 +430,13 @@ namespace VBG.Extensions
 
         public static T[] Resize<T>(this T[] array, int size)
         {
-            System.Array.Resize(ref array, size);
+            Array.Resize(ref array, size);
             return array;
         }
 
         public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(TKey[] keys, TValue value)
         {
-            Dictionary<TKey, TValue> dict = new Dictionary<TKey, TValue>();
+            Dictionary<TKey, TValue> dict = new();
             foreach (TKey item in keys)
             {
                 dict.Add(item, value);
@@ -445,7 +446,7 @@ namespace VBG.Extensions
 
         public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(TKey[] keys, List<TValue> values)
         {
-            Dictionary<TKey, TValue> dict = new Dictionary<TKey, TValue>();
+            Dictionary<TKey, TValue> dict = new();
             int count = Mathf.Min(keys.Length, values.Count);
             for (int i = 0; i < count; i++)
             {
@@ -456,7 +457,7 @@ namespace VBG.Extensions
 
         public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(TKey[] keys, params TValue[] values)
         {
-            Dictionary<TKey, TValue> dict = new Dictionary<TKey, TValue>();
+            Dictionary<TKey, TValue> dict = new();
             int count = Mathf.Min(keys.Length, values.Length);
             for (int i = 0; i < count; i++)
             {
@@ -574,7 +575,7 @@ namespace VBG.Extensions
 
         public static List<TKey> ToKeyList<TKey, TValue>(this Dictionary<TKey, TValue> dict)
         {
-            List<TKey> list = new List<TKey>();
+            List<TKey> list = new();
             foreach (KeyValuePair<TKey, TValue> item in dict)
             {
                 list.Add(item.Key);
@@ -584,7 +585,7 @@ namespace VBG.Extensions
 
         public static List<TValue> ToValueList<TKey, TValue>(this Dictionary<TKey, TValue> dict)
         {
-            List<TValue> list = new List<TValue>();
+            List<TValue> list = new();
             foreach (KeyValuePair<TKey, TValue> item in dict)
             {
                 list.Add(item.Value);
@@ -594,7 +595,7 @@ namespace VBG.Extensions
 
         public static List<KeyValuePair<TKey, TValue>> ToList<TKey, TValue>(this Dictionary<TKey, TValue> dict)
         {
-            List<KeyValuePair<TKey, TValue>> list = new List<KeyValuePair<TKey, TValue>>();
+            List<KeyValuePair<TKey, TValue>> list = new();
             foreach (KeyValuePair<TKey, TValue> item in dict)
             {
                 list.Add(item);

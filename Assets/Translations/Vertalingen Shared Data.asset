@@ -299,6 +299,10 @@ MonoBehaviour:
     m_Key: downloadprogress
     m_Metadata:
       m_Items: []
+  - m_Id: 115004167628251136
+    m_Key: app_name
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

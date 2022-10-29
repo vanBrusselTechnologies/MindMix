@@ -14,10 +14,10 @@
 //    limitations under the License.
 // </copyright>
 
+using GooglePlayGames.OurUtils;
+
 namespace GooglePlayGames.BasicApi.Nearby
 {
-    using GooglePlayGames.OurUtils;
-
     public struct ConnectionResponse
     {
         private static readonly byte[] EmptyPayload = new byte[0];

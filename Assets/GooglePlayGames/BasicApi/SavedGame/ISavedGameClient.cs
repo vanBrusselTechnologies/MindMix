@@ -14,11 +14,11 @@
 //    limitations under the License.
 // </copyright>
 
+using System;
+using System.Collections.Generic;
+
 namespace GooglePlayGames.BasicApi.SavedGame
 {
-    using System;
-    using System.Collections.Generic;
-
     /// <summary>
     /// An enum for the different strategies that can be used to resolve saved game conflicts (i.e.
     /// conflicts produced by two or more separate writes to the same saved game at once).

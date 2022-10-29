@@ -14,11 +14,10 @@
 //    limitations under the License.
 // </copyright>
 
+using System;
+
 namespace GooglePlayGames.BasicApi.Video
 {
-    using System;
-    using System.Collections.Generic;
-
     /// <summary>
     /// An interface for interacting with the video recording API.
     /// </summary>

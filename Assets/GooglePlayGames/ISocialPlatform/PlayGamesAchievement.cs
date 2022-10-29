@@ -14,17 +14,18 @@
 //    limitations under the License.
 // </copyright>
 
+using System;
+using GooglePlayGames.BasicApi;
+using UnityEngine;
+using UnityEngine.SocialPlatforms;
+
 #if UNITY_ANDROID
 
 namespace GooglePlayGames
 {
-    using System;
-    using GooglePlayGames.BasicApi;
-    using UnityEngine;
 #if UNITY_2017_1_OR_NEWER
     using UnityEngine.Networking;
 #endif
-    using UnityEngine.SocialPlatforms;
 
     internal delegate void ReportProgress(string id, double progress, Action<bool> callback);
 
@@ -36,24 +37,24 @@ namespace GooglePlayGames
     {
         private readonly ReportProgress mProgressCallback;
         private string mId = string.Empty;
-        private bool mIsIncremental = false;
-        private int mCurrentSteps = 0;
-        private int mTotalSteps = 0;
-        private double mPercentComplete = 0.0;
-        private bool mCompleted = false;
-        private bool mHidden = false;
+        private bool mIsIncremental;
+        private int mCurrentSteps;
+        private int mTotalSteps;
+        private double mPercentComplete;
+        private bool mCompleted;
+        private bool mHidden;
         private DateTime mLastModifiedTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
         private string mTitle = string.Empty;
         private string mRevealedImageUrl = string.Empty;
         private string mUnlockedImageUrl = string.Empty;
 #if UNITY_2017_1_OR_NEWER
-        private UnityWebRequest mImageFetcher = null;
+        private UnityWebRequest mImageFetcher;
 #else
         private WWW mImageFetcher = null;
 #endif
-        private Texture2D mImage = null;
+        private Texture2D mImage;
         private string mDescription = string.Empty;
-        private ulong mPoints = 0;
+        private ulong mPoints;
 
         internal PlayGamesAchievement()
             : this(PlayGamesPlatform.Instance.ReportProgress)
@@ -76,7 +77,7 @@ namespace GooglePlayGames
                 if (ach.TotalSteps > 0)
                 {
                     this.mPercentComplete =
-                        (double) ach.CurrentSteps / (double) ach.TotalSteps * 100.0;
+                        ach.CurrentSteps / (double) ach.TotalSteps * 100.0;
                 }
                 else
                 {

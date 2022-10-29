@@ -1,27 +1,29 @@
-using UnityEngine;
+using System;
 using System.Collections.Generic;
-using UnityEngine.SceneManagement;
+using Firebase.Auth;
+using UnityEngine;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
+using UnityEngine.SceneManagement;
 
 public class GegevensHouder : MonoBehaviour
 {
     public static GegevensHouder Instance;
-    bool testBuild = false;
-    [HideInInspector] public bool startNewGame = false;
+    bool _testBuild;
+    [HideInInspector] public bool startNewGame;
     public Texture2D zwart;
-    private bool isPaused = false;
-    private bool wasPaused = false;
-    public WaitForSecondsRealtime wachtHonderdste = new WaitForSecondsRealtime(0.01f);
+    private bool isPaused;
+    private bool wasPaused;
+    public WaitForSecondsRealtime wachtHonderdste = new(0.01f);
     public RuntimePlatform platform;
     public List<Sprite> achtergronden;
     public Sprite spriteWit;
-    private List<int> achtergrondSudoku = new List<int>() { 0, -2 };
-    private List<int> achtergrondMenu = new List<int>() { 0, -2 };
-    private List<int> achtergrond2048 = new List<int>() { 0, -2 };
-    private List<int> achtergrondMV = new List<int>() { 0, -2 };
-    private List<int> achtergrondSolitaire = new List<int>() { 0, -2 };
-    private List<int> achtergrondColorSort = new List<int>() { 0, -2 };
+    private List<int> achtergrondSudoku = new() { 0, -2 };
+    private List<int> achtergrondMenu = new() { 0, -2 };
+    private List<int> achtergrond2048 = new() { 0, -2 };
+    private List<int> achtergrondMV = new() { 0, -2 };
+    private List<int> achtergrondSolitaire = new() { 0, -2 };
+    private List<int> achtergrondColorSort = new() { 0, -2 };
     private Achtergrond bgScript;
     private SaveScript saveScript;
     [HideInInspector] public bool loginWarningGehad;
@@ -34,9 +36,9 @@ public class GegevensHouder : MonoBehaviour
             return;
         }
         Instance = this;
-        if (Application.platform == RuntimePlatform.WindowsEditor)
+        if (Application.platform == RuntimePlatform.WindowsEditor || true)
         {
-            testBuild = true;
+            _testBuild = true;
         }
         bgScript = GetComponent<Achtergrond>();
         saveScript = GetComponent<SaveScript>();
@@ -46,15 +48,15 @@ public class GegevensHouder : MonoBehaviour
 
     private void Start()
     {
-        if (!testBuild)
+        if (!_testBuild)
         {
             Debug.unityLogger.logEnabled = false;
         }
         ZetGegevens();
-        saveScript.longDict["laatsteLogin"] = System.DateTime.UtcNow.Ticks;
+        saveScript.longDict["laatsteLogin"] = DateTime.UtcNow.Ticks;
     }
 
-    private bool gewisseldeKleur = false;
+    private bool gewisseldeKleur;
     // Update is called once per frame
     private void Update()
     {
@@ -76,7 +78,7 @@ public class GegevensHouder : MonoBehaviour
         {
             sceneNaam = SceneManager.GetActiveScene().name.ToLower();
         }
-        List<int> list = new List<int>() { -1000, -1000 };
+        List<int> list = new() { -1000, -1000 };
         switch (sceneNaam)
         {
             case "sudoku": list = achtergrondSudoku; break;
@@ -85,10 +87,9 @@ public class GegevensHouder : MonoBehaviour
             case "mijnenveger": list = achtergrondMV; break;
             case "solitaire": list = achtergrondSolitaire; break;
             case "colorsort": list = achtergrondColorSort; break;
-            case "inlogenvoorplaatapp": list = new List<int>() { 1, -1 }; break;
+            case "inlogenvoorplaatapp": list = new List<int> { 1, -1 }; break;
             case "instellingen": list = achtergrondMenu; break;
             case "shop": list = achtergrondMenu; break;
-            default: break;
         }
         return list;
     }
@@ -122,7 +123,6 @@ public class GegevensHouder : MonoBehaviour
                 achtergrondColorSort[0] = bgSoort;
                 achtergrondColorSort[1] = waarde;
                 break;
-            default: break;
         }
     }
 
@@ -134,7 +134,7 @@ public class GegevensHouder : MonoBehaviour
         }
         saveScript.stringDict["taal"] = LocalizationSettings.AvailableLocales.Locales[taalWaarde].LocaleName;
         LocalizationSettings.SelectedLocale = LocalizationSettings.AvailableLocales.Locales[taalWaarde];
-        Firebase.Auth.FirebaseAuth.DefaultInstance.LanguageCode = LocalizationSettings.SelectedLocale.Identifier.Code;
+        FirebaseAuth.DefaultInstance.LanguageCode = LocalizationSettings.SelectedLocale.Identifier.Code;
     }
 
     private void OnApplicationPause(bool pauseStatus)
@@ -181,7 +181,7 @@ public class GegevensHouder : MonoBehaviour
 
     public void ZetAchtergronden()
     {
-        List<string> sceneNames = new List<string>() { "All", "Sudoku", "Solitaire", "2048", "Mijnenveger", "Menu", "ColorSort" };
+        List<string> sceneNames = new() { "All", "Sudoku", "Solitaire", "2048", "Mijnenveger", "Menu", "ColorSort" };
         foreach (string sceneName in sceneNames)
         {
             VeranderOpgeslagenAchtergrond(sceneName.ToLower(), saveScript.intDict["bgSoort" + sceneName], saveScript.intDict["bgWaarde" + sceneName]);

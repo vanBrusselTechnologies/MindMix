@@ -1,20 +1,19 @@
+using System;
+using GooglePlayGames.BasicApi;
+using GooglePlayGames.BasicApi.Video;
+using GooglePlayGames.OurUtils;
+using UnityEngine;
+
 #if UNITY_ANDROID
 #pragma warning disable 0642 // Possible mistaken empty statement
 
 namespace GooglePlayGames.Android
 {
-    using System;
-    using System.Collections.Generic;
-    using GooglePlayGames.BasicApi;
-    using GooglePlayGames.BasicApi.Video;
-    using GooglePlayGames.OurUtils;
-    using UnityEngine;
-
     internal class AndroidVideoClient : IVideoClient
     {
         private volatile AndroidJavaObject mVideosClient;
         private bool mIsCaptureSupported;
-        private OnCaptureOverlayStateListenerProxy mOnCaptureOverlayStateListenerProxy = null;
+        private OnCaptureOverlayStateListenerProxy mOnCaptureOverlayStateListenerProxy;
 
         public AndroidVideoClient(bool isCaptureSupported, AndroidJavaObject account)
         {

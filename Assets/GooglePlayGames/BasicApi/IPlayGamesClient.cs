@@ -14,13 +14,16 @@
 //    limitations under the License.
 // </copyright>
 
+using System;
+using GooglePlayGames.BasicApi.Events;
+using GooglePlayGames.BasicApi.SavedGame;
+using GooglePlayGames.BasicApi.Video;
+using UnityEngine.SocialPlatforms;
+
 #if UNITY_ANDROID
 
 namespace GooglePlayGames.BasicApi
 {
-    using System;
-    using UnityEngine.SocialPlatforms;
-
     /// <summary>
     /// Defines an abstract interface for a Play Games Client.
     /// </summary>
@@ -386,19 +389,19 @@ namespace GooglePlayGames.BasicApi
         /// Gets the saved game client.
         /// </summary>
         /// <returns>The saved game client.</returns>
-        SavedGame.ISavedGameClient GetSavedGameClient();
+        ISavedGameClient GetSavedGameClient();
 
         /// <summary>
         /// Gets the events client.
         /// </summary>
         /// <returns>The events client.</returns>
-        Events.IEventsClient GetEventsClient();
+        IEventsClient GetEventsClient();
 
         /// <summary>
         /// Gets the video client.
         /// </summary>
         /// <returns>The video client.</returns>
-        Video.IVideoClient GetVideoClient();
+        IVideoClient GetVideoClient();
 
         IUserProfile[] GetFriends();
 

@@ -1,9 +1,9 @@
-using UnityEngine;
-using UnityEngine.SceneManagement;
-using TMPro;
 using System.Collections.Generic;
+using TMPro;
+using UnityEngine;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class InstellingenScript : MonoBehaviour
@@ -19,9 +19,9 @@ public class InstellingenScript : MonoBehaviour
     [SerializeField] private GameObject overigeInstellingen;
     [SerializeField] private Slider muziekVolumeSlider;
 
-    private List<string> sceneNames = new List<string>() { "Sudoku", "Solitaire", "2048", "Mijnenveger", "Menu", "ColorSort" };
+    private List<string> sceneNames = new() { "Sudoku", "Solitaire", "2048", "Mijnenveger", "Menu", "ColorSort" };
     private bool startValues = true;
-    private bool volumeSetInStart = false;
+    private bool volumeSetInStart;
 
     // Start is called before the first frame update
     private void Start()
@@ -45,8 +45,8 @@ public class InstellingenScript : MonoBehaviour
 
     private void SetTaalStartWaarde()
     {
-        List<string> tmpTalen = new List<string>();
-        List<TMP_Dropdown.OptionData> options = new List<TMP_Dropdown.OptionData>();
+        List<string> tmpTalen = new();
+        List<TMP_Dropdown.OptionData> options = new();
         foreach (Locale locale in LocalizationSettings.AvailableLocales.Locales)
         {
             tmpTalen.Add(locale.LocaleName);

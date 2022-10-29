@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class SolitaireScript : MonoBehaviour
@@ -11,7 +11,7 @@ public class SolitaireScript : MonoBehaviour
     private SolitaireLayout solitaireLayout;
     private KnoppenScriptSolitaire knoppenScript;
 
-    public List<GameObject> kaarten = new List<GameObject>();
+    public List<GameObject> kaarten = new();
 
     [SerializeField] private TMP_Text tijdtijd;
     [SerializeField] private GameObject Stapel1Houder;
@@ -29,25 +29,25 @@ public class SolitaireScript : MonoBehaviour
     [SerializeField] private GameObject maakAfKnop;
     [SerializeField] private TMP_Text beloningText;
 
-    private List<GameObject> kaartenGeschud = new List<GameObject>();
-    [HideInInspector] public List<GameObject> Stapel1 = new List<GameObject>();
-    [HideInInspector] public List<GameObject> Stapel2 = new List<GameObject>();
-    [HideInInspector] public List<GameObject> Stapel3 = new List<GameObject>();
-    [HideInInspector] public List<GameObject> Stapel4 = new List<GameObject>();
-    [HideInInspector] public List<GameObject> Stapel5 = new List<GameObject>();
-    [HideInInspector] public List<GameObject> Stapel6 = new List<GameObject>();
-    [HideInInspector] public List<GameObject> Stapel7 = new List<GameObject>();
-    [HideInInspector] public List<GameObject> StapelRest = new List<GameObject>();
-    [HideInInspector] public List<GameObject> EindStapel1 = new List<GameObject>();
-    [HideInInspector] public List<GameObject> EindStapel2 = new List<GameObject>();
-    [HideInInspector] public List<GameObject> EindStapel3 = new List<GameObject>();
-    [HideInInspector] public List<GameObject> EindStapel4 = new List<GameObject>();
+    private List<GameObject> kaartenGeschud = new();
+    [HideInInspector] public List<GameObject> Stapel1 = new();
+    [HideInInspector] public List<GameObject> Stapel2 = new();
+    [HideInInspector] public List<GameObject> Stapel3 = new();
+    [HideInInspector] public List<GameObject> Stapel4 = new();
+    [HideInInspector] public List<GameObject> Stapel5 = new();
+    [HideInInspector] public List<GameObject> Stapel6 = new();
+    [HideInInspector] public List<GameObject> Stapel7 = new();
+    [HideInInspector] public List<GameObject> StapelRest = new();
+    [HideInInspector] public List<GameObject> EindStapel1 = new();
+    [HideInInspector] public List<GameObject> EindStapel2 = new();
+    [HideInInspector] public List<GameObject> EindStapel3 = new();
+    [HideInInspector] public List<GameObject> EindStapel4 = new();
 
-    [HideInInspector] public bool uitlegActief = false;
-    [HideInInspector] public bool voltooid = false;
+    [HideInInspector] public bool uitlegActief;
+    [HideInInspector] public bool voltooid;
     private float tijd;
     private float startTijdSolitaire;
-    private float totaleTijdstraf = 0f;
+    private float totaleTijdstraf;
     private float tijdstraf = 5f;
     private int minAantalKaartenStapel1 = 10;
     private int minAantalKaartenStapel2 = 10;
@@ -107,30 +107,28 @@ public class SolitaireScript : MonoBehaviour
             if (uitlegActief) startTijdSolitaire = Time.time - tijd;
             return;
         }
-        else
+
+        if (EindStapel1.Count >= 13 && EindStapel2.Count >= 13 && EindStapel3.Count >= 13 && EindStapel4.Count >= 13)
         {
-            if (EindStapel1.Count >= 13 && EindStapel2.Count >= 13 && EindStapel3.Count >= 13 && EindStapel4.Count >= 13)
+            if (EindStapel1[^1].name.EndsWith('K') && EindStapel2[^1].name.EndsWith('K') && EindStapel3[^1].name.EndsWith('K') && EindStapel4[^1].name.EndsWith('K'))
             {
-                if (EindStapel1[^1].name.EndsWith('K') && EindStapel2[^1].name.EndsWith('K') && EindStapel3[^1].name.EndsWith('K') && EindStapel4[^1].name.EndsWith('K'))
-                {
-                    voltooid = true;
-                    maakAfKnop.SetActive(false);
-                    Scene scene = SceneManager.GetActiveScene();
-                    float tijd = saveScript.floatDict["SolitaireTijd"];
-                    saveScript.floatDict["SolitaireSnelsteTijd"] = Mathf.Min(saveScript.floatDict["SolitaireSnelsteTijd"], tijd);
-                    saveScript.intDict["SolitairesGespeeld"] += 1;
-                    beloningText.text = beloningScript.Beloning(scene: scene, score: tijd, doelwitText: beloningText).ToString();
-                    knoppenScript.MaakSolitaireAf();
-                    return;
-                }
+                voltooid = true;
+                maakAfKnop.SetActive(false);
+                Scene scene = SceneManager.GetActiveScene();
+                float tijd = saveScript.floatDict["SolitaireTijd"];
+                saveScript.floatDict["SolitaireSnelsteTijd"] = Mathf.Min(saveScript.floatDict["SolitaireSnelsteTijd"], tijd);
+                saveScript.intDict["SolitairesGespeeld"] += 1;
+                beloningText.text = beloningScript.Beloning(scene: scene, score: tijd, doelwitText: beloningText).ToString();
+                knoppenScript.MaakSolitaireAf();
+                return;
             }
-            HoelangAlBezig();
         }
+        HoelangAlBezig();
     }
 
     public void SchudKaarten()
     {
-        List<GameObject> temp = new List<GameObject>();
+        List<GameObject> temp = new();
         for (int i = 0; i < 52; i++)
         {
             temp.Add(kaarten[i]);

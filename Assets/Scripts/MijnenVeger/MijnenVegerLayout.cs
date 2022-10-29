@@ -89,8 +89,8 @@ public class MijnenVegerLayout : BaseLayout
 
     private void SetLinesLayout()
     {
-        Vector3 horzLineScale = new Vector3(1f, 1f / (verticalSideBoxCount - 3f) * 0.04f, 0.01f);
-        Vector3 vertLineScale = new Vector3(1f / (horizontalSideBoxCount - 3f) * 0.04f, 1f, 0.01f);
+        Vector3 horzLineScale = new(1f, 1f / (verticalSideBoxCount - 3f) * 0.04f, 0.01f);
+        Vector3 vertLineScale = new(1f / (horizontalSideBoxCount - 3f) * 0.04f, 1f, 0.01f);
         for (int i = 0; i < gridTransform.childCount; i++)
         {
             Transform line = gridTransform.GetChild(i);
@@ -172,7 +172,7 @@ public class MijnenVegerLayout : BaseLayout
             yPosRootObj = 0;
         }
         mvField.localScale = new Vector3(scaleHorizontal, scaleVertical, 1);
-        Vector3 lScale = new Vector3(scale, scale, 1);
+        Vector3 lScale = new(scale, scale, 1);
         flagOrShovelButtonRect.localScale = lScale;
         bombsToGoTransform.localScale = lScale;
         float halfHorizontalSizeGrid = scaleHorizontal / 2f;

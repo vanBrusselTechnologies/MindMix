@@ -1,24 +1,24 @@
+using Firebase.Analytics;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Firebase.Analytics;
 
 public class BeloningScript : MonoBehaviour
 {
     public static BeloningScript Instance;
-    private int klaar = 0;
+    private int klaar;
     private float vorigeScreenWidth;
     private float vorigeSafezoneY;
     private float vorigeSafezoneX;
-    private bool isPaused = false;
-    private bool wasPaused = false;
+    private bool isPaused;
+    private bool wasPaused;
     private SaveScript saveScript;
     private int[] sudokuBeloningen = { 5, 11, 18, 27 };
     private int[] mvBeloningen = { 5, 10, 17, 25 };
     private int maxMunten2048 = 33;
     private int maxMuntenSolitaire = 35;
-    private int laatstVerdiendeMunten = 0;
-    private TMP_Text laatsteDoelwitText = null;
+    private int laatstVerdiendeMunten;
+    private TMP_Text laatsteDoelwitText;
     public RectTransform muntenObj;
     [SerializeField] private RectTransform muntenRect;
     [SerializeField] private TMP_Text muntenText;
@@ -67,13 +67,12 @@ public class BeloningScript : MonoBehaviour
                 munten = mvBeloningen[difficulty];
                 VoegMuntenToe(munten);
                 break;
-            default: break;
         }
         FirebaseAnalytics.LogEvent(
             FirebaseAnalytics.EventLevelEnd,
             new Parameter[]{
-                new Parameter(FirebaseAnalytics.ParameterLevelName, scene.name),
-                new Parameter(FirebaseAnalytics.ParameterSuccess, 1),
+                new(FirebaseAnalytics.ParameterLevelName, scene.name),
+                new(FirebaseAnalytics.ParameterSuccess, 1),
             }
         );
         laatstVerdiendeMunten = munten;
@@ -85,13 +84,7 @@ public class BeloningScript : MonoBehaviour
         saveScript.intDict["munten"] += coinsToAdd;
         ShowHuidigAantalMunten();
         FirebaseAnalytics.LogEvent(
-            FirebaseAnalytics.EventEarnVirtualCurrency,
-            new Parameter[] {
-                new Parameter(FirebaseAnalytics.ParameterValue, coinsToAdd),
-                new Parameter(FirebaseAnalytics.ParameterVirtualCurrencyName, "Coin"),
-                new Parameter(FirebaseAnalytics.ParameterCurrency, "EUR"),
-            }
-        );
+            FirebaseAnalytics.EventEarnVirtualCurrency, new Parameter(FirebaseAnalytics.ParameterValue, coinsToAdd), new Parameter(FirebaseAnalytics.ParameterVirtualCurrencyName, "Coin"), new Parameter(FirebaseAnalytics.ParameterCurrency, "EUR"));
     }
 
     public void GeefMuntenUit(int muntenToSpend)
@@ -99,13 +92,7 @@ public class BeloningScript : MonoBehaviour
         saveScript.intDict["munten"] -= muntenToSpend;
         ShowHuidigAantalMunten();
         FirebaseAnalytics.LogEvent(
-            FirebaseAnalytics.EventSpendVirtualCurrency,
-            new Parameter[] {
-                new Parameter(FirebaseAnalytics.ParameterItemName, shopScript.naam),
-                new Parameter(FirebaseAnalytics.ParameterValue, muntenToSpend),
-                new Parameter(FirebaseAnalytics.ParameterVirtualCurrencyName, "Coin"),
-            }
-        );
+            FirebaseAnalytics.EventSpendVirtualCurrency, new Parameter(FirebaseAnalytics.ParameterItemName, shopScript.naam), new Parameter(FirebaseAnalytics.ParameterValue, muntenToSpend), new Parameter(FirebaseAnalytics.ParameterVirtualCurrencyName, "Coin"));
     }
 
     public void VerdubbelCoins()
@@ -114,9 +101,10 @@ public class BeloningScript : MonoBehaviour
         int factor = 3;
         VoegMuntenToe(laatstVerdiendeMunten * (factor - 1));
         laatsteDoelwitText.text = (laatstVerdiendeMunten * factor).ToString();
-        laatsteDoelwitText.transform.parent.Find("verdubbel").gameObject.SetActive(false);
+        Transform parent = laatsteDoelwitText.transform.parent;
+        parent.Find("verdubbel").gameObject.SetActive(false);
         float scaleFactor = Mathf.Min(Screen.safeArea.width * 0.85f / 500, Screen.safeArea.height * (5f / 30f) / 175);
-        RectTransform rewardRect = laatsteDoelwitText.transform.parent.GetComponent<RectTransform>();
+        RectTransform rewardRect = parent.GetComponent<RectTransform>();
         rewardRect.localScale = new Vector3(scaleFactor, scaleFactor, 1);
         rewardRect.sizeDelta = new Vector2(500, 175);
     }
@@ -132,7 +120,7 @@ public class BeloningScript : MonoBehaviour
     {
         Vector2 sizeDelta = Vector2.one * Mathf.Min(Screen.safeArea.width, Screen.safeArea.height) / 11f;
         sizeDelta.x *= 2.5f;
-        muntenObj.anchoredPosition = new Vector2((Screen.width / 2) - (Screen.width - Screen.safeArea.width - Screen.safeArea.x) - (Mathf.Min(Screen.safeArea.width, Screen.safeArea.height) / 11f * 0.6f * 3f), (Screen.height / 2) - (Screen.height - Screen.safeArea.height - Screen.safeArea.y) - (Mathf.Min(Screen.safeArea.width, Screen.safeArea.height) / 11 * 0.6f));
+        muntenObj.anchoredPosition = new Vector2((Screen.width / 2f) - (Screen.width - Screen.safeArea.width - Screen.safeArea.x) - (Mathf.Min(Screen.safeArea.width, Screen.safeArea.height) / 11f * 0.6f * 3f), (Screen.height / 2f) - (Screen.height - Screen.safeArea.height - Screen.safeArea.y) - (Mathf.Min(Screen.safeArea.width, Screen.safeArea.height) / 11 * 0.6f));
         muntenObj.sizeDelta = sizeDelta;
         muntenRect.offsetMin = new Vector2(sizeDelta.y, 0);
     }

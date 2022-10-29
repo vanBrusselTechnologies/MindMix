@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 
 public class TetrisScript : MonoBehaviour
 {
@@ -11,21 +11,21 @@ public class TetrisScript : MonoBehaviour
     public GameObject vorm5;
     public GameObject vorm6;
     public GameObject vorm7;
-    private List<GameObject> vormen = new List<GameObject>();
-    private GameObject vallendeVorm = null;
+    private List<GameObject> vormen = new();
+    private GameObject vallendeVorm;
     private GameObject volgendeVorm;
     public bool valtGeenVormMeer = true;
     private float valSnelheid = 5f;
-    private Vector3 startpositie = new Vector3(0, 12, -1);
+    private Vector3 startpositie = new(0, 12, -1);
     private Vector3 positie;
-    private Vector3 volgendeVormPositie = new Vector3(-20, 0, 0);
+    private Vector3 volgendeVormPositie = new(-20, 0, 0);
     private bool Eenkomendepositie;
-    private bool stop = false;
+    private bool stop;
     private GameObject a;
-    private bool lijnMinder = false;
+    private bool lijnMinder;
     private TMP_Text scoreText;
     private int extraScore;
-    private List<Collider> tempList = new List<Collider>();
+    private List<Collider> tempList = new();
     private int snelheidverhogingbijpunten = 250;
 
     // Use this for initialization
@@ -159,7 +159,7 @@ public class TetrisScript : MonoBehaviour
     {
         bool kanVerplaatsen = true;
         Collider[] hitColliders = Physics.OverlapSphere(positie, 0.01f);
-        List<Collider> temp = new List<Collider>();
+        List<Collider> temp = new();
         for (int i = 0; i < hitColliders.Length; i++)
         {
             temp.Add(hitColliders[i]);
@@ -191,7 +191,7 @@ public class TetrisScript : MonoBehaviour
     {
         positie = vallendeVorm.transform.position;
         Vector3 komendePositie = positie;
-        List<Vector3> komendePosities = new List<Vector3>();
+        List<Vector3> komendePosities = new();
         if (vallendeVorm.name == vorm1.name + "(Clone)")
         {
             if (vallendeVorm.transform.rotation == new Quaternion(0, 0, 0, 1) || vallendeVorm.transform.rotation == new Quaternion(0, 0, 0, -1))
@@ -571,7 +571,7 @@ public class TetrisScript : MonoBehaviour
     {
         positie = vallendeVorm.transform.position;
         Vector3 komendePositie = positie;
-        List<Vector3> komendePosities = new List<Vector3>();
+        List<Vector3> komendePosities = new();
         if (vallendeVorm.name == vorm1.name + "(Clone)")
         {
             if (vallendeVorm.transform.rotation.eulerAngles.z == 90)
@@ -940,7 +940,7 @@ public class TetrisScript : MonoBehaviour
     {
         positie = vallendeVorm.transform.position;
         Vector3 komendePositie = positie;
-        List<Vector3> komendePosities = new List<Vector3>();
+        List<Vector3> komendePosities = new();
         if (vallendeVorm.name == vorm1.name + "(Clone)")
         {
             if (vallendeVorm.transform.rotation.eulerAngles.z == 270)
@@ -1309,7 +1309,7 @@ public class TetrisScript : MonoBehaviour
     {
         float rotatieZ = vallendeVorm.transform.rotation.eulerAngles.z;
         positie = vallendeVorm.transform.position;
-        List<Vector3> komendePosities = new List<Vector3>();
+        List<Vector3> komendePosities = new();
         float tempX;
         for (int i = 0; i < vallendeVorm.transform.childCount; i++)
         {

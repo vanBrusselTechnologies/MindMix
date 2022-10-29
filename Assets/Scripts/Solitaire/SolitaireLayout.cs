@@ -11,14 +11,14 @@ public class SolitaireLayout : BaseLayout
     [SerializeField] private Transform solitaire;
     [SerializeField] private RectTransform finishGameButtonRect;
     [SerializeField] private RectTransform clockTextRect;
-    [SerializeField] private List<Transform> cardColumns = new List<Transform>();
-    [SerializeField] private List<Transform> foundations = new List<Transform>();
+    [SerializeField] private List<Transform> cardColumns = new();
+    [SerializeField] private List<Transform> foundations = new();
     [SerializeField] private Transform stockPileTransform;
     [SerializeField] private Transform stockPileTurnButtonTransform;
 
     [HideInInspector] public float baseY;
     [HideInInspector] public float baseYFoundation;
-    [HideInInspector] public List<float> xPositions = new List<float>();
+    [HideInInspector] public List<float> xPositions = new();
 
     // Start is called before the first frame update
     protected override void Start()
@@ -91,7 +91,7 @@ public class SolitaireLayout : BaseLayout
             }
         }
         stockPileTurnButtonTransform.position = new Vector3(stockPileBaseXUI, stockPileBaseYUI, -1f);
-        List<List<GameObject>> CardsStocks = new List<List<GameObject>>();
+        List<List<GameObject>> CardsStocks = new();
         CardsStocks.AddRange(solitaireScript.Stapel1, solitaireScript.Stapel2, solitaireScript.Stapel3, solitaireScript.Stapel4, solitaireScript.Stapel5, solitaireScript.Stapel6, solitaireScript.Stapel7);
         for (int i = 0; i < CardsStocks.Count; i++)
         {
@@ -100,7 +100,7 @@ public class SolitaireLayout : BaseLayout
                 CardsStocks[i][ii].transform.position = new Vector3(xPositions[i], baseY - (ii * diffY), baseZ - (diffZ * ii));
             }
         }
-        List<List<GameObject>> CardsFoundations = new List<List<GameObject>>();
+        List<List<GameObject>> CardsFoundations = new();
         CardsFoundations.AddRange(solitaireScript.EindStapel1, solitaireScript.EindStapel2, solitaireScript.EindStapel3, solitaireScript.EindStapel4);
         for (int i = 0; i < CardsFoundations.Count; i++)
         {
@@ -164,7 +164,7 @@ public class SolitaireLayout : BaseLayout
                 finishedGameUIRewardRect.sizeDelta = new Vector2(1000, 175);
             }
         }
-        Vector2 size = new Vector2(screenSafeAreaWidth * 0.45f, screenSafeAreaHeight * (5f / 30f));
+        Vector2 size = new(screenSafeAreaWidth * 0.45f, screenSafeAreaHeight * (5f / 30f));
         float posY = screenSafeAreaCenterY + screenSafeAreaYUp + (screenSafeAreaHeight * (3.5f / 30f)) - (screenHeight / 2f);
         if (finishedGameUINewMoreDifficultGameButtonRect == null)
         {

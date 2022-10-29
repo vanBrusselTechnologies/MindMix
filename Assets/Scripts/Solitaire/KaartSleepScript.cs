@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using VBG.Extensions;
 
 public class KaartSleepScript : MonoBehaviour
@@ -11,16 +12,16 @@ public class KaartSleepScript : MonoBehaviour
     private float distance;
     private bool dragging;
     private string[] kaartsoort_kaartX = new string[2];
-    private List<GameObject> voorsteKaarten = new List<GameObject>();
-    private List<GameObject> mogelijk = new List<GameObject>();
+    private List<GameObject> voorsteKaarten = new();
+    private List<GameObject> mogelijk = new();
     private int[] deI = { -1, -1, -1, -1, -1, -1, -1 };
     private GameObject empty;
     private int aantalKaartenTeVerplaatsen;
-    private List<GameObject> deTeVerplaatsenKaarten = new List<GameObject>();
+    private List<GameObject> deTeVerplaatsenKaarten = new();
     private Vector3 positieMuis;
     private SaveScript saveScript;
     [SerializeField] private GameObject eventSystem;
-    private Vector3 achterkantboven = new Vector3(0, 180, 0);
+    private Vector3 achterkantboven = new(0, 180, 0);
     Transform tf;
 
     // Use this for initialization
@@ -61,7 +62,7 @@ public class KaartSleepScript : MonoBehaviour
     {
         if (tf.parent.localEulerAngles == achterkantboven || Input.touchCount == 0) yield break;
         yield return new WaitForEndOfFrame();
-        if (UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject != null) yield break;
+        if (EventSystem.current.currentSelectedGameObject != null) yield break;
         Vector3 muisPositie = Camera.main.ScreenToWorldPoint(Input.GetTouch(0).position);
         positieMuis = muisPositie;
         deTeVerplaatsenKaarten.Clear();
@@ -129,7 +130,7 @@ public class KaartSleepScript : MonoBehaviour
         }
         if (KanOpEindStapel())
         {
-            GameObject a = new GameObject("leeg");
+            GameObject a = new("leeg");
             mogelijk.Add(a);
             mogelijk.Add(a);
             Destroy(a);
@@ -234,7 +235,7 @@ public class KaartSleepScript : MonoBehaviour
         {
             tag = "helemaalLeeg"
         };
-        List<GameObject> voorsteKaarten = new List<GameObject>();
+        List<GameObject> voorsteKaarten = new();
         for (int i = 1; i <= 7; i++)
         {
             List<GameObject> stapel = i == 1 ? solitaireScript.Stapel1 : i == 2 ? solitaireScript.Stapel2 : i == 3 ? solitaireScript.Stapel3 : i == 4 ? solitaireScript.Stapel4 : i == 5 ? solitaireScript.Stapel5 : i == 6 ? solitaireScript.Stapel6 : i == 7 ? solitaireScript.Stapel7 : null;

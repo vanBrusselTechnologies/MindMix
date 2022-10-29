@@ -1,7 +1,7 @@
-using UnityEngine;
-using UnityEngine.SceneManagement;
 using Firebase.Auth;
 using GooglePlayGames;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class OpenAppScript : MonoBehaviour
@@ -19,9 +19,9 @@ public class OpenAppScript : MonoBehaviour
     private GegevensHouder gegevensScript;
     private StartupScreenLayout startupScreenLayout;
 
-    bool playgamesLoggedIn = false;
+    bool playgamesLoggedIn;
     string authCode = "";
-    bool inlogEnVoorplaatScene = false;
+    bool inlogEnVoorplaatScene;
 
     // Start is called before the first frame update
     private void Start()
@@ -50,7 +50,7 @@ public class OpenAppScript : MonoBehaviour
     }
 
     private bool firstFrame = true;
-    private bool animatieWasKlaar = false;
+    private bool animatieWasKlaar;
     private void Update()
     {
         if (firstFrame && fireBaseSetup != null && (fireBaseSetup.ready || fireBaseSetup.offline) && saveScript.ready)
@@ -106,7 +106,7 @@ public class OpenAppScript : MonoBehaviour
 
     public void PlayGamesLogin()
     {
-        Social.localUser.Authenticate((bool success) =>
+        Social.localUser.Authenticate(success =>
         {
             if (success)
             {

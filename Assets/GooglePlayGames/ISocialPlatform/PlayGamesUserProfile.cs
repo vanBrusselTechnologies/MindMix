@@ -14,18 +14,20 @@
 //    limitations under the License.
 // </copyright>
 
+using System;
+using System.Collections;
+using GooglePlayGames.OurUtils;
+using UnityEngine;
+using UnityEngine.SocialPlatforms;
+using Logger = GooglePlayGames.OurUtils.Logger;
+
 #if UNITY_ANDROID
 
 namespace GooglePlayGames
 {
-    using System;
-    using System.Collections;
-    using GooglePlayGames.OurUtils;
-    using UnityEngine;
 #if UNITY_2017_2_OR_NEWER
     using UnityEngine.Networking;
 #endif
-    using UnityEngine.SocialPlatforms;
 
     /// <summary>
     /// Represents a Google Play Games user profile. In the current implementation,
@@ -39,7 +41,7 @@ namespace GooglePlayGames
         private string mAvatarUrl;
         private bool mIsFriend;
 
-        private volatile bool mImageLoading = false;
+        private volatile bool mImageLoading;
         private Texture2D mImage;
 
         internal PlayGamesUserProfile(string displayName, string playerId,
@@ -110,7 +112,7 @@ namespace GooglePlayGames
             {
                 if (!mImageLoading && mImage == null && !string.IsNullOrEmpty(AvatarURL))
                 {
-                    OurUtils.Logger.d("Starting to load image: " + AvatarURL);
+                    Logger.d("Starting to load image: " + AvatarURL);
                     mImageLoading = true;
                     PlayGamesHelperObject.RunCoroutine(LoadImage());
                 }
@@ -160,14 +162,14 @@ namespace GooglePlayGames
                 else
                 {
                     mImage = Texture2D.blackTexture;
-                    OurUtils.Logger.e("Error downloading image: " + www.error);
+                    Logger.e("Error downloading image: " + www.error);
                 }
 
                 mImageLoading = false;
             }
             else
             {
-                OurUtils.Logger.e("No URL found.");
+                Logger.e("No URL found.");
                 mImage = Texture2D.blackTexture;
                 mImageLoading = false;
             }

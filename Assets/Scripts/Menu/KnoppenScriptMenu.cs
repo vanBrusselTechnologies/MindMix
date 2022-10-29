@@ -1,6 +1,6 @@
-﻿using UnityEngine;
+﻿using TMPro;
+using UnityEngine;
 using UnityEngine.SceneManagement;
-using TMPro;
 
 public class KnoppenScriptMenu : MonoBehaviour
 {
@@ -90,7 +90,6 @@ public class KnoppenScriptMenu : MonoBehaviour
                     }
                     confirmTitelText.text = KnopColorSortText.text;
                     break;
-                default: break;
             }
             ConfirmCanvas.SetActive(true);
             menuLayout.SetLayoutConfirmCanvas();

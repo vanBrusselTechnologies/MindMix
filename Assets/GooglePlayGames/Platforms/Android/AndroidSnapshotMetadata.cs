@@ -1,13 +1,11 @@
+using System;
+using GooglePlayGames.BasicApi.SavedGame;
+using UnityEngine;
+
 #if UNITY_ANDROID
 
 namespace GooglePlayGames.Android
 {
-    using System;
-    using System.Collections.Generic;
-    using GooglePlayGames.BasicApi;
-    using GooglePlayGames.BasicApi.SavedGame;
-    using UnityEngine;
-
     internal class AndroidSnapshotMetadata : ISavedGameMetadata
     {
         private AndroidJavaObject mJavaSnapshot;
@@ -81,7 +79,7 @@ namespace GooglePlayGames.Android
             get
             {
                 long timestamp = mJavaMetadata.Call<long>("getLastModifiedTimestamp");
-                System.DateTime lastModifiedTime = AndroidJavaConverter.ToDateTime(timestamp);
+                DateTime lastModifiedTime = AndroidJavaConverter.ToDateTime(timestamp);
                 return lastModifiedTime;
             }
         }

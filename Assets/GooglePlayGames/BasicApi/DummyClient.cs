@@ -14,14 +14,17 @@
 //    limitations under the License.
 // </copyright>
 
+using System;
+using GooglePlayGames.BasicApi.Events;
+using GooglePlayGames.BasicApi.SavedGame;
+using GooglePlayGames.BasicApi.Video;
+using GooglePlayGames.OurUtils;
+using UnityEngine.SocialPlatforms;
+
 #if UNITY_ANDROID
 
 namespace GooglePlayGames.BasicApi
 {
-    using System;
-    using GooglePlayGames.OurUtils;
-    using UnityEngine.SocialPlatforms;
-
     /// <summary>
     /// Dummy client used in Editor.
     /// </summary>
@@ -443,7 +446,7 @@ namespace GooglePlayGames.BasicApi
         /// Gets the saved game client.
         /// </summary>
         /// <returns>The saved game client.</returns>
-        public SavedGame.ISavedGameClient GetSavedGameClient()
+        public ISavedGameClient GetSavedGameClient()
         {
             LogUsage();
             return null;
@@ -453,7 +456,7 @@ namespace GooglePlayGames.BasicApi
         /// Gets the events client.
         /// </summary>
         /// <returns>The events client.</returns>
-        public GooglePlayGames.BasicApi.Events.IEventsClient GetEventsClient()
+        public IEventsClient GetEventsClient()
         {
             LogUsage();
             return null;
@@ -463,7 +466,7 @@ namespace GooglePlayGames.BasicApi
         /// Gets the video client.
         /// </summary>
         /// <returns>The video client.</returns>
-        public GooglePlayGames.BasicApi.Video.IVideoClient GetVideoClient()
+        public IVideoClient GetVideoClient()
         {
             LogUsage();
             return null;

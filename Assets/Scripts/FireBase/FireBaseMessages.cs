@@ -1,5 +1,5 @@
-using UnityEngine;
 using Firebase.Messaging;
+using UnityEngine;
 
 public class FireBaseMessages : MonoBehaviour
 {

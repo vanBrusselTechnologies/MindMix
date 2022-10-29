@@ -1,17 +1,17 @@
 ﻿using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 public class HaalGetallenWeg : MonoBehaviour
 {
     [SerializeField] private GameObject[] vakjes;
-    [HideInInspector] public List<GameObject> knoppen = new List<GameObject>();
+    [HideInInspector] public List<GameObject> knoppen = new();
     private readonly int[] diff = { 31, 41, 51, 56 };
-    private int difficulty = 0;
+    private int difficulty;
     private PlaatsGetallen plaatsScript;
-    [HideInInspector] public List<int> cijfers = new List<int>();
-    private List<int> tot81 = new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80 };
+    [HideInInspector] public List<int> cijfers = new();
+    private List<int> tot81 = new() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80 };
     private SaveScript saveScript;
     [SerializeField] private TMP_Dropdown dropdown;
 
@@ -118,8 +118,8 @@ public class HaalGetallenWeg : MonoBehaviour
         }
     }
 
-    int removedNumbers = 0;
-    List<int> notYetRemovedNumbers = new List<int>();
+    int removedNumbers;
+    List<int> notYetRemovedNumbers = new();
     public void RemoveNumbers()
     {
         if (tot81.Count == 0) return;
@@ -166,7 +166,7 @@ public class HaalGetallenWeg : MonoBehaviour
 
     private List<int> GetBoxRowColumn(int dei)
     {
-        List<int> vakRijEnKolom = new List<int>();
+        List<int> vakRijEnKolom = new();
         int vak = dei / 9;
         int rij = vak / 3 * 3 + dei % 9 / 3 + 1;
         int kolom = vak % 3 * 3 + dei % 9 % 3 + 1;
@@ -209,11 +209,9 @@ public class HaalGetallenWeg : MonoBehaviour
             if (RowFillCombinationPossible(rowNumbers, columnNumbers)) return true;
             return ColumnFillCombinationPossible(rowNumbers, columnNumbers);
         }
-        else
-        {
-            if (ColumnFillCombinationPossible(rowNumbers, columnNumbers)) return true;
-            return RowFillCombinationPossible(rowNumbers, columnNumbers);
-        }
+
+        if (ColumnFillCombinationPossible(rowNumbers, columnNumbers)) return true;
+        return RowFillCombinationPossible(rowNumbers, columnNumbers);
     }
 
     private bool HardCombinationPossible(List<int> boxNumbers, List<int> rowNumbers, List<int> columnNumbers)
@@ -244,7 +242,7 @@ public class HaalGetallenWeg : MonoBehaviour
 
     private List<int> GetBoxNumbers(int box)
     {
-        List<int> result = new List<int>();
+        List<int> result = new();
         for (int i = 0; i < 9; i++)
         {
             result.Add(box * 9 + i);
@@ -264,7 +262,7 @@ public class HaalGetallenWeg : MonoBehaviour
 
     private List<int> GetEmptyCells(List<int> list)
     {
-        List<int> emptyCells = new List<int>();
+        List<int> emptyCells = new();
         for (int i = 0; i < 9; i++)
         {
             if (cijfers[list[i]] == 0)
@@ -334,7 +332,7 @@ public class HaalGetallenWeg : MonoBehaviour
     private bool OnlyOnePossible(List<int> boxNumbers, List<int> rowNumbers, List<int> columnNumbers)
     {
         int cellValue = GetCellValue(rowNumbers, columnNumbers);
-        List<int> till9 = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+        List<int> till9 = new() { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         till9.Remove(cellValue);
         for (int i = 0; i < 9; i++)
         {
