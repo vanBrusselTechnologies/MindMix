@@ -23,7 +23,7 @@ public class FireBaseSetup : MonoBehaviour
         {
             eersteReadyFrame = false;
             FireBaseSettings();
-            GetComponent<PlayGamesSetup>().StartPlayGamesSetup();
+            GetComponent<PlayGamesSetup>().StartSetup();
             GetComponent<FireBaseDynamicLinks>().DynamicLinkSetup();
         }
     }

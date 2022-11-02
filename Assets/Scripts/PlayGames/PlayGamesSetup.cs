@@ -1,15 +1,16 @@
-using GooglePlayGames;
-using GooglePlayGames.BasicApi;
+﻿using GooglePlayGames;
 using UnityEngine;
 
 public class PlayGamesSetup : MonoBehaviour
 {
-    public void StartPlayGamesSetup()
+    public void StartSetup()
     {
-        PlayGamesClientConfiguration config = new PlayGamesClientConfiguration.Builder()
-            .RequestServerAuthCode(false /* Don't force refresh */)
-            .Build();
-        PlayGamesPlatform.InitializeInstance(config);
+        Activate();
+        GetComponent<PlayGamesLogin>().StartupLogin();
+    }
+
+    public void Activate()
+    {
         PlayGamesPlatform.Activate();
     }
 }

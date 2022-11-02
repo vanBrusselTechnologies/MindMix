@@ -139,6 +139,8 @@ PlayerSettings:
   bundleVersion: 1.0.6
   preloadedAssets:
   - {fileID: 11400000, guid: 8b4243a2344ac0043aab628635ca934a, type: 2}
+  - {fileID: -6489038998191064429, guid: ae46a28dbfae2eb45a1812fd272e87f8, type: 2}
+  - {fileID: 11400000, guid: 5b3c155c15b18554da810243cf8465c8, type: 2}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -166,7 +168,7 @@ PlayerSettings:
     iPhone: 0
     tvOS: 0
   overrideDefaultApplicationIdentifier: 0
-  AndroidBundleVersionCode: 22
+  AndroidBundleVersionCode: 30
   AndroidMinSdkVersion: 22
   AndroidTargetSdkVersion: 0
   AndroidPreferredInstallLocation: 1
@@ -249,7 +251,7 @@ PlayerSettings:
   useCustomLauncherGradleManifest: 0
   useCustomBaseGradleTemplate: 0
   useCustomGradlePropertiesTemplate: 1
-  useCustomProguardFile: 0
+  useCustomProguardFile: 1
   AndroidTargetArchitectures: 3
   AndroidTargetDevices: 1
   AndroidSplashScreenScale: 0

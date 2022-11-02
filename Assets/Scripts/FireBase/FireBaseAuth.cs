@@ -31,12 +31,11 @@ public class FireBaseAuth : MonoBehaviour
     private void RefreshLogin()
     {
         FirebaseUser user = auth.CurrentUser;
-        if (user == null) return;
         user.ReloadAsync().ContinueWith(task =>
         {
             if (task.IsFaulted || task.IsCanceled)
             {
-                Debug.Log(task.Exception.InnerException.Message);
+                Debug.Log(task.Exception?.InnerException?.Message);
             }
             if (user != null)
             {
@@ -56,7 +55,7 @@ public class FireBaseAuth : MonoBehaviour
         {
             if (task.IsFaulted || task.IsCanceled)
             {
-                Debug.Log(task.Exception.InnerException.Message);
+                Debug.Log(task.Exception?.InnerException?.Message);
             }
             saveScript.intDict["laatsteXOffline"] = 0;
             saveScript.UpdateData();

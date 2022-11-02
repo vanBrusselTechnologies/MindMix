@@ -1,32 +1,30 @@
 using Firebase.Auth;
 using GooglePlayGames;
+using GooglePlayGames.BasicApi;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class OpenAppScript : MonoBehaviour
 {
-
     [SerializeField] private GameObject naarMenuKnop;
     [SerializeField] private GameObject playGamesLoginObj;
     [SerializeField] private GameObject warningObj;
     [SerializeField] private Toggle dontShowLoginWarningToggle;
 
-    private StartupAnimation voorplaatAnimatie;
-    private FireBaseSetup fireBaseSetup;
-    private FireBaseAuth fireBaseAuth;
-    private SaveScript saveScript;
-    private GegevensHouder gegevensScript;
-    private StartupScreenLayout startupScreenLayout;
+    private StartupAnimation _voorplaatAnimatie;
+    private FireBaseSetup _fireBaseSetup;
+    private PlayGamesLogin _playGamesLogin;
+    private SaveScript _saveScript;
+    private GegevensHouder _gegevensScript;
+    private StartupScreenLayout _startupScreenLayout;
 
-    bool playgamesLoggedIn;
-    string authCode = "";
-    bool inlogEnVoorplaatScene;
+    bool _inlogEnVoorplaatScene;
 
     // Start is called before the first frame update
     private void Start()
     {
-        voorplaatAnimatie = GetComponent<StartupAnimation>();
+        _voorplaatAnimatie = GetComponent<StartupAnimation>();
         Physics.autoSimulation = false;
         Physics.Simulate(1000000f);
         GameObject googleScriptsObj = GameObject.Find("GoogleScriptsObj");
@@ -35,58 +33,61 @@ public class OpenAppScript : MonoBehaviour
             SceneManager.LoadScene("LogoEnAppOpstart");
             return;
         }
-        fireBaseSetup = googleScriptsObj.GetComponent<FireBaseSetup>();
-        fireBaseAuth = googleScriptsObj.GetComponent<FireBaseAuth>();
-        saveScript = SaveScript.Instance;
-        gegevensScript = GegevensHouder.Instance;
+        _fireBaseSetup = googleScriptsObj.GetComponent<FireBaseSetup>();
+        _playGamesLogin = googleScriptsObj.GetComponent<PlayGamesLogin>();
+        _playGamesLogin.PlayGamesLoginObject = playGamesLoginObj;
+        _saveScript = SaveScript.Instance;
+        _gegevensScript = GegevensHouder.Instance;
         if (SceneManager.GetActiveScene().name == "inlogEnVoorplaatApp")
         {
-            startupScreenLayout = GetComponent<StartupScreenLayout>();
-            inlogEnVoorplaatScene = true;
-            if (voorplaatAnimatie.finished && FirebaseAuth.DefaultInstance.CurrentUser == null)
+            _startupScreenLayout = GetComponent<StartupScreenLayout>();
+            _inlogEnVoorplaatScene = true;
+            if (_voorplaatAnimatie.finished && FirebaseAuth.DefaultInstance.CurrentUser == null)
                 playGamesLoginObj.SetActive(true);
             dontShowLoginWarningToggle.isOn = PlayerPrefs.GetInt("dontShowLoginWarning", 0) == 1;
         }
     }
 
-    private bool firstFrame = true;
-    private bool animatieWasKlaar;
+    private bool _firstFrame = true;
+    private bool _animatieWasKlaar;
+
     private void Update()
     {
-        if (firstFrame && fireBaseSetup != null && (fireBaseSetup.ready || fireBaseSetup.offline) && saveScript.ready)
+        if (_firstFrame && _fireBaseSetup != null && (_fireBaseSetup.ready || _fireBaseSetup.offline) && _saveScript.ready)
         {
-            firstFrame = false;
+            _firstFrame = false;
             if (SceneManager.GetActiveScene().name.Equals("LogoEnAppOpstart"))
             {
                 SceneManager.LoadScene("inlogEnVoorplaatApp");
                 return;
             }
         }
-        if (!inlogEnVoorplaatScene)
-            return;
-        if (playgamesLoggedIn && !authCode.Equals(""))
-        {
-            playgamesLoggedIn = false;
-            fireBaseAuth.PlayGamesLogin(authCode);
-            playGamesLoginObj.SetActive(false);
-        }
-        if (animatieWasKlaar == false && voorplaatAnimatie.finished)
+
+        if (!_inlogEnVoorplaatScene) return;
+
+        if (!_animatieWasKlaar && _voorplaatAnimatie.finished)
         {
             if (FirebaseAuth.DefaultInstance.CurrentUser == null)
             {
                 playGamesLoginObj.SetActive(true);
             }
-            animatieWasKlaar = true;
+
+            _animatieWasKlaar = true;
         }
     }
 
     public void GaNaarSpellenOverzicht()
     {
-        if (!voorplaatAnimatie.finished) { voorplaatAnimatie.finished = true; return; }
+        if (!_voorplaatAnimatie.finished)
+        {
+            _voorplaatAnimatie.finished = true;
+            return;
+        }
+
         FirebaseUser user = FirebaseAuth.DefaultInstance.CurrentUser;
         if (user != null)
             SceneManager.LoadScene("SpellenOverzicht");
-        else if (gegevensScript.loginWarningGehad || PlayerPrefs.GetInt("dontShowLoginWarning", 0) == 1)
+        else if (_gegevensScript.loginWarningGehad || PlayerPrefs.GetInt("dontShowLoginWarning", 0) == 1)
             ContinueWithoutLogin();
         else
             OpenNotLoggedInWarning();
@@ -95,7 +96,7 @@ public class OpenAppScript : MonoBehaviour
     public void ContinueWithoutLogin()
     {
         PlayerPrefs.SetInt("dontShowLoginWarning", dontShowLoginWarningToggle.isOn ? 1 : 0);
-        gegevensScript.loginWarningGehad = true;
+        _gegevensScript.loginWarningGehad = true;
         SceneManager.LoadScene("SpellenOverzicht");
     }
 
@@ -106,19 +107,12 @@ public class OpenAppScript : MonoBehaviour
 
     public void PlayGamesLogin()
     {
-        Social.localUser.Authenticate(success =>
-        {
-            if (success)
-            {
-                playgamesLoggedIn = true;
-                authCode = PlayGamesPlatform.Instance.GetServerAuthCode();
-            }
-        });
+        _playGamesLogin.ManualLogin();
     }
 
     private void OpenNotLoggedInWarning()
     {
         warningObj.SetActive(true);
-        startupScreenLayout.SetLayout();
+        _startupScreenLayout.SetLayout();
     }
 }
