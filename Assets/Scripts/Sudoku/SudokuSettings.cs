@@ -1,25 +1,26 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class SudokuSettings : BaseSceneSettings
 {
     [Header("Other settings")]
-    [SerializeField] Toggle dubbelGetalWarningToggle;
-    [SerializeField] Toggle notitieBijwerkToggle;
+    [SerializeField] Toggle doubleNumberWarningToggle;
+    [SerializeField] Toggle autoEditNotesToggle;
 
     protected override void SetSettingStartValues()
     {
-        notitieBijwerkToggle.isOn = saveScript.intDict["notitieBijwerkSettingIsOn"] == 1;
-        dubbelGetalWarningToggle.isOn = saveScript.intDict["dubbelGetalWarningIsOn"] == 1;
+        autoEditNotesToggle.isOn = saveScript.intDict["SudokuEnabledAutoEditNotes"] == 1;
+        doubleNumberWarningToggle.isOn = saveScript.intDict["SudokuEnabledDoubleNumberWarning"] == 1;
     }
 
-    public void VeranderNotitieBijwerkSetting()
+    public void ChangeAutoEditNotes()
     {
-        saveScript.intDict["notitieBijwerkSettingIsOn"] = notitieBijwerkToggle.isOn ? 1 : 0;
+        saveScript.intDict["SudokuEnabledAutoEditNotes"] = autoEditNotesToggle.isOn ? 1 : 0;
     }
 
-    public void VeranderDubbelGetalWarningSetting()
+    public void ChangeDoubleNumberWarning()
     {
-        saveScript.intDict["dubbelGetalWarningIsOn"] = dubbelGetalWarningToggle.isOn ? 1 : 0;
+        saveScript.intDict["SudokuEnabledDoubleNumberWarning"] = doubleNumberWarningToggle.isOn ? 1 : 0;
     }
 }

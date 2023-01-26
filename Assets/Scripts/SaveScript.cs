@@ -14,13 +14,9 @@ public class SaveScript : MonoBehaviour
     GegevensHouder gegevensHouder;
     [HideInInspector] public bool ready;
     private List<string> sceneNames = new() { "Sudoku", "Solitaire", "2048", "Mijnenveger", "Menu", "ColorSort" };
-    [HideInInspector]
     public Dictionary<string, int> intDict = new();
-    [HideInInspector]
     public Dictionary<string, string> stringDict = new();
-    [HideInInspector]
     public Dictionary<string, float> floatDict = new();
-    [HideInInspector]
     public Dictionary<string, long> longDict = new();
     private List<string> userLongNames = new();
     private List<string> userIntNames = new();
@@ -49,7 +45,7 @@ public class SaveScript : MonoBehaviour
         DontDestroyOnLoad(this);
         VulNames();
         LoadData();
-        SceneManager.sceneUnloaded += SaveSceneData;
+        UnityEngine.SceneManagement.SceneManager.sceneUnloaded += SaveSceneData;
         Application.quitting += Quitting;
     }
 
@@ -64,30 +60,18 @@ public class SaveScript : MonoBehaviour
 
         //Sudoku
         //Int
-        for (int i = 0; i < 81; i++)
-        {
-            SudokuIntNames.Add("kloppendCijferBijInt" + i);
-            SudokuIntNames.Add("Button " + i);
-            SudokuIntNames.Add("DoorSpelerIngevuldBij" + i);
-            SudokuIntNames.Add("doorComputerIngevuldCijfer" + i);
-        }
-        SudokuIntNames.Add("DeI");
-        SudokuIntNames.Add("difficulty");
-        SudokuIntNames.Add("SudokusGespeeld");
-        for (int i = 0; i < 4; i++)
-        {
-            SudokuIntNames.Add("SudokuDiff" + i + "Gespeeld");
-        }
-        SudokuIntNames.Add("dubbelGetalWarningIsOn");
-        SudokuIntNames.Add("notitieBijwerkSettingIsOn");
+        SudokuIntNames.Add("SudokuDifficulty");
+        //SudokuIntNames.Add("SudokusGespeeld");
+        //for (int i = 0; i < 4; i++)
+        //{
+        //    SudokuIntNames.Add("SudokuDiff" + i + "Gespeeld");
+        //}
+        SudokuIntNames.Add("SudokuEnabledDoubleNumberWarning");
+        SudokuIntNames.Add("SudokuEnabledAutoEditNotes");
         //String
-        for (int i = 0; i < 81; i++)
-        {
-            for (int ii = 1; ii < 10; ii++)
-            {
-                SudokuStringNames.Add("Button " + i + " notitie" + ii);
-            }
-        }
+        SudokuStringNames.Add("SudokuClues");
+        SudokuStringNames.Add("SudokuInput");
+        SudokuStringNames.Add("SudokuInputNotes");
 
         //Solitaire
         //Int
@@ -246,15 +230,15 @@ public class SaveScript : MonoBehaviour
                     if (soort == 1)
                     {
                         int waarde = intDict["bgWaarde" + sceneNames[i]];
-                        gegevensHouder.VeranderOpgeslagenAchtergrond(sceneNames[i].ToLower(), soort, waarde);
+                        gegevensHouder.ChangeSavedBackground(sceneNames[i].ToLower(), soort, waarde);
                     }
                     else
                     {
                         int waarde = intDict["bgWaarde" + sceneNames[i]];
-                        gegevensHouder.VeranderOpgeslagenAchtergrond(sceneNames[i].ToLower(), soort, waarde);
+                        gegevensHouder.ChangeSavedBackground(sceneNames[i].ToLower(), soort, waarde);
                     }
                 }
-                gegevensHouder.ZetTaal();
+                gegevensHouder.SetLanguage();
             }
             frameNaDownload += 1;
         }
@@ -265,7 +249,7 @@ public class SaveScript : MonoBehaviour
         Quitting();
     }
 
-    private void OnApplicationPause(bool pauze)
+    private void OnApplicationPause(bool pause)
     {
         Quitting();
     }
@@ -275,21 +259,21 @@ public class SaveScript : MonoBehaviour
         Quitting();
     }
 
-    private void SaveSceneData(Scene oudeScene)
+    private void SaveSceneData(Scene prevScene)
     {
-        quitting = true;
-        Save(oudeScene);
+        _quitting = true;
+        Save(prevScene);
     }
 
-    private bool quitting;
+    private bool _quitting;
 
     private void Quitting()
     {
-        if (quitting)
+        if (_quitting)
         {
             return;
         }
-        quitting = true;
+        _quitting = true;
         Save(SceneManager.GetActiveScene());
     }
 
@@ -322,7 +306,7 @@ public class SaveScript : MonoBehaviour
                 SaveColorSort();
                 break;
             default:
-                quitting = false;
+                _quitting = false;
                 break;
         }
     }
@@ -509,7 +493,7 @@ public class SaveScript : MonoBehaviour
         file.Close();
         if (Application.internetReachability == NetworkReachability.NotReachable || FirebaseAuth.DefaultInstance.CurrentUser == null)
         {
-            quitting = false;
+            _quitting = false;
             return;
         }
         UploadStorageData();
@@ -521,7 +505,7 @@ public class SaveScript : MonoBehaviour
         if (!File.Exists(path))
         {
             ready = true;
-            gegevensHouder.ZetAchtergronden();
+            gegevensHouder.SetBackground();
             achtergrond.StartValues();
             return;
         }
@@ -568,8 +552,8 @@ public class SaveScript : MonoBehaviour
         }
         file.Close();
         ready = true;
-        quitting = false;
-        gegevensHouder.ZetAchtergronden();
+        _quitting = false;
+        gegevensHouder.SetBackground();
         achtergrond.StartValues();
     }
 
@@ -580,15 +564,15 @@ public class SaveScript : MonoBehaviour
         FirebaseStorage storage = FirebaseStorage.DefaultInstance;
         StorageReference saveFile = storage.GetReferenceFromUrl(storage.RootReference + "/Users/" + FirebaseAuth.DefaultInstance.CurrentUser.UserId + "/save.vbg");
         string path = $"{Application.persistentDataPath}/save.vbg";
-        quitting = true;
+        _quitting = true;
         FileStream file = File.Open(path, FileMode.Open, FileAccess.Read);
         saveFile.PutStreamAsync(file).ContinueWith(task =>
         {
             file.Close();
-            quitting = false;
+            _quitting = false;
             if (task.IsFaulted || task.IsCanceled)
             {
-                Debug.Log(task.Exception.ToString());
+                Debug.Log(task.Exception?.ToString());
             }
         });
     }
@@ -609,7 +593,7 @@ public class SaveScript : MonoBehaviour
         {
             if (task.IsFaulted || task.IsCanceled)
             {
-                Debug.Log(task.Exception.InnerException.Message.ToString());
+                Debug.Log(task.Exception?.InnerException?.Message.ToString());
             }
             dataGedownloaded = true;
         });
