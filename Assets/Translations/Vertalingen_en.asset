@@ -58,20 +58,26 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 382025994067968
-    m_Localized: "The goal of the game is to move all of the cards to the 'foundations'
+    m_Localized: 'The goal of the game is to move all of the cards to the ''foundations''
       these are four additional stacks of cards. At the start of the game these stacks
       are empty. Each stack represents a suit (hearts, clubs, etc). They must be
-      stacked by suit and in order, starting with the Ace, then the 2, 3, 4,\u2026..ending
-      with the Queen and then King.\n\nCards that are face up and showing may be
-      moved from the stock pile or the columns to the foundation stacks or to other
-      columns. To move a card to a column, it must be one less in rank and the opposite
-      color. Stacks of cards may be moved from one column to another as long as they
-      maintain the same order (highest to lowest, alternating colors). If you get
-      an empty column, you can start a new column with a King.\n\nTo get new cards
-      from the stock pile, you turn one card at a time face up into the stack next
-      to the stock pile called the waist stack. You can only play the top card off
-      the waist stack. If you run out of stock cards, turn the waist stack over to
-      make a new stock pile and start again."
+      stacked by suit and in order, starting with the Ace, then the 2, 3, 4, ...
+      ending with the Queen and then King.
+
+
+      Cards that are face up and showing
+      may be moved from the stock pile or the columns to the foundation stacks or
+      to other columns. To move a card to a column, it must be one less in rank and
+      the opposite color. Stacks of cards may be moved from one column to another
+      as long as they maintain the same order (highest to lowest, alternating colors).
+      If you get an empty column, you can start a new column with a King.
+
+
+      To
+      get new cards from the stock pile, you turn one card at a time face up into
+      the stack next to the stock pile called the waist stack. You can only play
+      the top card off the waist stack. If you run out of stock cards, turn the waist
+      stack over to make a new stock pile and start again.'
     m_Metadata:
       m_Items: []
   - m_Id: 382408539758592
@@ -353,6 +359,10 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 115004167628251136
     m_Localized: MindMix
+    m_Metadata:
+      m_Items: []
+  - m_Id: 125825326594646016
+    m_Localized: Play
     m_Metadata:
       m_Items: []
   references:

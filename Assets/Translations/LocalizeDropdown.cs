@@ -8,30 +8,26 @@ using UnityEngine.Localization.Settings;
 public class LocalizeDropdown : MonoBehaviour
 {
     [SerializeField] private List<LocalizedString> dropdownOptions;
-    private TMP_Dropdown tmpDropdown;
+    private TMP_Dropdown _tmpDropdown;
 
     private void Awake()
     {
-        List<TMP_Dropdown.OptionData> tmpDropdownOptions = new List<TMP_Dropdown.OptionData>();
-        for (int i = 0; i < dropdownOptions.Count; i++)
-        {
-            tmpDropdownOptions.Add(new TMP_Dropdown.OptionData(dropdownOptions[i].GetLocalizedString()));
-        }
-        if (!tmpDropdown) tmpDropdown = GetComponent<TMP_Dropdown>();
-        tmpDropdown.options = tmpDropdownOptions;
+        List<TMP_Dropdown.OptionData> tmpDropdownOptions = new();
+        foreach (var option in dropdownOptions) 
+            tmpDropdownOptions.Add(new TMP_Dropdown.OptionData(option.GetLocalizedString()));
+        if (!_tmpDropdown) _tmpDropdown = GetComponent<TMP_Dropdown>();
+        _tmpDropdown.options = tmpDropdownOptions;
         LocalizationSettings.SelectedLocaleChanged += ChangedLocale;
     }
 
-    private Locale currentLocale;
+    private Locale _currentLocale;
     private void ChangedLocale(Locale newLocale)
     {
-        if (currentLocale == newLocale) return;
-        currentLocale = newLocale;
-        List<TMP_Dropdown.OptionData> tmpDropdownOptions = new List<TMP_Dropdown.OptionData>();
-        for (int i = 0; i < dropdownOptions.Count; i++)
-        {
-            tmpDropdownOptions.Add(new TMP_Dropdown.OptionData(dropdownOptions[i].GetLocalizedString()));
-        }
-        tmpDropdown.options = tmpDropdownOptions;
+        if (_currentLocale == newLocale) return;
+        _currentLocale = newLocale;
+        List<TMP_Dropdown.OptionData> tmpDropdownOptions = new();
+        foreach (var option in dropdownOptions)
+            tmpDropdownOptions.Add(new TMP_Dropdown.OptionData(option.GetLocalizedString()));
+        _tmpDropdown.options = tmpDropdownOptions;
     }
 }

@@ -71,11 +71,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 382025994067968
-    m_Localized: "Le but du jeu est de d\xE9placer toutes les cartes vers les \xAB\_fondations\_\xBB,
-      ce sont quatre piles de cartes suppl\xE9mentaires. Au d\xE9but du jeu, ces
-      piles sont vides. Chaque pile repr\xE9sente une couleur (c\u0153urs, massues,
-      etc.). Ils doivent \xEAtre empil\xE9s par couleur et dans l'ordre, en commen\xE7ant
-      par l'As, puis le 2, 3, 4,\u2026..fin avec la Dame puis le Roi.\r\n\r\nLes
+    m_Localized: "Le but du jeu est de d\xE9placer toutes les cartes vers les \xAB
+      fondations \xBB, ce sont quatre piles de cartes suppl\xE9mentaires. Au d\xE9but
+      du jeu, ces piles sont vides. Chaque pile repr\xE9sente une couleur (c\u0153urs,
+      massues, etc.). Ils doivent \xEAtre empil\xE9s par couleur et dans l'ordre,
+      en commen\xE7ant par l'As, puis le 2, 3, 4, ... fin avec la Dame puis le Roi.\r\n\r\nLes
       cartes qui sont face visible et visibles peuvent \xEAtre d\xE9plac\xE9es de
       la r\xE9serve ou des colonnes vers les piles de fondation ou vers d'autres
       colonnes. Pour d\xE9placer une carte dans une colonne, il faut qu'elle soit
@@ -157,7 +157,7 @@ MonoBehaviour:
       une cellule min\xE9e, la partie se termine, car il n'y a qu'1 point de vie
       par partie. Sinon, la cellule non couverte affiche soit un nombre indiquant
       le nombre de mines en diagonale et/ou adjacentes \xE0 celle-ci, soit une tuile
-      vierge (\xAB\_-\_\xBB), et toutes les cellules adjacentes non min\xE9es seront
+      vierge ( \xAB - \xBB ), et toutes les cellules adjacentes non min\xE9es seront
       automatiquement d\xE9couvertes. En mode indicateur, cliquer sur une cellule
       la marquera, ce qui entra\xEEnera l'apparition d'un indicateur dessus. Les
       cellules signal\xE9es sont toujours consid\xE9r\xE9es comme couvertes et un

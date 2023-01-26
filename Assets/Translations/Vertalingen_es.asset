@@ -69,16 +69,16 @@ MonoBehaviour:
       estas son cuatro pilas adicionales de cartas. Al comienzo del juego, estas
       pilas est\xE1n vac\xEDas. Cada pila representa un palo (corazones, tr\xE9boles,
       etc.). Deben apilarse por palo y en orden, comenzando con el As, luego el 2,
-      3, 4,\u2026..terminando con la Reina y luego el Rey.\r\n\r\nLas cartas que
-      est\xE1n boca arriba y que se muestran se pueden mover de la pila de reserva
-      o de las columnas a las pilas de base oa otras columnas. Para mover una carta
-      a una columna, debe ser una menos en rango y del color opuesto. Las pilas de
-      cartas se pueden mover de una columna a otra siempre que mantengan el mismo
-      orden (de mayor a menor, alternando colores). Si obtiene una columna vac\xEDa,
-      puede comenzar una nueva columna con un rey.\r\n\r\nPara obtener nuevas cartas
-      de la pila de existencias, debe girar una carta a la vez boca arriba en la
-      pila junto a la pila de existencias llamada pila de cintura. Solo puedes jugar
-      la carta superior de la pila de cintura. Si te quedas sin cartas de inventario,
+      3, 4, ... terminando con la Reina y luego el Rey.\r\n\r\nLas cartas que est\xE1n
+      boca arriba y que se muestran se pueden mover de la pila de reserva o de las
+      columnas a las pilas de base oa otras columnas. Para mover una carta a una
+      columna, debe ser una menos en rango y del color opuesto. Las pilas de cartas
+      se pueden mover de una columna a otra siempre que mantengan el mismo orden
+      (de mayor a menor, alternando colores). Si obtiene una columna vac\xEDa, puede
+      comenzar una nueva columna con un rey.\r\n\r\nPara obtener nuevas cartas de
+      la pila de existencias, debe girar una carta a la vez boca arriba en la pila
+      junto a la pila de existencias llamada pila de cintura. Solo puedes jugar la
+      carta superior de la pila de cintura. Si te quedas sin cartas de inventario,
       voltea la pila de la cintura para hacer una nueva pila de inventario y comienza
       de nuevo."
     m_Metadata:

@@ -64,17 +64,18 @@ MonoBehaviour:
     m_Localized: "L'obiettivo del gioco \xE8 spostare tutte le carte sulle \"fondazioni\",
       si tratta di quattro pile di carte aggiuntive. All'inizio del gioco queste
       pile sono vuote. Ogni pila rappresenta un seme (cuori, fiori, ecc.). Devono
-      essere impilati per seme e in ordine, iniziando con l'Asso, poi il 2, 3, 4,\u2026..per
-      finire con la Donna e poi il Re.\r\n\r\nLe carte scoperte e mostrate possono
-      essere spostate dal mazzo o dalle colonne alle pile di fondazione o ad altre
-      colonne. Per spostare una carta in una colonna, deve essere di uno in meno
-      di rango e del colore opposto. Le pile di carte possono essere spostate da
-      una colonna all'altra purch\xE9 mantengano lo stesso ordine (dal pi\xF9 alto
-      al pi\xF9 basso, colori alternati). Se ottieni una colonna vuota, puoi iniziare
-      una nuova colonna con un re.\r\n\r\nPer ottenere nuove carte dal mazzo, giri
-      una carta alla volta a faccia in su nella pila accanto al mazzo chiamato mazzo
-      della vita. Puoi giocare solo la prima carta dal mazzo. Se finisci le carte
-      di scorta, gira la pila della vita per creare una nuova pila di scorta e ricomincia."
+      essere impilati per seme e in ordine, iniziando con l'Asso, poi il 2, 3, 4,
+      ... per finire con la Donna e poi il Re.\r\n\r\nLe carte scoperte e mostrate
+      possono essere spostate dal mazzo o dalle colonne alle pile di fondazione o
+      ad altre colonne. Per spostare una carta in una colonna, deve essere di uno
+      in meno di rango e del colore opposto. Le pile di carte possono essere spostate
+      da una colonna all'altra purch\xE9 mantengano lo stesso ordine (dal pi\xF9
+      alto al pi\xF9 basso, colori alternati). Se ottieni una colonna vuota, puoi
+      iniziare una nuova colonna con un re.\r\n\r\nPer ottenere nuove carte dal mazzo,
+      giri una carta alla volta a faccia in su nella pila accanto al mazzo chiamato
+      mazzo della vita. Puoi giocare solo la prima carta dal mazzo. Se finisci le
+      carte di scorta, gira la pila della vita per creare una nuova pila di scorta
+      e ricomincia."
     m_Metadata:
       m_Items: []
   - m_Id: 382408539758592

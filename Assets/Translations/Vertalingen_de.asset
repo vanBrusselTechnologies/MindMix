@@ -74,7 +74,7 @@ MonoBehaviour:
       zu legen, das sind vier zus\xE4tzliche Kartenstapel. Zu Beginn des Spiels sind
       diese Stapel leer. Jeder Stapel repr\xE4sentiert eine Farbe (Herz, Kreuz usw.).
       Sie m\xFCssen nach Farbe und in der richtigen Reihenfolge gestapelt werden,
-      beginnend mit dem Ass, dann die 2, 3, 4,\u2026..end mit der Dame und dann dem
+      beginnend mit dem Ass, dann die 2, 3, 4, ... end mit der Dame und dann dem
       K\xF6nig.\r\n\r\nAufgedeckte und aufgedeckte Karten k\xF6nnen vom Vorratsstapel
       oder den S\xE4ulen in die Fundamentstapel oder in andere S\xE4ulen verschoben
       werden. Um eine Karte in eine Spalte zu verschieben, muss sie einen Rang weniger
