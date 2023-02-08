@@ -3,17 +3,17 @@ using Sudoku;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 [DefaultExecutionOrder(-50)]
 public class SudokuGameHandler : MonoBehaviour
 {
-    private SudokuUIHandler _sudokuUIHandler;
-    private SudokuLayout _sudokuLayout;
-    private BeloningScript _rewardHandler;
+    [SerializeField] private SudokuUIHandler sudokuUIHandler;
+    [SerializeField] private SudokuLayout sudokuLayout;
+    private RewardHandler _rewardHandler;
     private GegevensHouder _gegevensHouder;
     private SaveScript _saveScript;
+    
     [SerializeField] private GameObject finishedCanvas;
     [SerializeField] private GameObject sudokuCanvas;
     [SerializeField] private GameObject generalCanvas;
@@ -43,25 +43,23 @@ public class SudokuGameHandler : MonoBehaviour
         }
 
         _saveScript = SaveScript.Instance;
-        _rewardHandler = BeloningScript.Instance;
-        _sudokuLayout = GetComponent<SudokuLayout>();
-        _sudokuUIHandler = GetComponent<SudokuUIHandler>();
-        _sudokuUIHandler.cellInputButtons = inputCellButtons;
-        _sudokuUIHandler.cellInputButtonTexts = inputCellButtonTexts;
+        _rewardHandler = RewardHandler.Instance;
+        sudokuUIHandler.cellInputButtons = inputCellButtons;
+        sudokuUIHandler.cellInputButtonTexts = inputCellButtonTexts;
 
         if (_gegevensHouder.startNewGame)
         {
             ClearProgress();
-            CreateNewSudoku();
+            CreateNewPuzzle();
         }
         else
         {
             LoadProgress();
-            if (_saveScript.intDict["SudokuEnabledDoubleNumberWarning"] == 1) _sudokuUIHandler.CheckIfDoubleNumber();
+            if (_saveScript.intDict["SudokuEnabledDoubleNumberWarning"] == 1) sudokuUIHandler.CheckIfDoubleNumber();
         }
     }
 
-    private void CreateNewSudoku()
+    private void CreateNewPuzzle()
     {
         _puzzle = SudokuPuzzle.RandomGrid(9);
 
@@ -90,7 +88,7 @@ public class SudokuGameHandler : MonoBehaviour
         }
 
         _saveScript.stringDict["SudokuClues"] = cluesString;
-        _saveScript.stringDict["SudokuInput"] = SudokuUIHandler.StringifyInputArray(SudokuPuzzleInput);
+        _saveScript.stringDict["SudokuInput"] = SaveScript.StringifyArray(SudokuPuzzleInput);
         _saveScript.stringDict["SudokuInputNotes"] = SudokuUIHandler.StringifyInputNotesArray(SudokuPuzzleInputNotes);
     }
 
@@ -110,14 +108,7 @@ public class SudokuGameHandler : MonoBehaviour
         }
 
         _solution = SudokuPuzzle.GetSolution(sudokuClues);
-
-        char[] inputChars = _saveScript.stringDict["SudokuInput"].ToCharArray();
-        for (int i = 0; i < inputChars.Length; i++)
-        {
-            int number = inputChars[i] - '0';
-            if (number != 0) _sudokuUIHandler.EnterNormalNumber(i, number);
-        }
-
+        
         string[] inputNotesString = _saveScript.stringDict["SudokuInputNotes"].Split(",");
         for (int i = 0; i < inputNotesString.Length; i++)
         {
@@ -126,8 +117,15 @@ public class SudokuGameHandler : MonoBehaviour
             foreach (var n in inputNoteChars)
             {
                 int number = n - '0';
-                if (number != 0) _sudokuUIHandler.EnterNotesNumber(i, number);
+                if (number != 0) sudokuUIHandler.EnterNotesNumber(i, number);
             }
+        }
+        
+        char[] inputChars = _saveScript.stringDict["SudokuInput"].ToCharArray();
+        for (int i = 0; i < inputChars.Length; i++)
+        {
+            int number = inputChars[i] - '0';
+            if (number != 0) sudokuUIHandler.EnterNormalNumber(i, number);
         }
     }
 
@@ -157,7 +155,7 @@ public class SudokuGameHandler : MonoBehaviour
         sudokuCanvas.SetActive(false);
         generalCanvas.SetActive(false);
         menuUICanvasObj.SetActive(false);
-        _sudokuLayout.SetLayout();
+        sudokuLayout.SetLayout();
     }
 
     private void ClearProgress()

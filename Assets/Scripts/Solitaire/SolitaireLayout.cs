@@ -19,10 +19,12 @@ public class SolitaireLayout : BaseLayout
     [HideInInspector] public float baseY;
     [HideInInspector] public float baseYFoundation;
     [HideInInspector] public List<float> xPositions = new();
+    private Camera _cam;
 
     // Start is called before the first frame update
     protected override void Start()
     {
+        _cam = Camera.main;
         solitaireScript = GetComponent<SolitaireScript>();
         solitaireUIHandler = GetComponent<KnoppenScriptSolitaire>();
         base.Start();
@@ -78,7 +80,7 @@ public class SolitaireLayout : BaseLayout
         }
         float stockPileBaseXUI = screenSafeAreaCenterX + (_screenWidth / 81f * 33f) + (screenWidth / 2f);
         baseYFoundation = Mathf.Min(screenSafeAreaCenterYInUnits + (13f * diffY + cardYScale) / 2f, screenSafeAreaCenterYInUnits + screenSafeAreaHeightInUnits / 2f - cardYScale / 2f);
-        float stockPileBaseYUI = ScreenExt.UnitsToPixels(baseYFoundation) + (screenHeight / 2f);
+        float stockPileBaseYUI = ScreenExt.UnitsToPixels(baseYFoundation, _cam) + (screenHeight / 2f);
         baseY = baseYFoundation - cardYScale - diffY;
         float baseZ = -2f;
         float diffZ = 0.1f;

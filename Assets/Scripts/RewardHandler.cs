@@ -3,9 +3,9 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class BeloningScript : MonoBehaviour
+public class RewardHandler : MonoBehaviour
 {
-    public static BeloningScript Instance;
+    public static RewardHandler Instance;
     private int klaar;
     private float vorigeScreenWidth;
     private float vorigeSafezoneY;
@@ -31,12 +31,13 @@ public class BeloningScript : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
         Instance = this;
     }
 
     private void Start()
     {
-        SceneManager.sceneLoaded += SceneLoaded;
+        UnityEngine.SceneManagement.SceneManager.sceneLoaded += SceneLoaded;
         saveScript = SaveScript.Instance;
         DontDestroyOnLoad(this);
     }
@@ -68,9 +69,11 @@ public class BeloningScript : MonoBehaviour
                 VoegMuntenToe(munten);
                 break;
         }
+
         FirebaseAnalytics.LogEvent(
             FirebaseAnalytics.EventLevelEnd,
-            new Parameter[]{
+            new Parameter[]
+            {
                 new(FirebaseAnalytics.ParameterLevelName, scene.name),
                 new(FirebaseAnalytics.ParameterSuccess, 1),
             }
@@ -79,26 +82,31 @@ public class BeloningScript : MonoBehaviour
         return munten;
     }
 
-    private void VoegMuntenToe(int coinsToAdd)
+    private void VoegMuntenToe(int coins)
     {
-        saveScript.intDict["munten"] += coinsToAdd;
-        ShowHuidigAantalMunten();
+        saveScript.intDict["munten"] += coins;
+        ShowCurrentCoins();
         FirebaseAnalytics.LogEvent(
-            FirebaseAnalytics.EventEarnVirtualCurrency, new Parameter(FirebaseAnalytics.ParameterValue, coinsToAdd), new Parameter(FirebaseAnalytics.ParameterVirtualCurrencyName, "Coin"), new Parameter(FirebaseAnalytics.ParameterCurrency, "EUR"));
+            FirebaseAnalytics.EventEarnVirtualCurrency, new Parameter(FirebaseAnalytics.ParameterValue, coins),
+            new Parameter(FirebaseAnalytics.ParameterVirtualCurrencyName, "Coin"),
+            new Parameter(FirebaseAnalytics.ParameterCurrency, "EUR"));
     }
 
-    public void GeefMuntenUit(int muntenToSpend)
+    public void SpendCoins(int coins)
     {
-        saveScript.intDict["munten"] -= muntenToSpend;
-        ShowHuidigAantalMunten();
+        saveScript.intDict["munten"] -= coins;
+        ShowCurrentCoins();
         FirebaseAnalytics.LogEvent(
-            FirebaseAnalytics.EventSpendVirtualCurrency, new Parameter(FirebaseAnalytics.ParameterItemName, shopScript.naam), new Parameter(FirebaseAnalytics.ParameterValue, muntenToSpend), new Parameter(FirebaseAnalytics.ParameterVirtualCurrencyName, "Coin"));
+            FirebaseAnalytics.EventSpendVirtualCurrency,
+            new Parameter(FirebaseAnalytics.ParameterItemName, shopScript.naam),
+            new Parameter(FirebaseAnalytics.ParameterValue, coins),
+            new Parameter(FirebaseAnalytics.ParameterVirtualCurrencyName, "Coin"));
     }
 
-    public void VerdubbelCoins()
+    public void DoubleCoins()
     {
         if (laatsteDoelwitText == null) return;
-        int factor = 3;
+        const int factor = 3;
         VoegMuntenToe(laatstVerdiendeMunten * (factor - 1));
         laatsteDoelwitText.text = (laatstVerdiendeMunten * factor).ToString();
         Transform parent = laatsteDoelwitText.transform.parent;
@@ -109,18 +117,22 @@ public class BeloningScript : MonoBehaviour
         rewardRect.sizeDelta = new Vector2(500, 175);
     }
 
-    private void ShowHuidigAantalMunten()
+    private void ShowCurrentCoins()
     {
-        ZetLocatieHuidigAantalMunten();
+        SetPositionCurrentCoins();
         muntenText.text = saveScript.intDict["munten"].ToString();
         muntenObj.gameObject.SetActive(true);
     }
 
-    private void ZetLocatieHuidigAantalMunten()
+    private void SetPositionCurrentCoins()
     {
         Vector2 sizeDelta = Vector2.one * Mathf.Min(Screen.safeArea.width, Screen.safeArea.height) / 11f;
         sizeDelta.x *= 2.5f;
-        muntenObj.anchoredPosition = new Vector2((Screen.width / 2f) - (Screen.width - Screen.safeArea.width - Screen.safeArea.x) - (Mathf.Min(Screen.safeArea.width, Screen.safeArea.height) / 11f * 0.6f * 3f), (Screen.height / 2f) - (Screen.height - Screen.safeArea.height - Screen.safeArea.y) - (Mathf.Min(Screen.safeArea.width, Screen.safeArea.height) / 11 * 0.6f));
+        muntenObj.anchoredPosition = new Vector2(
+            (Screen.width / 2f) - (Screen.width - Screen.safeArea.width - Screen.safeArea.x) -
+            (Mathf.Min(Screen.safeArea.width, Screen.safeArea.height) / 11f * 0.6f * 3f),
+            (Screen.height / 2f) - (Screen.height - Screen.safeArea.height - Screen.safeArea.y) -
+            (Mathf.Min(Screen.safeArea.width, Screen.safeArea.height) / 11 * 0.6f));
         muntenObj.sizeDelta = sizeDelta;
         muntenRect.offsetMin = new Vector2(sizeDelta.y, 0);
     }
@@ -130,7 +142,7 @@ public class BeloningScript : MonoBehaviour
         if (scene.name == "Shop")
         {
             shopScript = GameObject.Find("EventSystem").GetComponent<ShopScript>();
-            ShowHuidigAantalMunten();
+            ShowCurrentCoins();
         }
         else
         {
@@ -142,21 +154,25 @@ public class BeloningScript : MonoBehaviour
     {
         if (!isPaused && wasPaused)
         {
-            ZetLocatieHuidigAantalMunten();
+            SetPositionCurrentCoins();
             wasPaused = isPaused;
             return;
         }
+
         wasPaused = isPaused;
-        if (vorigeScreenWidth == Screen.width && vorigeSafezoneY == Screen.safeArea.y && vorigeSafezoneX == Screen.safeArea.x)
+        if (vorigeScreenWidth == Screen.width && vorigeSafezoneY == Screen.safeArea.y &&
+            vorigeSafezoneX == Screen.safeArea.x)
         {
             if (klaar < 3)
             {
-                ZetLocatieHuidigAantalMunten();
+                SetPositionCurrentCoins();
             }
+
             return;
         }
+
         klaar = 0;
-        ZetLocatieHuidigAantalMunten();
+        SetPositionCurrentCoins();
         vorigeScreenWidth = Screen.width;
         vorigeSafezoneY = Screen.safeArea.y;
         vorigeSafezoneX = Screen.safeArea.x;

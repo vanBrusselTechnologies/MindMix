@@ -1,6 +1,5 @@
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public abstract class BaseSceneSettings : MonoBehaviour
 {
@@ -11,45 +10,45 @@ public abstract class BaseSceneSettings : MonoBehaviour
     [SerializeField] private TMP_Dropdown colorDropDown;
     [SerializeField] private TMP_Dropdown imageDropDown;
     [SerializeField] private TMP_Dropdown bgSoortDropDown;
-    private bool startValues = true;
-    private string sceneName;
+    private bool _startValues = true;
+    private string _sceneName;
 
     // Start is called before the first frame update
     void Start()
     {
-        GameObject gegevensHouder = GameObject.Find("gegevensHouder");
+        GameObject gegevensHouder = GameObject.Find("DataObject");
         if (gegevensHouder == null) return;
         saveScript = SaveScript.Instance;
         achtergrondScript = gegevensHouder.GetComponent<Achtergrond>();
         gegevensScript = GegevensHouder.Instance;
-        sceneName = SceneManager.GetActiveScene().name;
+        _sceneName = SceneManager.GetActiveScene().name;
         SetBackgroundStartValues();
         SetSettingStartValues();
-        startValues = false;
+        _startValues = false;
     }
 
     private void SetBackgroundStartValues()
     {
         colorDropDown.options.Clear();
-        colorDropDown.options.AddRange(achtergrondScript.gekochteColorOptionData);
+        colorDropDown.options.AddRange(achtergrondScript.boughtColorOptionData);
         imageDropDown.options.Clear();
-        imageDropDown.options.AddRange(achtergrondScript.gekochteImageOptionData);
-        int soort = saveScript.intDict["bgSoort" + sceneName];
-        bgSoortDropDown.value = soort;
-        if (soort == 1)
+        imageDropDown.options.AddRange(achtergrondScript.boughtImageOptionData);
+        int type = saveScript.intDict["bgSoort" + _sceneName];
+        bgSoortDropDown.value = type;
+        if (type == 1)
         {
             imageDropDown.gameObject.SetActive(true);
-            int bgWaarde = saveScript.intDict["bgWaarde" + sceneName];
-            int dropdownValue = bgWaarde >= 0 ? achtergrondScript.gekochteImageOptionData.IndexOf(achtergrondScript.imageOptionData[bgWaarde]) : -1;
+            int backgroundValue = saveScript.intDict["bgWaarde" + _sceneName];
+            int dropdownValue = backgroundValue >= 0 ? achtergrondScript.boughtImageOptionData.IndexOf(achtergrondScript.imageOptionData[backgroundValue]) : -1;
             imageDropDown.value = dropdownValue;
             colorDropDown.gameObject.SetActive(false);
             colorDropDown.value = 0;
         }
         else
         {
-            int bgWaarde = saveScript.intDict["bgWaarde" + sceneName];
-            int dropdownValue = bgWaarde >= 0 ? achtergrondScript.gekochteColorOptionData.IndexOf(achtergrondScript.colorOptionData[bgWaarde]) : -1;
-            if (bgWaarde == -1) dropdownValue = 0;
+            int backgroundValue = saveScript.intDict["bgWaarde" + _sceneName];
+            int dropdownValue = backgroundValue >= 0 ? achtergrondScript.boughtColorOptionData.IndexOf(achtergrondScript.colorOptionData[backgroundValue]) : -1;
+            if (backgroundValue == -1) dropdownValue = 0;
             imageDropDown.gameObject.SetActive(false);
             imageDropDown.value = 0;
             colorDropDown.gameObject.SetActive(true);
@@ -59,57 +58,56 @@ public abstract class BaseSceneSettings : MonoBehaviour
 
     public void ChangeBackgroundImage()
     {
-        if (startValues) return;
+        if (_startValues) return;
         if (imageDropDown.value == -1)
         {
             return;
         }
         int dropdownValue = imageDropDown.value;
-        int bgWaarde = achtergrondScript.imageOptionData.IndexOf(achtergrondScript.gekochteImageOptionData[dropdownValue]);
-        if (saveScript.intDict["bgWaardeAll"] != bgWaarde || saveScript.intDict["bgSoortAll"] != 1)
+        int backgroundValue = achtergrondScript.imageOptionData.IndexOf(achtergrondScript.boughtImageOptionData[dropdownValue]);
+        if (saveScript.intDict["bgWaardeAll"] != backgroundValue || saveScript.intDict["bgSoortAll"] != 1)
         {
             saveScript.intDict["bgWaardeAll"] = -2;
         }
-        saveScript.intDict["bgSoort" + sceneName] = 1;
-        saveScript.intDict["bgWaarde" + sceneName] = bgWaarde;
-        gegevensScript.VeranderOpgeslagenAchtergrond(sceneName.ToLower(), 1, bgWaarde);
+        saveScript.intDict["bgSoort" + _sceneName] = 1;
+        saveScript.intDict["bgWaarde" + _sceneName] = backgroundValue;
+        gegevensScript.ChangeSavedBackground(_sceneName.ToLower(), 1, backgroundValue);
     }
 
     public void ChangeBackgroundColor()
     {
-        if (startValues) return;
+        if (_startValues) return;
         if (colorDropDown.value == -1)
         {
             return;
         }
         int dropdownValue = colorDropDown.value;
-        int bgWaarde = achtergrondScript.colorOptionData.IndexOf(achtergrondScript.gekochteColorOptionData[dropdownValue]);
-        if (saveScript.intDict["bgWaardeAll"] != bgWaarde || saveScript.intDict["bgSoortAll"] != 0)
+        int backgroundValue = achtergrondScript.colorOptionData.IndexOf(achtergrondScript.boughtColorOptionData[dropdownValue]);
+        if (saveScript.intDict["bgWaardeAll"] != backgroundValue || saveScript.intDict["bgSoortAll"] != 0)
         {
             saveScript.intDict["bgWaardeAll"] = -2;
         }
-        saveScript.intDict["bgSoort" + sceneName] = 0;
-        saveScript.intDict["bgWaarde" + sceneName] = bgWaarde;
-        gegevensScript.VeranderOpgeslagenAchtergrond(sceneName.ToLower(), 0, bgWaarde);
+        saveScript.intDict["bgSoort" + _sceneName] = 0;
+        saveScript.intDict["bgWaarde" + _sceneName] = backgroundValue;
+        gegevensScript.ChangeSavedBackground(_sceneName.ToLower(), 0, backgroundValue);
     }
 
     public void ChangeBackgroundType()
     {
-        if (bgSoortDropDown.value == -1)
+        switch (bgSoortDropDown.value)
         {
-            return;
-        }
-        if (bgSoortDropDown.value == 1)
-        {
-            imageDropDown.value = -1;
-            imageDropDown.gameObject.SetActive(true);
-            colorDropDown.gameObject.SetActive(false);
-        }
-        else
-        {
-            imageDropDown.gameObject.SetActive(false);
-            colorDropDown.value = -1;
-            colorDropDown.gameObject.SetActive(true);
+            case -1:
+                return;
+            case 1:
+                imageDropDown.value = -1;
+                imageDropDown.gameObject.SetActive(true);
+                colorDropDown.gameObject.SetActive(false);
+                break;
+            default:
+                imageDropDown.gameObject.SetActive(false);
+                colorDropDown.value = -1;
+                colorDropDown.gameObject.SetActive(true);
+                break;
         }
     }
 

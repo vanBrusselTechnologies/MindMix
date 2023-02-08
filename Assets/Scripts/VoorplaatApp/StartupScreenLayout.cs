@@ -2,8 +2,9 @@ using UnityEngine;
 
 public class StartupScreenLayout : BaseLayout
 {
-    [Header("Scene specific")]
-    [SerializeField] private RectTransform vpSpelNaamRect;
+    [Header("Scene specific")] [SerializeField]
+    private RectTransform vpSpelNaamRect;
+
     [SerializeField] private RectTransform vpSpellenHouderRect;
     [SerializeField] private RectTransform vp2048Rect;
     [SerializeField] private RectTransform vpMijnenvegerRect;
@@ -31,7 +32,8 @@ public class StartupScreenLayout : BaseLayout
 
     private void SetAnimationLayout()
     {
-        vpSpellenHouderRect.localScale = Vector3.one * Mathf.Min(screenSafeAreaHeight / 350f, screenSafeAreaWidth / 350f);
+        vpSpellenHouderRect.localScale =
+            Vector3.one * Mathf.Min(screenSafeAreaHeightInUnits / 350f, screenSafeAreaWidthInUnits / 350f);
 
         vp2048Rect.anchoredPosition = startupAnimation.endPosRot2048[0];
         vp2048Rect.localEulerAngles = startupAnimation.endPosRot2048[1];
@@ -49,16 +51,17 @@ public class StartupScreenLayout : BaseLayout
         vpSudokuRect.localEulerAngles = startupAnimation.endPosRotSudoku[1];
         vpSudokuRect.localScale = Vector3.one;
 
-        vpSpelNaamRect.anchoredPosition = new Vector3(0, (screenSafeAreaHeight * 0.25f) + (screenSafeAreaX / 2f), 0);
+        vpSpelNaamRect.anchoredPosition = new Vector3(0, (screenSafeAreaXInUnits / 2f), 0);
         vpSpelNaamRect.localEulerAngles = Vector3.zero;
-        vpSpelNaamRect.sizeDelta = new Vector2(screenSafeAreaWidth * 0.25f, screenSafeAreaHeight / 2.05f);
+        vpSpelNaamRect.sizeDelta = new Vector2(screenSafeAreaWidthInUnits * 0.75f, screenSafeAreaHeightInUnits / 2.05f);
     }
 
     private void SetGeneralLayout()
     {
         loginKnopScalerRect.localScale = vpSpellenHouderRect.localScale;
         googlePlayGamesLoginRect.localScale = Vector3.one * (0.5f / loginKnopScalerRect.localScale.x);
-        googlePlayGamesLoginRect.anchoredPosition = new Vector2(0, startupAnimation.endPosRot2048[0].y - (200f * googlePlayGamesLoginRect.localScale.y * 1.5f));
+        googlePlayGamesLoginRect.anchoredPosition = new Vector2(0,
+            startupAnimation.endPosRot2048[0].y - (200f * googlePlayGamesLoginRect.localScale.y * 1.5f));
     }
 
     private void SetWarningLayout()

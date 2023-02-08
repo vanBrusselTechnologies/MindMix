@@ -17,7 +17,7 @@ public class KnoppenScriptSolitaire : BaseUIHandler
     private bool omdraaiKnopGedeactiveerd;
 
     private SolitaireScript solitaireScript;
-    private BeloningScript beloningScript;
+    private RewardHandler _rewardHandler;
 
     protected override void Start()
     {
@@ -26,7 +26,7 @@ public class KnoppenScriptSolitaire : BaseUIHandler
         if (saveScript == null) return;
         solitaireScript = GetComponent<SolitaireScript>();
         StapelRest = solitaireScript.StapelRest;
-        beloningScript = BeloningScript.Instance;
+        _rewardHandler = RewardHandler.Instance;
         if (gegevensHouder.startNewGame)
         {
             WisOudeGegevens();
@@ -130,7 +130,7 @@ public class KnoppenScriptSolitaire : BaseUIHandler
             float tijd = saveScript.floatDict["SolitaireTijd"];
             saveScript.floatDict["SolitaireSnelsteTijd"] = Mathf.Min(saveScript.floatDict["SolitaireSnelsteTijd"], tijd);
             saveScript.intDict["SolitairesGespeeld"] += 1;
-            beloningText.text = beloningScript.Beloning(scene: scene, score: tijd, doelwitText: beloningText).ToString();
+            beloningText.text = _rewardHandler.Beloning(scene: scene, score: tijd, doelwitText: beloningText).ToString();
         }
         solitaireScript.voltooid = true;
         for (int i = 0; i < solitaireScript.kaarten.Count; i++)

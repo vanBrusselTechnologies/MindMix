@@ -7098,6 +7098,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4691ffdf78e39f41af6c3126f24e0f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rewardedAdButton: {fileID: 1954192210}
 --- !u!114 &1379005095
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -2542,6 +2542,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 5469892693544770282}
     m_Modifications:
+    - target: {fileID: 721546172798156437, guid: 0d2a3e6615285ae48960a4c69920f999,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 721546172798156437, guid: 0d2a3e6615285ae48960a4c69920f999,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 721546172798156437, guid: 0d2a3e6615285ae48960a4c69920f999,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 180
+      objectReference: {fileID: 0}
     - target: {fileID: 1379250999405514953, guid: 0d2a3e6615285ae48960a4c69920f999,
         type: 3}
       propertyPath: m_LocalPosition.z
@@ -2657,7 +2672,7 @@ PrefabInstance:
   m_SourcePrefab: {fileID: 100100000, guid: 0d2a3e6615285ae48960a4c69920f999, type: 3}
 --- !u!4 &241903407 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 1381059058244403840, guid: 0d2a3e6615285ae48960a4c69920f999,
+  m_CorrespondingSourceObject: {fileID: 721546172798156437, guid: 0d2a3e6615285ae48960a4c69920f999,
     type: 3}
   m_PrefabInstance: {fileID: 241903406}
   m_PrefabAsset: {fileID: 0}
@@ -18829,6 +18844,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4691ffdf78e39f41af6c3126f24e0f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rewardedAdButton: {fileID: 1825398675}
 --- !u!114 &1999486501
 MonoBehaviour:
   m_ObjectHideFlags: 0

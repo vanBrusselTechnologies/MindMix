@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 [DefaultExecutionOrder(-49)]
 public abstract class BaseUIHandler : MonoBehaviour
@@ -8,7 +7,7 @@ public abstract class BaseUIHandler : MonoBehaviour
     protected GegevensHouder gegevensHouder;
     protected SaveScript saveScript;
 
-    protected BaseLayout baseLayout;
+    [SerializeField] protected BaseLayout baseLayout;
 
     [Header("Menu UI")]
     [SerializeField] protected GameObject menuUIObj;
@@ -45,7 +44,7 @@ public abstract class BaseUIHandler : MonoBehaviour
         }
     }
 
-    public void BackToMenu()
+    public virtual void BackToMenu()
     {
         SceneManager.LoadScene("SpellenOverzicht");
     }
@@ -67,17 +66,19 @@ public abstract class BaseUIHandler : MonoBehaviour
         if (appear)
         {
             menuUIObj.SetActive(true);
-            float schaal = Mathf.Min(Mathf.Min(baseLayout.screenSafeAreaHeight, baseLayout.screenSafeAreaWidth) / 1080f, Mathf.Max(baseLayout.screenSafeAreaHeight, baseLayout.screenSafeAreaWidth) / 2520f);
+            float scale = Mathf.Min(Mathf.Min(baseLayout.screenSafeAreaHeight, baseLayout.screenSafeAreaWidth) / 1080f, Mathf.Max(baseLayout.screenSafeAreaHeight, baseLayout.screenSafeAreaWidth) / 2520f);
             if (vertical)
             {
-                schaal *= 1.1f;
-                menuUIRect.sizeDelta = new Vector2(baseLayout.screenWidth, baseLayout.screenSafeAreaY + baseLayout.screenSafeAreaHeight * 0.15f);
-                menuUIRect.anchoredPosition = new Vector2(0, -menuUIRect.sizeDelta.y / 2f + baseLayout.screenSafeAreaY);
+                scale *= 1.1f;
+                float menuUIRectSizeDeltaX = baseLayout.screenWidth;
+                float menuUIRectSizeDeltaY = baseLayout.screenSafeAreaY + baseLayout.screenSafeAreaHeight * 0.15f;
+                menuUIRect.sizeDelta = new Vector2(menuUIRectSizeDeltaX, menuUIRectSizeDeltaY);
+                menuUIRect.anchoredPosition = new Vector2(0, -menuUIRectSizeDeltaY / 2f + baseLayout.screenSafeAreaY);
                 float xNewGameButton = 0;
                 if (menuNewGameOptionRect != null)
                 {
-                    xNewGameButton = menuUIRect.sizeDelta.x / 4f;
-                    menuNewGameOptionRect.anchoredPosition = new Vector2(-menuUIRect.sizeDelta.x / 4f, baseLayout.screenSafeAreaY / 2f);
+                    xNewGameButton = menuUIRectSizeDeltaX / 4f;
+                    menuNewGameOptionRect.anchoredPosition = new Vector2(-xNewGameButton, baseLayout.screenSafeAreaY / 2f);
                 }
                 menuNewGameButtonRect.anchoredPosition = new Vector2(xNewGameButton, baseLayout.screenSafeAreaY / 2f);
             }
@@ -97,16 +98,16 @@ public abstract class BaseUIHandler : MonoBehaviour
                 }
                 menuNewGameButtonRect.anchoredPosition = new Vector2(baseLayout.screenSafeAreaX / 2f, yNewGameButton);
             }
-            menuNewGameButtonRect.localScale = new Vector3(schaal, schaal, 1);
+            menuNewGameButtonRect.localScale = new Vector3(scale, scale, 1);
             if (menuNewGameOptionRect != null)
-                menuNewGameOptionRect.localScale = new Vector3(schaal, schaal, 1);
+                menuNewGameOptionRect.localScale = new Vector3(scale, scale, 1);
         }
         StartCoroutine(ShowMenu(appear, vertical));
     }
 
     private IEnumerator ShowMenu(bool appear, bool vertical)
     {
-        float speed = 50f;
+        const float speed = 50f;
         menuUIObj.SetActive(true);
         if (vertical)
         {
@@ -116,9 +117,11 @@ public abstract class BaseUIHandler : MonoBehaviour
                 menuUITransform.Translate(Vector3.up * speed);
                 if (menuUIRect.anchoredPosition.y > menuUIRect.sizeDelta.y / 2f)
                 {
-                    showMenuButtonRect.anchoredPosition = new Vector2(0, menuUIRect.sizeDelta.y + showMenuButtonRect.sizeDelta.y / 2f);
-                    menuUIRect.anchoredPosition = new Vector2(0, menuUIRect.sizeDelta.y / 2f);
+                    float sizeDeltaY = menuUIRect.sizeDelta.y;
+                    showMenuButtonRect.anchoredPosition = new Vector2(0, sizeDeltaY + showMenuButtonRect.sizeDelta.y / 2f);
+                    menuUIRect.anchoredPosition = new Vector2(0, sizeDeltaY / 2f);
                     StopAllCoroutines();
+                    yield break;
                 }
             }
             else
@@ -130,6 +133,7 @@ public abstract class BaseUIHandler : MonoBehaviour
                     showMenuButtonRect.anchoredPosition = new Vector2(0, Screen.safeArea.y + showMenuButtonRect.sizeDelta.y / 2f);
                     menuUIObj.SetActive(false);
                     StopAllCoroutines();
+                    yield break;
                 }
             }
         }
@@ -139,22 +143,25 @@ public abstract class BaseUIHandler : MonoBehaviour
             {
                 showMenuButtonTransform.Translate(Vector3.up * speed);
                 menuUITransform.Translate(Vector3.right * speed);
-                if (menuUIRect.anchoredPosition.x > menuUIRect.sizeDelta.x / 2f - (Screen.width / 2))
+                if (menuUIRect.anchoredPosition.x > menuUIRect.sizeDelta.x / 2f - (Screen.width / 2f))
                 {
-                    showMenuButtonRect.anchoredPosition = new Vector2(menuUIRect.sizeDelta.x - (Screen.width / 2f) + showMenuButtonRect.sizeDelta.y / 2f, Screen.height / 2f);
-                    menuUIRect.anchoredPosition = new Vector2((menuUIRect.sizeDelta.x / 2f) - (Screen.width / 2f), Screen.height / 2f);
+                    float sizeDeltaX = menuUIRect.sizeDelta.x;
+                    showMenuButtonRect.anchoredPosition = new Vector2(sizeDeltaX - (Screen.width / 2f) + showMenuButtonRect.sizeDelta.y / 2f, Screen.height / 2f);
+                    menuUIRect.anchoredPosition = new Vector2((sizeDeltaX / 2f) - (Screen.width / 2f), Screen.height / 2f);
                     StopAllCoroutines();
+                    yield break;
                 }
             }
             else
             {
                 showMenuButtonTransform.Translate(1.5f * speed * Vector3.up);
                 menuUITransform.Translate(1.5f * speed * Vector3.left);
-                if (menuUIRect.anchoredPosition.x < -menuUIRect.sizeDelta.x / 2f - (Screen.width / 2) + Screen.safeArea.x)
+                if (menuUIRect.anchoredPosition.x < -menuUIRect.sizeDelta.x / 2f - (Screen.width / 2f) + Screen.safeArea.x)
                 {
                     showMenuButtonRect.anchoredPosition = new Vector2(Screen.safeArea.x - (Screen.width / 2f) + showMenuButtonRect.sizeDelta.y / 2f, Screen.height / 2f);
                     menuUIObj.SetActive(false);
                     StopAllCoroutines();
+                    yield break;
                 }
             }
         }
@@ -190,17 +197,13 @@ public abstract class BaseUIHandler : MonoBehaviour
 
     private void OnApplicationPause(bool pause)
     {
-        if (!pause)
-        {
-            if (helpUICanvasObj != null && gameSpecificRootObj.activeInHierarchy) OpenHelpUI();
-        }
+        if (pause) return;
+        if (helpUICanvasObj != null && gameSpecificRootObj.activeInHierarchy) OpenHelpUI();
     }
 
     private void OnApplicationFocus(bool focus)
     {
-        if (!focus)
-        {
-            if (helpUICanvasObj != null && gameSpecificRootObj.activeInHierarchy) OpenHelpUI();
-        }
+        if (focus) return;
+        if (helpUICanvasObj != null && gameSpecificRootObj.activeInHierarchy) OpenHelpUI();
     }
 }

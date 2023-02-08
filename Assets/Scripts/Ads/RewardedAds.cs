@@ -1,28 +1,41 @@
+using TMPro;
 using Unity.Services.Mediation;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class RewardedAds : MonoBehaviour
 {
-    BeloningScript beloningScript;
-    AdsInitializer adsInitializer;
+    RewardHandler _rewardHandler;
+    AdsInitializer _adsInitializer;
+    [SerializeField] private Button rewardedAdButton;
 
     private void Awake()
     {
-        beloningScript = BeloningScript.Instance;
-        if (beloningScript == null) return;
-        adsInitializer = GameObject.Find("gegevensHouder").GetComponent<AdsInitializer>();
-        adsInitializer.m_AD.OnUserRewarded += OnUserRewarded;
+        Init();
+    }
+
+    private void Init()
+    {
+        _rewardHandler = RewardHandler.Instance;
+        if (_rewardHandler == null) return;
+        _adsInitializer = AdsInitializer.Instance;
+        if (_adsInitializer == null) return;
+        _adsInitializer.rewardedAds = this;
     }
 
     // Implement a method to execute when the user clicks the button.
     public void ShowAd() //Set this as OnClickListener of button
     {
-        adsInitializer.ShowRewardedAd();
+        if(_rewardHandler == null || _adsInitializer == null || _adsInitializer.rewardedAds != this) Init();
+        if (_adsInitializer == null) return;
+        rewardedAdButton.interactable = false;
+        rewardedAdButton.transform.GetChild(0).GetComponentInChildren<TMP_Text>().SetText("Loading...");
+        _adsInitializer.ShowRewardedAd();
     }
-    
-    void OnUserRewarded(object sender, RewardEventArgs e)
+
+    public void OnUserRewarded(object sender, RewardEventArgs e)
     {
         Debug.Log($"Received reward: type:{e.Type}; amount:{e.Amount}");
-        beloningScript.VerdubbelCoins();
+        _rewardHandler.DoubleCoins();
     }
 }

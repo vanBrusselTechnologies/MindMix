@@ -1,4 +1,4 @@
-public class MijnenVegerSettings : BaseSceneSettings
+public class MinesweeperSettings : BaseSceneSettings
 {
     protected override void SetSettingStartValues()
     {

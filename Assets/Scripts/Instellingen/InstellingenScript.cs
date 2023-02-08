@@ -3,7 +3,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class InstellingenScript : MonoBehaviour
@@ -26,7 +25,7 @@ public class InstellingenScript : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
-        GameObject gegevensHouder = GameObject.Find("gegevensHouder");
+        GameObject gegevensHouder = GameObject.Find("DataObject");
         if (gegevensHouder == null)
         {
             SceneManager.LoadScene("LogoEnAppOpstart");
@@ -72,11 +71,11 @@ public class InstellingenScript : MonoBehaviour
             Transform colorDropdownObj = child.Find("BGColor");
             TMP_Dropdown colorDropDown = colorDropdownObj.GetComponent<TMP_Dropdown>();
             colorDropDown.options.Clear();
-            colorDropDown.options.AddRange(achtergrondScript.gekochteColorOptionData);
+            colorDropDown.options.AddRange(achtergrondScript.boughtColorOptionData);
             Transform imageDropdownObj = child.Find("BGImage");
             TMP_Dropdown imageDropDown = imageDropdownObj.GetComponent<TMP_Dropdown>();
             imageDropDown.options.Clear();
-            imageDropDown.options.AddRange(achtergrondScript.gekochteImageOptionData);
+            imageDropDown.options.AddRange(achtergrondScript.boughtImageOptionData);
             string sceneNaam = child.gameObject.name[2..];
             int soort = saveScript.intDict["bgSoort" + sceneNaam];
             child.Find("BGSoort").GetComponent<TMP_Dropdown>().value = soort;
@@ -84,7 +83,7 @@ public class InstellingenScript : MonoBehaviour
             {
                 imageDropdownObj.gameObject.SetActive(true);
                 int bgWaarde = saveScript.intDict["bgWaarde" + sceneNaam];
-                int dropdownValue = bgWaarde >= 0 ? achtergrondScript.gekochteImageOptionData.IndexOf(achtergrondScript.imageOptionData[bgWaarde]) : -1;
+                int dropdownValue = bgWaarde >= 0 ? achtergrondScript.boughtImageOptionData.IndexOf(achtergrondScript.imageOptionData[bgWaarde]) : -1;
                 imageDropDown.value = dropdownValue;
                 colorDropdownObj.gameObject.SetActive(false);
                 colorDropDown.value = 0;
@@ -92,7 +91,7 @@ public class InstellingenScript : MonoBehaviour
             else
             {
                 int bgWaarde = saveScript.intDict["bgWaarde" + sceneNaam];
-                int dropdownValue = bgWaarde >= 0 ? achtergrondScript.gekochteColorOptionData.IndexOf(achtergrondScript.colorOptionData[bgWaarde]) : -1;
+                int dropdownValue = bgWaarde >= 0 ? achtergrondScript.boughtColorOptionData.IndexOf(achtergrondScript.colorOptionData[bgWaarde]) : -1;
                 if (bgWaarde == -1) dropdownValue = 0;
                 imageDropdownObj.gameObject.SetActive(false);
                 imageDropDown.value = 0;
@@ -119,7 +118,7 @@ public class InstellingenScript : MonoBehaviour
                 break;
             }
         }
-        gegevensScript.VeranderTaal(taalWaarde);
+        gegevensScript.ChangeLanguage(taalWaarde);
     }
 
     public void VeranderAchtergrondImg(GameObject obj)
@@ -131,14 +130,14 @@ public class InstellingenScript : MonoBehaviour
         if (sceneNaam.ToLower().Equals("all"))
         {
             int dropdownValue = dropdown.value;
-            int bgWaarde = achtergrondScript.imageOptionData.IndexOf(achtergrondScript.gekochteImageOptionData[dropdownValue]);
+            int bgWaarde = achtergrondScript.imageOptionData.IndexOf(achtergrondScript.boughtImageOptionData[dropdownValue]);
             saveScript.intDict["bgSoortAll"] = 1;
             saveScript.intDict["bgWaardeAll"] = bgWaarde;
             for (int i = 0; i < sceneNames.Count; i++)
             {
                 saveScript.intDict["bgSoort" + sceneNames[i]] = 1;
                 saveScript.intDict["bgWaarde" + sceneNames[i]] = bgWaarde;
-                gegevensScript.VeranderOpgeslagenAchtergrond(sceneNames[i].ToLower(), 1, bgWaarde);
+                gegevensScript.ChangeSavedBackground(sceneNames[i].ToLower(), 1, bgWaarde);
             }
             foreach (Transform andereDropdown in obj.transform.parent.parent)
             {
@@ -150,7 +149,7 @@ public class InstellingenScript : MonoBehaviour
         {
 
             int dropdownValue = dropdown.value;
-            int bgWaarde = achtergrondScript.imageOptionData.IndexOf(achtergrondScript.gekochteImageOptionData[dropdownValue]);
+            int bgWaarde = achtergrondScript.imageOptionData.IndexOf(achtergrondScript.boughtImageOptionData[dropdownValue]);
             if (saveScript.intDict["bgWaardeAll"] != bgWaarde || saveScript.intDict["bgSoortAll"] != 1)
             {
                 saveScript.intDict["bgWaardeAll"] = -2;
@@ -159,7 +158,7 @@ public class InstellingenScript : MonoBehaviour
             }
             saveScript.intDict["bgSoort" + sceneNaam] = 1;
             saveScript.intDict["bgWaarde" + sceneNaam] = bgWaarde;
-            gegevensScript.VeranderOpgeslagenAchtergrond(sceneNaam.ToLower(), 1, bgWaarde);
+            gegevensScript.ChangeSavedBackground(sceneNaam.ToLower(), 1, bgWaarde);
         }
     }
 
@@ -172,14 +171,14 @@ public class InstellingenScript : MonoBehaviour
         if (sceneNaam.ToLower() == "all")
         {
             int dropdownValue = dropdown.value;
-            int bgWaarde = achtergrondScript.colorOptionData.IndexOf(achtergrondScript.gekochteColorOptionData[dropdownValue]);
+            int bgWaarde = achtergrondScript.colorOptionData.IndexOf(achtergrondScript.boughtColorOptionData[dropdownValue]);
             saveScript.intDict["bgSoortAll"] = 0;
             saveScript.intDict["bgWaardeAll"] = bgWaarde;
             for (int i = 0; i < sceneNames.Count; i++)
             {
                 saveScript.intDict["bgSoort" + sceneNames[i]] = 0;
                 saveScript.intDict["bgWaarde" + sceneNames[i]] = bgWaarde;
-                gegevensScript.VeranderOpgeslagenAchtergrond(sceneNames[i].ToLower(), 0, bgWaarde);
+                gegevensScript.ChangeSavedBackground(sceneNames[i].ToLower(), 0, bgWaarde);
             }
             foreach (Transform andereDropdown in obj.transform.parent.parent)
             {
@@ -190,7 +189,7 @@ public class InstellingenScript : MonoBehaviour
         else
         {
             int dropdownValue = dropdown.value;
-            int bgWaarde = achtergrondScript.colorOptionData.IndexOf(achtergrondScript.gekochteColorOptionData[dropdownValue]);
+            int bgWaarde = achtergrondScript.colorOptionData.IndexOf(achtergrondScript.boughtColorOptionData[dropdownValue]);
             if (saveScript.intDict["bgWaardeAll"] != bgWaarde || saveScript.intDict["bgSoortAll"] != 0)
             {
                 saveScript.intDict["bgWaardeAll"] = -2;
@@ -199,7 +198,7 @@ public class InstellingenScript : MonoBehaviour
             }
             saveScript.intDict["bgSoort" + sceneNaam] = 0;
             saveScript.intDict["bgWaarde" + sceneNaam] = bgWaarde;
-            gegevensScript.VeranderOpgeslagenAchtergrond(sceneNaam.ToLower(), 0, bgWaarde);
+            gegevensScript.ChangeSavedBackground(sceneNaam.ToLower(), 0, bgWaarde);
         }
     }
 

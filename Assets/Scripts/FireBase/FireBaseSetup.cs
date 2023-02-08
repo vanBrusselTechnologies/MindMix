@@ -7,7 +7,7 @@ public class FireBaseSetup : MonoBehaviour
 {
     [HideInInspector]
     public bool ready, offline;
-    private bool eersteReadyFrame = true;
+    private bool _firstReadyFrame = true;
 
     // Start is called before the first frame update
     private void Start()
@@ -19,9 +19,9 @@ public class FireBaseSetup : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        if (ready && eersteReadyFrame)
+        if (ready && _firstReadyFrame)
         {
-            eersteReadyFrame = false;
+            _firstReadyFrame = false;
             FireBaseSettings();
             GetComponent<PlayGamesSetup>().StartSetup();
             GetComponent<FireBaseDynamicLinks>().DynamicLinkSetup();
@@ -40,12 +40,12 @@ public class FireBaseSetup : MonoBehaviour
             else
             {
                 offline = true;
-                Debug.LogError(string.Format("Could not resolve all Firebase dependencies: {0}", dependencyStatus));
+                Debug.LogError($"Could not resolve all Firebase dependencies: {dependencyStatus}");
             }
         });
     }
 
-    private void FireBaseSettings()
+    private static void FireBaseSettings()
     {
         FirebaseAuth auth = FirebaseAuth.DefaultInstance;
         auth.LanguageCode = LocalizationSettings.SelectedLocale.Identifier.Code;

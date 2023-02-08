@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using VBG.Extensions;
 
@@ -32,15 +33,15 @@ public class BaseLayout : MonoBehaviour
 
     protected ScreenOrientation screenOrientation;
 
-    private int _framesToWaitAfterScreenRotation = 1;
+    private const int FramesToWaitAfterScreenRotation = 1;
     private int _framesAfterRotation;
     private int _lastScreenWidth;
     private int _lastScreenHeight;
-    private float _lastSafezoneY;
-    private float _lastSafezoneX;
+    private float _lastSafeZoneY;
+    private float _lastSafeZoneX;
 
-    private bool isPaused;
-    private bool wasPaused;
+    private bool _isPaused;
+    private bool _wasPaused;
 
     [Header("Help UI")]
     [SerializeField] protected RectTransform helpUIOpenButtonRect;
@@ -85,18 +86,18 @@ public class BaseLayout : MonoBehaviour
     private void LateUpdate()
     {
         if (screenWidth == 0) return;
-        if (!isPaused && wasPaused)
+        if (!_isPaused && _wasPaused)
         {
             SetScreenValues();
             SetLayout();
         }
-        wasPaused = isPaused;
-        if (_lastScreenWidth == Screen.width && _lastScreenHeight == Screen.height && _lastSafezoneY == Screen.safeArea.y && _lastSafezoneX == Screen.safeArea.x)
+        _wasPaused = _isPaused;
+        if (_lastScreenWidth == Screen.width && _lastScreenHeight == Screen.height && Math.Abs(_lastSafeZoneY - Screen.safeArea.y) < 0.0001f && Math.Abs(_lastSafeZoneX - Screen.safeArea.x) < 0.0001f)
         {
-            if (_framesAfterRotation < _framesToWaitAfterScreenRotation)
+            if (_framesAfterRotation < FramesToWaitAfterScreenRotation)
             {
                 _framesAfterRotation += 1;
-                if (_framesAfterRotation == _framesToWaitAfterScreenRotation)
+                if (_framesAfterRotation == FramesToWaitAfterScreenRotation)
                 {
                     SetScreenValues();
                     SetLayout();
@@ -108,19 +109,19 @@ public class BaseLayout : MonoBehaviour
         _framesAfterRotation = 0;
         _lastScreenWidth = Screen.width;
         _lastScreenHeight = Screen.height;
-        _lastSafezoneY = Screen.safeArea.y;
-        _lastSafezoneX = Screen.safeArea.x;
+        _lastSafeZoneY = Screen.safeArea.y;
+        _lastSafeZoneX = Screen.safeArea.x;
     }
 
     private void SetScreenValues()
     {
         screenWidth = Screen.width;
         screenHeight = Screen.height;
-        Rect _safeArea = Screen.safeArea;
-        screenSafeAreaWidth = _safeArea.width;
-        screenSafeAreaHeight = _safeArea.height;
-        screenSafeAreaX = _safeArea.x;
-        screenSafeAreaY = _safeArea.y;
+        Rect safeArea = Screen.safeArea;
+        screenSafeAreaWidth = safeArea.width;
+        screenSafeAreaHeight = safeArea.height;
+        screenSafeAreaX = safeArea.x;
+        screenSafeAreaY = safeArea.y;
         screenSafeAreaXRight = screenWidth - screenSafeAreaWidth - screenSafeAreaX;
         screenSafeAreaYUp = screenHeight - screenSafeAreaHeight - screenSafeAreaY;
         screenSafeAreaCenterX = (screenSafeAreaX - screenSafeAreaXRight) / 2f;
@@ -144,19 +145,19 @@ public class BaseLayout : MonoBehaviour
     public virtual void SetLayout()
     {
         if (screenWidth == 0) SetScreenValues();
-        if (finishedGameUIObj != null && finishedGameUIObj.activeInHierarchy)
+        if (!finishedGameUIObj.Equals(null) && finishedGameUIObj.activeInHierarchy)
         {
             SetLayoutFinishedGameUI();
             return;
         }
 
-        if (helpUIObj != null && helpUIObj.activeInHierarchy)
+        if (!helpUIObj.Equals(null) && helpUIObj.activeInHierarchy)
         {
             SetLayoutHelpUI();
             return;
         }
 
-        if (settingsUIObj != null && settingsUIObj.activeInHierarchy)
+        if (!settingsUIObj.Equals(null) && settingsUIObj.activeInHierarchy)
         {
             SetLayoutSettingsUI();
             return;
@@ -188,8 +189,8 @@ public class BaseLayout : MonoBehaviour
         settingsUICloseButtonRect.localScale = new Vector2(Mathf.Min(screenSafeAreaHeight, screenSafeAreaWidth) * 0.1f, Mathf.Min(screenSafeAreaHeight, screenSafeAreaWidth) * 0.1f) / 108f;
         Vector3 scrollDownScale = new(screenSafeAreaWidth * 0.98f / 2250f, screenSafeAreaHeight * 0.85f / 950f, 1);
         settingsUIScrolldownRect.localScale = scrollDownScale;
-        float minScaleDeel = Mathf.Min(scrollDownScale.x, scrollDownScale.y);
-        Vector3 scrollDownContentScale = new(minScaleDeel / scrollDownScale.x, minScaleDeel / scrollDownScale.y, 1);
+        float minScaleValue = Mathf.Min(scrollDownScale.x, scrollDownScale.y);
+        Vector3 scrollDownContentScale = new(minScaleValue / scrollDownScale.x, minScaleValue / scrollDownScale.y, 1);
         settingsUIScrolldownContentRect.localScale = scrollDownContentScale;
         Vector3 scrollDownPosition = new(screenSafeAreaCenterX, screenSafeAreaCenterY + (screenSafeAreaHeight * 0.15f / -2f), 0);
         settingsUIScrolldownRect.anchoredPosition = scrollDownPosition;
@@ -277,11 +278,11 @@ public class BaseLayout : MonoBehaviour
 
     private void OnApplicationFocus(bool hasFocus)
     {
-        isPaused = !hasFocus;
+        _isPaused = !hasFocus;
     }
 
     private void OnApplicationPause(bool pauseStatus)
     {
-        isPaused = pauseStatus;
+        _isPaused = pauseStatus;
     }
 }

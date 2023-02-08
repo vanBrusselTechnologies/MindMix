@@ -11,105 +11,96 @@ using Color = UnityEngine.Color;
 public class Achtergrond : MonoBehaviour
 {
     [SerializeField] private Sprite voorplaat;
-    [SerializeField] private GameObject achtergrond;
     [SerializeField] private RectTransform achtergrondRect;
     [SerializeField] private Image achtergrondImg;
     [SerializeField] private GameObject lightObj;
     [SerializeField] private GameObject cameraObj;
     [SerializeField] private GameObject backgroundCanvasObj;
-    private Color wisselColor = Color.white;
-    private int klaar;
-    private bool isPaused;
-    private bool wasPaused;
-    private float vorigeScreenWidth;
-    private float vorigeSafezoneY;
-    private float vorigeSafezoneX;
-    private GegevensHouder gegevensScript;
-    [HideInInspector] public List<Color> kleuren = new();
-    private bool wisselendeKleur;
-    [HideInInspector] public bool aangepasteKleur;
-    private SaveScript saveScript;
+    private Color _color = Color.white;
+    private int _ready;
+    private bool _isPaused;
+    private bool _wasPaused;
+    private float _lastScreenWidth;
+    private float _lastSafeZoneY;
+    private float _lastSafeZoneX;
+    private GegevensHouder _gegevensScript;
+    [HideInInspector] public List<Color> colorList = new();
+    private bool _isChangingColor;
+    [HideInInspector] public bool isChangedColor;
+    private SaveScript _saveScript;
     [HideInInspector] public List<TMP_Dropdown.OptionData> colorOptionData = new();
-    private List<int> beschikbareKleuren = new();
-    [HideInInspector] public List<TMP_Dropdown.OptionData> gekochteColorOptionData = new();
+    private readonly List<int> _availableColors = new();
+    [HideInInspector] public List<TMP_Dropdown.OptionData> boughtColorOptionData = new();
     [HideInInspector] public List<TMP_Dropdown.OptionData> imageOptionData = new();
-    private List<int> beschikbareAfbeeldingen = new();
-    [HideInInspector] public List<TMP_Dropdown.OptionData> gekochteImageOptionData = new();
+    private readonly List<int> _availableImages = new();
+    [HideInInspector] public List<TMP_Dropdown.OptionData> boughtImageOptionData = new();
 
     private void Awake()
     {
-        gegevensScript = GetComponent<GegevensHouder>();
-        saveScript = GetComponent<SaveScript>();
-        List<System.Drawing.Color> listOfDrawingColours = new();
-        bool isKleur = false;
+        _gegevensScript = GetComponent<GegevensHouder>();
+        _saveScript = GetComponent<SaveScript>();
+        bool isColor = false;
         foreach (KnownColor knownColor in Enum.GetValues(typeof(KnownColor)))
         {
             System.Drawing.Color col = System.Drawing.Color.FromKnownColor(knownColor);
-            listOfDrawingColours.Add(col);
-            if (!isKleur && col.Name.Equals("AliceBlue"))
+            if (!isColor && col.Name.Equals("AliceBlue"))
             {
-                isKleur = true;
+                isColor = true;
             }
-            if (isKleur)
+
+            if (!isColor) continue;
+            colorOptionData.Add(new TMP_Dropdown.OptionData(col.Name));
+            Color color = new(col.R / 256f, col.G / 256f, col.B / 256f, col.A / 256f);
+            colorList.Add(color);
+            if (col.Name.Equals("YellowGreen"))
             {
-                colorOptionData.Add(new TMP_Dropdown.OptionData(col.Name));
-                Color color = new(col.R / 256f, col.G / 256f, col.B / 256f, col.A / 256f);
-                kleuren.Add(color);
-                if (col.Name.Equals("YellowGreen"))
-                {
-                    isKleur = false;
-                }
+                isColor = false;
             }
         }
-        foreach (Sprite afbeelding in gegevensScript.achtergronden)
+        foreach (Sprite image in _gegevensScript.achtergronden)
         {
-            imageOptionData.Add(new TMP_Dropdown.OptionData(afbeelding));
+            imageOptionData.Add(new TMP_Dropdown.OptionData(image));
         }
-        SceneManager.activeSceneChanged += OnSceneLoaded;
+        UnityEngine.SceneManagement.SceneManager.activeSceneChanged += OnSceneLoaded;
         DontDestroyOnLoad(this);
         DontDestroyOnLoad(backgroundCanvasObj);
         DontDestroyOnLoad(cameraObj);
         DontDestroyOnLoad(lightObj);
-        vorigeScreenWidth = Screen.width;
-        vorigeSafezoneY = Screen.safeArea.y;
-        vorigeSafezoneX = Screen.safeArea.x;
+        _lastScreenWidth = Screen.width;
+        _lastSafeZoneY = Screen.safeArea.y;
+        _lastSafeZoneX = Screen.safeArea.x;
     }
 
     public void StartValues()
     {
-        beschikbareKleuren.Clear();
-        beschikbareAfbeeldingen.Clear();
+        _availableColors.Clear();
+        _availableImages.Clear();
         for (int i = -1; i < 140; i++)
         {
-            if (saveScript.intDict["kleur" + i + "gekocht"] == 1)
+            if (_saveScript.intDict["kleur" + i + "gekocht"] == 1)
             {
-                beschikbareKleuren.Add(i);
+                _availableColors.Add(i);
             }
         }
         for (int i = 0; i < 50; i++)
         {
-            if (saveScript.intDict["afbeelding" + i + "gekocht"] == 1)
+            if (_saveScript.intDict["afbeelding" + i + "gekocht"] == 1)
             {
-                beschikbareAfbeeldingen.Add(i);
+                _availableImages.Add(i);
             }
         }
-        beschikbareKleuren.Sort();
-        beschikbareAfbeeldingen.Sort();
-        gekochteColorOptionData.Clear();
-        gekochteImageOptionData.Clear();
-        for (int ii = 0; ii < beschikbareKleuren.Count; ii++)
+        _availableColors.Sort();
+        _availableImages.Sort();
+        boughtColorOptionData.Clear();
+        boughtImageOptionData.Clear();
+        for (int ii = 0; ii < _availableColors.Count; ii++)
         {
-            if (beschikbareKleuren[ii] == -1)
+            boughtColorOptionData.Add(_availableColors[ii] == -1
+                ? new TMP_Dropdown.OptionData("Changing Color")
+                : colorOptionData[_availableColors[ii]]);
+            if (ii < _availableImages.Count)
             {
-                gekochteColorOptionData.Add(new TMP_Dropdown.OptionData("Changing Color"));
-            }
-            else
-            {
-                gekochteColorOptionData.Add(colorOptionData[beschikbareKleuren[ii]]);
-            }
-            if (ii < beschikbareAfbeeldingen.Count)
-            {
-                gekochteImageOptionData.Add(imageOptionData[beschikbareAfbeeldingen[ii]]);
+                boughtImageOptionData.Add(imageOptionData[_availableImages[ii]]);
             }
         }
         SetBackground();
@@ -122,51 +113,69 @@ public class Achtergrond : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!isPaused && wasPaused)
+        if (!_isPaused && _wasPaused)
         {
             SetBackground();
         }
-        wasPaused = isPaused;
-        if (aangepasteKleur)
+        _wasPaused = _isPaused;
+        if (isChangedColor)
         {
-            aangepasteKleur = false;
+            isChangedColor = false;
             SetBackground();
         }
-        if (wisselendeKleur)
+        if (_isChangingColor)
         {
             SetBackground();
         }
-        if (vorigeScreenWidth == Screen.width && vorigeSafezoneY == Screen.safeArea.y && vorigeSafezoneX == Screen.safeArea.x)
+        if (Math.Abs(_lastScreenWidth - Screen.width) < 0.0001f && Math.Abs(_lastSafeZoneY - Screen.safeArea.y) < 0.0001f && Math.Abs(_lastSafeZoneX - Screen.safeArea.x) < 0.0001f)
         {
-            if (klaar < 3)
-            {
-                klaar += 1;
-                SetBackground();
-            }
+            if (_ready >= 3) return;
+            _ready += 1;
+            SetBackground();
             return;
         }
-        klaar = 0;
-        vorigeScreenWidth = Screen.width;
-        vorigeSafezoneY = Screen.safeArea.y;
-        vorigeSafezoneX = Screen.safeArea.x;
+        _ready = 0;
+        _lastScreenWidth = Screen.width;
+        _lastSafeZoneY = Screen.safeArea.y;
+        _lastSafeZoneX = Screen.safeArea.x;
     }
 
     private void OnApplicationPause(bool pauseStatus)
     {
-        isPaused = pauseStatus;
+        _isPaused = pauseStatus;
     }
 
     private void SetBackground()
     {
-        List<int> BGList = gegevensScript.AchtergrondList();
-        wisselendeKleur = false;
-        if (BGList.Count < 2) return;
-        int bgSoort = BGList[0];
-        if (achtergrondImg)
+        List<int> bgList = _gegevensScript.GetBackgroundList();
+        _isChangingColor = false;
+        if (bgList.Count < 2) return;
+        int backgroundType = bgList[0];
+        if (!achtergrondImg) return;
+        switch (backgroundType)
         {
-            if (bgSoort == 1)
+            case 0:
             {
-                int afbInt = BGList[1];
+                int colorIndex = bgList[1];
+                achtergrondImg.sprite = _gegevensScript.spriteWit;
+                if (colorIndex == -1)
+                {
+                    _isChangingColor = true;
+                    ChangeColor(achtergrondImg, _color);
+                }
+                else
+                {
+                    achtergrondImg.color = colorList[colorIndex];
+                }
+                int width = Screen.width;
+                int height = Screen.height;
+                int sizeFactor = width > height ? width : height;
+                achtergrondRect.sizeDelta = Vector2.one * sizeFactor;
+                return;
+            }
+            case 1:
+            {
+                int afbInt = bgList[1];
                 achtergrondImg.color = Color.white;
                 float width = Screen.width;
                 float height = Screen.height;
@@ -178,7 +187,7 @@ public class Achtergrond : MonoBehaviour
                 }
                 else
                 {
-                    achtergrondImg.sprite = gegevensScript.achtergronden[afbInt];
+                    achtergrondImg.sprite = _gegevensScript.achtergronden[afbInt];
                     imgRect = achtergrondImg.sprite.rect;
                 }
                 if (imgRect.width / width < imgRect.height / height)
@@ -192,34 +201,16 @@ public class Achtergrond : MonoBehaviour
                 achtergrondRect.sizeDelta = new Vector2(width, height);
                 return;
             }
-            if (bgSoort == 0)
-            {
-                int kleurInt = BGList[1];
-                achtergrondImg.sprite = gegevensScript.spriteWit;
-                if (kleurInt == -1)
-                {
-                    wisselendeKleur = true;
-                    WisselKleur(achtergrondImg, wisselColor);
-                }
-                else
-                {
-                    achtergrondImg.color = kleuren[kleurInt];
-                }
-                int width = Screen.width;
-                int height = Screen.height;
-                int sizeFactor = width > height ? width : height;
-                achtergrondRect.sizeDelta = Vector2.one * sizeFactor;
-            }
         }
     }
 
-    private void WisselKleur(Image achtergrondImg, Color oldColor)
+    private void ChangeColor(Graphic backgroundImage, Color oldColor)
     {
         if (oldColor.Equals(Color.white))
         {
-            float tmpR = saveScript.floatDict["color.r"];
-            float tmpG = saveScript.floatDict["color.g"];
-            float tmpB = saveScript.floatDict["color.b"];
+            float tmpR = _saveScript.floatDict["color.r"];
+            float tmpG = _saveScript.floatDict["color.g"];
+            float tmpB = _saveScript.floatDict["color.b"];
             if (tmpR == 0 && tmpG == 0 && tmpB == 0)
             {
                 oldColor = Color.red;
@@ -261,39 +252,34 @@ public class Achtergrond : MonoBehaviour
             nextColor.b -= 1f / 255f;
             nextColor.b = Mathf.Max(nextColor.b, 0f);
         }
-        achtergrondImg.color = nextColor;
-        wisselColor = nextColor;
-        saveScript.floatDict["color.r"] = nextColor.r;
-        saveScript.floatDict["color.g"] = nextColor.g;
-        saveScript.floatDict["color.b"] = nextColor.b;
+        backgroundImage.color = nextColor;
+        _color = nextColor;
+        _saveScript.floatDict["color.r"] = nextColor.r;
+        _saveScript.floatDict["color.g"] = nextColor.g;
+        _saveScript.floatDict["color.b"] = nextColor.b;
     }
 
-    public void KleurGekocht(int kleurIndex)
+    public void ColorBought(int colorIndex)
     {
-        beschikbareKleuren.Add(kleurIndex);
-        beschikbareKleuren.Sort();
-        gekochteColorOptionData.Clear();
-        for (int i = 0; i < beschikbareKleuren.Count; i++)
+        _availableColors.Add(colorIndex);
+        _availableColors.Sort();
+        boughtColorOptionData.Clear();
+        foreach (var color in _availableColors)
         {
-            if (beschikbareKleuren[i] == -1)
-            {
-                gekochteColorOptionData.Add(new TMP_Dropdown.OptionData("Changing Color"));
-            }
-            else
-            {
-                gekochteColorOptionData.Add(colorOptionData[beschikbareKleuren[i]]);
-            }
+            boughtColorOptionData.Add(color == -1
+                ? new TMP_Dropdown.OptionData("Changing Color")
+                : colorOptionData[color]);
         }
     }
 
-    public void AfbeeldingGekocht(int kleurIndex)
+    public void ImageBought(int colorIndex)
     {
-        beschikbareAfbeeldingen.Add(kleurIndex);
-        beschikbareAfbeeldingen.Sort();
-        gekochteImageOptionData.Clear();
-        for (int i = 0; i < beschikbareAfbeeldingen.Count; i++)
+        _availableImages.Add(colorIndex);
+        _availableImages.Sort();
+        boughtImageOptionData.Clear();
+        foreach (var img in _availableImages)
         {
-            gekochteImageOptionData.Add(imageOptionData[beschikbareAfbeeldingen[i]]);
+            boughtImageOptionData.Add(imageOptionData[img]);
         }
     }
 }

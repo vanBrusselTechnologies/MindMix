@@ -23,10 +23,6 @@ namespace Sudoku
             _length = n;
         }
 
-        public SudokuPuzzle(string input) : this(input.Select(c => Char.IsDigit(c) ? c - '0' : 0).ToArray())
-        {
-        }
-
         private SudokuPuzzle(int[] input) : this((int)Math.Sqrt(input.Length))
         {
             for (var i = 0; i < input.Length; i++)

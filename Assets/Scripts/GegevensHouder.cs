@@ -4,7 +4,6 @@ using Firebase.Auth;
 using UnityEngine;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
-using UnityEngine.SceneManagement;
 
 public class GegevensHouder : MonoBehaviour
 {
@@ -12,21 +11,21 @@ public class GegevensHouder : MonoBehaviour
     bool _testBuild;
     [HideInInspector] public bool startNewGame;
     public Texture2D zwart;
-    private bool isPaused;
-    private bool wasPaused;
+    private bool _isPaused;
+    private bool _wasPaused;
     public WaitForSecondsRealtime wachtHonderdste = new(0.01f);
-    public RuntimePlatform platform;
     public List<Sprite> achtergronden;
     public Sprite spriteWit;
-    private List<int> achtergrondSudoku = new() { 0, -2 };
-    private List<int> achtergrondMenu = new() { 0, -2 };
-    private List<int> achtergrond2048 = new() { 0, -2 };
-    private List<int> achtergrondMV = new() { 0, -2 };
-    private List<int> achtergrondSolitaire = new() { 0, -2 };
-    private List<int> achtergrondColorSort = new() { 0, -2 };
-    private Achtergrond bgScript;
-    private SaveScript saveScript;
-    [HideInInspector] public bool loginWarningGehad;
+    private readonly List<int> _backgroundSudoku = new() { 0, -2 };
+    private readonly List<int> _backgroundMenu = new() { 0, -2 };
+    private readonly List<int> _background2048 = new() { 0, -2 };
+    private readonly List<int> _backgroundMinesweeper = new() { 0, -2 };
+    private readonly List<int> _backgroundSolitaire = new() { 0, -2 };
+    private readonly List<int> _backgroundColorSort = new() { 0, -2 };
+    private Achtergrond _bgScript;
+    private SaveScript _saveScript;
+    [HideInInspector] public bool isLoginWarned;
+    [HideInInspector] public int currentSelectedGameWheelIndex;
 
     private void Awake()
     {
@@ -35,15 +34,17 @@ public class GegevensHouder : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
         Instance = this;
+        DontDestroyOnLoad(this);
         if (Application.platform == RuntimePlatform.WindowsEditor || true)
         {
             _testBuild = true;
         }
-        bgScript = GetComponent<Achtergrond>();
-        saveScript = GetComponent<SaveScript>();
+
+        _bgScript = GetComponent<Achtergrond>();
+        _saveScript = GetComponent<SaveScript>();
         Application.targetFrameRate = Mathf.Min(30, Screen.currentResolution.refreshRate);
-        DontDestroyOnLoad(this);
     }
 
     private void Start()
@@ -52,113 +53,133 @@ public class GegevensHouder : MonoBehaviour
         {
             Debug.unityLogger.logEnabled = false;
         }
-        ZetGegevens();
-        saveScript.longDict["laatsteLogin"] = DateTime.UtcNow.Ticks;
+
+        SetData();
+        _saveScript.longDict["laatsteLogin"] = DateTime.UtcNow.Ticks;
     }
 
-    private bool gewisseldeKleur;
+    private bool _changedColor;
+
     // Update is called once per frame
     private void Update()
     {
-        if (!isPaused && wasPaused)
+        if (!_isPaused && _wasPaused) SetData();
+        if (_changedColor)
         {
-            ZetGegevens();
+            _changedColor = false;
+            _bgScript.isChangedColor = true;
         }
-        wasPaused = isPaused;
-        if (gewisseldeKleur)
-        {
-            gewisseldeKleur = false;
-            bgScript.aangepasteKleur = true;
-        }
+
+        _wasPaused = _isPaused;
     }
 
-    public List<int> AchtergrondList(string sceneNaam = "noscene")
+    public List<int> GetBackgroundList(string sceneName = "noscene")
     {
-        if (sceneNaam.Equals("noscene"))
+        if (sceneName.Equals("noscene"))
         {
-            sceneNaam = SceneManager.GetActiveScene().name.ToLower();
+            sceneName = SceneManager.GetActiveScene().name.ToLower();
         }
+
         List<int> list = new() { -1000, -1000 };
-        switch (sceneNaam)
+        switch (sceneName)
         {
-            case "sudoku": list = achtergrondSudoku; break;
-            case "spellenoverzicht": list = achtergrondMenu; break;
-            case "2048": list = achtergrond2048; break;
-            case "mijnenveger": list = achtergrondMV; break;
-            case "solitaire": list = achtergrondSolitaire; break;
-            case "colorsort": list = achtergrondColorSort; break;
-            case "inlogenvoorplaatapp": list = new List<int> { 1, -1 }; break;
-            case "instellingen": list = achtergrondMenu; break;
-            case "shop": list = achtergrondMenu; break;
+            case "sudoku":
+                list = _backgroundSudoku;
+                break;
+            case "spellenoverzicht":
+                list = _backgroundMenu;
+                break;
+            case "2048":
+                list = _background2048;
+                break;
+            case "mijnenveger":
+                list = _backgroundMinesweeper;
+                break;
+            case "solitaire":
+                list = _backgroundSolitaire;
+                break;
+            case "colorsort":
+                list = _backgroundColorSort;
+                break;
+            case "inlogenvoorplaatapp":
+                list = new List<int> { 1, -1 };
+                break;
+            case "instellingen":
+                list = _backgroundMenu;
+                break;
+            case "shop":
+                list = _backgroundMenu;
+                break;
         }
+
         return list;
     }
 
-    public void VeranderOpgeslagenAchtergrond(string sceneNaam, int bgSoort, int waarde)
+    public void ChangeSavedBackground(string sceneName, int backgroundType, int value)
     {
-        gewisseldeKleur = true;
-        switch (sceneNaam)
+        _changedColor = true;
+        switch (sceneName)
         {
             case "sudoku":
-                achtergrondSudoku[0] = bgSoort;
-                achtergrondSudoku[1] = waarde;
+                _backgroundSudoku[0] = backgroundType;
+                _backgroundSudoku[1] = value;
                 break;
             case "menu":
-                achtergrondMenu[0] = bgSoort;
-                achtergrondMenu[1] = waarde;
+                _backgroundMenu[0] = backgroundType;
+                _backgroundMenu[1] = value;
                 break;
             case "2048":
-                achtergrond2048[0] = bgSoort;
-                achtergrond2048[1] = waarde;
+                _background2048[0] = backgroundType;
+                _background2048[1] = value;
                 break;
             case "mijnenveger":
-                achtergrondMV[0] = bgSoort;
-                achtergrondMV[1] = waarde;
+                _backgroundMinesweeper[0] = backgroundType;
+                _backgroundMinesweeper[1] = value;
                 break;
             case "solitaire":
-                achtergrondSolitaire[0] = bgSoort;
-                achtergrondSolitaire[1] = waarde;
+                _backgroundSolitaire[0] = backgroundType;
+                _backgroundSolitaire[1] = value;
                 break;
             case "colorsort":
-                achtergrondColorSort[0] = bgSoort;
-                achtergrondColorSort[1] = waarde;
+                _backgroundColorSort[0] = backgroundType;
+                _backgroundColorSort[1] = value;
                 break;
         }
     }
 
-    public void VeranderTaal(int taalWaarde)
+    public void ChangeLanguage(int languageValue)
     {
-        if (taalWaarde == -1)
+        if (languageValue == -1)
         {
             return;
         }
-        saveScript.stringDict["taal"] = LocalizationSettings.AvailableLocales.Locales[taalWaarde].LocaleName;
-        LocalizationSettings.SelectedLocale = LocalizationSettings.AvailableLocales.Locales[taalWaarde];
+
+        _saveScript.stringDict["taal"] = LocalizationSettings.AvailableLocales.Locales[languageValue].LocaleName;
+        LocalizationSettings.SelectedLocale = LocalizationSettings.AvailableLocales.Locales[languageValue];
         FirebaseAuth.DefaultInstance.LanguageCode = LocalizationSettings.SelectedLocale.Identifier.Code;
     }
 
     private void OnApplicationPause(bool pauseStatus)
     {
-        isPaused = pauseStatus;
+        _isPaused = pauseStatus;
     }
 
-    private void ZetGegevens()
+    private void SetData()
     {
-        platform = Application.platform;
         zwart = new Texture2D(1, 1);
         zwart.SetPixel(0, 0, Color.black);
         zwart.Apply();
-        ZetTaal();
+        SetLanguage();
     }
 
-    public void ZetTaal()
+    public void SetLanguage()
     {
-        if (saveScript.stringDict["taal"] != "")
+        if (_saveScript.stringDict["taal"] != "")
         {
             LocalizationSettings.InitializationOperation.WaitForCompletion();
             foreach (Locale locale in LocalizationSettings.AvailableLocales.Locales)
             {
-                if (locale.LocaleName.Equals(saveScript.stringDict["taal"]))
+                if (locale.LocaleName.Equals(_saveScript.stringDict["taal"]))
                 {
                     LocalizationSettings.SelectedLocale = locale;
                     break;
@@ -170,21 +191,20 @@ public class GegevensHouder : MonoBehaviour
             LocalizationSettings.InitializationOperation.WaitForCompletion();
             foreach (Locale locale in LocalizationSettings.AvailableLocales.Locales)
             {
-                if (locale.LocaleName.Equals(LocalizationSettings.SelectedLocale.LocaleName))
-                {
-                    saveScript.stringDict["taal"] = locale.LocaleName;
-                    break;
-                }
+                if (!locale.LocaleName.Equals(LocalizationSettings.SelectedLocale.LocaleName)) continue;
+                _saveScript.stringDict["taal"] = locale.LocaleName;
+                break;
             }
         }
     }
 
-    public void ZetAchtergronden()
+    public void SetBackground()
     {
         List<string> sceneNames = new() { "All", "Sudoku", "Solitaire", "2048", "Mijnenveger", "Menu", "ColorSort" };
         foreach (string sceneName in sceneNames)
         {
-            VeranderOpgeslagenAchtergrond(sceneName.ToLower(), saveScript.intDict["bgSoort" + sceneName], saveScript.intDict["bgWaarde" + sceneName]);
+            ChangeSavedBackground(sceneName.ToLower(), _saveScript.intDict["bgSoort" + sceneName],
+                _saveScript.intDict["bgWaarde" + sceneName]);
         }
     }
 }

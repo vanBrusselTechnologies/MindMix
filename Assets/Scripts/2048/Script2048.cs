@@ -11,7 +11,7 @@ public class Script2048 : MonoBehaviour
     private Layout2048 layout2048;
     private GegevensHouder gegevensHouder;
     private SaveScript saveScript;
-    private BeloningScript beloningScript;
+    private RewardHandler _rewardHandler;
 
     [SerializeField] private Transform speelVeld;
     [SerializeField] private Button button;
@@ -66,7 +66,7 @@ public class Script2048 : MonoBehaviour
             return;
         }
         saveScript = SaveScript.Instance;
-        beloningScript = BeloningScript.Instance;
+        _rewardHandler = RewardHandler.Instance;
         layout2048 = GetComponent<Layout2048>();
         Physics.autoSimulation = false;
         Physics.Simulate(1000000f);
@@ -236,7 +236,7 @@ public class Script2048 : MonoBehaviour
                     saveScript.intDict["2048sGespeeld"] += 1;
                     saveScript.intDict["2048Grootte" + grootte + "Gespeeld"] += 1;
                     float score = ((IntVariable)scoreText.StringReference["score"]).Value;
-                    beloningText.text = beloningScript.Beloning(scene: scene, difficulty: grootte, score: score, doelwitText: beloningText).ToString();
+                    beloningText.text = _rewardHandler.Beloning(scene: scene, difficulty: grootte, score: score, doelwitText: beloningText).ToString();
                     OpenGehaaldCanvas();
                 }
             }

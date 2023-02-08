@@ -101,15 +101,16 @@ public class ShareScreenshot : MonoBehaviour
 
     private IEnumerable CreateScreenshotOfObject(GameObject objToCapture, GameObject objToRenderOn)
     {
+        Camera cam = Camera.main;
         yield return new WaitForEndOfFrame();
         Texture2D texture = ScreenCapture.CaptureScreenshotAsTexture(1);
         Transform tf = objToCapture.transform;
         Vector3 scale = tf.localScale;
-        float scaleXInPixels = ScreenExt.UnitsToPixels(scale.x);
-        float scaleYInPixels = ScreenExt.UnitsToPixels(scale.y);
+        float scaleXInPixels = ScreenExt.UnitsToPixels(scale.x, cam);
+        float scaleYInPixels = ScreenExt.UnitsToPixels(scale.y, cam);
         Vector3 pos = tf.position;
-        float posXInPixels = ScreenExt.UnitsToPixels(pos.x + ScreenExt.PixelsToUnits(Screen.width) / 2f);
-        float posYInPixels = ScreenExt.UnitsToPixels(pos.y + ScreenExt.PixelsToUnits(Screen.height) / 2f);
+        float posXInPixels = ScreenExt.UnitsToPixels(pos.x + ScreenExt.PixelsToUnits(Screen.width, cam) / 2f, cam);
+        float posYInPixels = ScreenExt.UnitsToPixels(pos.y + ScreenExt.PixelsToUnits(Screen.height, cam) / 2f, cam);
         Rect rect = new(posXInPixels - (scaleXInPixels / 2f), posYInPixels - (scaleYInPixels / 2f), scaleXInPixels, scaleYInPixels);
         Sprite sprite = Sprite.Create(texture, rect, Vector2.one / 2f);
         objToRenderOn.GetComponent<Image>().sprite = sprite;

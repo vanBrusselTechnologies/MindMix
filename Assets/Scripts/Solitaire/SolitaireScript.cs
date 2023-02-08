@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 public class SolitaireScript : MonoBehaviour
 {
     private GegevensHouder gegevensHouder;
-    private BeloningScript beloningScript;
+    private RewardHandler _rewardHandler;
     private SaveScript saveScript;
     private SolitaireLayout solitaireLayout;
     private KnoppenScriptSolitaire knoppenScript;
@@ -69,7 +69,7 @@ public class SolitaireScript : MonoBehaviour
             return;
         }
         saveScript = SaveScript.Instance;
-        beloningScript = BeloningScript.Instance;
+        _rewardHandler = RewardHandler.Instance;
         solitaireLayout = GetComponent<SolitaireLayout>();
         knoppenScript = GetComponent<KnoppenScriptSolitaire>();
         if (gegevensHouder.startNewGame)
@@ -118,7 +118,7 @@ public class SolitaireScript : MonoBehaviour
                 float tijd = saveScript.floatDict["SolitaireTijd"];
                 saveScript.floatDict["SolitaireSnelsteTijd"] = Mathf.Min(saveScript.floatDict["SolitaireSnelsteTijd"], tijd);
                 saveScript.intDict["SolitairesGespeeld"] += 1;
-                beloningText.text = beloningScript.Beloning(scene: scene, score: tijd, doelwitText: beloningText).ToString();
+                beloningText.text = _rewardHandler.Beloning(scene: scene, score: tijd, doelwitText: beloningText).ToString();
                 knoppenScript.MaakSolitaireAf();
                 return;
             }

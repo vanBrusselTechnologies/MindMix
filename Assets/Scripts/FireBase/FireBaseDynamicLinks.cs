@@ -1,7 +1,6 @@
 using System;
 using Firebase.DynamicLinks;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class FireBaseDynamicLinks : MonoBehaviour
 {
@@ -11,7 +10,7 @@ public class FireBaseDynamicLinks : MonoBehaviour
     }
 
     // Display the dynamic link received by the application.
-    void OnDynamicLink(object sender, EventArgs args)
+    static void OnDynamicLink(object sender, EventArgs args)
     {
         ReceivedDynamicLinkEventArgs dynamicLinkEventArgs = args as ReceivedDynamicLinkEventArgs;
         string url = dynamicLinkEventArgs?.ReceivedDynamicLink.Url.OriginalString;
@@ -21,7 +20,7 @@ public class FireBaseDynamicLinks : MonoBehaviour
         if (link.StartsWith("scene")) OpenScene(link);
     }
 
-    private string GetLinkFromUrl(string url)
+    private static string GetLinkFromUrl(string url)
     {
         if (!url.StartsWith("https://play.google.com/store/apps/details?link=")) return "";
         url = url[48..];
@@ -30,19 +29,10 @@ public class FireBaseDynamicLinks : MonoBehaviour
         return url;
     }
 
-    private void OpenScene(string link)
+    private static void OpenScene(string link)
     {
         link = link[5..];
-        string scene;
-        if (link.Contains('\\'))
-        {
-            scene = link.Split('\\')[0];
-            SceneManager.LoadScene(scene);
-        }
-        else
-        {
-            scene = link;
-            SceneManager.LoadScene(scene);
-        }
+        string scene = link.Contains('\\') ? link.Split('\\')[0] : link;
+        SceneManager.LoadScene(scene);
     }
 }

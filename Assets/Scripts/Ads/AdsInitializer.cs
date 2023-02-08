@@ -1,28 +1,68 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using GoogleMobileAds.Api;
 using Unity.Services.Core;
 using Unity.Services.Mediation;
 using UnityEngine;
 
 public class AdsInitializer : MonoBehaviour
 {
+    public static AdsInitializer Instance;
     [SerializeField] private string androidGameId;
     [SerializeField] private string iOsGameId;
     private string _gameId;
     private bool _isInitialized;
-    [HideInInspector] public bool adLoaded;
-    public IRewardedAd m_AD { get; private set; }
+    private bool _waitingForAd;
+    private bool _adLoaded;
+    private int _adCountSinceAppOpen;
+    private bool _callbackSet;
+    private bool _waitingForNetwork;
+    private bool _showAfterLoad;
+    [HideInInspector] public RewardedAds rewardedAds;
+    private IRewardedAd _rewardedAd;
 
     #region Initialization
+
+    private void Awake()
+    {
+        if (Instance != null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+    }
 
     private void Start()
     {
         InitializeAds();
-        StartCoroutine(ReInitialize());
     }
 
-    private async void InitializeAds()
+    private static void InitAdMob(InitializationStatus initStatus)
+    {
+        Dictionary<string, AdapterStatus> map = initStatus.getAdapterStatusMap();
+        foreach ((string className, AdapterStatus status) in map)
+        {
+            switch (status.InitializationState)
+            {
+                case AdapterState.NotReady:
+                    // The adapter initialization did not complete.
+                    Debug.LogWarning("Adapter: " + className + " not ready.");
+                    break;
+                case AdapterState.Ready:
+                    // The adapter was successfully initialized.
+                    Debug.Log("Adapter: " + className + " is initialized.");
+                    break;
+            }
+        }
+
+        Debug.Log("MobileAds initialized");
+    }
+
+    private async void InitUnityAds()
     {
         try
         {
@@ -40,12 +80,10 @@ public class AdsInitializer : MonoBehaviour
         }
     }
 
-    IEnumerator ReInitialize()
+    private void InitializeAds()
     {
-        yield return new WaitForSecondsRealtime(30f);
-        if (_isInitialized) yield break;
-        InitializeAds();
-        StartCoroutine(ReInitialize());
+        MobileAds.Initialize(InitAdMob);
+        InitUnityAds();
     }
 
     private void OnInitializationComplete()
@@ -63,17 +101,24 @@ public class AdsInitializer : MonoBehaviour
         }
 
         Debug.Log($"UnityAds InitializationError: {initializationError}: {e.Message}");
+        StartCoroutine(WaitForNetwork(-1));
     }
 
     #endregion
 
-    public async void LoadRewardedAd()
+    #region LoadAd
+
+    private async void LoadRewardedAd()
     {
+        if (!_isInitialized) return;
+        if (_rewardedAd != null) return;
+        _callbackSet = false;
+        _adLoaded = false;
         string rewardedAdUnitId = (Application.platform == RuntimePlatform.IPhonePlayer)
             ? "iOS_Rewarded"
             : "Android_Rewarded";
         IRewardedAd rewardedAd = MediationService.Instance.CreateRewardedAd(rewardedAdUnitId);
-        m_AD = rewardedAd;
+        _rewardedAd = rewardedAd;
         try
         {
             rewardedAd.OnLoaded += OnUnityAdsAdLoaded;
@@ -83,6 +128,12 @@ public class AdsInitializer : MonoBehaviour
             rewardedAd.OnClicked += OnUnityAdsShowClick;
             rewardedAd.OnClosed += OnUnityAdsClosed;
             rewardedAd.OnUserRewarded += OnUserRewarded;
+            if (rewardedAds != null)
+            {
+                _callbackSet = true;
+                rewardedAd.OnUserRewarded += rewardedAds.OnUserRewarded;
+            }
+
             await rewardedAd.LoadAsync();
         }
         catch (LoadFailedException e)
@@ -91,29 +142,43 @@ public class AdsInitializer : MonoBehaviour
         }
     }
 
+    #endregion
+
     #region ShowAd
 
     async Task WaitForAdLoaded()
     {
         await Task.Run(() =>
         {
-            while (!adLoaded)
+            _waitingForAd = true;
+            while (!_adLoaded)
             {
             }
+
+            _waitingForAd = false;
         });
     }
 
     public async void ShowRewardedAd()
     {
-        if (m_AD.AdState != AdState.Loaded)
-        {
-            if (m_AD.AdState == AdState.Unloaded) LoadRewardedAd();
-            await WaitForAdLoaded();
-        }
-
         try
         {
-            await m_AD.ShowAsync();
+            if (_rewardedAd.AdState == AdState.Showing) return;
+            if (_rewardedAd.AdState != AdState.Loaded)
+            {
+                if (_rewardedAd.AdState == AdState.Unloaded) LoadRewardedAd();
+                if (_waitingForAd) return;
+                await WaitForAdLoaded();
+            }
+
+            if (rewardedAds == null) return;
+            if (!_callbackSet)
+            {
+                _callbackSet = true;
+                _rewardedAd.OnUserRewarded += rewardedAds.OnUserRewarded;
+            }
+
+            await _rewardedAd.ShowAsync();
         }
         catch (Exception e)
         {
@@ -127,41 +192,106 @@ public class AdsInitializer : MonoBehaviour
 
     void OnUnityAdsAdLoaded(object sender, EventArgs e)
     {
-        Debug.Log("Ad Load Success");
-        adLoaded = true;
+        _adLoaded = true;
+        if (_showAfterLoad) ShowRewardedAd();
+        _showAfterLoad = false;
     }
 
-    void OnUnityAdsFailedToLoad(object sender, LoadErrorEventArgs e)
+    private void OnUnityAdsFailedToLoad(object sender, LoadErrorEventArgs e)
     {
-        Debug.Log($"{e.Error}:{e.Message}");
+        _adLoaded = false;
+        _rewardedAd = null;
+        switch (e.Error)
+        {
+            case LoadError.NoFill:
+                LoadRewardedAd();
+                break;
+            case LoadError.NetworkError:
+                StartCoroutine(WaitForNetwork(0));
+                break;
+            case LoadError.SdkNotInitialized:
+                break;
+            case LoadError.AdUnitLoading:
+                _adLoaded = false;
+                break;
+            case LoadError.AdUnitShowing: break;
+            case LoadError.MissingMandatoryMemberValues:
+            case LoadError.TooManyLoadRequests:
+            case LoadError.Unknown:
+            default:
+                Debug.Log($"{e.Error}:{e.Message}");
+                break;
+        }
     }
 
-    void OnUnityAdsShowFailure(object sender, ShowErrorEventArgs args)
+    private void OnUnityAdsShowFailure(object sender, ShowErrorEventArgs e)
     {
-        Debug.Log($"Ad failed to show: {args.Error}");
+        switch (e.Error)
+        {
+            case ShowError.AdNotLoaded:
+                _rewardedAd = null;
+                LoadRewardedAd();
+                break;
+            case ShowError.AdNetworkError:
+                StartCoroutine(WaitForNetwork(1));
+                break;
+            case ShowError.Unknown:
+            case ShowError.InvalidActivity:
+            default:
+                Debug.Log($"Ad failed to show: {e.Error}:{e.Message}");
+                break;
+        }
     }
 
     void OnUnityAdsShowStart(object sender, EventArgs args)
     {
-        Debug.Log("Ad shown successfully.");
-        adLoaded = false;
+        _adLoaded = false;
     }
 
-    void OnUnityAdsShowClick(object sender, EventArgs e)
+    private static void OnUnityAdsShowClick(object sender, EventArgs e)
     {
-        Debug.Log("Ad show clicked");
     }
 
     void OnUnityAdsClosed(object sender, EventArgs e)
     {
-        Debug.Log("Ad Closed");
+        _rewardedAd = null;
         LoadRewardedAd();
+#if UNITY_ANDROID && !UNITY_EDITOR
+        _adCountSinceAppOpen += 1;
+        if (_adCountSinceAppOpen == 3)
+            GameObject.Find("GoogleScriptsObj").GetComponent<InAppReview>().RequestInAppReview();
+#endif
     }
 
-    void OnUserRewarded(object sender, RewardEventArgs e)
+    private static void OnUserRewarded(object sender, RewardEventArgs e)
     {
-        Debug.Log("Ad - User rewarded");
     }
 
     #endregion
+
+    IEnumerator WaitForNetwork(int type)
+    {
+        if (_waitingForNetwork) yield break;
+        _waitingForNetwork = true;
+        yield return new WaitForSecondsRealtime(15f);
+        _waitingForNetwork = false;
+        if (Application.internetReachability == NetworkReachability.NotReachable)
+            yield return StartCoroutine(WaitForNetwork(type));
+        if (_isInitialized) yield break;
+        switch (type)
+        {
+            case -1:
+                Debug.Log("WaitForNetwork {-1}");
+                InitializeAds();
+                break;
+            case 0:
+                Debug.Log("WaitForNetwork {0}");
+                LoadRewardedAd();
+                break;
+            case 1:
+                Debug.Log("WaitForNetwork {1}");
+                ShowRewardedAd();
+                break;
+        }
+    }
 }

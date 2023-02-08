@@ -2,7 +2,6 @@ using Firebase.Auth;
 using UnityEngine;
 using UnityEngine.Localization;
 using UnityEngine.Networking;
-using UnityEngine.SceneManagement;
 
 public class SupportScript : MonoBehaviour
 {

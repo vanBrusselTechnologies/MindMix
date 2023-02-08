@@ -48904,6 +48904,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d68f26ddd6851294e89e457b52e34f7a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sudokuUIHandler: {fileID: 2022518273}
+  sudokuLayout: {fileID: 2022518274}
   finishedCanvas: {fileID: 1501461889}
   sudokuCanvas: {fileID: 1814864594}
   generalCanvas: {fileID: 1498580089}
@@ -49169,6 +49171,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63bc055c6ef96604dab4e3d5269f57ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  baseLayout: {fileID: 2022518274}
   menuUIObj: {fileID: 593994385}
   menuUITransform: {fileID: 593994386}
   menuUIRect: {fileID: 593994386}
@@ -49183,13 +49186,13 @@ MonoBehaviour:
   gameSpecificRootObj: {fileID: 1814864594}
   settingsCanvasObj: {fileID: 1866116073}
   finishedGameUIObj: {fileID: 1501461889}
-  backgroundNumberEnterButtonObj: {fileID: 906606001}
+  sudokuGameHandler: {fileID: 2022518272}
+  backgroundNumberEnterButtonTf: {fileID: 906606002}
   dropdown: {fileID: 461471464}
   normalNumberEnterButtonMesh: {fileID: 915747440}
   noteNumberEnterButtonMesh: {fileID: 325637441}
   cellInputButtons: []
   cellInputButtonTexts: []
-  sudokuGameHandler: {fileID: 2022518272}
 --- !u!114 &2022518274
 MonoBehaviour:
   m_ObjectHideFlags: 0

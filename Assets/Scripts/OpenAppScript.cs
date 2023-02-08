@@ -1,13 +1,9 @@
 using Firebase.Auth;
-using GooglePlayGames;
-using GooglePlayGames.BasicApi;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class OpenAppScript : MonoBehaviour
 {
-    [SerializeField] private GameObject naarMenuKnop;
     [SerializeField] private GameObject playGamesLoginObj;
     [SerializeField] private GameObject warningObj;
     [SerializeField] private Toggle dontShowLoginWarningToggle;
@@ -69,7 +65,9 @@ public class OpenAppScript : MonoBehaviour
         {
             if (FirebaseAuth.DefaultInstance.CurrentUser == null)
             {
+#if UNITY_ANDROID && !UNITY_EDITOR
                 playGamesLoginObj.SetActive(true);
+#endif
             }
 
             _animatieWasKlaar = true;
@@ -87,7 +85,7 @@ public class OpenAppScript : MonoBehaviour
         FirebaseUser user = FirebaseAuth.DefaultInstance.CurrentUser;
         if (user != null)
             SceneManager.LoadScene("SpellenOverzicht");
-        else if (_gegevensScript.loginWarningGehad || PlayerPrefs.GetInt("dontShowLoginWarning", 0) == 1)
+        else if (_gegevensScript.isLoginWarned || PlayerPrefs.GetInt("dontShowLoginWarning", 0) == 1)
             ContinueWithoutLogin();
         else
             OpenNotLoggedInWarning();
@@ -96,7 +94,7 @@ public class OpenAppScript : MonoBehaviour
     public void ContinueWithoutLogin()
     {
         PlayerPrefs.SetInt("dontShowLoginWarning", dontShowLoginWarningToggle.isOn ? 1 : 0);
-        _gegevensScript.loginWarningGehad = true;
+        _gegevensScript.isLoginWarned = true;
         SceneManager.LoadScene("SpellenOverzicht");
     }
 

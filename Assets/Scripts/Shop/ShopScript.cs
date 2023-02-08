@@ -2,12 +2,11 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Localization;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class ShopScript : MonoBehaviour
 {
-    private BeloningScript beloningScript;
+    private RewardHandler _rewardHandler;
     private GegevensHouder gegevensScript;
     private SaveScript saveScript;
     private Achtergrond achtergrondScript;
@@ -48,7 +47,7 @@ public class ShopScript : MonoBehaviour
 
     private void Start()
     {
-        GameObject gegevensHouder = GameObject.Find("gegevensHouder");
+        GameObject gegevensHouder = GameObject.Find("DataObject");
         if (gegevensHouder == null)
         {
             SceneManager.LoadScene("LogoEnAppOpstart");
@@ -56,7 +55,7 @@ public class ShopScript : MonoBehaviour
         }
         gegevensScript = GegevensHouder.Instance;
         saveScript = SaveScript.Instance;
-        beloningScript = BeloningScript.Instance;
+        _rewardHandler = RewardHandler.Instance;
         achtergrondScript = gegevensHouder.GetComponent<Achtergrond>();
         shopLayout = GetComponent<ShopLayout>();
         ZetShopItems();
@@ -127,7 +126,7 @@ public class ShopScript : MonoBehaviour
             }
             else
             {
-                infoDeelItemAfbeelding.color = achtergrondScript.kleuren[kleurIndex];
+                infoDeelItemAfbeelding.color = achtergrondScript.colorList[kleurIndex];
             }
             infoDeelItemAfbeeldingMidden.gameObject.SetActive(false);
             infoDeelItemAfbeelding.gameObject.SetActive(true);
@@ -157,12 +156,12 @@ public class ShopScript : MonoBehaviour
     {
         if (saveScript.intDict["munten"] >= prijs)
         {
-            beloningScript.GeefMuntenUit(prijs);
+            _rewardHandler.SpendCoins(prijs);
             infoEnKoopDeelObj.SetActive(false);
             if (naam.StartsWith("kleur"))
             {
                 int kleurIndex = int.Parse(naam.Split("kleur")[1]);
-                achtergrondScript.KleurGekocht(kleurIndex);
+                achtergrondScript.ColorBought(kleurIndex);
                 saveScript.intDict["kleur" + kleurIndex + "gekocht"] = 1;
                 for (int i = 0; i < bgColorItems.Count; i++)
                 {
@@ -179,7 +178,7 @@ public class ShopScript : MonoBehaviour
             else if (naam.StartsWith("afbeelding"))
             {
                 int afbeeldingIndex = int.Parse(naam.Split("afbeelding")[1]);
-                achtergrondScript.AfbeeldingGekocht(afbeeldingIndex);
+                achtergrondScript.ImageBought(afbeeldingIndex);
                 saveScript.intDict["afbeelding" + afbeeldingIndex + "gekocht"] = 1;
                 for (int i = 0; i < bgImgItems.Count; i++)
                 {

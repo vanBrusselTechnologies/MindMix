@@ -13,23 +13,24 @@ public class SaveScript : MonoBehaviour
     Achtergrond achtergrond;
     GegevensHouder gegevensHouder;
     [HideInInspector] public bool ready;
-    private List<string> sceneNames = new() { "Sudoku", "Solitaire", "2048", "Mijnenveger", "Menu", "ColorSort" };
+    private readonly List<string> sceneNames = new() { "Sudoku", "Solitaire", "2048", "Mijnenveger", "Menu", "ColorSort" };
     public Dictionary<string, int> intDict = new();
     public Dictionary<string, string> stringDict = new();
     public Dictionary<string, float> floatDict = new();
     public Dictionary<string, long> longDict = new();
-    private List<string> userLongNames = new();
-    private List<string> userIntNames = new();
-    private List<string> SudokuIntNames = new();
-    private List<string> SudokuStringNames = new();
-    private List<string> SolitaireIntNames = new();
-    private List<string> SolitaireFloatNames = new();
-    private List<string> MijnenVegerIntNames = new();
-    private List<string> intNames2048 = new();
-    private List<string> SettingsStringNames = new();
-    private List<string> SettingsIntNames = new();
-    private List<string> AchtergrondFloatNames = new();
-    private List<string> gekochteItems = new();
+    private readonly List<string> userLongNames = new();
+    private readonly List<string> userIntNames = new();
+    private readonly List<string> SudokuIntNames = new();
+    private readonly List<string> SudokuStringNames = new();
+    private readonly List<string> SolitaireIntNames = new();
+    private readonly List<string> SolitaireFloatNames = new();
+    private readonly List<string> MijnenVegerIntNames = new();
+    private readonly List<string> MijnenVegerStringNames = new();
+    private readonly List<string> intNames2048 = new();
+    private readonly List<string> SettingsStringNames = new();
+    private readonly List<string> SettingsIntNames = new();
+    private readonly List<string> AchtergrondFloatNames = new();
+    private readonly List<string> gekochteItems = new();
 
     // Start is called before the first frame update
     private void Awake()
@@ -103,7 +104,12 @@ public class SaveScript : MonoBehaviour
 
         //Mijnenveger
         //Int
-        MijnenVegerIntNames.Add("difficultyMijnenVeger");
+        MijnenVegerIntNames.Add("MinesweeperDifficulty");
+        //SudokuIntNames.Add("Minesweeper ????"); //settings
+        //String
+        MijnenVegerStringNames.Add("MinesweeperMines");
+        MijnenVegerStringNames.Add("MinesweeperInput");
+        /*
         MijnenVegerIntNames.Add("begonnenAanMV");
         for (int i = 0; i < 4; i++)
         {
@@ -126,7 +132,7 @@ public class SaveScript : MonoBehaviour
                 MijnenVegerIntNames.Add("mijnenvegerVlaggenGezet" + index);
             }
         }
-
+        */
         //2048
         //Int
         intNames2048.Add("grootte2048");
@@ -145,8 +151,8 @@ public class SaveScript : MonoBehaviour
         //String
         SettingsStringNames.Add("taal");
         //Int
-        List<string> sceneNames = new() { "All", "Sudoku", "Solitaire", "2048", "Mijnenveger", "Menu", "ColorSort" };
-        foreach (string sceneName in sceneNames)
+        List<string> sceneNames2 = new() { "All", "Sudoku", "Solitaire", "2048", "Mijnenveger", "Menu", "ColorSort" };
+        foreach (string sceneName in sceneNames2)
         {
             SettingsIntNames.Add("bgSoort" + sceneName);
             SettingsIntNames.Add("bgWaarde" + sceneName);
@@ -179,8 +185,9 @@ public class SaveScript : MonoBehaviour
         intDict.AddRange(userIntNames, 0);
         intDict.AddRange(gekochteItems, 0);
         //String
-        stringDict.AddRange(SudokuStringNames, "  ");
+        stringDict.AddRange(SudokuStringNames, "");
         stringDict.AddRange(SettingsStringNames, "");
+        stringDict.AddRange(MijnenVegerStringNames, "");
         //Float
         floatDict.AddRange(SolitaireFloatNames, 0f);
         floatDict.AddRange(AchtergrondFloatNames, 0f);
@@ -314,16 +321,16 @@ public class SaveScript : MonoBehaviour
     private StringBuilder SaveUserData()
     {
         StringBuilder data = new("@@@data");
-        foreach (string name in userLongNames)
+        foreach (string n in userLongNames)
         {
-            data.Append(",,,long" + "///" + name + ":::" + longDict[name]);
+            data.Append(",,,long" + "///" + n + ":::" + longDict[n]);
         }
         intDict["laatsteXOffline"] = Application.internetReachability == NetworkReachability.NotReachable || FirebaseAuth.DefaultInstance.CurrentUser == null ? 1 : 0;
-        foreach (string name in userIntNames)
+        foreach (string n in userIntNames)
         {
-            data.Append(",,,int" + "///" + name + ":::" + intDict[name]);
+            data.Append(",,,int" + "///" + n + ":::" + intDict[n]);
         }
-        data.Append(",,,supportInfo///versie:::" + Application.version);
+        data.Append(",,,supportInfo///version:::" + Application.version);
         data.Append(",,,supportInfo///installerName:::" + Application.installerName);
         data.Append(",,,supportInfo///deviceModel:::" + SystemInfo.deviceModel);
         data.Append(",,,supportInfo///operatingSystem:::" + SystemInfo.operatingSystem);
@@ -335,9 +342,9 @@ public class SaveScript : MonoBehaviour
     private StringBuilder SaveAchtergrond()
     {
         StringBuilder data = new("@@@achtergrond");
-        foreach (string name in AchtergrondFloatNames)
+        foreach (string n in AchtergrondFloatNames)
         {
-            data.Append(",,,float" + "///" + name + ":::" + floatDict[name]);
+            data.Append(",,,float" + "///" + n + ":::" + floatDict[n]);
         }
         return data;
     }
@@ -345,13 +352,13 @@ public class SaveScript : MonoBehaviour
     private StringBuilder SaveSettings()
     {
         StringBuilder data = new("@@@instellingen");
-        foreach (string name in SettingsIntNames)
+        foreach (string n in SettingsIntNames)
         {
-            data.Append(",,,int" + "///" + name + ":::" + intDict[name]);
+            data.Append(",,,int" + "///" + n + ":::" + intDict[n]);
         }
-        foreach (string name in SettingsStringNames)
+        foreach (string n in SettingsStringNames)
         {
-            data.Append(",,,string" + "///" + name + ":::" + stringDict[name]);
+            data.Append(",,,string" + "///" + n + ":::" + stringDict[n]);
         }
         return data;
     }
@@ -365,13 +372,13 @@ public class SaveScript : MonoBehaviour
     private void SaveSudoku()
     {
         StringBuilder data = new("@@@sudoku");
-        foreach (string name in SudokuIntNames)
+        foreach (string n in SudokuIntNames)
         {
-            data.Append(",,,int" + "///" + name + ":::" + intDict[name]);
+            data.Append(",,,int" + "///" + n + ":::" + intDict[n]);
         }
-        foreach (string name in SudokuStringNames)
+        foreach (string n in SudokuStringNames)
         {
-            data.Append(",,,string" + "///" + name + ":::" + stringDict[name]);
+            data.Append(",,,string" + "///" + n + ":::" + stringDict[n]);
         }
         SaveData(data);
     }
@@ -379,13 +386,13 @@ public class SaveScript : MonoBehaviour
     private void SaveSolitaire()
     {
         StringBuilder data = new("@@@solitaire");
-        foreach (string name in SolitaireIntNames)
+        foreach (string n in SolitaireIntNames)
         {
-            data.Append(",,,int" + "///" + name + ":::" + intDict[name]);
+            data.Append(",,,int" + "///" + n + ":::" + intDict[n]);
         }
-        foreach (string name in SolitaireFloatNames)
+        foreach (string n in SolitaireFloatNames)
         {
-            data.Append(",,,float" + "///" + name + ":::" + floatDict[name]);
+            data.Append(",,,float" + "///" + n + ":::" + floatDict[n]);
         }
         SaveData(data);
     }
@@ -393,9 +400,13 @@ public class SaveScript : MonoBehaviour
     private void SaveMijnenveger()
     {
         StringBuilder data = new("@@@mijnenveger");
-        foreach (string name in MijnenVegerIntNames)
+        foreach (string n in MijnenVegerIntNames)
         {
-            data.Append(",,,int" + "///" + name + ":::" + intDict[name]);
+            data.Append(",,,int" + "///" + n + ":::" + intDict[n]);
+        }
+        foreach (string n in MijnenVegerStringNames)
+        {
+            data.Append(",,,string" + "///" + n + ":::" + stringDict[n]);
         }
         SaveData(data);
     }
@@ -403,9 +414,9 @@ public class SaveScript : MonoBehaviour
     private void Save2048()
     {
         StringBuilder data = new("@@@2048");
-        foreach (string name in intNames2048)
+        foreach (string n in intNames2048)
         {
-            data.Append(",,,int" + "///" + name + ":::" + intDict[name]);
+            data.Append(",,,int" + "///" + n + ":::" + intDict[n]);
         }
         SaveData(data);
     }
@@ -413,9 +424,9 @@ public class SaveScript : MonoBehaviour
     private void SaveShop()
     {
         StringBuilder data = new("@@@shop");
-        foreach (string name in gekochteItems)
+        foreach (string n in gekochteItems)
         {
-            data.Append(",,,int" + "///" + name + ":::" + intDict[name]);
+            data.Append(",,,int" + "///" + n + ":::" + intDict[n]);
         }
         SaveData(data);
     }
@@ -597,5 +608,13 @@ public class SaveScript : MonoBehaviour
             }
             dataGedownloaded = true;
         });
+    }
+    
+    public static string StringifyArray(int[] array)
+    {
+        StringBuilder str = new();
+        foreach (var t in array)
+            str.Append(t);
+        return str.ToString();
     }
 }
