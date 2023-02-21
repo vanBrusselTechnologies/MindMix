@@ -30,18 +30,18 @@ public class SudokuUIHandler : BaseUIHandler
     {
         base.Start();
         if (saveScript == null) return;
-        dropdown.value = saveScript.intDict["SudokuDifficulty"];
+        dropdown.value = saveScript.IntDict["SudokuDifficulty"];
     }
 
     public void StartNewSudoku()
     {
-        saveScript.intDict["SudokuDifficulty"] = dropdown.value;
+        saveScript.IntDict["SudokuDifficulty"] = dropdown.value;
         StartNewGame();
     }
 
     public void StartMoreDifficultSudoku()
     {
-        saveScript.intDict["SudokuDifficulty"] += 1;
+        saveScript.IntDict["SudokuDifficulty"] += 1;
         StartNewGame();
     }
 
@@ -61,15 +61,15 @@ public class SudokuUIHandler : BaseUIHandler
         if (_isNormalNumberInput)
         {
             EnterNormalNumber(index, selectedNum);
-            if (saveScript.intDict["SudokuEnabledAutoEditNotes"] == 1) AutoChangeNotes(index);
+            if (saveScript.IntDict["SudokuEnabledAutoEditNotes"] == 1) AutoChangeNotes(index);
         }
         else
             EnterNotesNumber(index, selectedNum);
 
-        saveScript.stringDict["SudokuInputNotes"] = StringifyInputNotesArray(sudokuGameHandler.SudokuPuzzleInputNotes);
-        saveScript.stringDict["SudokuInput"] = SaveScript.StringifyArray(sudokuGameHandler.SudokuPuzzleInput);
+        saveScript.StringDict["SudokuInputNotes"] = StringifyInputNotesArray(sudokuGameHandler.SudokuPuzzleInputNotes);
+        saveScript.StringDict["SudokuInput"] = SaveScript.StringifyArray(sudokuGameHandler.SudokuPuzzleInput);
 
-        if (saveScript.intDict["SudokuEnabledDoubleNumberWarning"] == 1) CheckIfDoubleNumber();
+        if (saveScript.IntDict["SudokuEnabledDoubleNumberWarning"] == 1) CheckIfDoubleNumber();
         sudokuGameHandler.receivedInput = true;
     }
 
@@ -128,7 +128,7 @@ public class SudokuUIHandler : BaseUIHandler
         bool settingObjActive = settingsCanvasObj.activeSelf;
         base.OpenSettings();
         if (!settingObjActive) return;
-        if (saveScript.intDict["SudokuEnabledDoubleNumberWarning"] == 1)
+        if (saveScript.IntDict["SudokuEnabledDoubleNumberWarning"] == 1)
             CheckIfDoubleNumber();
         else
         {
@@ -160,39 +160,40 @@ public class SudokuUIHandler : BaseUIHandler
 
     public void CheckIfDoubleNumber(int index = 0)
     {
-        if (index >= 81) return;
-        List<int> indexes = GetConnectedIndexes(index);
-        Button button = cellInputButtons[index];
-        ColorBlock colorBlock = button.colors;
-        foreach (int n in indexes)
+        while (true)
         {
-            if (index == n) continue;
-            if (sudokuGameHandler.SudokuPuzzleInput[index] == 0)
+            if (index >= 81) return;
+            List<int> indexes = GetConnectedIndexes(index);
+            Button button = cellInputButtons[index];
+            ColorBlock colorBlock = button.colors;
+            foreach (int n in indexes)
             {
-                for (int i = 0; i < 9; i++)
+                if (index == n) continue;
+                if (sudokuGameHandler.SudokuPuzzleInput[index] == 0)
                 {
-                    int note = sudokuGameHandler.SudokuPuzzleInputNotes[index][i];
-                    if (note == 0 || (note != sudokuGameHandler.SudokuPuzzleInput[n] &&
-                                      note != sudokuGameHandler.sudokuClues[n])) continue;
+                    for (int i = 0; i < 9; i++)
+                    {
+                        int note = sudokuGameHandler.SudokuPuzzleInputNotes[index][i];
+                        if (note == 0 || (note != sudokuGameHandler.SudokuPuzzleInput[n] && note != sudokuGameHandler.sudokuClues[n])) continue;
+                        colorBlock.normalColor = _redColor;
+                        button.colors = colorBlock;
+                        CheckIfDoubleNumber(index + 1);
+                        return;
+                    }
+                }
+                else if (sudokuGameHandler.SudokuPuzzleInput[index] == sudokuGameHandler.SudokuPuzzleInput[n] || sudokuGameHandler.SudokuPuzzleInput[index] == sudokuGameHandler.sudokuClues[n])
+                {
                     colorBlock.normalColor = _redColor;
                     button.colors = colorBlock;
                     CheckIfDoubleNumber(index + 1);
                     return;
                 }
             }
-            else if (sudokuGameHandler.SudokuPuzzleInput[index] == sudokuGameHandler.SudokuPuzzleInput[n] ||
-                     sudokuGameHandler.SudokuPuzzleInput[index] == sudokuGameHandler.sudokuClues[n])
-            {
-                colorBlock.normalColor = _redColor;
-                button.colors = colorBlock;
-                CheckIfDoubleNumber(index + 1);
-                return;
-            }
-        }
 
-        colorBlock.normalColor = _normalCellColor;
-        button.colors = colorBlock;
-        CheckIfDoubleNumber(index + 1);
+            colorBlock.normalColor = _normalCellColor;
+            button.colors = colorBlock;
+            index += 1;
+        }
     }
 
     private static List<int> GetConnectedIndexes(int index)

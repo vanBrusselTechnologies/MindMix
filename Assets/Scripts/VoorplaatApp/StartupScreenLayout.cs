@@ -58,10 +58,11 @@ public class StartupScreenLayout : BaseLayout
 
     private void SetGeneralLayout()
     {
-        loginKnopScalerRect.localScale = vpSpellenHouderRect.localScale;
-        googlePlayGamesLoginRect.localScale = Vector3.one * (0.5f / loginKnopScalerRect.localScale.x);
+        float scaleFactor = Mathf.Min(screenSafeAreaHeightInUnits / 350f, screenSafeAreaWidthInUnits / 350f);
+        loginKnopScalerRect.localScale = Vector3.one * scaleFactor;
+        googlePlayGamesLoginRect.localScale = Vector3.one * (0.5f / scaleFactor);
         googlePlayGamesLoginRect.anchoredPosition = new Vector2(0,
-            startupAnimation.endPosRot2048[0].y - (200f * googlePlayGamesLoginRect.localScale.y * 1.5f));
+            startupAnimation.endPosRot2048[0].y - (200f * (0.5f / scaleFactor) * 1.5f));
     }
 
     private void SetWarningLayout()

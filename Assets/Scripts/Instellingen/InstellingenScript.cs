@@ -18,7 +18,7 @@ public class InstellingenScript : MonoBehaviour
     [SerializeField] private GameObject overigeInstellingen;
     [SerializeField] private Slider muziekVolumeSlider;
 
-    private List<string> sceneNames = new() { "Sudoku", "Solitaire", "2048", "Mijnenveger", "Menu", "ColorSort" };
+    private List<string> sceneNames = new() { "Sudoku", "Solitaire", "2048", "Minesweeper", "Menu", "ColorSort" };
     private bool startValues = true;
     private bool volumeSetInStart;
 
@@ -54,7 +54,7 @@ public class InstellingenScript : MonoBehaviour
         taalDropdown.options = options;
         for (int i = 0; i < tmpTalen.Count; i++)
         {
-            if (saveScript.stringDict["taal"].Equals(tmpTalen[i]))
+            if (saveScript.StringDict["taal"].Equals(tmpTalen[i]))
             {
                 taalDropdown.value = i;
                 break;
@@ -77,12 +77,12 @@ public class InstellingenScript : MonoBehaviour
             imageDropDown.options.Clear();
             imageDropDown.options.AddRange(achtergrondScript.boughtImageOptionData);
             string sceneNaam = child.gameObject.name[2..];
-            int soort = saveScript.intDict["bgSoort" + sceneNaam];
+            int soort = saveScript.IntDict["bgSoort" + sceneNaam];
             child.Find("BGSoort").GetComponent<TMP_Dropdown>().value = soort;
             if (soort == 1)
             {
                 imageDropdownObj.gameObject.SetActive(true);
-                int bgWaarde = saveScript.intDict["bgWaarde" + sceneNaam];
+                int bgWaarde = saveScript.IntDict["bgWaarde" + sceneNaam];
                 int dropdownValue = bgWaarde >= 0 ? achtergrondScript.boughtImageOptionData.IndexOf(achtergrondScript.imageOptionData[bgWaarde]) : -1;
                 imageDropDown.value = dropdownValue;
                 colorDropdownObj.gameObject.SetActive(false);
@@ -90,7 +90,7 @@ public class InstellingenScript : MonoBehaviour
             }
             else
             {
-                int bgWaarde = saveScript.intDict["bgWaarde" + sceneNaam];
+                int bgWaarde = saveScript.IntDict["bgWaarde" + sceneNaam];
                 int dropdownValue = bgWaarde >= 0 ? achtergrondScript.boughtColorOptionData.IndexOf(achtergrondScript.colorOptionData[bgWaarde]) : -1;
                 if (bgWaarde == -1) dropdownValue = 0;
                 imageDropdownObj.gameObject.SetActive(false);
@@ -131,12 +131,12 @@ public class InstellingenScript : MonoBehaviour
         {
             int dropdownValue = dropdown.value;
             int bgWaarde = achtergrondScript.imageOptionData.IndexOf(achtergrondScript.boughtImageOptionData[dropdownValue]);
-            saveScript.intDict["bgSoortAll"] = 1;
-            saveScript.intDict["bgWaardeAll"] = bgWaarde;
+            saveScript.IntDict["bgSoortAll"] = 1;
+            saveScript.IntDict["bgWaardeAll"] = bgWaarde;
             for (int i = 0; i < sceneNames.Count; i++)
             {
-                saveScript.intDict["bgSoort" + sceneNames[i]] = 1;
-                saveScript.intDict["bgWaarde" + sceneNames[i]] = bgWaarde;
+                saveScript.IntDict["bgSoort" + sceneNames[i]] = 1;
+                saveScript.IntDict["bgWaarde" + sceneNames[i]] = bgWaarde;
                 gegevensScript.ChangeSavedBackground(sceneNames[i].ToLower(), 1, bgWaarde);
             }
             foreach (Transform andereDropdown in obj.transform.parent.parent)
@@ -150,14 +150,14 @@ public class InstellingenScript : MonoBehaviour
 
             int dropdownValue = dropdown.value;
             int bgWaarde = achtergrondScript.imageOptionData.IndexOf(achtergrondScript.boughtImageOptionData[dropdownValue]);
-            if (saveScript.intDict["bgWaardeAll"] != bgWaarde || saveScript.intDict["bgSoortAll"] != 1)
+            if (saveScript.IntDict["bgWaardeAll"] != bgWaarde || saveScript.IntDict["bgSoortAll"] != 1)
             {
-                saveScript.intDict["bgWaardeAll"] = -2;
+                saveScript.IntDict["bgWaardeAll"] = -2;
                 bgInstellingScrolldownContent.Find("BGAll").Find("BGImage").GetComponent<TMP_Dropdown>().value = -1;
                 bgInstellingScrolldownContent.Find("BGAll").Find("BGColor").GetComponent<TMP_Dropdown>().value = -1;
             }
-            saveScript.intDict["bgSoort" + sceneNaam] = 1;
-            saveScript.intDict["bgWaarde" + sceneNaam] = bgWaarde;
+            saveScript.IntDict["bgSoort" + sceneNaam] = 1;
+            saveScript.IntDict["bgWaarde" + sceneNaam] = bgWaarde;
             gegevensScript.ChangeSavedBackground(sceneNaam.ToLower(), 1, bgWaarde);
         }
     }
@@ -172,12 +172,12 @@ public class InstellingenScript : MonoBehaviour
         {
             int dropdownValue = dropdown.value;
             int bgWaarde = achtergrondScript.colorOptionData.IndexOf(achtergrondScript.boughtColorOptionData[dropdownValue]);
-            saveScript.intDict["bgSoortAll"] = 0;
-            saveScript.intDict["bgWaardeAll"] = bgWaarde;
+            saveScript.IntDict["bgSoortAll"] = 0;
+            saveScript.IntDict["bgWaardeAll"] = bgWaarde;
             for (int i = 0; i < sceneNames.Count; i++)
             {
-                saveScript.intDict["bgSoort" + sceneNames[i]] = 0;
-                saveScript.intDict["bgWaarde" + sceneNames[i]] = bgWaarde;
+                saveScript.IntDict["bgSoort" + sceneNames[i]] = 0;
+                saveScript.IntDict["bgWaarde" + sceneNames[i]] = bgWaarde;
                 gegevensScript.ChangeSavedBackground(sceneNames[i].ToLower(), 0, bgWaarde);
             }
             foreach (Transform andereDropdown in obj.transform.parent.parent)
@@ -190,14 +190,14 @@ public class InstellingenScript : MonoBehaviour
         {
             int dropdownValue = dropdown.value;
             int bgWaarde = achtergrondScript.colorOptionData.IndexOf(achtergrondScript.boughtColorOptionData[dropdownValue]);
-            if (saveScript.intDict["bgWaardeAll"] != bgWaarde || saveScript.intDict["bgSoortAll"] != 0)
+            if (saveScript.IntDict["bgWaardeAll"] != bgWaarde || saveScript.IntDict["bgSoortAll"] != 0)
             {
-                saveScript.intDict["bgWaardeAll"] = -2;
+                saveScript.IntDict["bgWaardeAll"] = -2;
                 bgInstellingScrolldownContent.Find("BGAll").Find("BGImage").GetComponent<TMP_Dropdown>().value = -1;
                 bgInstellingScrolldownContent.Find("BGAll").Find("BGColor").GetComponent<TMP_Dropdown>().value = -1;
             }
-            saveScript.intDict["bgSoort" + sceneNaam] = 0;
-            saveScript.intDict["bgWaarde" + sceneNaam] = bgWaarde;
+            saveScript.IntDict["bgSoort" + sceneNaam] = 0;
+            saveScript.IntDict["bgWaarde" + sceneNaam] = bgWaarde;
             gegevensScript.ChangeSavedBackground(sceneNaam.ToLower(), 0, bgWaarde);
         }
     }

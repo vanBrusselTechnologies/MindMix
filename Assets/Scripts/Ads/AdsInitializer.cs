@@ -258,7 +258,7 @@ public class AdsInitializer : MonoBehaviour
         LoadRewardedAd();
 #if UNITY_ANDROID && !UNITY_EDITOR
         _adCountSinceAppOpen += 1;
-        if (_adCountSinceAppOpen == 3)
+        if (_adCountSinceAppOpen == 5)
             GameObject.Find("GoogleScriptsObj").GetComponent<InAppReview>().RequestInAppReview();
 #endif
     }

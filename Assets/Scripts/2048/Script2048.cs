@@ -72,11 +72,11 @@ public class Script2048 : MonoBehaviour
         Physics.Simulate(1000000f);
         dragDistanceVert = Screen.height * 10 / 100;
         dragDistanceHorz = Screen.width * 10 / 100;
-        grootte = saveScript.intDict["grootte2048"] + 4;
+        grootte = saveScript.IntDict["grootte2048"] + 4;
         if (gegevensHouder.startNewGame)
         {
             WisOudeGegevens();
-            saveScript.intDict["begonnenAan2048"] = 1;
+            saveScript.IntDict["begonnenAan2048"] = 1;
             for (int i = 0; i < 3; i++)
             {
                 KrijgHuidigeButtons();
@@ -91,7 +91,7 @@ public class Script2048 : MonoBehaviour
         {
             for (int i = 0; i < grootte * grootte; i++)
             {
-                int getal = saveScript.intDict["2048Knop" + i];
+                int getal = saveScript.IntDict["2048Knop" + i];
                 if (getal != 0)
                 {
                     CreateButton(button, i, grootte, speelVeld, getal);
@@ -232,11 +232,11 @@ public class Script2048 : MonoBehaviour
                 if (!KanNogMoven())
                 {
                     Scene scene = SceneManager.GetActiveScene();
-                    int grootte = saveScript.intDict["grootte2048"];
-                    saveScript.intDict["2048sGespeeld"] += 1;
-                    saveScript.intDict["2048Grootte" + grootte + "Gespeeld"] += 1;
+                    int grootte = saveScript.IntDict["grootte2048"];
+                    saveScript.IntDict["2048sGespeeld"] += 1;
+                    saveScript.IntDict["2048Grootte" + grootte + "Gespeeld"] += 1;
                     float score = ((IntVariable)scoreText.StringReference["score"]).Value;
-                    beloningText.text = _rewardHandler.Beloning(scene: scene, difficulty: grootte, score: score, doelwitText: beloningText).ToString();
+                    beloningText.text = _rewardHandler.GetReward(scene: scene, difficulty: grootte, score: score, targetText: beloningText).ToString();
                     OpenGehaaldCanvas();
                 }
             }
@@ -514,7 +514,7 @@ public class Script2048 : MonoBehaviour
         {
             return true;
         }
-        saveScript.intDict["begonnenAan2048"] = 0;
+        saveScript.IntDict["begonnenAan2048"] = 0;
         return false;
     }
 
@@ -572,17 +572,17 @@ public class Script2048 : MonoBehaviour
             {
                 if (knoppenX[knoppenXgetal] == i)
                 {
-                    saveScript.intDict["2048Knop" + knoppenX[knoppenXgetal]] = int.Parse(knoppenGesorteerd[knoppenXgetal].GetComponentInChildren<TMP_Text>().text);
+                    saveScript.IntDict["2048Knop" + knoppenX[knoppenXgetal]] = int.Parse(knoppenGesorteerd[knoppenXgetal].GetComponentInChildren<TMP_Text>().text);
                     knoppenXgetal += 1;
                 }
                 else
                 {
-                    saveScript.intDict["2048Knop" + i] = 0;
+                    saveScript.IntDict["2048Knop" + i] = 0;
                 }
             }
             else
             {
-                saveScript.intDict["2048Knop" + i] = 0;
+                saveScript.IntDict["2048Knop" + i] = 0;
             }
         }
     }
@@ -592,7 +592,7 @@ public class Script2048 : MonoBehaviour
         a.StringReference.Clear();
         a.StringReference.Add("score", new IntVariable { Value = ((IntVariable)scoreText.StringReference["score"]).Value });
         WisOudeGegevens();
-        saveScript.intDict["begonnenAan2048"] = 0;
+        saveScript.IntDict["begonnenAan2048"] = 0;
         obj2048.SetActive(false);
         overigCanvas.SetActive(false);
         uitlegCanvas.SetActive(false);
@@ -605,7 +605,7 @@ public class Script2048 : MonoBehaviour
     {
         for (int i = 0; i < 100; i++)
         {
-            saveScript.intDict["2048Knop" + i] = 0;
+            saveScript.IntDict["2048Knop" + i] = 0;
         }
     }
 }

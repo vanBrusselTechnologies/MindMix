@@ -35,6 +35,7 @@ public class StartupAnimation : MonoBehaviour
         Debug.Log("Dit moet weg of veranderd worden!");
         _screenLayout = GetComponent<StartupScreenLayout>();
         finished = PlayerPrefs.GetInt("voorplaatFilmpjeGehad", 0) == 1;
+        finished = true;
         if (!finished)
         {
             vpSpellenHouderRect.localScale = Vector3.one * Mathf.Min(_screenLayout.screenSafeAreaHeightInUnits / 350f,

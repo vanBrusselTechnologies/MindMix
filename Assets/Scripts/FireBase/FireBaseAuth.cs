@@ -58,7 +58,7 @@ public class FireBaseAuth : MonoBehaviour
             {
                 Debug.Log(task.Exception?.InnerException?.Message);
             }
-            _saveScript.intDict["laatsteXOffline"] = 0;
+            _saveScript.IntDict["laatsteXOffline"] = 0;
             _saveScript.UpdateData();
         });
     }

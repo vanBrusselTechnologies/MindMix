@@ -16,10 +16,10 @@ public abstract class BaseSceneSettings : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        GameObject gegevensHouder = GameObject.Find("DataObject");
-        if (gegevensHouder == null) return;
+        GameObject dataObj = GameObject.Find("DataObject");
+        if (dataObj == null) return;
         saveScript = SaveScript.Instance;
-        achtergrondScript = gegevensHouder.GetComponent<Achtergrond>();
+        achtergrondScript = dataObj.GetComponent<Achtergrond>();
         gegevensScript = GegevensHouder.Instance;
         _sceneName = SceneManager.GetActiveScene().name;
         SetBackgroundStartValues();
@@ -33,12 +33,12 @@ public abstract class BaseSceneSettings : MonoBehaviour
         colorDropDown.options.AddRange(achtergrondScript.boughtColorOptionData);
         imageDropDown.options.Clear();
         imageDropDown.options.AddRange(achtergrondScript.boughtImageOptionData);
-        int type = saveScript.intDict["bgSoort" + _sceneName];
+        int type = saveScript.IntDict["bgSoort" + _sceneName];
         bgSoortDropDown.value = type;
         if (type == 1)
         {
             imageDropDown.gameObject.SetActive(true);
-            int backgroundValue = saveScript.intDict["bgWaarde" + _sceneName];
+            int backgroundValue = saveScript.IntDict["bgWaarde" + _sceneName];
             int dropdownValue = backgroundValue >= 0 ? achtergrondScript.boughtImageOptionData.IndexOf(achtergrondScript.imageOptionData[backgroundValue]) : -1;
             imageDropDown.value = dropdownValue;
             colorDropDown.gameObject.SetActive(false);
@@ -46,7 +46,7 @@ public abstract class BaseSceneSettings : MonoBehaviour
         }
         else
         {
-            int backgroundValue = saveScript.intDict["bgWaarde" + _sceneName];
+            int backgroundValue = saveScript.IntDict["bgWaarde" + _sceneName];
             int dropdownValue = backgroundValue >= 0 ? achtergrondScript.boughtColorOptionData.IndexOf(achtergrondScript.colorOptionData[backgroundValue]) : -1;
             if (backgroundValue == -1) dropdownValue = 0;
             imageDropDown.gameObject.SetActive(false);
@@ -65,12 +65,12 @@ public abstract class BaseSceneSettings : MonoBehaviour
         }
         int dropdownValue = imageDropDown.value;
         int backgroundValue = achtergrondScript.imageOptionData.IndexOf(achtergrondScript.boughtImageOptionData[dropdownValue]);
-        if (saveScript.intDict["bgWaardeAll"] != backgroundValue || saveScript.intDict["bgSoortAll"] != 1)
+        if (saveScript.IntDict["bgWaardeAll"] != backgroundValue || saveScript.IntDict["bgSoortAll"] != 1)
         {
-            saveScript.intDict["bgWaardeAll"] = -2;
+            saveScript.IntDict["bgWaardeAll"] = -2;
         }
-        saveScript.intDict["bgSoort" + _sceneName] = 1;
-        saveScript.intDict["bgWaarde" + _sceneName] = backgroundValue;
+        saveScript.IntDict["bgSoort" + _sceneName] = 1;
+        saveScript.IntDict["bgWaarde" + _sceneName] = backgroundValue;
         gegevensScript.ChangeSavedBackground(_sceneName.ToLower(), 1, backgroundValue);
     }
 
@@ -83,12 +83,12 @@ public abstract class BaseSceneSettings : MonoBehaviour
         }
         int dropdownValue = colorDropDown.value;
         int backgroundValue = achtergrondScript.colorOptionData.IndexOf(achtergrondScript.boughtColorOptionData[dropdownValue]);
-        if (saveScript.intDict["bgWaardeAll"] != backgroundValue || saveScript.intDict["bgSoortAll"] != 0)
+        if (saveScript.IntDict["bgWaardeAll"] != backgroundValue || saveScript.IntDict["bgSoortAll"] != 0)
         {
-            saveScript.intDict["bgWaardeAll"] = -2;
+            saveScript.IntDict["bgWaardeAll"] = -2;
         }
-        saveScript.intDict["bgSoort" + _sceneName] = 0;
-        saveScript.intDict["bgWaarde" + _sceneName] = backgroundValue;
+        saveScript.IntDict["bgSoort" + _sceneName] = 0;
+        saveScript.IntDict["bgWaarde" + _sceneName] = backgroundValue;
         gegevensScript.ChangeSavedBackground(_sceneName.ToLower(), 0, backgroundValue);
     }
 

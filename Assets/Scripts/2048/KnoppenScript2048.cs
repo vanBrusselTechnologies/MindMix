@@ -14,7 +14,7 @@ public class KnoppenScript2048 : BaseUIHandler
 
     public void StartNew2048()
     {
-        saveScript.intDict["grootte2048"] = sizeDropdown.value;
+        saveScript.IntDict["grootte2048"] = sizeDropdown.value;
         StartNewGame();
     }
 }

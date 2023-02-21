@@ -288,10 +288,10 @@ public class MenuUIHandler : BaseUIHandler
     {
         gegevensHouder.startNewGame = _currentSelectedGame.ToLower() switch
         {
-            "sudoku" => saveScript.stringDict["SudokuClues"].Equals(""),
-            "mijnenveger" => saveScript.stringDict["MinesweeperMines"].Equals(""),
-            "solitaire" => saveScript.intDict["aanSolitaireBegonnen"] == 0,
-            "2048" => saveScript.intDict["begonnenAan2048"] == 0,
+            "sudoku" => saveScript.StringDict["SudokuClues"].Equals(""),
+            "minesweeper" => saveScript.StringDict["MinesweeperMines"].Equals(""),
+            "solitaire" => saveScript.StringDict["SolitaireProgress"].Equals(""),
+            "2048" => saveScript.IntDict["begonnenAan2048"] == 0,
             "colorsort" => true,
             _ => gegevensHouder.startNewGame
         };

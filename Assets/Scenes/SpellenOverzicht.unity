@@ -2364,7 +2364,7 @@ GameObject:
   - component: {fileID: 702038493}
   - component: {fileID: 702038494}
   m_Layer: 0
-  m_Name: Mijnenveger
+  m_Name: Minesweeper
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4324,6 +4324,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98161c81fa8740de9719d143b01d80aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  baseLayout: {fileID: 0}
   menuUIObj: {fileID: 0}
   menuUITransform: {fileID: 0}
   menuUIRect: {fileID: 0}

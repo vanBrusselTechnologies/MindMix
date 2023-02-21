@@ -76,7 +76,7 @@ public class ShopScript : MonoBehaviour
     {
         for (int ii = -1; ii < achtergrondScript.colorOptionData.Count; ii++)
         {
-            if (saveScript.intDict["kleur" + ii + "gekocht"] == 0)
+            if (saveScript.IntDict["kleur" + ii + "gekocht"] == 0)
             {
                 GameObject button = Instantiate(textButtonPrefab, bgColorScrolldownContentTransform, false);
                 RectTransform buttonRect = button.GetComponent<RectTransform>();
@@ -89,7 +89,7 @@ public class ShopScript : MonoBehaviour
         }
         for (int ii = 0; ii < achtergrondScript.imageOptionData.Count; ii++)
         {
-            if (saveScript.intDict["afbeelding" + ii + "gekocht"] == 0)
+            if (saveScript.IntDict["afbeelding" + ii + "gekocht"] == 0)
             {
                 GameObject button = Instantiate(imageButtonPrefab, bgImgScrolldownContentTransform, false);
                 RectTransform buttonRect = button.GetComponent<RectTransform>();
@@ -154,42 +154,40 @@ public class ShopScript : MonoBehaviour
 
     public void Koop()
     {
-        if (saveScript.intDict["munten"] >= prijs)
+        if (saveScript.IntDict["munten"] < prijs) return; // show: 'too few coins' or something like that
+        _rewardHandler.SpendCoins(prijs);
+        infoEnKoopDeelObj.SetActive(false);
+        if (naam.StartsWith("kleur"))
         {
-            _rewardHandler.SpendCoins(prijs);
-            infoEnKoopDeelObj.SetActive(false);
-            if (naam.StartsWith("kleur"))
+            int kleurIndex = int.Parse(naam.Split("kleur")[1]);
+            achtergrondScript.ColorBought(kleurIndex);
+            saveScript.IntDict["kleur" + kleurIndex + "gekocht"] = 1;
+            for (int i = 0; i < bgColorItems.Count; i++)
             {
-                int kleurIndex = int.Parse(naam.Split("kleur")[1]);
-                achtergrondScript.ColorBought(kleurIndex);
-                saveScript.intDict["kleur" + kleurIndex + "gekocht"] = 1;
-                for (int i = 0; i < bgColorItems.Count; i++)
+                GameObject button = bgColorItems[i].gameObject;
+                if (button.name == naam)
                 {
-                    GameObject button = bgColorItems[i].gameObject;
-                    if (button.name == naam)
-                    {
-                        bgColorItems.RemoveAt(i);
-                        Destroy(button);
-                        shopLayout.SetLayout();
-                        break;
-                    }
+                    bgColorItems.RemoveAt(i);
+                    Destroy(button);
+                    shopLayout.SetLayout();
+                    break;
                 }
             }
-            else if (naam.StartsWith("afbeelding"))
+        }
+        else if (naam.StartsWith("afbeelding"))
+        {
+            int afbeeldingIndex = int.Parse(naam.Split("afbeelding")[1]);
+            achtergrondScript.ImageBought(afbeeldingIndex);
+            saveScript.IntDict["afbeelding" + afbeeldingIndex + "gekocht"] = 1;
+            for (int i = 0; i < bgImgItems.Count; i++)
             {
-                int afbeeldingIndex = int.Parse(naam.Split("afbeelding")[1]);
-                achtergrondScript.ImageBought(afbeeldingIndex);
-                saveScript.intDict["afbeelding" + afbeeldingIndex + "gekocht"] = 1;
-                for (int i = 0; i < bgImgItems.Count; i++)
+                GameObject button = bgImgItems[i].gameObject;
+                if (button.name == naam)
                 {
-                    GameObject button = bgImgItems[i].gameObject;
-                    if (button.name == naam)
-                    {
-                        bgImgItems.RemoveAt(i);
-                        Destroy(button);
-                        shopLayout.SetLayout();
-                        break;
-                    }
+                    bgImgItems.RemoveAt(i);
+                    Destroy(button);
+                    shopLayout.SetLayout();
+                    break;
                 }
             }
         }
@@ -252,9 +250,9 @@ public class ShopScript : MonoBehaviour
         Color oldColor = infoDeelItemAfbeelding.color;
         if (oldColor.Equals(Color.black))
         {
-            float tmpR = saveScript.floatDict["color.r"];
-            float tmpG = saveScript.floatDict["color.g"];
-            float tmpB = saveScript.floatDict["color.b"];
+            float tmpR = saveScript.FloatDict["color.r"];
+            float tmpG = saveScript.FloatDict["color.g"];
+            float tmpB = saveScript.FloatDict["color.b"];
             if (tmpR == 0 && tmpG == 0 && tmpB == 0)
             {
                 oldColor = Color.red;
@@ -297,9 +295,9 @@ public class ShopScript : MonoBehaviour
             nextColor.b = Mathf.Max(nextColor.b, 0f);
         }
         infoDeelItemAfbeelding.color = nextColor;
-        saveScript.floatDict["color.r"] = nextColor.r;
-        saveScript.floatDict["color.g"] = nextColor.g;
-        saveScript.floatDict["color.b"] = nextColor.b;
+        saveScript.FloatDict["color.r"] = nextColor.r;
+        saveScript.FloatDict["color.g"] = nextColor.g;
+        saveScript.FloatDict["color.b"] = nextColor.b;
     }
 
     public void OpenGekochtScherm()

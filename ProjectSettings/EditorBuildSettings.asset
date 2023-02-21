@@ -18,7 +18,7 @@ EditorBuildSettings:
     path: Assets/Scenes/2048.unity
     guid: 6ffeb7f40756382489b9901905dbcbea
   - enabled: 1
-    path: Assets/Scenes/Mijnenveger.unity
+    path: Assets/Scenes/Minesweeper.unity
     guid: b678625a95a0d6448a2b0d782be15f54
   - enabled: 1
     path: Assets/Scenes/Solitaire.unity

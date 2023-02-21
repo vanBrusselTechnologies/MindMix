@@ -62,7 +62,7 @@ public class MinesweeperGameHandler : MonoBehaviour
 
     private void CreateNewPuzzle()
     {
-        _notFoundBombs = 25 + (int)(10f * Mathf.Pow(1.75f, _saveScript.intDict["MinesweeperDifficulty"]));
+        _notFoundBombs = 25 + (int)(10f * Mathf.Pow(1.75f, _saveScript.IntDict["MinesweeperDifficulty"]));
         for (var i = 0; i < _notFoundBombs; i++)
         {
             int rand = Random.Range(0, _minesweeperMines.Length);
@@ -73,12 +73,12 @@ public class MinesweeperGameHandler : MonoBehaviour
                 i--;
         }
 
-        _saveScript.stringDict["MinesweeperMines"] = SaveScript.StringifyArray(_minesweeperMines);
+        _saveScript.StringDict["MinesweeperMines"] = SaveScript.StringifyArray(_minesweeperMines);
     }
 
     private void LoadProgress()
     {
-        string bombs = _saveScript.stringDict["MinesweeperMines"];
+        string bombs = _saveScript.StringDict["MinesweeperMines"];
         var chars = bombs.ToCharArray();
         for (var i = 0; i < chars.Length; i++)
         {
@@ -87,7 +87,7 @@ public class MinesweeperGameHandler : MonoBehaviour
             if (ch - '0' == 1) _notFoundBombs += 1;
         }
         
-        string input = _saveScript.stringDict["MinesweeperInput"];
+        string input = _saveScript.StringDict["MinesweeperInput"];
         chars = input.ToCharArray();
         for (var i = 0; i < chars.Length; i++)
         {
@@ -97,7 +97,6 @@ public class MinesweeperGameHandler : MonoBehaviour
                 case '2':
                     _minesweeperInput[i] = 2;
                     InstantiateFlag(i);
-                    _notFoundBombs -= 1;
                     break;
                 case '1':
                     _minesweeperInput[i] = 1;
@@ -170,8 +169,8 @@ public class MinesweeperGameHandler : MonoBehaviour
 
     private void DeleteProgress()
     {
-        _saveScript.stringDict["MinesweeperMines"] = "";
-        _saveScript.stringDict["MinesweeperInput"] = "";
+        _saveScript.StringDict["MinesweeperMines"] = "";
+        _saveScript.StringDict["MinesweeperInput"] = "";
     }
 
     private void InstantiateButton(int index)
@@ -245,7 +244,7 @@ public class MinesweeperGameHandler : MonoBehaviour
             InstantiateButton(index);
             CheckIfFinished();
         }
-        _saveScript.stringDict["MinesweeperInput"] = SaveScript.StringifyArray(_minesweeperInput);
+        _saveScript.StringDict["MinesweeperInput"] = SaveScript.StringifyArray(_minesweeperInput);
     }
 
     private void CheckIfFinished()
@@ -256,10 +255,10 @@ public class MinesweeperGameHandler : MonoBehaviour
 
         if (inputCount + _notFoundBombs < _minesweeperInput.Length) return;
         Scene scene = SceneManager.GetActiveScene();
-        int diff = _saveScript.intDict["MinesweeperDifficulty"];
+        int diff = _saveScript.IntDict["MinesweeperDifficulty"];
         //_saveScript.intDict["MijnenvegerDiff" + diff + "Gespeeld"] += 1;
         //_saveScript.intDict["MijnenvegersGespeeld"] += 1;
-        rewardText.text = _rewardHandler.Beloning(scene: scene, difficulty: diff, doelwitText: rewardText)
+        rewardText.text = _rewardHandler.GetReward(scene: scene, difficulty: diff, targetText: rewardText)
             .ToString();
         OpenFinishedCanvas();
         DeleteProgress();

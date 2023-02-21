@@ -94,16 +94,11 @@ public class BaseLayout : MonoBehaviour
         _wasPaused = _isPaused;
         if (_lastScreenWidth == Screen.width && _lastScreenHeight == Screen.height && Math.Abs(_lastSafeZoneY - Screen.safeArea.y) < 0.0001f && Math.Abs(_lastSafeZoneX - Screen.safeArea.x) < 0.0001f)
         {
-            if (_framesAfterRotation < FramesToWaitAfterScreenRotation)
-            {
-                _framesAfterRotation += 1;
-                if (_framesAfterRotation == FramesToWaitAfterScreenRotation)
-                {
-                    SetScreenValues();
-                    SetLayout();
-                    return;
-                }
-            }
+            if (_framesAfterRotation >= FramesToWaitAfterScreenRotation) return;
+            _framesAfterRotation += 1;
+            if (_framesAfterRotation != FramesToWaitAfterScreenRotation) return;
+            SetScreenValues();
+            SetLayout();
             return;
         }
         _framesAfterRotation = 0;

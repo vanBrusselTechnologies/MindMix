@@ -9,17 +9,17 @@ public class SudokuSettings : BaseSceneSettings
 
     protected override void SetSettingStartValues()
     {
-        autoEditNotesToggle.isOn = saveScript.intDict["SudokuEnabledAutoEditNotes"] == 1;
-        doubleNumberWarningToggle.isOn = saveScript.intDict["SudokuEnabledDoubleNumberWarning"] == 1;
+        autoEditNotesToggle.isOn = saveScript.IntDict["SudokuEnabledAutoEditNotes"] == 1;
+        doubleNumberWarningToggle.isOn = saveScript.IntDict["SudokuEnabledDoubleNumberWarning"] == 1;
     }
 
     public void ChangeAutoEditNotes()
     {
-        saveScript.intDict["SudokuEnabledAutoEditNotes"] = autoEditNotesToggle.isOn ? 1 : 0;
+        saveScript.IntDict["SudokuEnabledAutoEditNotes"] = autoEditNotesToggle.isOn ? 1 : 0;
     }
 
     public void ChangeDoubleNumberWarning()
     {
-        saveScript.intDict["SudokuEnabledDoubleNumberWarning"] = doubleNumberWarningToggle.isOn ? 1 : 0;
+        saveScript.IntDict["SudokuEnabledDoubleNumberWarning"] = doubleNumberWarningToggle.isOn ? 1 : 0;
     }
 }

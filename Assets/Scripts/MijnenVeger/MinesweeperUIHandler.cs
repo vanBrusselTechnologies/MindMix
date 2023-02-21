@@ -14,7 +14,7 @@ public class MinesweeperUIHandler : BaseUIHandler
     {
         base.Start();
         if (saveScript == null) return;
-        difficultyDropdown.value = saveScript.intDict["MinesweeperDifficulty"];
+        difficultyDropdown.value = saveScript.IntDict["MinesweeperDifficulty"];
     }
 
     public void ChangeInputType()
@@ -29,7 +29,7 @@ public class MinesweeperUIHandler : BaseUIHandler
     {
         int chosenDiff = difficultyDropdown.value;
         if (moreDifficult) chosenDiff += 1;
-        saveScript.intDict["MinesweeperDifficulty"] = chosenDiff;
+        saveScript.IntDict["MinesweeperDifficulty"] = chosenDiff;
         StartNewGame();
     }
 }

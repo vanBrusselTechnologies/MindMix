@@ -1,3 +1,4 @@
+using System;
 using Firebase.Analytics;
 using TMPro;
 using UnityEngine;
@@ -6,23 +7,23 @@ using UnityEngine.SceneManagement;
 public class RewardHandler : MonoBehaviour
 {
     public static RewardHandler Instance;
-    private int klaar;
-    private float vorigeScreenWidth;
-    private float vorigeSafezoneY;
-    private float vorigeSafezoneX;
-    private bool isPaused;
-    private bool wasPaused;
-    private SaveScript saveScript;
-    private int[] sudokuBeloningen = { 5, 11, 18, 27 };
-    private int[] mvBeloningen = { 5, 10, 17, 25 };
-    private int maxMunten2048 = 33;
-    private int maxMuntenSolitaire = 35;
-    private int laatstVerdiendeMunten;
-    private TMP_Text laatsteDoelwitText;
+    private int _finished;
+    private float _lastScreenWidth;
+    private float _lastSafeZoneY;
+    private float _lastSafeZoneX;
+    private bool _isPaused;
+    private bool _wasPaused;
+    private SaveScript _saveScript;
+    private readonly int[] _sudokuRewards = { 5, 11, 18, 27 };
+    private readonly int[] _minesweeperRewards = { 5, 10, 17, 25 };
+    private const int MaximumReward2048 = 33;
+    private const int MaximumRewardSolitaire = 35;
+    private int _lastEarnedCoinAmount;
+    private TMP_Text _lastTargetText;
     public RectTransform muntenObj;
     [SerializeField] private RectTransform muntenRect;
     [SerializeField] private TMP_Text muntenText;
-    ShopScript shopScript;
+    ShopScript _shopScript;
 
     private void Awake()
     {
@@ -38,35 +39,35 @@ public class RewardHandler : MonoBehaviour
     private void Start()
     {
         UnityEngine.SceneManagement.SceneManager.sceneLoaded += SceneLoaded;
-        saveScript = SaveScript.Instance;
+        _saveScript = SaveScript.Instance;
         DontDestroyOnLoad(this);
     }
 
-    public int Beloning(Scene scene, int difficulty = 0, float score = 0, TMP_Text doelwitText = null)
+    public int GetReward(Scene scene, int difficulty = 0, float score = 0, TMP_Text targetText = null)
     {
-        laatsteDoelwitText = doelwitText;
-        int munten = 0;
+        _lastTargetText = targetText;
+        int coins = 0;
         switch (scene.name.ToLower())
         {
             case "sudoku":
-                munten = sudokuBeloningen[difficulty];
-                VoegMuntenToe(munten);
+                coins = _sudokuRewards[difficulty];
+                ReceiveCoins(coins);
                 break;
             case "2048":
                 float max = Mathf.Pow(2, ((difficulty + 4) * (difficulty + 4)) - 2);
-                munten = Mathf.CeilToInt(score / max * maxMunten2048);
-                munten = Mathf.Max(1, munten);
-                VoegMuntenToe(munten);
+                coins = Mathf.CeilToInt(score / max * MaximumReward2048);
+                coins = Mathf.Max(1, coins);
+                ReceiveCoins(coins);
                 break;
             case "solitaire":
-                float minuten = Mathf.Max(1, score / 60);
-                munten = Mathf.FloorToInt(maxMuntenSolitaire / minuten);
-                munten = Mathf.Max(1, munten);
-                VoegMuntenToe(munten);
+                float minutes = Mathf.Max(1, score / 60f);
+                coins = Mathf.FloorToInt(MaximumRewardSolitaire / minutes);
+                coins = Mathf.Max(1, coins);
+                ReceiveCoins(coins);
                 break;
-            case "mijnenveger":
-                munten = mvBeloningen[difficulty];
-                VoegMuntenToe(munten);
+            case "minesweeper":
+                coins = _minesweeperRewards[difficulty];
+                ReceiveCoins(coins);
                 break;
         }
 
@@ -78,13 +79,13 @@ public class RewardHandler : MonoBehaviour
                 new(FirebaseAnalytics.ParameterSuccess, 1),
             }
         );
-        laatstVerdiendeMunten = munten;
-        return munten;
+        _lastEarnedCoinAmount = coins;
+        return coins;
     }
 
-    private void VoegMuntenToe(int coins)
+    private void ReceiveCoins(int coins)
     {
-        saveScript.intDict["munten"] += coins;
+        _saveScript.IntDict["munten"] += coins;
         ShowCurrentCoins();
         FirebaseAnalytics.LogEvent(
             FirebaseAnalytics.EventEarnVirtualCurrency, new Parameter(FirebaseAnalytics.ParameterValue, coins),
@@ -94,22 +95,22 @@ public class RewardHandler : MonoBehaviour
 
     public void SpendCoins(int coins)
     {
-        saveScript.intDict["munten"] -= coins;
+        _saveScript.IntDict["munten"] -= coins;
         ShowCurrentCoins();
         FirebaseAnalytics.LogEvent(
             FirebaseAnalytics.EventSpendVirtualCurrency,
-            new Parameter(FirebaseAnalytics.ParameterItemName, shopScript.naam),
+            new Parameter(FirebaseAnalytics.ParameterItemName, _shopScript.naam),
             new Parameter(FirebaseAnalytics.ParameterValue, coins),
             new Parameter(FirebaseAnalytics.ParameterVirtualCurrencyName, "Coin"));
     }
 
     public void DoubleCoins()
     {
-        if (laatsteDoelwitText == null) return;
+        if (_lastTargetText == null) return;
         const int factor = 3;
-        VoegMuntenToe(laatstVerdiendeMunten * (factor - 1));
-        laatsteDoelwitText.text = (laatstVerdiendeMunten * factor).ToString();
-        Transform parent = laatsteDoelwitText.transform.parent;
+        ReceiveCoins(_lastEarnedCoinAmount * (factor - 1));
+        _lastTargetText.text = (_lastEarnedCoinAmount * factor).ToString();
+        Transform parent = _lastTargetText.transform.parent;
         parent.Find("verdubbel").gameObject.SetActive(false);
         float scaleFactor = Mathf.Min(Screen.safeArea.width * 0.85f / 500, Screen.safeArea.height * (5f / 30f) / 175);
         RectTransform rewardRect = parent.GetComponent<RectTransform>();
@@ -120,7 +121,7 @@ public class RewardHandler : MonoBehaviour
     private void ShowCurrentCoins()
     {
         SetPositionCurrentCoins();
-        muntenText.text = saveScript.intDict["munten"].ToString();
+        muntenText.text = _saveScript.IntDict["munten"].ToString();
         muntenObj.gameObject.SetActive(true);
     }
 
@@ -139,9 +140,9 @@ public class RewardHandler : MonoBehaviour
 
     private void SceneLoaded(Scene scene, LoadSceneMode _)
     {
-        if (scene.name == "Shop")
+        if (scene.name.Equals("Shop"))
         {
-            shopScript = GameObject.Find("EventSystem").GetComponent<ShopScript>();
+            _shopScript = GameObject.Find("EventSystem").GetComponent<ShopScript>();
             ShowCurrentCoins();
         }
         else
@@ -152,18 +153,19 @@ public class RewardHandler : MonoBehaviour
 
     private void Update()
     {
-        if (!isPaused && wasPaused)
+        if (!_isPaused && _wasPaused)
         {
             SetPositionCurrentCoins();
-            wasPaused = isPaused;
+            _wasPaused = _isPaused;
             return;
         }
 
-        wasPaused = isPaused;
-        if (vorigeScreenWidth == Screen.width && vorigeSafezoneY == Screen.safeArea.y &&
-            vorigeSafezoneX == Screen.safeArea.x)
+        _wasPaused = _isPaused;
+        if (Math.Abs(_lastScreenWidth - Screen.width) < 0.0001f && 
+            Math.Abs(_lastSafeZoneY - Screen.safeArea.y) < 0.0001f &&
+            Math.Abs(_lastSafeZoneX - Screen.safeArea.x) < 0.0001f)
         {
-            if (klaar < 3)
+            if (_finished < 3)
             {
                 SetPositionCurrentCoins();
             }
@@ -171,20 +173,20 @@ public class RewardHandler : MonoBehaviour
             return;
         }
 
-        klaar = 0;
+        _finished = 0;
         SetPositionCurrentCoins();
-        vorigeScreenWidth = Screen.width;
-        vorigeSafezoneY = Screen.safeArea.y;
-        vorigeSafezoneX = Screen.safeArea.x;
+        _lastScreenWidth = Screen.width;
+        _lastSafeZoneY = Screen.safeArea.y;
+        _lastSafeZoneX = Screen.safeArea.x;
     }
 
     private void OnApplicationFocus(bool hasFocus)
     {
-        isPaused = !hasFocus;
+        _isPaused = !hasFocus;
     }
 
     private void OnApplicationPause(bool pauseStatus)
     {
-        isPaused = pauseStatus;
+        _isPaused = pauseStatus;
     }
 }

@@ -55,7 +55,7 @@ public class SudokuGameHandler : MonoBehaviour
         else
         {
             LoadProgress();
-            if (_saveScript.intDict["SudokuEnabledDoubleNumberWarning"] == 1) sudokuUIHandler.CheckIfDoubleNumber();
+            if (_saveScript.IntDict["SudokuEnabledDoubleNumberWarning"] == 1) sudokuUIHandler.CheckIfDoubleNumber();
         }
     }
 
@@ -63,7 +63,7 @@ public class SudokuGameHandler : MonoBehaviour
     {
         _puzzle = SudokuPuzzle.RandomGrid(9);
 
-        int maxClues = _cluesPerDiff[_saveScript.intDict["SudokuDifficulty"]];
+        int maxClues = _cluesPerDiff[_saveScript.IntDict["SudokuDifficulty"]];
 
         sudokuClues = SudokuPuzzle.CreateClues(_puzzle, maxClues, MaxMillisecondsCreateTime);
         _solution = SudokuPuzzle.GetSolution(sudokuClues);
@@ -87,15 +87,15 @@ public class SudokuGameHandler : MonoBehaviour
             SudokuPuzzleInputNotes[i] = new int[9];
         }
 
-        _saveScript.stringDict["SudokuClues"] = cluesString;
-        _saveScript.stringDict["SudokuInput"] = SaveScript.StringifyArray(SudokuPuzzleInput);
-        _saveScript.stringDict["SudokuInputNotes"] = SudokuUIHandler.StringifyInputNotesArray(SudokuPuzzleInputNotes);
+        _saveScript.StringDict["SudokuClues"] = cluesString;
+        _saveScript.StringDict["SudokuInput"] = SaveScript.StringifyArray(SudokuPuzzleInput);
+        _saveScript.StringDict["SudokuInputNotes"] = SudokuUIHandler.StringifyInputNotesArray(SudokuPuzzleInputNotes);
     }
 
     private void LoadProgress()
     {
         sudokuClues = new int[81];
-        char[] clues = _saveScript.stringDict["SudokuClues"].ToCharArray();
+        char[] clues = _saveScript.StringDict["SudokuClues"].ToCharArray();
         for (int i = 0; i < clues.Length; i++)
         {
             char clueChar = clues[i];
@@ -109,10 +109,11 @@ public class SudokuGameHandler : MonoBehaviour
 
         _solution = SudokuPuzzle.GetSolution(sudokuClues);
         
-        string[] inputNotesString = _saveScript.stringDict["SudokuInputNotes"].Split(",");
+        string[] inputNotesString = _saveScript.StringDict["SudokuInputNotes"].Split(",");
         for (int i = 0; i < inputNotesString.Length; i++)
         {
             SudokuPuzzleInputNotes[i] = new int[9];
+            if(sudokuClues[i] != 0) continue;
             char[] inputNoteChars = inputNotesString[i].ToCharArray();
             foreach (var n in inputNoteChars)
             {
@@ -121,9 +122,10 @@ public class SudokuGameHandler : MonoBehaviour
             }
         }
         
-        char[] inputChars = _saveScript.stringDict["SudokuInput"].ToCharArray();
+        char[] inputChars = _saveScript.StringDict["SudokuInput"].ToCharArray();
         for (int i = 0; i < inputChars.Length; i++)
         {
+            if(sudokuClues[i] != 0) continue;
             int number = inputChars[i] - '0';
             if (number != 0) sudokuUIHandler.EnterNormalNumber(i, number);
         }
@@ -141,8 +143,8 @@ public class SudokuGameHandler : MonoBehaviour
         }
 
         Scene scene = SceneManager.GetActiveScene();
-        int diff = _saveScript.intDict["SudokuDifficulty"];
-        rewardText.text = _rewardHandler.Beloning(scene, difficulty: diff, doelwitText: rewardText).ToString();
+        int diff = _saveScript.IntDict["SudokuDifficulty"];
+        rewardText.text = _rewardHandler.GetReward(scene, difficulty: diff, targetText: rewardText).ToString();
         //_saveScript.intDict["SudokuDiff" + diff + "Gespeeld"] += 1;
         //_saveScript.intDict["SudokusGespeeld"] += 1;
         OpenFinishedCanvas();
@@ -160,8 +162,8 @@ public class SudokuGameHandler : MonoBehaviour
 
     private void ClearProgress()
     {
-        _saveScript.stringDict["SudokuClues"] = "";
-        _saveScript.stringDict["SudokuInput"] = "";
-        _saveScript.stringDict["SudokuInputNotes"] = "";
+        _saveScript.StringDict["SudokuClues"] = "";
+        _saveScript.StringDict["SudokuInput"] = "";
+        _saveScript.StringDict["SudokuInputNotes"] = "";
     }
 }

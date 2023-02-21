@@ -77,14 +77,14 @@ public class Achtergrond : MonoBehaviour
         _availableImages.Clear();
         for (int i = -1; i < 140; i++)
         {
-            if (_saveScript.intDict["kleur" + i + "gekocht"] == 1)
+            if (_saveScript.IntDict["kleur" + i + "gekocht"] == 1)
             {
                 _availableColors.Add(i);
             }
         }
         for (int i = 0; i < 50; i++)
         {
-            if (_saveScript.intDict["afbeelding" + i + "gekocht"] == 1)
+            if (_saveScript.IntDict["afbeelding" + i + "gekocht"] == 1)
             {
                 _availableImages.Add(i);
             }
@@ -208,9 +208,9 @@ public class Achtergrond : MonoBehaviour
     {
         if (oldColor.Equals(Color.white))
         {
-            float tmpR = _saveScript.floatDict["color.r"];
-            float tmpG = _saveScript.floatDict["color.g"];
-            float tmpB = _saveScript.floatDict["color.b"];
+            float tmpR = _saveScript.FloatDict["color.r"];
+            float tmpG = _saveScript.FloatDict["color.g"];
+            float tmpB = _saveScript.FloatDict["color.b"];
             if (tmpR == 0 && tmpG == 0 && tmpB == 0)
             {
                 oldColor = Color.red;
@@ -254,9 +254,9 @@ public class Achtergrond : MonoBehaviour
         }
         backgroundImage.color = nextColor;
         _color = nextColor;
-        _saveScript.floatDict["color.r"] = nextColor.r;
-        _saveScript.floatDict["color.g"] = nextColor.g;
-        _saveScript.floatDict["color.b"] = nextColor.b;
+        _saveScript.FloatDict["color.r"] = nextColor.r;
+        _saveScript.FloatDict["color.g"] = nextColor.g;
+        _saveScript.FloatDict["color.b"] = nextColor.b;
     }
 
     public void ColorBought(int colorIndex)
