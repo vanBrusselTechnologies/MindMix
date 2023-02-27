@@ -39,6 +39,7 @@ public class GegevensHouder : MonoBehaviour
         DontDestroyOnLoad(this);
         if (Application.platform == RuntimePlatform.WindowsEditor || true)
         {
+            Debug.LogWarning("Test Build!!");
             _testBuild = true;
         }
 
@@ -77,37 +78,37 @@ public class GegevensHouder : MonoBehaviour
     {
         if (sceneName.Equals("noscene"))
         {
-            sceneName = SceneManager.GetActiveScene().name.ToLower();
+            sceneName = SceneManager.GetActiveScene().name;
         }
 
         List<int> list = new() { -1000, -1000 };
         switch (sceneName)
         {
-            case "sudoku":
+            case "Sudoku":
                 list = _backgroundSudoku;
                 break;
-            case "spellenoverzicht":
+            case "GameChoiceMenu":
                 list = _backgroundMenu;
                 break;
             case "2048":
                 list = _background2048;
                 break;
-            case "minesweeper":
+            case "Minesweeper":
                 list = _backgroundMinesweeper;
                 break;
-            case "solitaire":
+            case "Solitaire":
                 list = _backgroundSolitaire;
                 break;
-            case "colorsort":
+            case "ColorSort":
                 list = _backgroundColorSort;
                 break;
-            case "inlogenvoorplaatapp":
+            case "inlogEnVoorplaatApp":
                 list = new List<int> { 1, -1 };
                 break;
-            case "instellingen":
+            case "Instellingen":
                 list = _backgroundMenu;
                 break;
-            case "shop":
+            case "Shop":
                 list = _backgroundMenu;
                 break;
         }
@@ -176,7 +177,7 @@ public class GegevensHouder : MonoBehaviour
     {
         if (_saveScript.StringDict["taal"] != "")
         {
-            LocalizationSettings.InitializationOperation.WaitForCompletion();
+            //LocalizationSettings.InitializationOperation.WaitForCompletion();
             foreach (Locale locale in LocalizationSettings.AvailableLocales.Locales)
             {
                 if (locale.LocaleName.Equals(_saveScript.StringDict["taal"]))
@@ -188,7 +189,7 @@ public class GegevensHouder : MonoBehaviour
         }
         else
         {
-            LocalizationSettings.InitializationOperation.WaitForCompletion();
+            //LocalizationSettings.InitializationOperation.WaitForCompletion();
             foreach (Locale locale in LocalizationSettings.AvailableLocales.Locales)
             {
                 if (!locale.LocaleName.Equals(LocalizationSettings.SelectedLocale.LocaleName)) continue;

@@ -15,7 +15,7 @@ public class FireBaseDynamicLinks : MonoBehaviour
         ReceivedDynamicLinkEventArgs dynamicLinkEventArgs = args as ReceivedDynamicLinkEventArgs;
         string url = dynamicLinkEventArgs?.ReceivedDynamicLink.Url.OriginalString;
         string link = GetLinkFromUrl(url);
-        if (link == "") return;
+        if (link.Equals("")) return;
         Debug.LogFormat("Received dynamic link {0}", link);
         if (link.StartsWith("scene")) OpenScene(link);
     }

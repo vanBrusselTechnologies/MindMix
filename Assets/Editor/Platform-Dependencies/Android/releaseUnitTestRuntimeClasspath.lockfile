@@ -27,7 +27,7 @@ androidx.lifecycle:lifecycle-common:2.5.1
 androidx.lifecycle:lifecycle-extensions:2.0.0
 androidx.lifecycle:lifecycle-livedata-core:2.5.1
 androidx.lifecycle:lifecycle-livedata:2.1.0
-androidx.lifecycle:lifecycle-process:2.4.1
+androidx.lifecycle:lifecycle-process:2.5.1
 androidx.lifecycle:lifecycle-runtime:2.5.1
 androidx.lifecycle:lifecycle-service:2.1.0
 androidx.lifecycle:lifecycle-viewmodel-savedstate:2.5.1
@@ -108,12 +108,13 @@ com.google.guava:listenablefuture:1.0
 com.google.protobuf:protobuf-javalite:3.19.3
 com.squareup.okhttp3:okhttp:4.6.0
 com.squareup.okio:okio:2.6.0
-com.unity3d.ads:unity-ads:4.5.0
+com.unity3d.ads:unity-ads:4.6.0
 com.unity3d.mediation:admob-adapter:1.1.0
 com.unity3d.mediation:mediation-adapter:1.1.0
 com.unity3d.mediation:mediation-logger:1.1.0
 com.unity3d.mediation:mediation-sdk:1.0.0
 com.unity3d.mediation:unityads-adapter:1.0.1
+com.unity3d.services.identifiers:unity-services-identifiers:1.0.0
 javax.inject:javax.inject:1
 org.jetbrains.kotlin:kotlin-stdlib-common:1.7.10
 org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.0

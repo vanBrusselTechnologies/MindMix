@@ -343,6 +343,14 @@ MonoBehaviour:
     m_Localized: MindMix
     m_Metadata:
       m_Items: []
+  - m_Id: 160129279230468096
+    m_Localized: Flaggen automatisch platzieren
+    m_Metadata:
+      m_Items: []
+  - m_Id: 160166442542292992
+    m_Localized: Das Spiel beginnt mit einem sicheren Bereich
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds:

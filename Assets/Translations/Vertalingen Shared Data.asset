@@ -307,6 +307,14 @@ MonoBehaviour:
     m_Key: PlayGame
     m_Metadata:
       m_Items: []
+  - m_Id: 160129279230468096
+    m_Key: Minesweeper_setting_autoflag
+    m_Metadata:
+      m_Items: []
+  - m_Id: 160166442542292992
+    m_Key: Minesweeper_setting_startArea
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

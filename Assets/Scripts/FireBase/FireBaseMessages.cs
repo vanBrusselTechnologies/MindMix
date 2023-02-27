@@ -3,31 +3,19 @@ using UnityEngine;
 
 public class FireBaseMessages : MonoBehaviour
 {
-    private FireBaseSetup fireBaseSetup;
-
-    private void Start()
+    public void OnFirebaseReady()
     {
-        fireBaseSetup = GetComponent<FireBaseSetup>();
+        FirebaseMessaging.TokenReceived += OnTokenReceived;
+        FirebaseMessaging.MessageReceived += OnMessageReceived;
     }
 
-    private bool eersteReadyFrame = true;
-    private void Update()
+    private void OnTokenReceived(object sender, TokenReceivedEventArgs token)
     {
-        if (fireBaseSetup.ready && eersteReadyFrame)
-        {
-            eersteReadyFrame = false;
-            FirebaseMessaging.TokenReceived += OnTokenReceived;
-            FirebaseMessaging.MessageReceived += OnMessageReceived;
-        }
+        Debug.Log($"Received Registration Token: {token.Token}");
     }
 
-    public void OnTokenReceived(object sender, TokenReceivedEventArgs token)
+    private void OnMessageReceived(object sender, MessageReceivedEventArgs e)
     {
-        //Debug.Log("Received Registration Token: " + token.Token);
-    }
-
-    public void OnMessageReceived(object sender, MessageReceivedEventArgs e)
-    {
-        //Debug.Log("Received a new message from: " + e.Message.From);
+        Debug.Log($"Received a new message {e.Message.Notification.Body} from: {e.Message.From}");
     }
 }

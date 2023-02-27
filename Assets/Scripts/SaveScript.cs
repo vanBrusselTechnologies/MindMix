@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Firebase.Auth;
 using Firebase.Storage;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -10,11 +9,12 @@ using VBG.Extensions;
 public class SaveScript : MonoBehaviour
 {
     public static SaveScript Instance;
+    [SerializeField] private FireBaseAuth fireBaseAuth;
     Achtergrond achtergrond;
     GegevensHouder gegevensHouder;
     [HideInInspector] public bool ready;
 
-    private readonly List<string> sceneNames = new()
+    private readonly List<string> _sceneNames = new()
         { "Sudoku", "Solitaire", "2048", "Minesweeper", "Menu", "ColorSort" };
 
     public readonly Dictionary<string, int> IntDict = new();
@@ -67,11 +67,6 @@ public class SaveScript : MonoBehaviour
         //Sudoku
         //Int
         _sudokuIntNames.Add("SudokuDifficulty");
-        //_sudokuIntNames.Add("SudokusGespeeld");
-        //for (int i = 0; i < 4; i++)
-        //{
-        //    _sudokuIntNames.Add("SudokuDiff" + i + "Gespeeld");
-        //}
         _sudokuIntNames.Add("SudokuEnabledDoubleNumberWarning");
         _sudokuIntNames.Add("SudokuEnabledAutoEditNotes");
         //String
@@ -81,7 +76,6 @@ public class SaveScript : MonoBehaviour
 
         //Solitaire
         //Int
-        //_solitaireIntNames.Add("SolitairesGespeeld");
         _solitaireIntNames.Add("SolitaireCardsSpriteType");
         //Float
         _solitaireFloatNames.Add("SolitaireTime");
@@ -92,7 +86,8 @@ public class SaveScript : MonoBehaviour
         //Mijnenveger
         //Int
         _minesweeperIntNames.Add("MinesweeperDifficulty");
-        //_minesweeperIntNames.Add("Minesweeper????"); //settings
+        _minesweeperIntNames.Add("MinesweeperAutoFlag");
+        _minesweeperIntNames.Add("MinesweeperStartAreaSetting");
         //String
         _minesweeperStringNames.Add("MinesweeperMines");
         _minesweeperStringNames.Add("MinesweeperInput");
@@ -103,13 +98,13 @@ public class SaveScript : MonoBehaviour
         intNames2048.Add("begonnenAan2048");
         for (int i = 0; i < 4; i++)
         {
-            intNames2048.Add("2048Grootte" + i + "Gespeeld");
+            intNames2048.Add($"2048Grootte{i}Gespeeld");
         }
 
         intNames2048.Add("2048sGespeeld");
         for (int i = 0; i < 100; i++)
         {
-            intNames2048.Add("2048Knop" + i);
+            intNames2048.Add($"2048Knop{i}");
         }
 
         //Settings
@@ -119,8 +114,8 @@ public class SaveScript : MonoBehaviour
         List<string> sceneNames2 = new() { "All", "Sudoku", "Solitaire", "2048", "Minesweeper", "Menu", "ColorSort" };
         foreach (string sceneName in sceneNames2)
         {
-            SettingsIntNames.Add("bgSoort" + sceneName);
-            SettingsIntNames.Add("bgWaarde" + sceneName);
+            SettingsIntNames.Add($"bgSoort{sceneName}");
+            SettingsIntNames.Add($"bgWaarde{sceneName}");
         }
 
         //AchtergrondSettings
@@ -133,12 +128,12 @@ public class SaveScript : MonoBehaviour
         //String
         for (int i = -1; i < 140; i++)
         {
-            gekochteItems.Add("kleur" + i + "gekocht");
+            gekochteItems.Add($"kleur{i}gekocht");
         }
 
         for (int i = 0; i < 50; i++)
         {
-            gekochteItems.Add("afbeelding" + i + "gekocht");
+            gekochteItems.Add($"afbeelding{i}gekocht");
         }
 
         //Alles
@@ -161,13 +156,13 @@ public class SaveScript : MonoBehaviour
         //Long
         LongDict.AddRange(userLongNames, 0);
 
-        IntDict["kleur" + 9 + "gekocht"] = 1;
-        IntDict["kleur" + 113 + "gekocht"] = 1;
-        IntDict["kleur" + 136 + "gekocht"] = 1;
-        IntDict["kleur" + 138 + "gekocht"] = 1;
-        foreach (string sceneName in sceneNames)
+        IntDict["kleur9gekocht"] = 1;
+        IntDict["kleur113gekocht"] = 1;
+        IntDict["kleur136gekocht"] = 1;
+        IntDict["kleur138gekocht"] = 1;
+        foreach (string sceneName in _sceneNames)
         {
-            IntDict["bgWaarde" + sceneName] = 9;
+            IntDict[$"bgWaarde{sceneName}"] = 9;
         }
     }
 
@@ -198,17 +193,17 @@ public class SaveScript : MonoBehaviour
         {
             dataGedownloaded = false;
             LoadData();
-            foreach (var n in sceneNames)
+            foreach (var n in _sceneNames)
             {
-                int soort = IntDict["bgSoort" + n];
+                int soort = IntDict[$"bgSoort{n}"];
                 if (soort == 1)
                 {
-                    int waarde = IntDict["bgWaarde" + n];
+                    int waarde = IntDict[$"bgWaarde{n}"];
                     gegevensHouder.ChangeSavedBackground(n.ToLower(), soort, waarde);
                 }
                 else
                 {
-                    int waarde = IntDict["bgWaarde" + n];
+                    int waarde = IntDict[$"bgWaarde{n}"];
                     gegevensHouder.ChangeSavedBackground(n.ToLower(), soort, waarde);
                 }
             }
@@ -255,30 +250,30 @@ public class SaveScript : MonoBehaviour
 
     private void Save(Scene scene)
     {
-        switch (scene.name.ToLower())
+        switch (scene.name)
         {
-            case "spellenoverzicht":
+            case "GameChoiceMenu":
                 SaveNull();
                 break;
-            case "sudoku":
+            case "Sudoku":
                 SaveSudoku();
                 break;
             case "2048":
                 Save2048();
                 break;
-            case "minesweeper":
+            case "Minesweeper":
                 SaveMijnenveger();
                 break;
-            case "solitaire":
+            case "Solitaire":
                 SaveSolitaire();
                 break;
-            case "instellingen":
+            case "Instellingen":
                 SaveNull();
                 break;
-            case "shop":
+            case "Shop":
                 SaveShop();
                 break;
-            case "colorsort":
+            case "ColorSort":
                 SaveColorSort();
                 break;
             default:
@@ -292,24 +287,24 @@ public class SaveScript : MonoBehaviour
         StringBuilder data = new("@@@data");
         foreach (string n in userLongNames)
         {
-            data.Append(",,,long" + "///" + n + ":::" + LongDict[n]);
+            data.Append($",,,long///{n}:::{LongDict[n]}");
         }
 
         IntDict["laatsteXOffline"] = Application.internetReachability == NetworkReachability.NotReachable ||
-                                     FirebaseAuth.DefaultInstance.CurrentUser == null
+                                     !fireBaseAuth.Connected
             ? 1
             : 0;
         foreach (string n in userIntNames)
         {
-            data.Append(",,,int" + "///" + n + ":::" + IntDict[n]);
+            data.Append($",,,int///{n}:::{IntDict[n]}");
         }
 
-        data.Append(",,,supportInfo///version:::" + Application.version);
-        data.Append(",,,supportInfo///installerName:::" + Application.installerName);
-        data.Append(",,,supportInfo///deviceModel:::" + SystemInfo.deviceModel);
-        data.Append(",,,supportInfo///operatingSystem:::" + SystemInfo.operatingSystem);
-        data.Append(",,,supportInfo///graphicsDeviceID:::" + SystemInfo.graphicsDeviceID);
-        data.Append(",,,supportInfo///graphicsDeviceName:::" + SystemInfo.graphicsDeviceName);
+        data.Append($",,,supportInfo///version:::{Application.version}");
+        data.Append($",,,supportInfo///installerName:::{Application.installerName}");
+        data.Append($",,,supportInfo///deviceModel:::{SystemInfo.deviceModel}");
+        data.Append($",,,supportInfo///operatingSystem:::{SystemInfo.operatingSystem}");
+        data.Append($",,,supportInfo///graphicsDeviceID:::{SystemInfo.graphicsDeviceID}");
+        data.Append($",,,supportInfo///graphicsDeviceName:::{SystemInfo.graphicsDeviceName}");
         return data;
     }
 
@@ -318,7 +313,7 @@ public class SaveScript : MonoBehaviour
         StringBuilder data = new("@@@achtergrond");
         foreach (string n in AchtergrondFloatNames)
         {
-            data.Append(",,,float" + "///" + n + ":::" + FloatDict[n]);
+            data.Append($",,,float///{n}:::{FloatDict[n]}");
         }
 
         return data;
@@ -329,12 +324,12 @@ public class SaveScript : MonoBehaviour
         StringBuilder data = new("@@@instellingen");
         foreach (string n in SettingsIntNames)
         {
-            data.Append(",,,int" + "///" + n + ":::" + IntDict[n]);
+            data.Append($",,,int///{n}:::{IntDict[n]}");
         }
 
         foreach (string n in SettingsStringNames)
         {
-            data.Append(",,,string" + "///" + n + ":::" + StringDict[n]);
+            data.Append($",,,string///{n}:::{StringDict[n]}");
         }
 
         return data;
@@ -351,12 +346,12 @@ public class SaveScript : MonoBehaviour
         StringBuilder data = new("@@@sudoku");
         foreach (string n in _sudokuIntNames)
         {
-            data.Append(",,,int" + "///" + n + ":::" + IntDict[n]);
+            data.Append($",,,int///{n}:::{IntDict[n]}");
         }
 
         foreach (string n in _sudokuStringNames)
         {
-            data.Append(",,,string" + "///" + n + ":::" + StringDict[n]);
+            data.Append($",,,string///{n}:::{StringDict[n]}");
         }
 
         SaveData(data);
@@ -367,17 +362,17 @@ public class SaveScript : MonoBehaviour
         StringBuilder data = new("@@@solitaire");
         foreach (string n in _solitaireIntNames)
         {
-            data.Append(",,,int" + "///" + n + ":::" + IntDict[n]);
+            data.Append($",,,int///{n}:::{IntDict[n]}");
         }
 
         foreach (string n in _solitaireFloatNames)
         {
-            data.Append(",,,float" + "///" + n + ":::" + FloatDict[n]);
+            data.Append($",,,float///{n}:::{FloatDict[n]}");
         }
-        
+
         foreach (string n in _solitaireStringNames)
         {
-            data.Append(",,,string" + "///" + n + ":::" + StringDict[n]);
+            data.Append($",,,string///{n}:::{StringDict[n]}");
         }
 
         SaveData(data);
@@ -388,12 +383,12 @@ public class SaveScript : MonoBehaviour
         StringBuilder data = new("@@@mijnenveger");
         foreach (string n in _minesweeperIntNames)
         {
-            data.Append(",,,int" + "///" + n + ":::" + IntDict[n]);
+            data.Append($",,,int///{n}:::{IntDict[n]}");
         }
 
         foreach (string n in _minesweeperStringNames)
         {
-            data.Append(",,,string" + "///" + n + ":::" + StringDict[n]);
+            data.Append($",,,string///{n}:::{StringDict[n]}");
         }
 
         SaveData(data);
@@ -404,7 +399,7 @@ public class SaveScript : MonoBehaviour
         StringBuilder data = new("@@@2048");
         foreach (string n in intNames2048)
         {
-            data.Append(",,,int" + "///" + n + ":::" + IntDict[n]);
+            data.Append($",,,int///{n}:::{IntDict[n]}");
         }
 
         SaveData(data);
@@ -415,7 +410,7 @@ public class SaveScript : MonoBehaviour
         StringBuilder data = new("@@@shop");
         foreach (string n in gekochteItems)
         {
-            data.Append(",,,int" + "///" + n + ":::" + IntDict[n]);
+            data.Append($",,,int///{n}:::{IntDict[n]}");
         }
 
         SaveData(data);
@@ -499,7 +494,7 @@ public class SaveScript : MonoBehaviour
 
         file.Close();
         if (Application.internetReachability == NetworkReachability.NotReachable ||
-            FirebaseAuth.DefaultInstance.CurrentUser == null)
+            !fireBaseAuth.Connected)
         {
             _quitting = false;
             return;
@@ -530,17 +525,16 @@ public class SaveScript : MonoBehaviour
             return;
         }
 
-        string data = oldData;
-        string[] dataParts = data.Split("@@@");
+        string[] dataParts = oldData.Split("@@@");
         for (int i = 1; i < dataParts.Length; i++)
         {
             string[] vars = dataParts[i].Split(",,,");
             for (int ii = 1; ii < vars.Length; ii++)
             {
                 string[] varParts = vars[ii].Split("///");
-                string soort = varParts[0];
+                string type = varParts[0];
                 string[] savedVarParts = varParts[1].Split(":::");
-                switch (soort)
+                switch (type)
                 {
                     case "int":
                     {
@@ -575,12 +569,11 @@ public class SaveScript : MonoBehaviour
 
     private void UploadStorageData()
     {
-        if (FirebaseAuth.DefaultInstance.CurrentUser == null) return;
-        if (FirebaseAuth.DefaultInstance.CurrentUser.IsAnonymous) return;
+        if (!fireBaseAuth.Connected) return;
+        if (fireBaseAuth.CurrentUser.IsAnonymous) return;
         FirebaseStorage storage = FirebaseStorage.DefaultInstance;
-        StorageReference saveFile = storage.GetReferenceFromUrl(storage.RootReference + "/Users/" +
-                                                                FirebaseAuth.DefaultInstance.CurrentUser.UserId +
-                                                                "/save.vbg");
+        StorageReference saveFile = storage.GetReferenceFromUrl(
+            $"{storage.RootReference}/Users/{fireBaseAuth.CurrentUser.UserId}/save.vbg");
         string path = $"{Application.persistentDataPath}/save.vbg";
         _quitting = true;
         FileStream file = File.Open(path, FileMode.Open, FileAccess.Read);
@@ -602,11 +595,11 @@ public class SaveScript : MonoBehaviour
 
     private void DownloadStorageData()
     {
-        if (FirebaseAuth.DefaultInstance.CurrentUser == null) return;
-        if (FirebaseAuth.DefaultInstance.CurrentUser.IsAnonymous) return;
+        if (!fireBaseAuth.Connected) return;
+        if (fireBaseAuth.CurrentUser.IsAnonymous) return;
         FirebaseStorage storage = FirebaseStorage.DefaultInstance;
         StorageReference saveFile = storage.GetReferenceFromUrl(
-            storage.RootReference + "/Users/" + FirebaseAuth.DefaultInstance.CurrentUser.UserId + "/save.vbg");
+            $"{storage.RootReference}/Users/{fireBaseAuth.CurrentUser.UserId}/save.vbg");
         string path = $"{Application.persistentDataPath}/save.vbg";
         saveFile.GetFileAsync(path).ContinueWith(task =>
         {
@@ -637,7 +630,7 @@ public class SaveScript : MonoBehaviour
 
         return str.ToString()[divisor.Length..];
     }
-    
+
     public static string StringifyArray(string[] array, string divisor = "")
     {
         StringBuilder str = new();

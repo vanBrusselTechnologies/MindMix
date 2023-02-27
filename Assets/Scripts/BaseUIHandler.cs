@@ -46,7 +46,7 @@ public abstract class BaseUIHandler : MonoBehaviour
 
     public virtual void BackToMenu()
     {
-        SceneManager.LoadScene("SpellenOverzicht");
+        SceneManager.LoadScene("GameChoiceMenu");
     }
 
     public void OpenMenu()

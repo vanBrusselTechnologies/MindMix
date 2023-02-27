@@ -20,7 +20,7 @@ public class SupportScript : MonoBehaviour
 
     public void TerugNaarMenu()
     {
-        SceneManager.LoadScene("SpellenOverzicht");
+        SceneManager.LoadScene("GameChoiceMenu");
     }
 
     public void StuurSupportEmail()

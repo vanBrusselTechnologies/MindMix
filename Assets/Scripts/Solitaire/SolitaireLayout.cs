@@ -20,8 +20,8 @@ public class SolitaireLayout : BaseLayout
         settingsUIOpenButtonRect.anchoredPosition = new Vector2(-screenSafeAreaXRight - (size * 0.6f) - size,
             -screenSafeAreaYUp - (size * 0.6f));
 
-        float solitaireScaleMax = screenSafeAreaWidth / 2040;
-        float solitaireScaleMin = (screenSafeAreaHeight - size / 2f) / 1800;
+        float solitaireScaleMax = screenSafeAreaWidth / 2040f;
+        float solitaireScaleMin = (screenSafeAreaHeight - size / 2f) / 2160f;
         float solitaireScale = Mathf.Min(solitaireScaleMax, solitaireScaleMin) * 0.95f;
         Vector3 localScale = new(solitaireScale, solitaireScale, 1);
         solitaire.localScale = localScale;

@@ -1,82 +1,57 @@
 using Firebase.Auth;
 using UnityEngine;
+using UnityEngine.Localization.Settings;
 
 public class FireBaseAuth : MonoBehaviour
 {
+    public FirebaseUser CurrentUser => _auth?.CurrentUser;
+    public bool Connected => CurrentUser != null;
+
     private SaveScript _saveScript;
-    private FireBaseSetup _fireBaseSetup;
     private FirebaseAuth _auth;
 
-    private void Start()
-    {
-        _saveScript = SaveScript.Instance;
-        _fireBaseSetup = GetComponent<FireBaseSetup>();
-    }
+    private bool _waitingForNetwork;
 
-    private bool _firstReadyFrame = true;
-    private void Update()
+    public void OnFirebaseReady()
     {
-        if (_fireBaseSetup.ready && _firstReadyFrame)
-        {
-            _auth = FirebaseAuth.DefaultInstance;
-            _firstReadyFrame = false;
-            FirebaseUser user = _auth.CurrentUser;
-            if (user != null)
-            {
-                RefreshLogin();
-            }
-        }
+        _auth = FirebaseAuth.DefaultInstance;
+        _auth.LanguageCode = LocalizationSettings.SelectedLocale.Identifier.Code;
+        if (Connected) RefreshLogin();
     }
 
     private void RefreshLogin()
     {
-        FirebaseUser user = _auth.CurrentUser;
-        user.ReloadAsync().ContinueWith(task =>
+        CurrentUser.ReloadAsync().ContinueWith(task =>
         {
             if (task.IsFaulted || task.IsCanceled)
             {
                 Debug.Log(task.Exception?.InnerException?.Message);
+                return;
             }
-            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-            if (user != null)
-            {
-                _saveScript.UpdateData();
-            }
-            else
-            {
-                _firstReadyFrame = true;
-            }
+
+            _saveScript = SaveScript.Instance;
+            Debug.LogWarning("MUST BE CHANGED");
+            _saveScript.IntDict["laatsteXOffline"] = 0;
+            _saveScript.UpdateData();
         });
     }
 
     public void PlayGamesLogin(string authCode)
     {
+        if (Connected && !CurrentUser.IsAnonymous) return;
         Credential credential = PlayGamesAuthProvider.GetCredential(authCode);
         _auth.SignInWithCredentialAsync(credential).ContinueWith(task =>
         {
             if (task.IsFaulted || task.IsCanceled)
             {
                 Debug.Log(task.Exception?.InnerException?.Message);
+                return;
             }
+
+            _saveScript = SaveScript.Instance;
+            Debug.LogWarning("MUST BE CHANGED");
             _saveScript.IntDict["laatsteXOffline"] = 0;
             _saveScript.UpdateData();
         });
     }
-
-    /*public void LogUit()
-    {
-        FirebaseAuth.DefaultInstance.SignOut();
-        RefreshLogin();
-    }*/
-
-    /*public void UnlinkPlayGames(InstellingenScript script = null)
-    {
-        auth.CurrentUser.UnlinkAsync(PlayGamesAuthProvider.ProviderId).ContinueWith(task =>
-        {
-            if (task.IsFaulted || task.IsCanceled)
-            {
-                Debug.Log(task.Exception.InnerException.Message);
-            }
-        });
-    }*/
 }

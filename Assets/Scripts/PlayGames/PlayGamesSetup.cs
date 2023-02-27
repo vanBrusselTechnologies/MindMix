@@ -3,14 +3,14 @@ using UnityEngine;
 
 public class PlayGamesSetup : MonoBehaviour
 {
+    [SerializeField] private PlayGamesLogin playGamesLogin;
+
     public void StartSetup()
     {
-        Activate();
-        GetComponent<PlayGamesLogin>().StartupLogin();
-    }
-
-    public void Activate()
-    {
+#if UNITY_ANDROID
+        PlayGamesPlatform.DebugLogEnabled = Debug.unityLogger.logEnabled;
         PlayGamesPlatform.Activate();
+        playGamesLogin.StartupLogin();
+#endif
     }
 }

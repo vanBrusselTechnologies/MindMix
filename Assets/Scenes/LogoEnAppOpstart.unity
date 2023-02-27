@@ -175,9 +175,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
+  m_Maskable: 0
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -331,8 +331,6 @@ GameObject:
   m_Component:
   - component: {fileID: 736385804}
   - component: {fileID: 736385803}
-  - component: {fileID: 736385802}
-  - component: {fileID: 736385801}
   m_Layer: 5
   m_Name: BackGroundCanvas
   m_TagString: Untagged
@@ -340,46 +338,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &736385801
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 736385800}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IgnoreReversedGraphics: 1
-  m_BlockingObjects: 0
-  m_BlockingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
---- !u!114 &736385802
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 736385800}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
-  m_ReferencePixelsPerUnit: 100
-  m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
-  m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
-  m_PhysicalUnit: 3
-  m_FallbackScreenDPI: 96
-  m_DefaultSpriteDPI: 96
-  m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
 --- !u!223 &736385803
 Canvas:
   m_ObjectHideFlags: 0
@@ -530,9 +488,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f95b40fde7ce32d4b9c645a5238941c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playGamesLoginObj: {fileID: 0}
-  warningObj: {fileID: 0}
-  dontShowLoginWarningToggle: {fileID: 0}
 --- !u!1 &1081812584
 GameObject:
   m_ObjectHideFlags: 0
@@ -585,13 +540,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
+  m_Maskable: 0
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 1
+  m_text: 0
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 125cb55b44b24c4393181402bc6200e6, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: f629c6e43dba4bf38cb74d8860150664, type: 2}
@@ -720,7 +675,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 0, g: 0, b: 0, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 0
   m_OnCullStateChanged:
@@ -883,6 +838,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2c614e00f82a5143b4ca6928a05749c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fireBaseAuth: {fileID: 1782114983}
   ready: 0
 --- !u!114 &1206942322
 MonoBehaviour:
@@ -1107,8 +1063,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b62c4e44f5f9da24ba938976f843af18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ready: 0
-  offline: 0
+  playGamesSetup: {fileID: 1782114990}
+  fireBaseDynamicLinks: {fileID: 1782114988}
+  fireBaseAuth: {fileID: 1782114983}
+  fireBaseMessages: {fileID: 1782114984}
 --- !u!114 &1782114983
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1182,6 +1140,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd7c0b9be023468cb394e9d705694ec1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playGamesLogin: {fileID: 1782114989}
 --- !u!114 &1782114991
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.Rendering;
 
 public class MenuUIHandler : BaseUIHandler
 {
@@ -21,8 +20,6 @@ public class MenuUIHandler : BaseUIHandler
     private bool _swipeOnButton;
     private Coroutine _coroutine;
     private Vector2 _startTouchPosition;
-    private readonly List<SortingGroup> _gameWheelSortingGroups = new();
-    private readonly List<SortingGroup> _gameModeWheelSortingGroups = new();
     private readonly List<TMP_Text> _gameWheelNames = new();
     private string _currentSelectedGame = "";
     private bool _startSetup = true;
@@ -45,17 +42,12 @@ public class MenuUIHandler : BaseUIHandler
         _sceneManager = GetComponent<SceneManager>();
         foreach (Transform child in gameWheel)
         {
-            _gameWheelSortingGroups.Add(child.GetComponent<SortingGroup>());
             _gameWheelNames.Add(child.GetChild(1).GetComponent<TMP_Text>());
         }
 
         gameWheel.localEulerAngles =
             new Vector3(0, 0, 360f / gameWheel.childCount * gegevensHouder.currentSelectedGameWheelIndex);
 
-        //foreach(Transform child in gameModeWheel)
-        //{
-        //    _gameModeWheelSortingGroups.Add(child.GetComponent<SortingGroup>());
-        //}
         ChangeWheelItemSizes(gameWheel, true);
         ChangeWheelItemSizes(gameModeWheel, false);
         Transform selectedGameTransform = gameWheel.GetChild(gegevensHouder.currentSelectedGameWheelIndex);
@@ -171,11 +163,10 @@ public class MenuUIHandler : BaseUIHandler
 
     private void ChangeWheelItemSizes(Transform wheel, bool isGameWheel)
     {
-        List<SortingGroup> sortingGroups = isGameWheel ? _gameWheelSortingGroups : _gameModeWheelSortingGroups;
         List<TMP_Text> wheelNames = isGameWheel ? _gameWheelNames : null;
 
         int childCount = wheel.childCount;
-        if (childCount <= 1 || sortingGroups.Count == 0) return;
+        if (childCount <= 1) return;
         float rotationDivPerChild = 360f / childCount;
         float zRotation = Mathf.Round(wheel.localEulerAngles.z * 1000f) / 1000f;
 
@@ -188,7 +179,6 @@ public class MenuUIHandler : BaseUIHandler
             if (ceilChild == floorChild)
             {
                 child.localScale = Vector3.one * (floorChild == childIndex ? 1f : 0.5f);
-                sortingGroups[childIndex].sortingOrder = floorChild == childIndex ? 100 : 1;
                 if (_startSetup) continue;
                 if (wheelNames != null)
                     wheelNames[childIndex].alpha = floorChild == childIndex ? 1f : 0f;
@@ -200,9 +190,6 @@ public class MenuUIHandler : BaseUIHandler
                     child.localScale = Vector3.one *
                                        (Mathf.Lerp(0.5f, 1f,
                                            floorChild == childIndex ? 1 - partitionChildren : partitionChildren));
-                    sortingGroups[childIndex].sortingOrder = floorChild == childIndex
-                        ? Mathf.RoundToInt((1f - partitionChildren) * 100f)
-                        : Mathf.RoundToInt(partitionChildren * 100f);
                     if (wheelNames != null)
                     {
                         wheelNames[childIndex].alpha = Mathf.Lerp(0, 1f,
@@ -214,7 +201,6 @@ public class MenuUIHandler : BaseUIHandler
                 else if (childIndex == (floorChild - 1) % childCount || childIndex == (ceilChild + 1) % childCount)
                 {
                     child.localScale = Vector3.one * 0.5f;
-                    sortingGroups[childIndex].sortingOrder = 1;
                     if (wheelNames != null)
                     {
                         wheelNames[childIndex].alpha = 0;

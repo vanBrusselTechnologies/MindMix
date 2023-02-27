@@ -103,7 +103,7 @@ public class InstellingenScript : MonoBehaviour
 
     public void TerugNaarMenu()
     {
-        SceneManager.LoadScene("SpellenOverzicht");
+        SceneManager.LoadScene("GameChoiceMenu");
     }
 
     public void VeranderTaal()
@@ -168,7 +168,7 @@ public class InstellingenScript : MonoBehaviour
         TMP_Dropdown dropdown = obj.GetComponent<TMP_Dropdown>();
         if (dropdown.value == -1) return;
         string sceneNaam = obj.transform.parent.name[2..];
-        if (sceneNaam.ToLower() == "all")
+        if (sceneNaam.ToLower().Equals("all"))
         {
             int dropdownValue = dropdown.value;
             int bgWaarde = achtergrondScript.colorOptionData.IndexOf(achtergrondScript.boughtColorOptionData[dropdownValue]);

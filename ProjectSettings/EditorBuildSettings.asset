@@ -12,7 +12,7 @@ EditorBuildSettings:
     path: Assets/Scenes/inlogEnVoorplaatApp.unity
     guid: e12805ef7e75a254ba3c268fdffe3cc2
   - enabled: 1
-    path: Assets/Scenes/SpellenOverzicht.unity
+    path: Assets/Scenes/GameChoiceMenu.unity
     guid: 3f0fac97d590a0f4d95b1c388d3a2f1a
   - enabled: 1
     path: Assets/Scenes/2048.unity

@@ -196,7 +196,7 @@ public class ShopScript : MonoBehaviour
 
     public void TerugNaarMenu()
     {
-        SceneManager.LoadScene("SpellenOverzicht");
+        SceneManager.LoadScene("GameChoiceMenu");
     }
 
     public void SluitInfoEnKoopDeeltje()

@@ -9,6 +9,6 @@ public class KnoppenScriptTetris : MonoBehaviour
 
     public void terugNaarMenu()
     {
-        SceneManager.LoadScene("SpellenOverzicht");
+        SceneManager.LoadScene("GameChoiceMenu");
     }
 }

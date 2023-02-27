@@ -273,25 +273,26 @@ public class AdsInitializer : MonoBehaviour
     {
         if (_waitingForNetwork) yield break;
         _waitingForNetwork = true;
-        yield return new WaitForSecondsRealtime(15f);
-        _waitingForNetwork = false;
-        if (Application.internetReachability == NetworkReachability.NotReachable)
-            yield return StartCoroutine(WaitForNetwork(type));
+        while (true)
+        {
+            yield return new WaitForSecondsRealtime(15f);
+            if (Application.internetReachability == NetworkReachability.NotReachable) yield return null;
+            else break;
+        }
         if (_isInitialized) yield break;
+        Debug.Log($"WaitForNetwork type={type}");
         switch (type)
         {
             case -1:
-                Debug.Log("WaitForNetwork {-1}");
                 InitializeAds();
                 break;
             case 0:
-                Debug.Log("WaitForNetwork {0}");
                 LoadRewardedAd();
                 break;
             case 1:
-                Debug.Log("WaitForNetwork {1}");
                 ShowRewardedAd();
                 break;
         }
+        _waitingForNetwork = false;
     }
 }
