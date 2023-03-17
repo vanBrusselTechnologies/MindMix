@@ -6,15 +6,15 @@ public class MinesweeperTouchHandler : MonoBehaviour
     private const float MovePower = 2.5f;
 
     [SerializeField] private MinesweeperLayout mvLayout;
-
     [SerializeField] private RectTransform mvField;
 
     [HideInInspector] public bool isMultipleFingerMovement;
     
     private readonly Vector2[] _currentFingerPositions = new Vector2[2];
+    
+    private Vector2 _lastCenter;
     private float _zoomFactor = 1;
     private float _lastDistance;
-    private Vector2 _lastCenter;
 
     void Update()
     {
@@ -28,11 +28,10 @@ public class MinesweeperTouchHandler : MonoBehaviour
             switch (touch.phase)
             {
                 case TouchPhase.Began:
+                    moved = false;
                     _currentFingerPositions[i] = touch.position;
-                    if (i != 1) break;
                     _lastDistance = Vector2.Distance(_currentFingerPositions[0], _currentFingerPositions[1]);
                     _lastCenter = (_currentFingerPositions[0] + _currentFingerPositions[1]) / 2f;
-                    moved = false;
                     break;
                 case TouchPhase.Moved:
                     moved = true;

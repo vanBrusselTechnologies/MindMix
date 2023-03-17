@@ -25,7 +25,7 @@ namespace Sudoku
 
         private SudokuPuzzle(int[] input) : this((int)Math.Sqrt(input.Length))
         {
-            for (var i = 0; i < input.Length; i++)
+            for (int i = 0; i < input.Length; i++)
             {
                 if (input[i] <= 0 || input[i] > _length) continue;
                 var puzzle = PlaceValue(i, input[i]);
@@ -42,7 +42,7 @@ namespace Sudoku
                 _cells = new int[_cells.Length][]
             };
 
-            for (var i = 0; i < _cells.Length; i++)
+            for (int i = 0; i < _cells.Length; i++)
             {
                 clone._cells[i] = new int[_cells[i].Length];
                 Buffer.BlockCopy(_cells[i], 0, clone._cells[i], 0, Buffer.ByteLength(_cells[i]));
@@ -71,7 +71,7 @@ namespace Sudoku
             if (SavedPeers.ContainsKey(key)) return SavedPeers[key];
 
             var items = new List<int>();
-            for (var j = 0; j < _length * _length; j++)
+            for (int j = 0; j < _length * _length; j++)
             {
                 if (IsPeer(cell, j)) items.Add(j);
             }
@@ -88,9 +88,9 @@ namespace Sudoku
             //Standard Sudoku constraint logic: Set this cell to one and only one candidate, and remove this value from the candidate list of all its peers
             puzzle._cells[cellIndex] = new[] { value };
 
-            foreach (var peerIndex in puzzle.Peers(cellIndex))
+            foreach (int peerIndex in puzzle.Peers(cellIndex))
             {
-                var newPeers = puzzle._cells[peerIndex].Except(new[] { value }).ToArray();
+                int[] newPeers = puzzle._cells[peerIndex].Except(new[] { value }).ToArray();
                 if (newPeers.Length == 0)
                     return null;
 
@@ -104,7 +104,7 @@ namespace Sudoku
         {
             Debug.Assert(puzzle1._length == puzzle2._length);
             var result = new List<int>();
-            foreach (var i in puzzle1.Peers(cellIndex))
+            foreach (int i in puzzle1.Peers(cellIndex))
             {
                 if (puzzle1._cells[i].Length > 1 && puzzle2._cells[i].Length == 1)
                     result.Add(i);
@@ -122,7 +122,7 @@ namespace Sudoku
             if (puzzle == null)
                 return null;
 
-            foreach (var i in FindSingularizedCells(this, puzzle, cellIndex))
+            foreach (int i in FindSingularizedCells(this, puzzle, cellIndex))
             {
                 if ((puzzle = puzzle.PlaceValue(i, puzzle._cells[i].Single())) == null)
                     return null;
@@ -133,7 +133,7 @@ namespace Sudoku
 
         private int FindWorkingCell()
         {
-            var minCandidates = _cells.Where(candidates => candidates.Length >= 2).Min(candidates => candidates.Length);
+            int minCandidates = _cells.Where(candidates => candidates.Length >= 2).Min(candidates => candidates.Length);
             return Array.FindIndex(_cells, c => c.Length == minCandidates);
         }
 
@@ -153,8 +153,8 @@ namespace Sudoku
             if (_cells.All(cell => cell.Length == 1))
                 return (solutionFunc != null && solutionFunc(this)) ? null : this;
 
-            var activeCell = FindWorkingCell();
-            foreach (var guess in _cells[activeCell])
+            int activeCell = FindWorkingCell();
+            foreach (int guess in _cells[activeCell])
             {
                 SudokuPuzzle puzzle;
                 if ((puzzle = PlaceValue(activeCell, guess)) == null) continue;
@@ -170,9 +170,9 @@ namespace Sudoku
             int[] solution = new int[81];
             SudokuPuzzle puzzle = new SudokuPuzzle(clues).Solve();
             if (puzzle == null) throw new ArgumentException("Can't create solution from an unsolvable puzzle!");
-            for (var i = 0; i < puzzle._cells.Length; i++)
+            for (int i = 0; i < puzzle._cells.Length; i++)
             {
-                var cell = puzzle._cells[i];
+                int[] cell = puzzle._cells[i];
                 if (cell.Length == 0) throw new ArgumentException("Can't create solution from an unsolvable puzzle!");
                 solution[i] = cell[0];
             }
@@ -195,7 +195,7 @@ namespace Sudoku
                     rand = new Random();
                 }
 
-                var unsolvedCellIndexes = puzzle._cells
+                int[] unsolvedCellIndexes = puzzle._cells
                     .Select((candidates, index) =>
                         new
                         {
@@ -205,8 +205,8 @@ namespace Sudoku
                     .Select(u => u.index) //Project the tuple to only the index
                     .ToArray();
 
-                var cellIndex = unsolvedCellIndexes[rand.Next(unsolvedCellIndexes.Length)];
-                var candidateValue = puzzle._cells[cellIndex][rand.Next(puzzle._cells[cellIndex].Length)];
+                int cellIndex = unsolvedCellIndexes[rand.Next(unsolvedCellIndexes.Length)];
+                int candidateValue = puzzle._cells[cellIndex][rand.Next(puzzle._cells[cellIndex].Length)];
 
                 var workingPuzzle = puzzle.PlaceValue(cellIndex, candidateValue);
                 if (workingPuzzle != null)
@@ -231,7 +231,7 @@ namespace Sudoku
             if (puzzle == null) throw new ArgumentException("Can't create clues from an unsolvable puzzle!");
 
             //This is the list of clues we work on.  It can be reconstituted into a new puzzle object by way of a constructor
-            var clues = puzzle._cells.Select(c => c[0]).ToArray();
+            int[] clues = puzzle._cells.Select(c => c[0]).ToArray();
             var rand = new Random();
             var stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -245,9 +245,9 @@ namespace Sudoku
                 }
 
                 //Pick a random cell to blank
-                var clueCell = rand.Next(clues.Length);
+                int clueCell = rand.Next(clues.Length);
                 if (clues[clueCell] == 0) continue;
-                var workingClues = clues.ToArray();
+                int[] workingClues = clues.ToArray();
                 workingClues[clueCell] = 0;
                 if (MultiSolve(new SudokuPuzzle(workingClues), 2).Count > 1)
                 {
@@ -269,7 +269,7 @@ namespace Sudoku
         {
             var result = new StringBuilder();
 
-            foreach (var t in _cells)
+            foreach (int[] t in _cells)
             {
                 if (t.Length == 1) result.Append(t[0]);
                 else result.Append('.');

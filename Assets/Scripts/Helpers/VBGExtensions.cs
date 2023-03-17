@@ -126,9 +126,8 @@ namespace VBG.Extensions
         public static void AddRange<T>(this List<T> list, params List<T>[] items)
         {
             foreach (List<T> l in items)
-            {
-                foreach (T item in l) list.Add(item);
-            }
+            foreach (T item in l)
+                list.Add(item);
         }
 
         public static void AddRange<T>(this List<T> list, params T[] items)
@@ -139,34 +138,18 @@ namespace VBG.Extensions
         public static void InsertRange<T>(this List<T> list, int index, List<T> items)
         {
             list.AddRange(items);
-            for (int i = index; i < list.Count - items.Count; i++)
-            {
-                list[i + items.Count] = list[i];
-            }
-
+            for (int i = index; i < list.Count - items.Count; i++) list[i + items.Count] = list[i];
             if (index < list.Count)
-            {
                 for (int i = 0; i < items.Count; i++)
-                {
                     list[index + i] = items[i];
-                }
-            }
         }
 
         public static void InsertRange<T>(this List<T> list, int index, params T[] items)
         {
             list.AddRange(items);
-            for (int i = index; i < list.Count - items.Length; i++)
-            {
-                list[i + items.Length] = list[i];
-            }
-
+            for (int i = index; i < list.Count - items.Length; i++) list[i + items.Length] = list[i];
             if (index >= list.Count) return;
-
-            for (int i = 0; i < items.Length; i++)
-            {
-                list[index + i] = items[i];
-            }
+            for (int i = 0; i < items.Length; i++) list[index + i] = items[i];
         }
 
         /// <summary>
@@ -182,8 +165,7 @@ namespace VBG.Extensions
                 for (int i = 0; i < list.Count; i++)
                 {
                     T item = list[i];
-                    if (output.Trim().Length != 0)
-                        output += ",\n";
+                    if (output.Trim().Length != 0) output += ",\n";
                     output += "[" + i + "] " + item;
                 }
 
@@ -194,8 +176,7 @@ namespace VBG.Extensions
             for (int i = 0; i < list.Count; i++)
             {
                 T item = list[i];
-                if (output.Trim().Length != 0)
-                    output += ",\n";
+                if (output.Trim().Length != 0) output += ",\n";
                 output += "[" + i + "] " + item;
             }
 
@@ -254,19 +235,14 @@ namespace VBG.Extensions
             array.AddRange(items);
             for (int i = index; i < array.Length - items.Count; i++) array[i + items.Count] = array[i];
 
-            if (index < array.Length)
-            {
-                for (int i = 0; i < items.Count; i++) array[index + i] = items[i];
-            }
+            if (index >= array.Length) return;
+            for (int i = 0; i < items.Count; i++) array[index + i] = items[i];
         }
 
         public static void InsertRange<T>(this T[] array, int index, params T[] items)
         {
             array.AddRange(items);
-            for (int i = index; i < array.Length - items.Length; i++)
-            {
-                array[i + items.Length] = array[i];
-            }
+            for (int i = index; i < array.Length - items.Length; i++) array[i + items.Length] = array[i];
 
             if (index >= array.Length) return;
             for (int i = 0; i < items.Length; i++) array[index + i] = items[i];
@@ -275,10 +251,7 @@ namespace VBG.Extensions
         public static T[] Insert<T>(this T[] array, T item, int index)
         {
             array = array.Add(item);
-            for (int i = index; i < array.Length - 1; i++)
-            {
-                array[i + 1] = array[i];
-            }
+            for (int i = index; i < array.Length - 1; i++) array[i + 1] = array[i];
 
             array[index] = item;
             return array;
@@ -533,7 +506,7 @@ namespace VBG.Extensions
         /// <returns>True if the GameObject is in camera's viewport, otherwise false</returns>
         public static bool IsInCameraViewport(this GameObject obj, Camera camera)
         {
-            //Works with camera.rotation = Vector3.zero and gameobject.rotation = Vector3.zero;
+            //Works with camera.rotation = Vector3.zero and GameObject.rotation = Vector3.zero;
             Debug.LogWarning("Currently only correct without rotations");
             if (camera == null)
             {
@@ -630,12 +603,11 @@ namespace VBG.Extensions
     /// </summary>
     public static class ScreenExt
     {
-        
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="pixels">Screenpixels you want to convert to Units</param>
-        /// <param name="orthographicCam">Orthografic camera used. If not set Camera.main will be used</param>
+        /// <param name="pixels">ScreenPixels you want to convert to Units</param>
+        /// <param name="orthographicCam">Orthographic camera used. If not set Camera.main will be used</param>
         /// <returns></returns>
         public static float PixelsToUnits(float pixels, Camera orthographicCam)
         {
@@ -645,30 +617,30 @@ namespace VBG.Extensions
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="units">Units you want to convert to Screenpixels</param>
-        /// <param name="orthographicCam">Orthografic camera used. If not set Camera.main will be used</param>
+        /// <param name="units">Units you want to convert to ScreenPixels</param>
+        /// <param name="orthographicCam">Orthographic camera used. If not set Camera.main will be used</param>
         /// <returns></returns>
         public static float UnitsToPixels(float units, Camera orthographicCam)
         {
             return units * Screen.height / orthographicCam.orthographicSize / 2;
         }
 
-        public static float BottomOutsideSafezone
+        public static float BottomOutsideSafeZone
         {
             get { return Screen.safeArea.y; }
         }
 
-        public static float LeftOutsideSafezone
+        public static float LeftOutsideSafeZone
         {
             get { return Screen.safeArea.x; }
         }
 
-        public static float RightOutsideSafezone
+        public static float RightOutsideSafeZone
         {
             get { return Screen.width - Screen.safeArea.width - Screen.safeArea.x; }
         }
 
-        public static float TopOutsideSafezone
+        public static float TopOutsideSafeZone
         {
             get { return Screen.height - Screen.safeArea.height - Screen.safeArea.y; }
         }

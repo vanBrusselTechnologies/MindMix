@@ -45982,6 +45982,7 @@ MonoBehaviour:
   menuUICanvasObj: {fileID: 2072075354}
   minesToFindText: {fileID: 1285722786}
   rewardText: {fileID: 705273114}
+  finishedGameUIRewardDoubleButtonObj: {fileID: 525722456}
   cellInputButtonImages:
   - {fileID: 38771720}
   - {fileID: 162220379}
@@ -110865,8 +110866,8 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2138386213}
   m_LocalRotation: {x: -0, y: -0, z: 1, w: 0}
-  m_LocalPosition: {x: 0, y: 0, z: 0.2}
-  m_LocalScale: {x: 1.1111112, y: 1.1111112, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2022675449}
@@ -110875,7 +110876,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 180}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 10666.666, y: 556.05554}
+  m_AnchoredPosition: {x: 0, y: 50}
   m_SizeDelta: {x: 250, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2138386215

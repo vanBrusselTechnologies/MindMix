@@ -39,7 +39,6 @@ public class MinesweeperLayout : BaseLayout
     protected override void SetLayoutFinishedGameUI()
     {
         bool gameOver = mvGameHandler.gameOver;
-        finishedGameUIRewardDoubleButtonObj.SetActive(!gameOver);
         finishedGameUIRewardRect.gameObject.SetActive(!gameOver);
         finishedGameUIWinTextRect.gameObject.SetActive(!gameOver);
         finishedGameUILossTextRect.gameObject.SetActive(gameOver);

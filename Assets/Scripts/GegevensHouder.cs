@@ -24,8 +24,6 @@ public class GegevensHouder : MonoBehaviour
     private readonly List<int> _backgroundColorSort = new() { 0, -2 };
     private Achtergrond _bgScript;
     private SaveScript _saveScript;
-    [HideInInspector] public bool isLoginWarned;
-    [HideInInspector] public int currentSelectedGameWheelIndex;
 
     private void Awake()
     {
@@ -78,7 +76,7 @@ public class GegevensHouder : MonoBehaviour
     {
         if (sceneName.Equals("noscene"))
         {
-            sceneName = SceneManager.GetActiveScene().name;
+            sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
         }
 
         List<int> list = new() { -1000, -1000 };

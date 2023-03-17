@@ -42,9 +42,9 @@ public class SolitaireTouchHandler : MonoBehaviour
                 _lastStack = parent;
                 if (parent.name.StartsWith("Stack_"))
                 {
-                    var siblingIndex = card.GetSiblingIndex();
-                    var stackChildCount = parent.childCount;
-                    for (var i = siblingIndex + 1; i < stackChildCount; stackChildCount--)
+                    int siblingIndex = card.GetSiblingIndex();
+                    int stackChildCount = parent.childCount;
+                    for (int i = siblingIndex + 1; i < stackChildCount; stackChildCount--)
                     {
                         parent.GetChild(i).SetParent(card);
                     }
@@ -82,7 +82,7 @@ public class SolitaireTouchHandler : MonoBehaviour
                 if (_lastStack.name.StartsWith("Foundation_"))
                 {
                     bool _ = false;
-                    for (var i = 7; i < stackTfs.Count; i++)
+                    for (int i = 7; i < stackTfs.Count; i++)
                     {
                         if (!IsStackPossible(_selectedCardRect, stackTfs[i])) continue;
                         _isMovingCard = false;
@@ -172,7 +172,7 @@ public class SolitaireTouchHandler : MonoBehaviour
     private bool TryPlaceCard(RectTransform card)
     {
         if (card.childCount == 2 && IsFoundationPossible(card)) return true;
-        for (var i = 7; i < stackTfs.Count; i++)
+        for (int i = 7; i < stackTfs.Count; i++)
         {
             if (IsStackPossible(card, stackTfs[i])) return true;
         }

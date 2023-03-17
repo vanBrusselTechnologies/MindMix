@@ -49247,7 +49247,7 @@ MonoBehaviour:
   menuUIOpenButtonRect: {fileID: 898936096}
   backToMenuButtonRect: {fileID: 1931981228}
   backToMenuButtonCanvasTransform: {fileID: 1498580093}
-  sudoku: {fileID: 320400331}
+  sudokuRasterTf: {fileID: 320400332}
   onScreenNumpadRect: {fileID: 2042992581}
   numpadPartsRect:
   - {fileID: 806089625}

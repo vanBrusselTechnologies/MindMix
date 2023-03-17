@@ -60,6 +60,7 @@ public class SolitaireUIHandler : BaseUIHandler
         solitaireGameHandler.solitaireInactive = settingsCanvasObj.activeSelf;
     }
 
+    // ReSharper disable Unity.PerformanceAnalysis
     public void ShowFinishedCanvas()
     {
         finishedGameUIObj.SetActive(true);

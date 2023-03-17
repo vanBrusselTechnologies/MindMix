@@ -30,7 +30,9 @@ public class SaveScript : MonoBehaviour
     private readonly List<string> _solitaireStringNames = new();
     private readonly List<string> _minesweeperIntNames = new();
     private readonly List<string> _minesweeperStringNames = new();
-    private readonly List<string> intNames2048 = new();
+    private readonly List<string> _intNames2048 = new();
+    private readonly List<string> _stringNames2048 = new();
+    private readonly List<string> _menuIntNames = new();
     private readonly List<string> SettingsStringNames = new();
     private readonly List<string> SettingsIntNames = new();
     private readonly List<string> AchtergrondFloatNames = new();
@@ -94,18 +96,14 @@ public class SaveScript : MonoBehaviour
 
         //2048
         //Int
-        intNames2048.Add("grootte2048");
-        intNames2048.Add("begonnenAan2048");
-        for (int i = 0; i < 4; i++)
-        {
-            intNames2048.Add($"2048Grootte{i}Gespeeld");
-        }
+        _intNames2048.Add("2048SelectedMode");
+        //String
+        for (int i = 0; i < 5; i++)
+            _stringNames2048.Add($"2048Mode{i}Progress");
 
-        intNames2048.Add("2048sGespeeld");
-        for (int i = 0; i < 100; i++)
-        {
-            intNames2048.Add($"2048Knop{i}");
-        }
+        //Menu
+        //Int
+        _menuIntNames.Add("MenuSelectedGameIndex");
 
         //Settings
         //String
@@ -141,7 +139,8 @@ public class SaveScript : MonoBehaviour
         IntDict.AddRange(_sudokuIntNames, 0);
         IntDict.AddRange(_solitaireIntNames, 0);
         IntDict.AddRange(_minesweeperIntNames, 0);
-        IntDict.AddRange(intNames2048, 0);
+        IntDict.AddRange(_intNames2048, 0);
+        IntDict.AddRange(_menuIntNames, 0);
         IntDict.AddRange(SettingsIntNames, 0);
         IntDict.AddRange(userIntNames, 0);
         IntDict.AddRange(gekochteItems, 0);
@@ -149,6 +148,7 @@ public class SaveScript : MonoBehaviour
         StringDict.AddRange(_sudokuStringNames, "");
         StringDict.AddRange(SettingsStringNames, "");
         StringDict.AddRange(_minesweeperStringNames, "");
+        StringDict.AddRange(_stringNames2048, "");
         StringDict.AddRange(_solitaireStringNames, "");
         //Float
         FloatDict.AddRange(_solitaireFloatNames, 0f);
@@ -253,7 +253,7 @@ public class SaveScript : MonoBehaviour
         switch (scene.name)
         {
             case "GameChoiceMenu":
-                SaveNull();
+                SaveMenu();
                 break;
             case "Sudoku":
                 SaveSudoku();
@@ -268,7 +268,7 @@ public class SaveScript : MonoBehaviour
                 SaveSolitaire();
                 break;
             case "Instellingen":
-                SaveNull();
+                SaveMenu();
                 break;
             case "Shop":
                 SaveShop();
@@ -335,9 +335,14 @@ public class SaveScript : MonoBehaviour
         return data;
     }
 
-    private void SaveNull()
+    private void SaveMenu()
     {
-        StringBuilder data = new("@@@nul,,,int///0:::0");
+        StringBuilder data = new("@@@menu");
+        foreach (string n in _menuIntNames)
+        {
+            data.Append($",,,int///{n}:::{IntDict[n]}");
+        }
+
         SaveData(data);
     }
 
@@ -397,9 +402,14 @@ public class SaveScript : MonoBehaviour
     private void Save2048()
     {
         StringBuilder data = new("@@@2048");
-        foreach (string n in intNames2048)
+        foreach (string n in _intNames2048)
         {
             data.Append($",,,int///{n}:::{IntDict[n]}");
+        }
+
+        foreach (string n in _stringNames2048)
+        {
+            data.Append($",,,string///{n}:::{StringDict[n]}");
         }
 
         SaveData(data);
@@ -418,7 +428,6 @@ public class SaveScript : MonoBehaviour
 
     private void SaveColorSort()
     {
-        SaveNull();
     }
 
     private void SaveData(StringBuilder data)
@@ -459,7 +468,7 @@ public class SaveScript : MonoBehaviour
                 }
             }
 
-            if (!vorigeDataGevonden && !sceneName.Equals("nul"))
+            if (!vorigeDataGevonden)
             {
                 oldDataParts = oldDataParts.Add(data.ToString()[3..]);
             }

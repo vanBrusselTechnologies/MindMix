@@ -82,7 +82,7 @@ public class SudokuGameHandler : MonoBehaviour
             inputCellButtons[i].interactable = false;
         }
 
-        for (var i = 0; i < 81; i++)
+        for (int i = 0; i < 81; i++)
         {
             SudokuPuzzleInputNotes[i] = new int[9];
         }
@@ -115,7 +115,7 @@ public class SudokuGameHandler : MonoBehaviour
             SudokuPuzzleInputNotes[i] = new int[9];
             if(sudokuClues[i] != 0) continue;
             char[] inputNoteChars = inputNotesString[i].ToCharArray();
-            foreach (var n in inputNoteChars)
+            foreach (char n in inputNoteChars)
             {
                 int number = n - '0';
                 if (number != 0) sudokuUIHandler.EnterNotesNumber(i, number);
@@ -136,7 +136,7 @@ public class SudokuGameHandler : MonoBehaviour
         if (finishedCanvas.activeInHierarchy) return;
         if (!receivedInput) return;
 
-        for (var i = 0; i < 81; i++)
+        for (int i = 0; i < 81; i++)
         {
             if (sudokuClues[i] != 0) continue;
             if (SudokuPuzzleInput[i] != _solution[i]) return;
@@ -145,8 +145,6 @@ public class SudokuGameHandler : MonoBehaviour
         Scene scene = SceneManager.GetActiveScene();
         int diff = _saveScript.IntDict["SudokuDifficulty"];
         rewardText.text = _rewardHandler.GetReward(scene, difficulty: diff, targetText: rewardText).ToString();
-        //_saveScript.intDict["SudokuDiff" + diff + "Gespeeld"] += 1;
-        //_saveScript.intDict["SudokusGespeeld"] += 1;
         OpenFinishedCanvas();
     }
 

@@ -31,8 +31,8 @@ public class FireBaseAuth : MonoBehaviour
 
             _saveScript = SaveScript.Instance;
             Debug.LogWarning("MUST BE CHANGED");
-            _saveScript.IntDict["laatsteXOffline"] = 0;
-            _saveScript.UpdateData();
+            //_saveScript.IntDict["laatsteXOffline"] = 0;
+            //_saveScript.UpdateData();
         });
     }
 
@@ -50,8 +50,8 @@ public class FireBaseAuth : MonoBehaviour
 
             _saveScript = SaveScript.Instance;
             Debug.LogWarning("MUST BE CHANGED");
-            _saveScript.IntDict["laatsteXOffline"] = 0;
-            _saveScript.UpdateData();
+            //_saveScript.IntDict["laatsteXOffline"] = 0;
+            //_saveScript.UpdateData();
         });
     }
 }

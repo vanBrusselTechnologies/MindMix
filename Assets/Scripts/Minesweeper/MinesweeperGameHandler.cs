@@ -24,6 +24,7 @@ public class MinesweeperGameHandler : MonoBehaviour
     [SerializeField] private GameObject menuUICanvasObj;
     [SerializeField] private TMP_Text minesToFindText;
     [SerializeField] private TMP_Text rewardText;
+    [SerializeField] private GameObject finishedGameUIRewardDoubleButtonObj;
 
     public List<Image> cellInputButtonImages;
     public List<TMP_Text> cellInputButtonTexts;
@@ -65,7 +66,7 @@ public class MinesweeperGameHandler : MonoBehaviour
     private void CreateNewPuzzle()
     {
         _notFoundBombs = 25 + (int)(10f * Mathf.Pow(1.75f, _saveScript.IntDict["MinesweeperDifficulty"]));
-        for (var i = 0; i < _notFoundBombs; i++)
+        for (int i = 0; i < _notFoundBombs; i++)
         {
             int rand = Random.Range(0, _minesweeperMines.Length);
             int num = _minesweeperMines[rand];
@@ -77,36 +78,39 @@ public class MinesweeperGameHandler : MonoBehaviour
 
         _saveScript.StringDict["MinesweeperMines"] = SaveScript.StringifyArray(_minesweeperMines);
 
-        if (_saveScript.IntDict["MinesweeperStartAreaSetting"] == 1)
+        if (_saveScript.IntDict["MinesweeperStartAreaSetting"] != 1) return;
+        CreateStartArea();
+        _saveScript.StringDict["MinesweeperInput"] = SaveScript.StringifyArray(_minesweeperInput);
+    }
+
+    private void CreateStartArea()
+    {
+        while (true)
         {
-            while (true)
-            {
-                int randomIndex = Random.Range(0, _minesweeperInput.Length);
-                if (GetMineCount(randomIndex) != 0) continue;
-                InstantiateButton(randomIndex);
-                if (_saveScript.IntDict["MinesweeperAutoFlag"] == 1) AutoFlag();
-                break;
-            }
-            _saveScript.StringDict["MinesweeperInput"] = SaveScript.StringifyArray(_minesweeperInput);
+            int randomIndex = Random.Range(0, _minesweeperInput.Length);
+            if (GetMineCount(randomIndex) != 0) continue;
+            InstantiateButton(randomIndex);
+            if (_saveScript.IntDict["MinesweeperAutoFlag"] == 1) AutoFlag();
+            break;
         }
     }
 
     private void LoadProgress()
     {
         string bombs = _saveScript.StringDict["MinesweeperMines"];
-        var chars = bombs.ToCharArray();
-        for (var i = 0; i < chars.Length; i++)
+        char[] chars = bombs.ToCharArray();
+        for (int i = 0; i < chars.Length; i++)
         {
-            var ch = chars[i];
+            char ch = chars[i];
             _minesweeperMines[i] = ch - '0';
             if (ch - '0' == 1) _notFoundBombs += 1;
         }
 
         string input = _saveScript.StringDict["MinesweeperInput"];
         chars = input.ToCharArray();
-        for (var i = 0; i < chars.Length; i++)
+        for (int i = 0; i < chars.Length; i++)
         {
-            var ch = chars[i];
+            char ch = chars[i];
             switch (ch)
             {
                 case '2':
@@ -132,9 +136,9 @@ public class MinesweeperGameHandler : MonoBehaviour
         int longSide = Mathf.Max(MinesweeperLayout.HorizontalSideBoxCount, MinesweeperLayout.VerticalSideBoxCount);
         if (_minesweeperMines[index] == 1) return 99;
         int mineCount = 0;
-        for (var i = 0; i < 3; i++)
+        for (int i = 0; i < 3; i++)
         {
-            for (var j = 0; j < 3; j++)
+            for (int j = 0; j < 3; j++)
             {
                 int mineIndex = index + i - 1 + (j - 1) * longSide;
                 if (mineIndex < 0 || mineIndex >= _minesweeperMines.Length) continue;
@@ -150,9 +154,9 @@ public class MinesweeperGameHandler : MonoBehaviour
     {
         int longSide = Mathf.Max(MinesweeperLayout.HorizontalSideBoxCount, MinesweeperLayout.VerticalSideBoxCount);
         int minesweeperMinesLength = _minesweeperMines.Length;
-        for (var i = 0; i < 3; i++)
+        for (int i = 0; i < 3; i++)
         {
-            for (var j = 0; j < 3; j++)
+            for (int j = 0; j < 3; j++)
             {
                 int mineIndex = index + i - 1 + (j - 1) * longSide;
                 if (mineIndex < 0 || mineIndex >= minesweeperMinesLength) continue;
@@ -180,6 +184,7 @@ public class MinesweeperGameHandler : MonoBehaviour
         generalCanvasObj.SetActive(false);
         minesweeperCanvasObj.SetActive(false);
         menuUICanvasObj.SetActive(false);
+        finishedGameUIRewardDoubleButtonObj.gameObject.SetActive(!gameOver);
         mvLayout.SetLayout();
     }
 
@@ -269,15 +274,13 @@ public class MinesweeperGameHandler : MonoBehaviour
     private void CheckIfFinished()
     {
         int inputCount = 0;
-        foreach (var i in _minesweeperInput)
+        foreach (int i in _minesweeperInput)
             if (i > 0)
                 inputCount += 1;
 
         if (inputCount + _notFoundBombs < _minesweeperInput.Length) return;
         Scene scene = SceneManager.GetActiveScene();
         int diff = _saveScript.IntDict["MinesweeperDifficulty"];
-        //_saveScript.intDict["MijnenvegerDiff" + diff + "Gespeeld"] += 1;
-        //_saveScript.intDict["MijnenvegersGespeeld"] += 1;
         rewardText.text = _rewardHandler.GetReward(scene: scene, difficulty: diff, targetText: rewardText)
             .ToString();
         OpenFinishedCanvas();
@@ -295,7 +298,7 @@ public class MinesweeperGameHandler : MonoBehaviour
     {
         int longSide = Mathf.Max(MinesweeperLayout.HorizontalSideBoxCount, MinesweeperLayout.VerticalSideBoxCount);
         int minesweeperMinesLength = _minesweeperMines.Length;
-        for (var mineIndex = 0; mineIndex < minesweeperMinesLength; mineIndex++)
+        for (int mineIndex = 0; mineIndex < minesweeperMinesLength; mineIndex++)
         {
             if (_minesweeperMines[mineIndex] != 1) continue;
             if (_minesweeperInput[mineIndex] != 0) continue;
@@ -306,9 +309,9 @@ public class MinesweeperGameHandler : MonoBehaviour
 
     private bool CanBeAutoFlagged(int mineIndex, int longSide, int minesweeperMinesLength, List<int> safeIndexes)
     {
-        for (var i = 0; i < 3; i++)
+        for (int i = 0; i < 3; i++)
         {
-            for (var j = 0; j < 3; j++)
+            for (int j = 0; j < 3; j++)
             {
                 int index = mineIndex + i - 1 + (j - 1) * longSide;
                 if (index == mineIndex) continue;

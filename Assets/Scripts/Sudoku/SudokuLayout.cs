@@ -4,7 +4,7 @@ using UnityEngine;
 public class SudokuLayout : BaseLayout
 {
     [Header("Other scene specific")] [SerializeField]
-    private GameObject sudoku;
+    private Transform sudokuRasterTf;
 
     [SerializeField] private RectTransform onScreenNumpadRect;
     [SerializeField] private List<RectTransform> numpadPartsRect;
@@ -73,6 +73,6 @@ public class SudokuLayout : BaseLayout
             }
         }
 
-        sudoku.transform.localScale = new Vector3(sudokuSize / 10f, sudokuSize / 10f, 1);
+        sudokuRasterTf.localScale = new Vector3(sudokuSize / 10f, sudokuSize / 10f, 1);
     }
 }

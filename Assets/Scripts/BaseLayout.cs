@@ -246,7 +246,7 @@ public class BaseLayout : MonoBehaviour
     protected virtual void SetLayoutBasic()
     {
         float size = Mathf.Min(Mathf.Max(screenSafeAreaWidth, screenSafeAreaHeight) / 12f, Mathf.Min(screenSafeAreaWidth, screenSafeAreaHeight) / 10f);
-        if (screenOrientation == ScreenOrientation.Portrait || screenOrientation == ScreenOrientation.PortraitUpsideDown)
+        if (screenOrientation is ScreenOrientation.Portrait or ScreenOrientation.PortraitUpsideDown)
         {
             menuUIObj.SetActive(true);
             backToMenuButtonRect.transform.SetParent(backToMenuButtonCanvasTransform);

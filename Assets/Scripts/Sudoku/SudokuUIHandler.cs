@@ -48,8 +48,8 @@ public class SudokuUIHandler : BaseUIHandler
     public void IsSelected()
     {
         GameObject selectedButton = EventSystem.current.currentSelectedGameObject;
-        var n = int.Parse(selectedButton.name);
-        var index = Mathf.FloorToInt(n / 10f) * 9 + n % 10;
+        int n = int.Parse(selectedButton.name);
+        int index = Mathf.FloorToInt(n / 10f) * 9 + n % 10;
         _selectedButtonIndex = index;
     }
 

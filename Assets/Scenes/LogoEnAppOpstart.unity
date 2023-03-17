@@ -754,7 +754,6 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 19c1629ade696e541b576aca329bd281, type: 3}
   - {fileID: 21300000, guid: 3d2541056cf80e8458e252c860a62262, type: 3}
   spriteWit: {fileID: 21300000, guid: f59f4af13fd14ea42bad57e2ca4d71d3, type: 3}
-  isLoginWarned: 0
   currentSelectedGameWheelIndex: 0
 --- !u!4 &1206942316
 Transform:
@@ -884,7 +883,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1462511227
 MonoBehaviour:
   m_ObjectHideFlags: 0
