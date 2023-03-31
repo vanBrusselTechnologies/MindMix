@@ -35,7 +35,7 @@ public class GegevensHouder : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(this);
-        if (Application.platform == RuntimePlatform.WindowsEditor || true)
+        if (Application.platform == RuntimePlatform.WindowsEditor)
         {
             Debug.LogWarning("Test Build!!");
             _testBuild = true;
@@ -85,6 +85,8 @@ public class GegevensHouder : MonoBehaviour
             case "Sudoku":
                 list = _backgroundSudoku;
                 break;
+            case "Settings":
+            case "Shop":
             case "GameChoiceMenu":
                 list = _backgroundMenu;
                 break;
@@ -102,12 +104,6 @@ public class GegevensHouder : MonoBehaviour
                 break;
             case "inlogEnVoorplaatApp":
                 list = new List<int> { 1, -1 };
-                break;
-            case "Instellingen":
-                list = _backgroundMenu;
-                break;
-            case "Shop":
-                list = _backgroundMenu;
                 break;
         }
 
@@ -153,7 +149,7 @@ public class GegevensHouder : MonoBehaviour
             return;
         }
 
-        _saveScript.StringDict["taal"] = LocalizationSettings.AvailableLocales.Locales[languageValue].LocaleName;
+        _saveScript.StringDict["language"] = LocalizationSettings.AvailableLocales.Locales[languageValue].LocaleName;
         LocalizationSettings.SelectedLocale = LocalizationSettings.AvailableLocales.Locales[languageValue];
         FirebaseAuth.DefaultInstance.LanguageCode = LocalizationSettings.SelectedLocale.Identifier.Code;
     }
@@ -173,16 +169,14 @@ public class GegevensHouder : MonoBehaviour
 
     public void SetLanguage()
     {
-        if (_saveScript.StringDict["taal"] != "")
+        if (_saveScript.StringDict["language"] != "")
         {
             //LocalizationSettings.InitializationOperation.WaitForCompletion();
             foreach (Locale locale in LocalizationSettings.AvailableLocales.Locales)
             {
-                if (locale.LocaleName.Equals(_saveScript.StringDict["taal"]))
-                {
-                    LocalizationSettings.SelectedLocale = locale;
-                    break;
-                }
+                if (!locale.LocaleName.Equals(_saveScript.StringDict["language"])) continue;
+                LocalizationSettings.SelectedLocale = locale;
+                break;
             }
         }
         else
@@ -191,7 +185,7 @@ public class GegevensHouder : MonoBehaviour
             foreach (Locale locale in LocalizationSettings.AvailableLocales.Locales)
             {
                 if (!locale.LocaleName.Equals(LocalizationSettings.SelectedLocale.LocaleName)) continue;
-                _saveScript.StringDict["taal"] = locale.LocaleName;
+                _saveScript.StringDict["language"] = locale.LocaleName;
                 break;
             }
         }
@@ -202,7 +196,7 @@ public class GegevensHouder : MonoBehaviour
         List<string> sceneNames = new() { "All", "Sudoku", "Solitaire", "2048", "Minesweeper", "Menu", "ColorSort" };
         foreach (string sceneName in sceneNames)
         {
-            ChangeSavedBackground(sceneName.ToLower(), _saveScript.IntDict["bgSoort" + sceneName],
+            ChangeSavedBackground(sceneName.ToLower(), 0,//_saveScript.IntDict["bgSoort" + sceneName],
                 _saveScript.IntDict["bgWaarde" + sceneName]);
         }
     }

@@ -68,7 +68,7 @@ public class SolitaireGameHandler : MonoBehaviour
         if (finished) return;
         if (solitaireInactive)
         {
-            _startPlayTime = Time.time - _currentPlayingTime;
+            _startPlayTime = Time.time - _currentPlayingTime + _totalTimePenalty;
             return;
         }
 

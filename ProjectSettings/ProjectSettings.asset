@@ -139,6 +139,8 @@ PlayerSettings:
   bundleVersion: 1.0.6
   preloadedAssets:
   - {fileID: 11400000, guid: 8b4243a2344ac0043aab628635ca934a, type: 2}
+  - {fileID: -6489038998191064429, guid: ae46a28dbfae2eb45a1812fd272e87f8, type: 2}
+  - {fileID: 11400000, guid: 5b3c155c15b18554da810243cf8465c8, type: 2}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -166,7 +168,7 @@ PlayerSettings:
     iPhone: 0
     tvOS: 0
   overrideDefaultApplicationIdentifier: 0
-  AndroidBundleVersionCode: 66
+  AndroidBundleVersionCode: 72
   AndroidMinSdkVersion: 22
   AndroidTargetSdkVersion: 33
   AndroidPreferredInstallLocation: 1
@@ -182,10 +184,10 @@ PlayerSettings:
   StripUnusedMeshComponents: 1
   VertexChannelCompressionMask: 214
   iPhoneSdkVersion: 988
-  iOSTargetOSVersionString: 11.0
+  iOSTargetOSVersionString: 12.0
   tvOSSdkVersion: 0
   tvOSRequireExtendedGameController: 0
-  tvOSTargetOSVersionString: 11.0
+  tvOSTargetOSVersionString: 12.0
   uIPrerenderedIcon: 0
   uIRequiresPersistentWiFi: 0
   uIRequiresFullScreen: 1

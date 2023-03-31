@@ -107,12 +107,12 @@ public class SaveScript : MonoBehaviour
 
         //Settings
         //String
-        SettingsStringNames.Add("taal");
+        SettingsStringNames.Add("language");
         //Int
         List<string> sceneNames2 = new() { "All", "Sudoku", "Solitaire", "2048", "Minesweeper", "Menu", "ColorSort" };
         foreach (string sceneName in sceneNames2)
         {
-            SettingsIntNames.Add($"bgSoort{sceneName}");
+            //SettingsIntNames.Add($"bgSoort{sceneName}");
             SettingsIntNames.Add($"bgWaarde{sceneName}");
         }
 
@@ -122,17 +122,17 @@ public class SaveScript : MonoBehaviour
         AchtergrondFloatNames.Add("color.g");
         AchtergrondFloatNames.Add("color.b");
 
-        //GekochteItems
+        /*//GekochteItems
         //String
-        for (int i = -1; i < 140; i++)
-        {
-            gekochteItems.Add($"kleur{i}gekocht");
-        }
+        //for (int i = -1; i < 140; i++)
+        //{
+        //    gekochteItems.Add($"kleur{i}gekocht");
+        //}
 
-        for (int i = 0; i < 50; i++)
-        {
-            gekochteItems.Add($"afbeelding{i}gekocht");
-        }
+        //for (int i = 0; i < 50; i++)
+        //{
+        //    gekochteItems.Add($"afbeelding{i}gekocht");
+        //}*/
 
         //Alles
         //Int
@@ -156,14 +156,21 @@ public class SaveScript : MonoBehaviour
         //Long
         LongDict.AddRange(userLongNames, 0);
 
-        IntDict["kleur9gekocht"] = 1;
-        IntDict["kleur113gekocht"] = 1;
-        IntDict["kleur136gekocht"] = 1;
-        IntDict["kleur138gekocht"] = 1;
-        foreach (string sceneName in _sceneNames)
-        {
-            IntDict[$"bgWaarde{sceneName}"] = 9;
-        }
+        //IntDict["kleur9gekocht"] = 1;
+        //IntDict["kleur113gekocht"] = 1;
+        //IntDict["kleur136gekocht"] = 1;
+        //IntDict["kleur138gekocht"] = 1;
+        //{ "Sudoku", "Solitaire", "2048", "Minesweeper", "Menu", "ColorSort" };
+        //foreach (string sceneName in _sceneNames)
+        //{
+        //    IntDict[$"bgWaarde{sceneName}"] = 9;
+        //}
+
+        IntDict["bgWaardeSolitaire"] = 44;
+        IntDict["bgWaardeMinesweeper"] = 91;
+        IntDict["bgWaardeSudoku"] = 62;
+        IntDict["bgWaarde2048"] = 5;//8;
+        IntDict["bgWaardeMenu"] = 115; //49;
     }
 
     private bool updateData;
@@ -193,9 +200,9 @@ public class SaveScript : MonoBehaviour
         {
             dataGedownloaded = false;
             LoadData();
-            foreach (var n in _sceneNames)
+            foreach (string n in _sceneNames)
             {
-                int soort = IntDict[$"bgSoort{n}"];
+                int soort = 0;//IntDict[$"bgSoort{n}"];
                 if (soort == 1)
                 {
                     int waarde = IntDict[$"bgWaarde{n}"];
@@ -267,7 +274,7 @@ public class SaveScript : MonoBehaviour
             case "Solitaire":
                 SaveSolitaire();
                 break;
-            case "Instellingen":
+            case "Settings":
                 SaveMenu();
                 break;
             case "Shop":
@@ -626,12 +633,12 @@ public class SaveScript : MonoBehaviour
         StringBuilder str = new();
         if (divisor.Equals(""))
         {
-            foreach (var t in array)
+            foreach (int t in array)
                 str.Append(t);
             return str.ToString();
         }
 
-        foreach (var t in array)
+        foreach (int t in array)
         {
             str.Append(divisor);
             str.Append(t);
@@ -645,12 +652,12 @@ public class SaveScript : MonoBehaviour
         StringBuilder str = new();
         if (divisor.Equals(""))
         {
-            foreach (var t in array)
+            foreach (string t in array)
                 str.Append(t);
             return str.ToString();
         }
 
-        foreach (var t in array)
+        foreach (string t in array)
         {
             str.Append(divisor);
             str.Append(t);

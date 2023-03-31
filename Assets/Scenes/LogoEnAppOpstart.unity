@@ -734,27 +734,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f36c97cd8cea9b48b46b55598de271c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startNewGame: 0
+  startNewGame: 1
   zwart: {fileID: 0}
-  achtergronden:
-  - {fileID: 21300000, guid: 221c2c670a030a648acb88cf9f9ea2b2, type: 3}
-  - {fileID: 21300000, guid: 2d374556187f0b142a3673fe4f221bf2, type: 3}
-  - {fileID: 21300000, guid: 34ed70b13bf53a5459bbe3f347cd299f, type: 3}
-  - {fileID: 21300000, guid: e3700b8374db4fe42b3d5f82f09c1b76, type: 3}
-  - {fileID: 21300000, guid: eca1e43445ba02c4387330d3214fb1c9, type: 3}
-  - {fileID: 21300000, guid: f3491f82212ccbc48b85cb67d2064589, type: 3}
-  - {fileID: 21300000, guid: 5c3e600f0a2f1c64c99a82298a6f1555, type: 3}
-  - {fileID: 21300000, guid: ac9838f5caafb7142a967d51549a482e, type: 3}
-  - {fileID: 21300000, guid: 0ea592e3538a62e40956de8f8d604f33, type: 3}
-  - {fileID: 21300000, guid: 5c3aaba3f610108489fb455aae3d7d9a, type: 3}
-  - {fileID: 21300000, guid: 96c3c07fbc6969c4a9a142d0029b097e, type: 3}
-  - {fileID: 21300000, guid: c87889daeb78ca24d9445e2c33404380, type: 3}
-  - {fileID: 21300000, guid: 59eef4da36b65e844875c42539f4f1f2, type: 3}
-  - {fileID: 21300000, guid: 310167d687ebb7147aa4f30d3a893a2a, type: 3}
-  - {fileID: 21300000, guid: 19c1629ade696e541b576aca329bd281, type: 3}
-  - {fileID: 21300000, guid: 3d2541056cf80e8458e252c860a62262, type: 3}
+  achtergronden: []
   spriteWit: {fileID: 21300000, guid: f59f4af13fd14ea42bad57e2ca4d71d3, type: 3}
-  currentSelectedGameWheelIndex: 0
 --- !u!4 &1206942316
 Transform:
   m_ObjectHideFlags: 0

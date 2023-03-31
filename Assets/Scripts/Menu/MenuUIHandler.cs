@@ -368,7 +368,7 @@ public class MenuUIHandler : BaseUIHandler
 
     public override void BackToMenu() => SceneManager.LoadScene("inlogEnVoorplaatApp");
 
-    public override void OpenSettings() => SceneManager.LoadScene("Instellingen");
+    public override void OpenSettings() => SceneManager.LoadScene("Settings");
 
     public void OpenShop() => SceneManager.LoadScene("Shop");
 
@@ -386,10 +386,10 @@ public class MenuUIHandler : BaseUIHandler
 
         gegevensHouder.startNewGame = _currentSelectedGame switch
         {
-            "Sudoku" => saveScript.StringDict["SudokuClues"].Equals(""),
-            "Minesweeper" => saveScript.StringDict["MinesweeperMines"].Equals(""),
-            "Solitaire" => saveScript.StringDict["SolitaireProgress"].Equals(""),
-            "2048" => saveScript.StringDict[$"2048Mode{gameMode}Progress"] == "",
+            "Sudoku" => saveScript.StringDict["SudokuClues"].Trim().Equals(""),
+            "Minesweeper" => saveScript.StringDict["MinesweeperMines"].Trim().Equals(""),
+            "Solitaire" => saveScript.StringDict["SolitaireProgress"].Trim().Equals(""),
+            "2048" => saveScript.StringDict[$"2048Mode{gameMode}Progress"].Trim().Equals(""),
             "ColorSort" => true,
             _ => gegevensHouder.startNewGame
         };

@@ -3,43 +3,43 @@ using UnityEngine;
 
 public abstract class BaseSceneSettings : MonoBehaviour
 {
-    private Achtergrond achtergrondScript;
+    protected Achtergrond BackgroundManager;
     protected SaveScript saveScript;
     protected GegevensHouder gegevensScript;
     [Header("Background settings")]
     [SerializeField] private TMP_Dropdown colorDropDown;
     [SerializeField] private TMP_Dropdown imageDropDown;
     [SerializeField] private TMP_Dropdown bgSoortDropDown;
-    private bool _startValues = true;
+    protected bool IsStartValues = true;
     private string _sceneName;
 
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         GameObject dataObj = GameObject.Find("DataObject");
         if (dataObj == null) return;
         saveScript = SaveScript.Instance;
-        achtergrondScript = dataObj.GetComponent<Achtergrond>();
+        BackgroundManager = dataObj.GetComponent<Achtergrond>();
         gegevensScript = GegevensHouder.Instance;
         _sceneName = SceneManager.GetActiveScene().name;
         SetBackgroundStartValues();
         SetSettingStartValues();
-        _startValues = false;
+        IsStartValues = false;
     }
 
     private void SetBackgroundStartValues()
     {
         colorDropDown.options.Clear();
-        colorDropDown.options.AddRange(achtergrondScript.boughtColorOptionData);
+        colorDropDown.options.AddRange(BackgroundManager.boughtColorOptionData);
         imageDropDown.options.Clear();
-        imageDropDown.options.AddRange(achtergrondScript.boughtImageOptionData);
-        int type = saveScript.IntDict["bgSoort" + _sceneName];
+        imageDropDown.options.AddRange(BackgroundManager.boughtImageOptionData);
+        int type = 0;//saveScript.IntDict["bgSoort" + _sceneName];
         bgSoortDropDown.value = type;
         if (type == 1)
         {
             imageDropDown.gameObject.SetActive(true);
             int backgroundValue = saveScript.IntDict["bgWaarde" + _sceneName];
-            int dropdownValue = backgroundValue >= 0 ? achtergrondScript.boughtImageOptionData.IndexOf(achtergrondScript.imageOptionData[backgroundValue]) : -1;
+            int dropdownValue = backgroundValue >= 0 ? BackgroundManager.boughtImageOptionData.IndexOf(BackgroundManager.imageOptionData[backgroundValue]) : -1;
             imageDropDown.value = dropdownValue;
             colorDropDown.gameObject.SetActive(false);
             colorDropDown.value = 0;
@@ -47,7 +47,7 @@ public abstract class BaseSceneSettings : MonoBehaviour
         else
         {
             int backgroundValue = saveScript.IntDict["bgWaarde" + _sceneName];
-            int dropdownValue = backgroundValue >= 0 ? achtergrondScript.boughtColorOptionData.IndexOf(achtergrondScript.colorOptionData[backgroundValue]) : -1;
+            int dropdownValue = backgroundValue >= 0 ? BackgroundManager.boughtColorOptionData.IndexOf(BackgroundManager.colorOptionData[backgroundValue]) : -1;
             if (backgroundValue == -1) dropdownValue = 0;
             imageDropDown.gameObject.SetActive(false);
             imageDropDown.value = 0;
@@ -58,13 +58,13 @@ public abstract class BaseSceneSettings : MonoBehaviour
 
     public void ChangeBackgroundImage()
     {
-        if (_startValues) return;
+        if (IsStartValues) return;
         if (imageDropDown.value == -1)
         {
             return;
         }
         int dropdownValue = imageDropDown.value;
-        int backgroundValue = achtergrondScript.imageOptionData.IndexOf(achtergrondScript.boughtImageOptionData[dropdownValue]);
+        int backgroundValue = BackgroundManager.imageOptionData.IndexOf(BackgroundManager.boughtImageOptionData[dropdownValue]);
         if (saveScript.IntDict["bgWaardeAll"] != backgroundValue || saveScript.IntDict["bgSoortAll"] != 1)
         {
             saveScript.IntDict["bgWaardeAll"] = -2;
@@ -76,13 +76,13 @@ public abstract class BaseSceneSettings : MonoBehaviour
 
     public void ChangeBackgroundColor()
     {
-        if (_startValues) return;
+        if (IsStartValues) return;
         if (colorDropDown.value == -1)
         {
             return;
         }
         int dropdownValue = colorDropDown.value;
-        int backgroundValue = achtergrondScript.colorOptionData.IndexOf(achtergrondScript.boughtColorOptionData[dropdownValue]);
+        int backgroundValue = BackgroundManager.colorOptionData.IndexOf(BackgroundManager.boughtColorOptionData[dropdownValue]);
         if (saveScript.IntDict["bgWaardeAll"] != backgroundValue || saveScript.IntDict["bgSoortAll"] != 0)
         {
             saveScript.IntDict["bgWaardeAll"] = -2;
@@ -92,7 +92,7 @@ public abstract class BaseSceneSettings : MonoBehaviour
         gegevensScript.ChangeSavedBackground(_sceneName.ToLower(), 0, backgroundValue);
     }
 
-    public void ChangeBackgroundType()
+    public virtual void ChangeBackgroundType()
     {
         switch (bgSoortDropDown.value)
         {

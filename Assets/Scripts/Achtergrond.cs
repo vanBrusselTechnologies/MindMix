@@ -75,33 +75,33 @@ public class Achtergrond : MonoBehaviour
     {
         _availableColors.Clear();
         _availableImages.Clear();
-        for (int i = -1; i < 140; i++)
+        for (int i = /*-1*/0; i < colorOptionData.Count; i++)
         {
-            if (_saveScript.IntDict["kleur" + i + "gekocht"] == 1)
-            {
+            //if (_saveScript.IntDict["kleur" + i + "gekocht"] == 1)
+            //{
                 _availableColors.Add(i);
-            }
+            //}
         }
-        for (int i = 0; i < 50; i++)
-        {
-            if (_saveScript.IntDict["afbeelding" + i + "gekocht"] == 1)
-            {
-                _availableImages.Add(i);
-            }
-        }
+        //for (int i = 0; i < 50; i++)
+        //{
+        //    if (_saveScript.IntDict["afbeelding" + i + "gekocht"] == 1)
+        //    {
+        //        _availableImages.Add(i);
+        //    }
+        //}
         _availableColors.Sort();
-        _availableImages.Sort();
+        //_availableImages.Sort();
         boughtColorOptionData.Clear();
-        boughtImageOptionData.Clear();
+        //boughtImageOptionData.Clear();
         for (int ii = 0; ii < _availableColors.Count; ii++)
         {
             boughtColorOptionData.Add(_availableColors[ii] == -1
                 ? new TMP_Dropdown.OptionData("Changing Color")
                 : colorOptionData[_availableColors[ii]]);
-            if (ii < _availableImages.Count)
-            {
-                boughtImageOptionData.Add(imageOptionData[_availableImages[ii]]);
-            }
+            //if (ii < _availableImages.Count)
+            //{
+            //    boughtImageOptionData.Add(imageOptionData[_availableImages[ii]]);
+            //}
         }
         SetBackground();
     }
@@ -264,7 +264,7 @@ public class Achtergrond : MonoBehaviour
         _availableColors.Add(colorIndex);
         _availableColors.Sort();
         boughtColorOptionData.Clear();
-        foreach (var color in _availableColors)
+        foreach (int color in _availableColors)
         {
             boughtColorOptionData.Add(color == -1
                 ? new TMP_Dropdown.OptionData("Changing Color")
@@ -277,7 +277,7 @@ public class Achtergrond : MonoBehaviour
         _availableImages.Add(colorIndex);
         _availableImages.Sort();
         boughtImageOptionData.Clear();
-        foreach (var img in _availableImages)
+        foreach (int img in _availableImages)
         {
             boughtImageOptionData.Add(imageOptionData[img]);
         }

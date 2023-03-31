@@ -30,15 +30,15 @@ EditorBuildSettings:
     path: Assets/Scenes/Tetris.unity
     guid: aefe925e163996b4ba2ae8e5b82632b4
   - enabled: 1
-    path: Assets/Scenes/Instellingen.unity
+    path: Assets/Scenes/Settings.unity
     guid: e3a222d47720045438106d8b8c47f397
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Shop.unity
     guid: 1244505e35feaa748b7734fe0c43a264
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Support.unity
     guid: 59caf61b254b05348b11a4c2a5d94b27
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/ColorSort.unity
     guid: 65b53643f44e29e43aa5761a8793516c
   m_configObjects:
