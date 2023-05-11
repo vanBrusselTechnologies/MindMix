@@ -351,6 +351,10 @@ MonoBehaviour:
     m_Localized: "D\xE9marrer le jeu avec une zone s\xE9curis\xE9e"
     m_Metadata:
       m_Items: []
+  - m_Id: 187764658873720832
+    m_Localized: Taille de carte
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds:

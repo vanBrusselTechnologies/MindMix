@@ -3,8 +3,9 @@ using UnityEngine;
 public class SolitaireLayout : BaseLayout
 {
     [Header("Other scene specific")] [SerializeField]
-    private RectTransform solitaire;
+    private SolitaireGameHandler solitaireGameHandler;
 
+    [SerializeField] private RectTransform solitaire;
     [SerializeField] private RectTransform finishGameButtonRect;
     [SerializeField] private RectTransform clockTextRect;
 
@@ -20,9 +21,10 @@ public class SolitaireLayout : BaseLayout
         settingsUIOpenButtonRect.anchoredPosition = new Vector2(-screenSafeAreaXRight - (size * 0.6f) - size,
             -screenSafeAreaYUp - (size * 0.6f));
 
-        float solitaireScaleMax = screenSafeAreaWidth / 2040f;
-        float solitaireScaleMin = (screenSafeAreaHeight - size / 2f) / 2160f;
-        float solitaireScale = Mathf.Min(solitaireScaleMax, solitaireScaleMin) * 0.95f;
+        float solitaireScaleWidth = screenSafeAreaWidth / 2040f;
+        float solitaireScaleHeight = (screenSafeAreaHeight - size / 2f) / 2160f;
+        float solitaireScale = Mathf.Min(solitaireScaleWidth, solitaireScaleHeight *
+                                                              solitaireGameHandler.cardSizeFactor) * 0.95f;
         Vector3 localScale = new(solitaireScale, solitaireScale, 1);
         solitaire.localScale = localScale;
         float lowerByButtons = solitaireScale * 2040f < screenSafeAreaWidth - size * 4 ? 0 : 1.1f * size;

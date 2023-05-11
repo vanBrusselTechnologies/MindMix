@@ -1,5 +1,7 @@
-﻿using GooglePlayGames;
-using UnityEngine;
+﻿using UnityEngine;
+#if UNITY_ANDROID
+using GooglePlayGames;
+#endif
 
 public class PlayGamesSetup : MonoBehaviour
 {

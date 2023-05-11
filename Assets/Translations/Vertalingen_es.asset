@@ -345,6 +345,10 @@ MonoBehaviour:
     m_Localized: "Iniciar juego con \xE1rea segura"
     m_Metadata:
       m_Items: []
+  - m_Id: 187764658873720832
+    m_Localized: "Tama\xF1o de la tarjeta"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds:

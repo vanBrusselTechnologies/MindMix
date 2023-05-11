@@ -16,15 +16,6 @@
       },
       "url": "https://packages.unity.com"
     },
-    "com.unity.adaptiveperformance.samsung.android": {
-      "version": "4.0.2",
-      "depth": 0,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.adaptiveperformance": "4.0.1"
-      },
-      "url": "https://packages.unity.com"
-    },
     "com.unity.addressables": {
       "version": "1.20.5",
       "depth": 1,
@@ -73,7 +64,7 @@
       }
     },
     "com.unity.ide.rider": {
-      "version": "3.0.18",
+      "version": "3.0.21",
       "depth": 0,
       "source": "registry",
       "dependencies": {

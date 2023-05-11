@@ -12,7 +12,7 @@ public class Achtergrond : MonoBehaviour
 {
     [SerializeField] private Sprite voorplaat;
     [SerializeField] private RectTransform achtergrondRect;
-    [SerializeField] private Image achtergrondImg;
+    [SerializeField] private UnityEngine.UI.Image achtergrondImg;
     [SerializeField] private GameObject lightObj;
     [SerializeField] private GameObject cameraObj;
     [SerializeField] private GameObject backgroundCanvasObj;

@@ -1011,6 +1011,7 @@ GameObject:
   - component: {fileID: 1782114989}
   - component: {fileID: 1782114990}
   - component: {fileID: 1782114991}
+  - component: {fileID: 1782114992}
   m_Layer: 0
   m_Name: GoogleScriptsObj
   m_TagString: Untagged
@@ -1049,6 +1050,7 @@ MonoBehaviour:
   fireBaseDynamicLinks: {fileID: 1782114988}
   fireBaseAuth: {fileID: 1782114983}
   fireBaseMessages: {fileID: 1782114984}
+  fireBaseCrashlytics: {fileID: 1782114992}
 --- !u!114 &1782114983
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1133,6 +1135,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 72c8e8d1a86ea3f47a30b1174389b89b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1782114992
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1782114980}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d06ed03e3da4d01932d1dea92a109ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1857870275

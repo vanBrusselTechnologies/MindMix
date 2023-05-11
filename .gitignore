@@ -70,7 +70,7 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
-Assets/Firebase/Plugins/x86_64/FirebaseCppApp-10_7_0.bundle
+Assets/Firebase/Plugins/x86_64/FirebaseCppApp-11_0_0.bundle
 
 
 ignore.conf
@@ -78,3 +78,4 @@ ignore.conf
 *.jks
 *.keystore
 .idea/
+.crashlytics/

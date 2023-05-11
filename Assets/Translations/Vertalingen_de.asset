@@ -351,6 +351,10 @@ MonoBehaviour:
     m_Localized: Das Spiel beginnt mit einem sicheren Bereich
     m_Metadata:
       m_Items: []
+  - m_Id: 187764658873720832
+    m_Localized: "Kartengr\xF6\xDFe"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds:

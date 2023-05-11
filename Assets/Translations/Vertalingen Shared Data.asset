@@ -315,6 +315,10 @@ MonoBehaviour:
     m_Key: Minesweeper_setting_startArea
     m_Metadata:
       m_Items: []
+  - m_Id: 187764658873720832
+    m_Key: CardSize
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

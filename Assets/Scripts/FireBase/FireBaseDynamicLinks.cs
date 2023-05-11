@@ -4,16 +4,15 @@ using UnityEngine;
 
 public class FireBaseDynamicLinks : MonoBehaviour
 {
-    public void DynamicLinkSetup()
+    public void OnFirebaseReady()
     {
         DynamicLinks.DynamicLinkReceived += OnDynamicLink;
     }
 
     // Display the dynamic link received by the application.
-    static void OnDynamicLink(object sender, EventArgs args)
+    static void OnDynamicLink(object sender, ReceivedDynamicLinkEventArgs args)
     {
-        ReceivedDynamicLinkEventArgs dynamicLinkEventArgs = args as ReceivedDynamicLinkEventArgs;
-        string url = dynamicLinkEventArgs?.ReceivedDynamicLink.Url.OriginalString;
+        string url = args.ReceivedDynamicLink.Url.OriginalString;
         string link = GetLinkFromUrl(url);
         if (link.Equals("")) return;
         Debug.LogFormat("Received dynamic link {0}", link);

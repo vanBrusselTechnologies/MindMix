@@ -82,6 +82,7 @@ public class SaveScript : MonoBehaviour
         //Float
         _solitaireFloatNames.Add("SolitaireTime");
         _solitaireFloatNames.Add("SolitaireSpaceBetweenCardsFactor");
+        _solitaireFloatNames.Add("SolitaireCardSizeFactor");
         //String
         _solitaireStringNames.Add("SolitaireProgress");
 

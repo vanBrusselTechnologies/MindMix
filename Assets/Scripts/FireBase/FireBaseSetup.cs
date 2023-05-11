@@ -1,5 +1,6 @@
 using Firebase;
 using Firebase.Extensions;
+using Firebase.AppCheck;
 using UnityEngine;
 
 public class FireBaseSetup : MonoBehaviour
@@ -8,7 +9,9 @@ public class FireBaseSetup : MonoBehaviour
     [SerializeField] private FireBaseDynamicLinks fireBaseDynamicLinks;
     [SerializeField] private FireBaseAuth fireBaseAuth;
     [SerializeField] private FireBaseMessages fireBaseMessages;
+    [SerializeField] private FireBaseCrashlytics fireBaseCrashlytics;
 
+#if UNITY_ANDROID && !UNITY_EDITOR
     // Start is called before the first frame update
     private void Start()
     {
@@ -18,7 +21,6 @@ public class FireBaseSetup : MonoBehaviour
 
     private void FireBaseLogin()
     {
-        FirebaseApp.LogLevel = LogLevel.Warning;
         FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
         {
             var dependencyStatus = task.Result;
@@ -31,9 +33,13 @@ public class FireBaseSetup : MonoBehaviour
 
     private void EmitOnFirebaseReady()
     {
+        FirebaseAppCheck.SetAppCheckProviderFactory(
+            PlayIntegrityProviderFactory.Instance);
+        fireBaseCrashlytics.OnFirebaseReady();
         fireBaseAuth.OnFirebaseReady();
         fireBaseMessages.OnFirebaseReady();
-        fireBaseDynamicLinks.DynamicLinkSetup();
+        fireBaseDynamicLinks.OnFirebaseReady();
         playGamesSetup.StartSetup();
     }
+#endif
 }

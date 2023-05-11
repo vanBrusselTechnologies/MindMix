@@ -23,6 +23,7 @@ public class SolitaireGameHandler : MonoBehaviour
     private readonly List<RectTransform> _shuffledPlayingCards = new();
 
     [HideInInspector] public float spaceBetweenCardsFactor = 1f;
+    [HideInInspector] public float cardSizeFactor = 1f;
     [HideInInspector] public bool solitaireInactive;
     [HideInInspector] public bool finished;
     private float _currentPlayingTime;

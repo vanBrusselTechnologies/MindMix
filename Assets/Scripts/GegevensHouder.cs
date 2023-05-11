@@ -51,6 +51,7 @@ public class GegevensHouder : MonoBehaviour
         if (!_testBuild)
         {
             Debug.unityLogger.logEnabled = false;
+            Firebase.FirebaseApp.LogLevel = Firebase.LogLevel.Debug;
         }
 
         SetData();

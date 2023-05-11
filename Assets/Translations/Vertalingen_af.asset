@@ -339,6 +339,10 @@ MonoBehaviour:
     m_Localized: Begin spel met veilige area
     m_Metadata:
       m_Items: []
+  - m_Id: 187764658873720832
+    m_Localized: Kaartgrootte
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds:

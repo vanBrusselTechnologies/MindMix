@@ -1,13 +1,16 @@
-﻿using GooglePlayGames;
+﻿using UnityEngine;
+#if UNITY_ANDROID
+using GooglePlayGames;
 using GooglePlayGames.BasicApi;
-using UnityEngine;
 using VBG.UnityAndroid;
+#endif
 
 public class PlayGamesLogin : MonoBehaviour
 {
     [SerializeField] private FireBaseAuth fireBaseAuth;
     private bool _waitingForNetwork;
 
+#if UNITY_ANDROID
     private enum AuthenticationMethod
     {
         Automatic,
@@ -31,11 +34,7 @@ public class PlayGamesLogin : MonoBehaviour
 
     private void ProcessAuthentication(SignInStatus status)
     {
-        if (status != SignInStatus.Success)
-        {
-            if (_method == AuthenticationMethod.Automatic && fireBaseAuth.CurrentUser == null) ManualLogin();
-            return;
-        }
+        if (status != SignInStatus.Success) return;
 
         PlayGamesPlatform.Instance.RequestServerSideAccess(false,
             code =>
@@ -68,4 +67,5 @@ public class PlayGamesLogin : MonoBehaviour
         else ManualLogin();
         _waitingForNetwork = false;
     }
+#endif
 }

@@ -7,7 +7,7 @@ public class FireBaseAuth : MonoBehaviour
     public FirebaseUser CurrentUser => _auth?.CurrentUser;
     public bool Connected => CurrentUser != null;
 
-    private SaveScript _saveScript;
+    //private SaveScript _saveScript;
     private FirebaseAuth _auth;
 
     private bool _waitingForNetwork;
@@ -29,7 +29,7 @@ public class FireBaseAuth : MonoBehaviour
                 return;
             }
 
-            _saveScript = SaveScript.Instance;
+            //_saveScript = SaveScript.Instance;
             Debug.LogWarning("MUST BE CHANGED");
             //_saveScript.IntDict["laatsteXOffline"] = 0;
             //_saveScript.UpdateData();
@@ -48,7 +48,7 @@ public class FireBaseAuth : MonoBehaviour
                 return;
             }
 
-            _saveScript = SaveScript.Instance;
+            //_saveScript = SaveScript.Instance;
             Debug.LogWarning("MUST BE CHANGED");
             //_saveScript.IntDict["laatsteXOffline"] = 0;
             //_saveScript.UpdateData();

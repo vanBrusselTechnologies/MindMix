@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" package="com.vanBrusselGames.MindMix" android:versionCode="1" android:versionName="1.0">
   <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
-  <application android:label="@string/app_name" android:icon="@drawable/app_icon">
+  <application android:allowNativeHeapPointerTagging="false" android:label="@string/app_name" android:icon="@drawable/app_icon">
     <!-- The MessagingUnityPlayerActivity is a class that extends
          UnityPlayerActivity to work around a known issue when receiving
          notification data payloads in the background. -->

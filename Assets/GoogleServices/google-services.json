@@ -2,8 +2,7 @@
   "project_info": {
     "project_number": "528380549151",
     "project_id": "mindmix-a147c",
-    "storage_bucket": "mindmix-a147c.appspot.com",
-    "firebase_url": "https://mindmix-a147c.firebaseio.com"
+    "storage_bucket": "mindmix-a147c.appspot.com"
   },
   "client": [
     {
@@ -14,14 +13,6 @@
         }
       },
       "oauth_client": [
-        {
-          "client_id": "528380549151-3duhdu6f4m54o74ltj7h0sm86458qr2u.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.vanBrusselGames.MindMix",
-            "certificate_hash": "d0c0c0ca885e47b5cca9c90d95f1673213efcc20"
-          }
-        },
         {
           "client_id": "528380549151-l079h9g6e2hpo6biq15j58o96p39j8pd.apps.googleusercontent.com",
           "client_type": 3
@@ -48,7 +39,8 @@
             }
           ]
         }
-      }
+      },
+      "admob_app_id": "ca-app-pub-7048585956228368~3762816385"
     }
   ],
   "configuration_version": "1"

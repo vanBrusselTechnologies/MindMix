@@ -316,12 +316,10 @@ namespace GooglePlayGames
         /// access the Play Games Services web APIs. This is commonly used to complete a sign-in flow
         /// by verifying the Play Games Services player id.
         ///
-        /// If {@code forceRefreshToken} is true, when exchanging the authorization code a refresh
+        /// <p>If {@code forceRefreshToken} is true, when exchanging the authorization code a refresh
         /// token will be returned in addition to the access token. The refresh token allows the
         /// game-server to request additional access tokens, allowing your game-server to continue
-        /// accesses Play Games Services while the user is not actively playing your app.
-        /// 
-        /// <remarks>
+        /// accesses Play Games Services while the user is not actively playing your app. <remarks>
         ///
         /// </remarks>
         /// <param name="forceRefreshToken">If {@code true} when the returned authorization code is

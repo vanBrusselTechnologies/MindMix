@@ -349,6 +349,10 @@ MonoBehaviour:
     m_Localized: Inizia il gioco con un'area sicura
     m_Metadata:
       m_Items: []
+  - m_Id: 187764658873720832
+    m_Localized: Dimensione della carta
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds:
