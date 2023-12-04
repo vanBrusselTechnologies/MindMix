@@ -32,7 +32,7 @@ data class MinesweeperCell(val id: Int, val isMine: Boolean){
                 val mineIndex = id + i + j * shortSide
                 if (mineIndex < 0 || mineIndex >= MinesweeperManager.cellCount) continue
                 if (mineIndex % shortSide == 0 && i == 1 || id % shortSide == 0 && i == -1) continue
-                mineCount += if (MinesweeperData.Mines[mineIndex]) 1 else 0
+                mineCount += if (MinesweeperManager.mines[mineIndex]) 1 else 0
             }
             i++
         }

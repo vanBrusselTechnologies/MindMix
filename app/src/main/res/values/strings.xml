@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">MindMix</string>
+    <string name="game_services_project_id">528380549151</string>
+    <string name="default_web_client_id">528380549151-l079h9g6e2hpo6biq15j58o96p39j8pd.apps.googleusercontent.com</string>
 </resources>

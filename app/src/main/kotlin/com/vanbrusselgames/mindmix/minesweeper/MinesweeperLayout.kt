@@ -20,9 +20,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -123,7 +123,7 @@ class MinesweeperLayout : BaseLayout() {
                 .align(Alignment.Center)
                 .pointerInput(Unit) {
                     detectTapGestures { offset ->
-                        if (MinesweeperData.Finised || MinesweeperData.GameOver) return@detectTapGestures
+                        if (MinesweeperManager.finished || MinesweeperManager.gameOver) return@detectTapGestures
                         val column = floor(offset.x / cellSize.toPx())
                         val row = floor(offset.y / cellSize.toPx())
                         val cellIndex = if (MinesweeperManager.sizeX < MinesweeperManager.sizeY) {
@@ -161,14 +161,13 @@ class MinesweeperLayout : BaseLayout() {
     }
 
     private fun onSelectCell(cell: MinesweeperCell) {
-        if (MinesweeperData.Finised || MinesweeperData.GameOver) return
-        if (cell.isMine) return showAllMines()
-
+        if (MinesweeperManager.finished || MinesweeperManager.gameOver) return
         when (cell.state) {
             MinesweeperCell.State.Empty -> {
                 if (MinesweeperManager.inputMode == InputMode.Flag) {
                     cell.state = MinesweeperCell.State.Flag
                 } else {
+                    if (cell.isMine) return showAllMines()
                     cell.state = MinesweeperCell.State.Number
                     if (cell.mineCount == 0) {
                         val tempCheckList = mutableListOf(-1)
@@ -266,7 +265,7 @@ class MinesweeperLayout : BaseLayout() {
     fun Tools(isHorizontal: Boolean) {
         if (isHorizontal) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                val painterId = remember { mutableStateOf(R.drawable.spade) }
+                val painterId = remember { mutableIntStateOf(R.drawable.spade) }
                 Button(
                     onClick = { changeInputMode(painterId) },
                     modifier = Modifier
@@ -276,14 +275,14 @@ class MinesweeperLayout : BaseLayout() {
                     enabled = !minesweeperFinished.value
                 ) {
                     Image(
-                        painter = painterResource(painterId.value),
+                        painter = painterResource(painterId.intValue),
                         contentDescription = "inputType: ${MinesweeperManager.inputMode.name}"
                     )
                 }
             }
         } else {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                val painterId = remember { mutableStateOf(R.drawable.spade) }
+                val painterId = remember { mutableIntStateOf(R.drawable.spade) }
                 Button(
                     onClick = { changeInputMode(painterId) },
                     modifier = Modifier
@@ -293,7 +292,7 @@ class MinesweeperLayout : BaseLayout() {
                     enabled = !minesweeperFinished.value
                 ) {
                     Image(
-                        painter = painterResource(painterId.value),
+                        painter = painterResource(painterId.intValue),
                         contentDescription = "inputType: ${MinesweeperManager.inputMode.name}"
                     )
                 }
@@ -301,8 +300,8 @@ class MinesweeperLayout : BaseLayout() {
         }
     }
 
-    private fun changeInputMode(painterId: MutableState<Int>) {
-        painterId.value =
+    private fun changeInputMode(painterId: MutableIntState) {
+        painterId.intValue =
             if (MinesweeperManager.changeInputMode() == InputMode.Flag) R.drawable.flag_red
             else R.drawable.spade
     }

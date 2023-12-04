@@ -1,15 +1,21 @@
 package com.vanbrusselgames.mindmix.sudoku
 
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 class SudokuManager {
     companion object Instance {
         private lateinit var solution: IntArray
-        lateinit var clues: Array<Int>
         var inputMode: InputMode = InputMode.Normal
         private lateinit var puzzle: SudokuPuzzle
+        var cells: Array<SudokuPuzzleCell> = arrayOf()
+        var selectedCellIndex: Int = -1
+
+        var checkConflictingCells = true
+        var autoEditNotes = true
         val sudokuFinished = mutableStateOf(false)
+        var finished = false
 
         enum class PuzzleType {
             Classic
@@ -19,16 +25,47 @@ class SudokuManager {
             Normal, Note
         }
 
+        fun loadFromFile(data: SudokuData) {
+            val cellList = mutableListOf<SudokuPuzzleCell>()
+            var clueId = 0
+            for (i in data.input.indices) {
+                val isClue = data.clues[clueId] == i
+                if (isClue) clueId++
+                val notes = Array(9) { false }
+                for (i2 in data.inputNotes[i]) {
+                    notes[i2] = true
+                }
+                cellList.add(SudokuPuzzleCell(i, isClue, data.input[i], notes))
+            }
+            cells = cellList.toTypedArray()
+            finished = data.finished
+
+            val clues = cells.map { c -> if (c.isClue) c.value else 0 }.toIntArray()
+            solution = SudokuPuzzle.getSolution(clues)
+            puzzle = SudokuPuzzle(solution)
+
+            if(checkConflictingCells){
+                cells.forEach { c -> checkConflictingCell(c.id) }
+            }
+        }
+
+        fun saveToFile(): String {
+            val clues = cells.filter { c -> c.isClue }.map { c -> c.id }
+            val input = cells.map { c -> c.value }
+            val notes = cells.map { c ->
+                c.notes.mapIndexed { i, n -> if (n) i else -1 }.filter { n -> n != -1 }
+            }
+            return Json.encodeToString(SudokuData(clues, input, notes, finished))
+        }
+
         fun loadPuzzle() {
-            if (SudokuData.Clues.isEmpty()) {
-                puzzle = createPuzzle()
+            val size = 9
+
+            if (cells.isEmpty()) {
+                puzzle = createPuzzle(size = size)
                 solution = SudokuPuzzle.getSolution(puzzle)
-                SudokuData.Clues = SudokuPuzzle.createClues(puzzle, 60)
-                clues = SudokuData.Clues.toTypedArray()
-            } else {
-                solution = SudokuPuzzle.getSolution(SudokuData.Clues)
-                clues = SudokuData.Clues.toTypedArray()
-                puzzle = SudokuPuzzle(solution)
+                val clues = SudokuPuzzle.createClues(puzzle, 60)
+                cells = Array(size * size) { SudokuPuzzleCell(it, clues[it] != 0, clues[it]) }
             }
         }
 
@@ -39,74 +76,63 @@ class SudokuManager {
             else SudokuPuzzle.randomGrid(0)
         }
 
-        fun autoChangeNotes(index: Int, cellRememberValueList: Array<MutableState<Int>>) {
+        fun autoChangeNotes(index: Int) {
             if (index >= 81) return
-            if (SudokuData.Input[index] == 0) return
+            if (cells[index].value == 0) return
             val indices: IntArray = puzzle.peers(index)
-            val number: Int = SudokuData.Input[index]
+            val number: Int = cells[index].value
             for (n: Int in indices) {
                 if (index == n) continue
-                val note: Int = SudokuData.InputNotes[n][number - 1]
-                if (note != number) continue
-                SudokuData.InputNotes[n][number - 1] = 0
-                if (SudokuData.Input[n] != 0) continue
-                cellRememberValueList[n].value = -SudokuData.InputNotes[n].sum()
+                if (!cells[n].hasNote(number)) continue
+                cells[n].setNote(number)
             }
         }
 
-        fun checkConflictingCell(
-            index: Int = 0,
-            cellColorList: Array<MutableState<Int>>,
-            selectedCellIndex: MutableState<Int>,
-            isSecondary: Boolean = false
-        ) {
-            if (index >= 81) return
+        fun checkConflictingCell(index: Int = 0, isSecondary: Boolean = false) {
+            if (index >= 81 || index < 0 || cells[index].isClue) return
             val indices: IntArray = puzzle.peers(index)
             var isConflicting = false
             for (n: Int in indices) {
                 if (index == n) continue
-                if (SudokuData.Input[index] == 0) {
-                    var i = 0
-                    while (i < 9) {
-                        val note: Int = SudokuData.InputNotes[index][i]
-                        i++
-                        if (note == 0 || (note != SudokuData.Input[n] && note != clues[n])) continue
-                        cellColorList[index].value = -1
-                        return
+                when (true) {
+                    (cells[index].value == 0) -> {
+                        var i = 0
+                        while (i < 9) {
+                            i++
+                            if (!cells[index].hasNote(i)) continue
+                            if (i != cells[n].value) continue
+                            cells[index].isIncorrect = true
+                            return
+                        }
                     }
-                } else if (SudokuData.Input[index] == SudokuData.Input[n] || SudokuData.Input[index] == clues[n]) {
-                    cellColorList[index].value = -1
-                    isConflicting = true
-                    if (!isSecondary) checkConflictingCell(
-                        n, cellColorList, selectedCellIndex, true
-                    )
-                } else if (!isSecondary && cellColorList[n].value == -1) {
-                    checkConflictingCell(n, cellColorList, selectedCellIndex, true)
+
+                    (cells[index].value == cells[n].value) -> {
+                        cells[index].isIncorrect = true
+                        isConflicting = true
+                        if (!isSecondary) checkConflictingCell(n, true)
+                    }
+
+                    (!isSecondary && cells[index].isIncorrect) -> {
+                        checkConflictingCell(n, true)
+                    }
+
+                    else -> {}
                 }
             }
-            if (!isConflicting) cellColorList[index].value =
-                if (selectedCellIndex.value == index) 1 else 0
+            if (!isConflicting) cells[index].isIncorrect = false
         }
 
         fun checkFinished() {
-            SudokuData.Finised = isFinished()
-            sudokuFinished.value = SudokuData.Finised
+            finished = isFinished()
+            sudokuFinished.value = finished
         }
 
-        private fun isFinished(): Boolean{
+        private fun isFinished(): Boolean {
             try {
-                var i = 0
-                val input = IntArray(SudokuData.Input.size){0}
-                while (i < SudokuData.Input.size){
-                    input[i] = SudokuData.Input[i] + SudokuData.Clues[i]
-                    if(input[i] == 0) {
-                        return false
-                    }
-                    i++
-                }
-                val solution = SudokuPuzzle.getSolution(input)
+                if (cells.any { c -> c.value == 0 }) return false
+                val input = cells.map { c -> c.value }.toIntArray()
                 return solution.contentEquals(input)
-            } catch(_:Exception) {
+            } catch (_: Exception) {
                 return false
             }
         }

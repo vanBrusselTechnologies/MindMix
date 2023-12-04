@@ -18,11 +18,9 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
@@ -38,10 +36,7 @@ import com.vanbrusselgames.mindmix.PixelHelper.Companion.pxToSp
 import kotlin.math.floor
 
 class SudokuLayout : BaseLayout() {
-
     override var uiHandler: BaseUIHandler = SudokuUIHandler()
-    private var cellRememberValueList = arrayOf<MutableState<Int>>()
-    private var cellColorList = arrayOf<MutableState<Int>>()
 
     @Composable
     fun BaseScene() {
@@ -52,12 +47,6 @@ class SudokuLayout : BaseLayout() {
 
     @Composable
     fun SudokuSpecificLayout() {
-        val selectedCellIndex = remember { mutableStateOf(-1) }
-        val isSudokuFinished = remember { SudokuManager.sudokuFinished }
-        if (cellRememberValueList.isEmpty()) {
-            cellRememberValueList = Array(81) { remember { mutableStateOf(SudokuData.Input[it]) } }
-            cellColorList = Array(81) { remember { mutableStateOf(0) } }
-        }
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -68,7 +57,7 @@ class SudokuLayout : BaseLayout() {
                     .align(Alignment.Center),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                SudokuGrid(selectedCellIndex)
+                SudokuGrid()
 
                 Spacer(
                     modifier = Modifier
@@ -76,16 +65,14 @@ class SudokuLayout : BaseLayout() {
                         .aspectRatio(1f)
                 )
 
-                SudokuNumPad(
-                    selectedCellIndex, cellRememberValueList, cellColorList, isSudokuFinished
-                ).Show()
+                SudokuNumPad().Show()
             }
         }
     }
 
     //#region Grid
     @Composable
-    fun SudokuGrid(selectedCellIndex: MutableState<Int>) {
+    fun SudokuGrid() {
         Box(
             modifier = Modifier
                 .fillMaxWidth(0.95f)
@@ -97,27 +84,16 @@ class SudokuLayout : BaseLayout() {
                 userScrollEnabled = false,
                 modifier = Modifier.align(Alignment.Center)
             ) {
-                itemsIndexed(SudokuManager.clues) { index, _ ->
-                    SudokuCell(
-                        index = index
-                    ) {
-                        if (cellColorList[index].value != -1) {
-                            cellColorList[index].value = 1
-                        }
-                        if (selectedCellIndex.value != -1 && cellColorList[selectedCellIndex.value].value != -1) {
-                            cellColorList[selectedCellIndex.value].value = 0
-                        }
-                        selectedCellIndex.value = index
-                    }
+                itemsIndexed(SudokuManager.cells) { _, cellData ->
+                    SudokuCell(cellData)
                 }
             }
         }
     }
 
     @Composable
-    fun SudokuCell(
-        index: Int, onSelected: () -> Unit
-    ) {
+    fun SudokuCell(cellData: SudokuPuzzleCell) {
+        val index = cellData.id
         val vertIndex = index % 3
         val horzIndex = floor(index / 9f) % 3f
         val padding = PaddingValues(
@@ -126,55 +102,59 @@ class SudokuLayout : BaseLayout() {
             top = if (horzIndex == 0f) 2.dp else if (horzIndex == 1f) 1.25.dp else 0.dp,
             bottom = if (horzIndex == 2f) 2.dp else if (horzIndex == 1f) 1.25.dp else 0.dp,
         )
-        val isClue = SudokuManager.clues[index] in 1..9
-        BoxWithConstraints(
-            Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .background(
-                    when (cellColorList[index].value) {
-                        -1 -> MaterialTheme.colorScheme.errorContainer
-                        1 -> MaterialTheme.colorScheme.primaryContainer
-                        else -> MaterialTheme.colorScheme.secondaryContainer
+        val colorScheme = MaterialTheme.colorScheme
+        BoxWithConstraints(Modifier
+            .fillMaxSize()
+            .padding(padding)
+            .aspectRatio(1f)
+            .clickable(enabled = (!cellData.isClue && !SudokuManager.sudokuFinished.value)) {
+                cellData.isSelected = true
+
+                val currSelectedCellId = SudokuManager.selectedCellIndex
+                if (currSelectedCellId != -1 && currSelectedCellId != cellData.id) {
+                    SudokuManager.cells[currSelectedCellId].isSelected = false
+                }
+
+                SudokuManager.selectedCellIndex = cellData.id
+            }
+            .drawBehind {
+                drawRect(
+                    when (true) {
+                        cellData.mutableIsIncorrect.value -> colorScheme.errorContainer
+                        cellData.mutableIsSelected.value -> colorScheme.primaryContainer
+                        else -> colorScheme.secondaryContainer
                     }
                 )
-                .aspectRatio(1f)
-                .clickable(enabled = (!isClue && !SudokuManager.sudokuFinished.value)) { onSelected() }) {
+            }) {
             val space = pxToSp(minOf(constraints.maxHeight, constraints.minHeight))
-            val isNoteInput =
-                !isClue && cellRememberValueList[index].value <= 0 && !SudokuData.InputNotes[index].contentEquals(
-                    IntArray(9) { 0 })
-            val textColor = when (cellColorList[index].value) {
-                -1 -> MaterialTheme.colorScheme.onErrorContainer
-                1 -> MaterialTheme.colorScheme.onPrimaryContainer
-                else -> MaterialTheme.colorScheme.onSecondaryContainer
-            }
-
-            if (!isNoteInput) {
-                val cellValue = if (isClue) SudokuManager.clues[index] else SudokuData.Input[index]
-                if (cellValue == 0) return@BoxWithConstraints
-                SudokuRegularCellText(
-                    value = cellValue,
-                    space = space,
-                    textColor = textColor,
-                    isClue = isClue
-                )
-            } else {
-                SudokuNoteCellText(
-                    value = SudokuData.InputNotes[index],
-                    space = space,
-                    textColor = textColor
-                )
-            }
+            SudokuCellValueText(cellData, space)
         }
     }
 
     @Composable
-    fun SudokuRegularCellText(space: TextUnit, value: Int, textColor: Color, isClue: Boolean) {
+    fun SudokuCellValueText(cellData: SudokuPuzzleCell, space: TextUnit) {
+        val isNoteInput = !cellData.isClue && cellData.mutableCellValue.value == 0
+        if (!isNoteInput) {
+            SudokuRegularCellText(cellData = cellData, space = space, isClue = cellData.isClue)
+        } else {
+            SudokuNoteCellText(cellData = cellData, space = space)
+        }
+    }
+
+    @Composable
+    fun SudokuRegularCellText(
+        cellData: SudokuPuzzleCell, space: TextUnit, isClue: Boolean
+    ) {
         Box(Modifier.fillMaxSize()) {
+            val value = cellData.mutableCellValue.value
+            if (value == 0) return@Box
             Text(
                 text = AnnotatedString(value.toString()),
-                color = textColor,
+                color = when (true) {
+                    cellData.mutableIsIncorrect.value -> MaterialTheme.colorScheme.onErrorContainer
+                    cellData.mutableIsSelected.value -> MaterialTheme.colorScheme.onPrimaryContainer
+                    else -> MaterialTheme.colorScheme.onSecondaryContainer
+                },
                 textAlign = TextAlign.Center,
                 fontSize = space / 2f * if (isClue) 1.15f else 1f,
                 fontWeight = if (isClue) FontWeight.ExtraBold else FontWeight.Normal,
@@ -194,21 +174,27 @@ class SudokuLayout : BaseLayout() {
     }
 
     @Composable
-    fun SudokuNoteCellText(value: IntArray, space: TextUnit, textColor: Color) {
+    fun SudokuNoteCellText(cellData: SudokuPuzzleCell, space: TextUnit) {
         Box(Modifier.fillMaxSize()) {
+            val notes = cellData.mutableCellNotes
+            if (notes.none { n -> n }) return@Box
             val str = StringBuilder()
             var i = 0
             while (i < 9) {
-                val num = value[i]
+                val hasNote = notes[i]
                 val rIndex = i % 3
                 if (i != 0 && rIndex == 0) str.append("\n")
-                if (num == 0) str.append("  ") else str.append(num.toString())
-                if (rIndex < 2) str.append(" ")
                 i++
+                str.append(if (hasNote) i.toString() else "  ")
+                if (rIndex < 2) str.append(" ")
             }
             Text(
                 text = AnnotatedString(str.toString()),
-                color = textColor,
+                color = when (true) {
+                    cellData.mutableIsIncorrect.value -> MaterialTheme.colorScheme.onErrorContainer
+                    cellData.mutableIsSelected.value -> MaterialTheme.colorScheme.onPrimaryContainer
+                    else -> MaterialTheme.colorScheme.onSecondaryContainer
+                },
                 textAlign = TextAlign.Center,
                 fontSize = space / 6f,
                 lineHeight = space / 6f,

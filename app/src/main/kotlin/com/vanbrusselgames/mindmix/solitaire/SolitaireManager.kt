@@ -1,15 +1,19 @@
 package com.vanbrusselgames.mindmix.solitaire
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.IntOffset
 import androidx.core.math.MathUtils.clamp
 import com.vanbrusselgames.mindmix.R
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import kotlin.math.absoluteValue
 import kotlin.math.floor
 import kotlin.math.roundToInt
 
 class SolitaireManager {
     companion object Instance {
-        private val cards = arrayOf(
+        val cards = arrayOf(
             PlayingCard(
                 PlayingCard.CardType.CLOVERS,
                 PlayingCard.CardIndex.A,
@@ -274,22 +278,46 @@ class SolitaireManager {
         )
 
         private val movingCards: MutableList<PlayingCard> = mutableListOf()
-        val cardStacks: Array<MutableList<PlayingCard>> = Array(14) { mutableListOf() }
+        private val cardStacks: Array<MutableList<PlayingCard>> = Array(14) { mutableListOf() }
 
-        fun loadPuzzle() {/* This should be moved to 'reset()'
-            movingCards.clear()
-            for (cardStack in cardStacks) {
-                cardStack.clear()
+
+        val solitaireFinished = mutableStateOf(false)
+        var finished = false
+
+        fun loadFromFile(data: SolitaireData) {
+            for (i in data.cardStacks.indices) {
+                data.cardStacks[i].forEachIndexed { j, k ->
+                    var index = k
+                    var frontVisible = true
+                    if (index < 0) {
+                        index = (index + 1).absoluteValue
+                        frontVisible = false
+                    }
+                    val c = cards[index]
+                    c.currentStackId = i
+                    c.currentStackIndex = j
+                    c.frontVisible = frontVisible
+                    cardStacks[i].add(c)
+                }
             }
-            for (card in cards) {
-                card.frontVisible = false
+            finished = data.finished
+        }
+
+        fun saveToFile(): String {
+            val stacks = MutableList(14) { listOf<Int>() }
+            for (i in cardStacks.indices) {
+                stacks[i] = cardStacks[i].map { c -> if (c.frontVisible) c.id else -1 * c.id - 1 }
             }
-            */
+            return Json.encodeToString(SolitaireData(stacks, finished))
+        }
+
+        fun loadPuzzle() {
             if (cards[0].currentStackIndex == -1) {
-                cards.shuffle()
+                val dupCards = cards.copyOf()
+                dupCards.shuffle()
                 var j = 0
                 for (i in 0 until 7) {
-                    cardStacks[7 + i] = cards.copyOfRange(j, j + i + 1).toMutableList()
+                    cardStacks[7 + i] = dupCards.copyOfRange(j, j + i + 1).toMutableList()
                     cardStacks[7 + i].last().frontVisible = true
                     cardStacks[7 + i].forEachIndexed { index, card ->
                         card.currentStackIndex = index
@@ -297,7 +325,7 @@ class SolitaireManager {
                     }
                     j += i + 1
                 }
-                cardStacks[6] = cards.copyOfRange(j, cards.size).toMutableList()
+                cardStacks[6] = dupCards.copyOfRange(j, dupCards.size).toMutableList()
                 cardStacks[6].forEachIndexed { index, card ->
                     card.currentStackIndex = index
                     card.currentStackId = 6
@@ -394,6 +422,7 @@ class SolitaireManager {
             if (firstCardStackId >= 7 && oldStack.size >= 1) {
                 oldStack.last().frontVisible = true
             }
+            checkFinished()
         }
 
         private fun moveCardToFoundation(card: PlayingCard): Boolean {
@@ -435,9 +464,9 @@ class SolitaireManager {
             return true
         }
 
-        fun checkFinished() {
-            //MinesweeperData.Finised = isFinished()
-            //solitaireFinished.value = MinesweeperData.Finised
+        private fun checkFinished() {
+            finished = isFinished()
+            solitaireFinished.value = finished
         }
 
         private fun isFinished(): Boolean {

@@ -1,10 +1,13 @@
 package com.vanbrusselgames.mindmix.sudoku
 
-object SudokuData {
-    var Clues = intArrayOf()
-    var Input = IntArray(81){0}
-    var InputNotes = Array(81){IntArray(9){0} }
-    var CheckConflictingCells = true
-    var AutoEditNotes = true
-    var Finised = false
-}
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class SudokuData(
+    val clues: List<Int>,
+    val input: List<Int>,
+    val inputNotes: List<List<Int>>,
+    val finished: Boolean
+)
+//var CheckConflictingCells = true      Preference -> DataStore
+//var AutoEditNotes = true              Preference -> DataStore

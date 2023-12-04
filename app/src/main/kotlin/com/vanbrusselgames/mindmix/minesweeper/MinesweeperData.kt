@@ -1,8 +1,6 @@
 package com.vanbrusselgames.mindmix.minesweeper
 
-object MinesweeperData {
-    var Mines = arrayOf<Boolean>()
-    var Input = intArrayOf()
-    var Finised = false
-    var GameOver = false
-}
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class MinesweeperData(val input: List<Int>, val mines: List<Int>, val finished: Boolean)

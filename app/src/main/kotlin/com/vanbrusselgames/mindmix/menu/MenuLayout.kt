@@ -27,7 +27,7 @@ import com.vanbrusselgames.mindmix.BaseUIHandler
 
 class MenuLayout : BaseLayout() {
 
-    override lateinit var uiHandler: BaseUIHandler
+    override var uiHandler: BaseUIHandler
     private val menuUiHandler: MenuUIHandler
 
     init {

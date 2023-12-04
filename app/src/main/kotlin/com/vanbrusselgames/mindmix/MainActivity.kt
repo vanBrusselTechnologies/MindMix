@@ -16,11 +16,16 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.vanbrusselgames.mindmix.ui.theme.MindMixTheme
 
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AuthManager.start(this)
+
         PixelHelper.setResources(resources)
         setFullScreen(actionBar, window)
+        DataManager.init(applicationContext)
+        DataManager.load()
 
         setContent {
             MindMixTheme {

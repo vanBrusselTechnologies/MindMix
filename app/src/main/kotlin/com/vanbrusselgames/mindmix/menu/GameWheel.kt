@@ -18,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -55,7 +56,7 @@ fun GameWheel(
     val gameWheelSize = min(screenHeight.value / 425f, screenWidth.value / 225f)
     val wheelSizeFactor = if (isInnerWheel) 1f else 1.625f
     var canRotate by remember { mutableStateOf(false) }
-    var rotationAngle by remember { mutableStateOf(0f) }
+    var rotationAngle by remember { mutableFloatStateOf(0f) }
     val rotationAnimation by animateFloatAsState(
         targetValue = rotationAngle, animationSpec = spring(
             dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessVeryLow
@@ -97,9 +98,9 @@ fun GameWheel(
             if (gameCount == 0) return
             val radius = gameWheelSize * 40f * if (isInnerWheel) 1f else 1.125f
             for (i in 0 until gameCount * withDupsFactor) {
-                if (i >= gameCount) {
-                    //Select gameImage 1: we are placing dups now
-                }
+                // if (i >= gameCount) {
+                // Select gameImage 1: we are placing dups now
+                // }
                 val angle = i * angleStep
                 val offsetX = sin(angle * Math.PI / 180f) * radius
                 val offsetY = cos(angle * Math.PI / 180f) * radius

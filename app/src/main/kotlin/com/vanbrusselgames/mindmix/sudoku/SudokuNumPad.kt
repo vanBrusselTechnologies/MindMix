@@ -29,12 +29,7 @@ import com.vanbrusselgames.mindmix.AutoSizeText
 import com.vanbrusselgames.mindmix.R
 import com.vanbrusselgames.mindmix.sudoku.SudokuManager.Instance.InputMode
 
-class SudokuNumPad(
-    private val selectedCellIndex: MutableState<Int>,
-    private val cellRememberValueList: Array<MutableState<Int>>,
-    private val cellColorList: Array<MutableState<Int>>,
-    private val sudokuFinished: MutableState<Boolean>
-) {
+class SudokuNumPad {
     @Composable
     fun Show() {
         Box(
@@ -72,7 +67,7 @@ class SudokuNumPad(
                 .aspectRatio(1f)
                 .padding(padding)
                 .background(MaterialTheme.colorScheme.secondaryContainer)
-                .clickable(enabled = !sudokuFinished.value) {
+                .clickable(enabled = !SudokuManager.sudokuFinished.value) {
                     if (value != 10) onClickNumPadCell(index)
                     else changeInputMode(inputMode)
                 }) {
@@ -88,37 +83,30 @@ class SudokuNumPad(
                 )
             }
             if (value == 10) {
-                val imagePainter =
-                    if (inputMode.value == InputMode.Normal) painterResource(id = R.drawable.pencil) else painterResource(
-                        id = R.drawable.note_paper
-                    )
+                val imagePainter = if (inputMode.value == InputMode.Normal) {
+                    painterResource(id = R.drawable.pencil)
+                } else painterResource(id = R.drawable.note_paper)
                 Image(imagePainter, "", Modifier.scale(0.9f))
             }
         }
     }
 
     private fun onClickNumPadCell(numPadCellIndex: Int) {
-        val gridCellIndex = selectedCellIndex.value
-        if (gridCellIndex != -1) {
-            if (SudokuManager.inputMode == InputMode.Normal) {
-                SudokuData.Input[gridCellIndex] = numPadCellIndex + 1
-                cellRememberValueList[gridCellIndex].value = numPadCellIndex + 1
-                SudokuManager.checkFinished()
-                if(SudokuData.Finised){
-                    selectedCellIndex.value = -1
-                }
-                else if (SudokuData.AutoEditNotes)
-                    SudokuManager.autoChangeNotes(gridCellIndex, cellRememberValueList)
-            } else {
-                SudokuData.Input[gridCellIndex] = 0
-                SudokuData.InputNotes[gridCellIndex][numPadCellIndex] =
-                    if (SudokuData.InputNotes[gridCellIndex][numPadCellIndex] == 0) numPadCellIndex + 1 else 0
-                cellRememberValueList[gridCellIndex].value =
-                    -SudokuData.InputNotes[gridCellIndex].sum()
-            }
-            if (SudokuData.CheckConflictingCells) {
-                SudokuManager.checkConflictingCell(gridCellIndex, cellColorList, selectedCellIndex)
-            }
+        val gridCellIndex = SudokuManager.selectedCellIndex
+        if (gridCellIndex == -1) return
+        if (SudokuManager.inputMode == InputMode.Normal) {
+            SudokuManager.cells[gridCellIndex].setNumber(numPadCellIndex + 1)
+            SudokuManager.checkFinished()
+            if (SudokuManager.finished) {
+                SudokuManager.selectedCellIndex = -1
+                SudokuManager.cells.find { c -> c.isSelected }?.isSelected = false
+            } else if (SudokuManager.autoEditNotes) SudokuManager.autoChangeNotes(gridCellIndex)
+        } else {
+            SudokuManager.cells[gridCellIndex].setNote(numPadCellIndex + 1)
+            SudokuManager.cells[gridCellIndex].value = 0
+        }
+        if (SudokuManager.checkConflictingCells) {
+            SudokuManager.checkConflictingCell(gridCellIndex)
         }
     }
 

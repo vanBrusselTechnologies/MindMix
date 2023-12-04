@@ -1,6 +1,8 @@
 package com.vanbrusselgames.mindmix.minesweeper
 
 import androidx.compose.runtime.mutableStateOf
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import kotlin.math.pow
 import kotlin.random.Random
 
@@ -10,6 +12,12 @@ class MinesweeperManager {
         val minesweeperFinished = mutableStateOf(false)
         var sizeX = 16
         var sizeY = 22
+
+        var gameOver = false
+        var finished = false
+
+        val mines = BooleanArray(sizeX * sizeY) { false }
+
         val cellCount
             get() = sizeX * sizeY
         var cells = arrayOf<MinesweeperCell>()
@@ -22,39 +30,40 @@ class MinesweeperManager {
             Normal, Flag
         }
 
+        fun loadFromFile(data: MinesweeperData) {
+            for (index in data.mines) mines[index] = true
+            finished = data.finished
+            cells = Array(cellCount) { MinesweeperCell(it, mines[it]) }
+            val stateEntries = MinesweeperCell.State.entries
+            for (i in data.input.indices) {
+                cells[i].state = stateEntries[data.input[i]]
+            }
+        }
+
+        fun saveToFile(): String {
+            val mineIndices = mutableListOf<Int>()
+            val input = mutableListOf<Int>()
+            cells.forEach { c ->
+                if (c.isMine) mineIndices.add(c.id)
+                input.add(c.state.ordinal)
+            }
+            return Json.encodeToString(MinesweeperData(input, mineIndices, finished))
+        }
+
         fun loadPuzzle() {
-            if (MinesweeperData.Mines.isEmpty()) {
+            if (cells.isEmpty()) {
                 val difficulty = 0
-                MinesweeperData.Mines = Array(cellCount) { false }
-                MinesweeperData.Input = IntArray(cellCount) { 0 }
                 val mineCount = 25 + (10f * 1.75f.pow(difficulty)).toInt()
                 var i = 0
                 while (i < mineCount) {
                     val rand: Int = Random.nextInt(cellCount)
-                    val isMine = MinesweeperData.Mines[rand]
+                    val isMine = mines[rand]
                     if (!isMine) {
-                        MinesweeperData.Mines[rand] = true
+                        mines[rand] = true
                         i++
                     }
                 }
-                cells = Array(cellCount) { MinesweeperCell(it, MinesweeperData.Mines[it]) }
-            } else {/*
-                for (int i = 0; i < chars.Length; i++)
-                {
-                    char ch = chars[i];
-                    switch (ch)
-                    {
-                        case '2':
-                            _minesweeperInput[i] = 2;
-                            InstantiateFlag(i);
-                            break;
-                        case '1':
-                            _minesweeperInput[i] = 1;
-                            InstantiateButton(i);
-                            break;
-                    }
-                }
-                */
+                cells = Array(cellCount) { MinesweeperCell(it, mines[it]) }
             }
         }
 
@@ -86,8 +95,8 @@ class MinesweeperManager {
         }
 
         fun showAllMines() {
-            if (MinesweeperData.GameOver) return
-            MinesweeperData.GameOver = true
+            if (gameOver) return
+            gameOver = true
             var i = -1
             while (i < cellCount - 1) {
                 i++
@@ -99,8 +108,8 @@ class MinesweeperManager {
         }
 
         fun checkFinished() {
-            MinesweeperData.Finised = isFinished()
-            minesweeperFinished.value = MinesweeperData.Finised
+            finished = isFinished()
+            minesweeperFinished.value = finished
         }
 
         private fun isFinished(): Boolean {

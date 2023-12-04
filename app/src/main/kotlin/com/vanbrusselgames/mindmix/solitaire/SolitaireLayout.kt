@@ -18,8 +18,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -68,7 +66,6 @@ class SolitaireLayout : BaseLayout() {
             BoxWithConstraints(
                 Modifier.align(Alignment.Center)
             ) {
-                val constraints = constraints
                 val maxHeight = constraints.maxHeight
                 val maxWidth = constraints.maxWidth
                 cardHeight =
@@ -90,11 +87,7 @@ class SolitaireLayout : BaseLayout() {
                 //Tools()   // Maybe nice if tools like time is build in in top/bottom row of scaffold
                 //          // best is top row: bottom row could be used for 'up-swipeable' menu
 
-                SolitaireManager.cardStacks.forEach { cardStack ->
-                    cardStack.forEach { card ->
-                        PlayingCard(card, modifier)
-                    }
-                }
+                SolitaireManager.cards.forEach { PlayingCard(it, modifier) }
             }
         }
     }
@@ -152,33 +145,31 @@ class SolitaireLayout : BaseLayout() {
 
     @Composable
     fun PlayingCard(card: PlayingCard, modifier: Modifier) {
-        val frontVisible by remember { card.mutableFrontVisible }
-        val currentStackId by remember { card.mutableCurrentStackId }
+        val currentStackId by card.mutableCurrentStackId
         val baseOffset = calculateBaseOffsetByStackData(currentStackId, card.currentStackIndex)
-        val zIndex = remember { mutableStateOf(card.currentStackIndex * 0.01f) }
         val offset by animateIntOffsetAsState(
             targetValue = baseOffset + card.mutableOffset.value, label = "moveCardToStack"
-        ) { if(card.mutableOffset.value == IntOffset(0,0)) zIndex.value = card.currentStackIndex * 0.01f }
-        Image(painterResource(if (frontVisible) card.drawableResId else R.drawable.playingcards_detailed_back),
-            "",
+        )
+        val zIndex =
+            card.currentStackIndex * 0.01f + if (currentStackId == 6 || offset == baseOffset) 0 else 10
+        Image(painterResource(if (card.mutableFrontVisible.value) card.drawableResId else R.drawable.playingcards_detailed_back),
+            "Playing card",
             modifier
-                .zIndex(if(currentStackId == 6) card.currentStackIndex * 0.01f else zIndex.value)
+                .zIndex(zIndex)
                 .offset { offset }
-                .clickable {
+            .clickable(enabled = !SolitaireManager.solitaireFinished.value) {
                     if (currentStackId == 6) {
-                        zIndex.value = card.currentStackIndex * 0.01f + 5f
                         SolitaireManager.turnFromRestStack(card)
                     } else {
-                        if (zIndex.value >= 5f) return@clickable
+                        if (!card.frontVisible || zIndex >= 5f) return@clickable
                         SolitaireManager.startMoveCard(card)
-                        zIndex.value = card.currentStackIndex * 0.01f + 5f
                         SolitaireManager.onReleaseMovingCards()
                     }
                 }
                 .pointerInput(Unit) {
                     detectDragGestures(onDragStart = {
+                        if (SolitaireManager.finished || !card.frontVisible) return@detectDragGestures
                         SolitaireManager.startMoveCard(card)
-                        zIndex.value = card.currentStackIndex * 0.01f + 5f
                     }, onDragCancel = {
                         SolitaireManager.onReleaseMovingCards()
                     }, onDragEnd = {

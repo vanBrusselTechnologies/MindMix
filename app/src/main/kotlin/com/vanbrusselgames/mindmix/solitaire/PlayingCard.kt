@@ -1,5 +1,6 @@
 package com.vanbrusselgames.mindmix.solitaire
 
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.unit.IntOffset
 
@@ -16,12 +17,12 @@ data class PlayingCard(val type: CardType, val index: CardIndex, val drawableRes
         }
 
     private var _currentStackId = -1
-    val mutableCurrentStackId = mutableStateOf(_currentStackId)
+    val mutableCurrentStackId = mutableIntStateOf(_currentStackId)
     var currentStackId
         get() = _currentStackId
         set(value) {
             _currentStackId = value
-            mutableCurrentStackId.value = value
+            mutableCurrentStackId.intValue = value
         }
     var currentStackIndex = -1
 
