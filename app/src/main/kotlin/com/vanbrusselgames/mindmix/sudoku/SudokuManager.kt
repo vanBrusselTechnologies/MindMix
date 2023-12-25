@@ -39,12 +39,13 @@ class SudokuManager {
             }
             cells = cellList.toTypedArray()
             finished = data.finished
+            sudokuFinished.value = finished
 
             val clues = cells.map { c -> if (c.isClue) c.value else 0 }.toIntArray()
             solution = SudokuPuzzle.getSolution(clues)
             puzzle = SudokuPuzzle(solution)
 
-            if(checkConflictingCells){
+            if (checkConflictingCells) {
                 cells.forEach { c -> checkConflictingCell(c.id) }
             }
         }
@@ -67,6 +68,12 @@ class SudokuManager {
                 val clues = SudokuPuzzle.createClues(puzzle, 60)
                 cells = Array(size * size) { SudokuPuzzleCell(it, clues[it] != 0, clues[it]) }
             }
+        }
+
+        fun reset() {
+            finished = false
+            sudokuFinished.value = finished
+            cells = arrayOf()
         }
 
         private fun createPuzzle(

@@ -62,32 +62,24 @@ class SolitaireLayout : BaseLayout() {
 
     @Composable
     fun SolitaireSpecificLayout() {
-        Box(Modifier.fillMaxSize()) {
-            BoxWithConstraints(
-                Modifier.align(Alignment.Center)
-            ) {
-                val maxHeight = constraints.maxHeight
-                val maxWidth = constraints.maxWidth
-                cardHeight =
-                    if (maxWidth / maxHeight > cardAspectRatio) maxHeight / 4.2375f else maxWidth / 7f / cardAspectRatio
-                cardWidth = cardHeight * cardAspectRatio
-                val cardHeightInDp = with(LocalDensity.current) { cardHeight.toDp() }
-                val modifier = Modifier
-                    .width(cardHeightInDp * cardAspectRatio)
-                    .height(cardHeightInDp)
-                    .aspectRatio(cardAspectRatio)
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Box(Modifier.fillMaxSize(0.95f), contentAlignment = Alignment.TopCenter) {
+                BoxWithConstraints {
+                    val maxHeight = constraints.maxHeight
+                    val maxWidth = constraints.maxWidth
+                    cardHeight =
+                        if (maxWidth / maxHeight > cardAspectRatio) maxHeight / 4.2375f else maxWidth / 7f / cardAspectRatio
+                    cardWidth = cardHeight * cardAspectRatio
+                    val cardHeightInDp = with(LocalDensity.current) { cardHeight.toDp() }
+                    val modifier = Modifier
+                        .width(cardHeightInDp * cardAspectRatio)
+                        .height(cardHeightInDp)
+                        .aspectRatio(cardAspectRatio)
 
-                Background(modifier = modifier, cardHeight = cardHeightInDp)
+                    Background(modifier = modifier, cardHeight = cardHeightInDp)
 
-                //Spacer(
-                //    modifier = Modifier
-                //        .fillMaxSize(0.1f)
-                //        .aspectRatio(1f)
-                //)
-                //Tools()   // Maybe nice if tools like time is build in in top/bottom row of scaffold
-                //          // best is top row: bottom row could be used for 'up-swipeable' menu
-
-                SolitaireManager.cards.forEach { PlayingCard(it, modifier) }
+                    SolitaireManager.cards.forEach { PlayingCard(it, modifier) }
+                }
             }
         }
     }
@@ -151,7 +143,7 @@ class SolitaireLayout : BaseLayout() {
             targetValue = baseOffset + card.mutableOffset.value, label = "moveCardToStack"
         )
         val zIndex =
-            card.currentStackIndex * 0.01f + if (currentStackId == 6 || offset == baseOffset) 0 else 10
+            card.currentStackIndex * 0.01f + if (currentStackId == 6 || offset == baseOffset) 0 else if(currentStackId == 5) 10 else 20
         Image(painterResource(if (card.mutableFrontVisible.value) card.drawableResId else R.drawable.playingcards_detailed_back),
             "Playing card",
             modifier
@@ -161,7 +153,7 @@ class SolitaireLayout : BaseLayout() {
                     if (currentStackId == 6) {
                         SolitaireManager.turnFromRestStack(card)
                     } else {
-                        if (!card.frontVisible || zIndex >= 5f) return@clickable
+                        if (!card.frontVisible || zIndex >= 20f) return@clickable
                         SolitaireManager.startMoveCard(card)
                         SolitaireManager.onReleaseMovingCards()
                     }

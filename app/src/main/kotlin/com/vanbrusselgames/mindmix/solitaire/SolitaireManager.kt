@@ -301,6 +301,7 @@ class SolitaireManager {
                 }
             }
             finished = data.finished
+            solitaireFinished.value = finished
         }
 
         fun saveToFile(): String {
@@ -312,7 +313,7 @@ class SolitaireManager {
         }
 
         fun loadPuzzle() {
-            if (cards[0].currentStackIndex == -1) {
+            if (cardStacks.all { cs -> cs.isEmpty() }) {
                 val dupCards = cards.copyOf()
                 dupCards.shuffle()
                 var j = 0
@@ -331,6 +332,12 @@ class SolitaireManager {
                     card.currentStackId = 6
                 }
             }
+        }
+
+        fun reset() {
+            finished = false
+            solitaireFinished.value = finished
+            cardStacks.fill(mutableListOf())
         }
 
         fun resetRestStack() {

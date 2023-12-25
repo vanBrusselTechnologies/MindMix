@@ -29,7 +29,7 @@ android {
     defaultConfig {
         applicationId = "com.vanBrusselGames.MindMix"
         minSdk = 21
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 79
         versionName = "1.1.0"
 
@@ -77,7 +77,7 @@ android {
 dependencies {
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
-    implementation("androidx.activity:activity-compose:1.8.1")
+    implementation("androidx.activity:activity-compose:1.8.2")
     implementation(platform("androidx.compose:compose-bom:2023.10.01"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
@@ -92,13 +92,8 @@ dependencies {
     implementation("com.google.android.gms:play-services-auth:20.7.0")
     implementation("com.google.android.gms:play-services-games-v2:19.0.0")
 
-
-    //implementation("org.jetbrains.kotlin.plugin.serialization:org.jetbrains.kotlin.plugin.serialization.gradle.plugin:1.9.21")
-    //kotlin("plugin.serialization", "1.9.20")
-    //kotlin("jvm", "1.9.20")
-    //implementation("org.jetbrains.kotlin.multiplatform:org.jetbrains.kotlin.multiplatform.gradle.plugin:1.9.20")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
-
+    implementation("androidx.navigation:navigation-compose:2.7.6")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

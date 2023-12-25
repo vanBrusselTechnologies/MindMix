@@ -14,6 +14,17 @@ import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.vanbrusselgames.mindmix.menu.MenuLayout
+import com.vanbrusselgames.mindmix.minesweeper.MinesweeperLayout
+import com.vanbrusselgames.mindmix.minesweeper.MinesweeperManager
+import com.vanbrusselgames.mindmix.solitaire.SolitaireLayout
+import com.vanbrusselgames.mindmix.solitaire.SolitaireManager
+import com.vanbrusselgames.mindmix.sudoku.SudokuLayout
+import com.vanbrusselgames.mindmix.sudoku.SudokuManager
 import com.vanbrusselgames.mindmix.ui.theme.MindMixTheme
 
 
@@ -35,7 +46,35 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background,
                     contentColor = MaterialTheme.colorScheme.onBackground
                 ) {
-                    SceneManager.OpenScene()
+                    SceneManager.navController = rememberNavController()
+                    NavHost(navController = SceneManager.navController, startDestination = "main", Modifier.fillMaxSize()) {
+                        composable("main") { MenuLayout().BaseScene() }
+                        composable("menu") { MenuLayout().BaseScene() }
+                        composable(
+                            "solitaire?mode={mode}",
+                            arguments = listOf(navArgument("mode") { defaultValue = "0" })
+                        ) { backStackEntry ->
+                            val mode = backStackEntry.arguments?.getString("mode")
+                            SolitaireManager.loadPuzzle()
+                            SolitaireLayout().BaseScene()
+                        }
+                        composable(
+                            "sudoku?mode={mode}",
+                            arguments = listOf(navArgument("mode") { defaultValue = "0" })
+                        ) { backStackEntry ->
+                            val mode = backStackEntry.arguments?.getString("mode")
+                            SudokuManager.loadPuzzle()
+                            SudokuLayout().BaseScene()
+                        }
+                        composable(
+                            "minesweeper?mode={mode}",
+                            arguments = listOf(navArgument("mode") { defaultValue = "0" })
+                        ) { backStackEntry ->
+                            val mode = backStackEntry.arguments?.getString("mode")
+                            MinesweeperManager.loadPuzzle()
+                            MinesweeperLayout().BaseScene()
+                        }
+                    }
                 }
             }
         }

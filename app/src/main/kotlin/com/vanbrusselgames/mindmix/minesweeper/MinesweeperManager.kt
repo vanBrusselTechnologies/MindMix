@@ -13,7 +13,6 @@ class MinesweeperManager {
         var sizeX = 16
         var sizeY = 22
 
-        var gameOver = false
         var finished = false
 
         val mines = BooleanArray(sizeX * sizeY) { false }
@@ -31,8 +30,10 @@ class MinesweeperManager {
         }
 
         fun loadFromFile(data: MinesweeperData) {
-            for (index in data.mines) mines[index] = true
             finished = data.finished
+            minesweeperFinished.value = finished
+            if (data.mines.isEmpty()) return
+            for (index in data.mines) mines[index] = true
             cells = Array(cellCount) { MinesweeperCell(it, mines[it]) }
             val stateEntries = MinesweeperCell.State.entries
             for (i in data.input.indices) {
@@ -67,6 +68,13 @@ class MinesweeperManager {
             }
         }
 
+        fun reset() {
+            finished = false
+            minesweeperFinished.value = finished
+            mines.fill(false)
+            cells = arrayOf()
+        }
+
         fun findOtherSafeCells(cell: MinesweeperCell, tmp: MutableList<Int>) {
             val index = cell.id
             var i = -1
@@ -84,8 +92,6 @@ class MinesweeperManager {
                     }
                     val nextCell = cells[mineIndex]
                     if (nextCell.state != MinesweeperCell.State.Empty) continue
-                    //if (MinesweeperData.Input[mineIndex] == 1) continue
-                    //MinesweeperData.Input[mineIndex] = 1
                     nextCell.state = MinesweeperCell.State.Number
                     tmp.add(mineIndex)
                     if (nextCell.mineCount == 0) findOtherSafeCells(nextCell, tmp)
@@ -95,14 +101,13 @@ class MinesweeperManager {
         }
 
         fun showAllMines() {
-            if (gameOver) return
-            gameOver = true
+            if (finished) return
+            finished = true
             var i = -1
             while (i < cellCount - 1) {
                 i++
                 if (!cells[i].isMine || cells[i].state != MinesweeperCell.State.Empty/*MinesweeperData.Input[i] != 0*/) continue
                 cells[i].state = MinesweeperCell.State.Bomb
-                //MinesweeperData.Input[i] = 1
             }
             minesweeperFinished.value = true
         }
@@ -116,12 +121,7 @@ class MinesweeperManager {
             for (cell in cells) {
                 if (!cell.isMine && cell.state != MinesweeperCell.State.Number) return false
                 if (cell.state == MinesweeperCell.State.Bomb) return false
-            }/*var i = 0
-            while (i < cellCount) {
-                if (!MinesweeperData.Mines[i] && MinesweeperData.Input[i] != 1) return false
-                if (MinesweeperData.Mines[i] && MinesweeperData.Input[i] == 1) return false
-                i++
-            }*/
+            }
             return true
         }
 

@@ -5,7 +5,7 @@ abstract class BaseUIHandler {
 
     open fun backToMenu(){
         DataManager.save()
-        SceneManager.setCurrentScene(SceneManager.Scene.MENU)
+        SceneManager.loadScene(SceneManager.Scene.MENU)
     }
 
     open fun openShop() {}

@@ -123,7 +123,7 @@ class MinesweeperLayout : BaseLayout() {
                 .align(Alignment.Center)
                 .pointerInput(Unit) {
                     detectTapGestures { offset ->
-                        if (MinesweeperManager.finished || MinesweeperManager.gameOver) return@detectTapGestures
+                        if (MinesweeperManager.finished) return@detectTapGestures
                         val column = floor(offset.x / cellSize.toPx())
                         val row = floor(offset.y / cellSize.toPx())
                         val cellIndex = if (MinesweeperManager.sizeX < MinesweeperManager.sizeY) {
@@ -161,7 +161,7 @@ class MinesweeperLayout : BaseLayout() {
     }
 
     private fun onSelectCell(cell: MinesweeperCell) {
-        if (MinesweeperManager.finished || MinesweeperManager.gameOver) return
+        if (MinesweeperManager.finished) return
         when (cell.state) {
             MinesweeperCell.State.Empty -> {
                 if (MinesweeperManager.inputMode == InputMode.Flag) {
@@ -176,12 +176,10 @@ class MinesweeperLayout : BaseLayout() {
                     }
                     MinesweeperManager.checkFinished()
                 }
-                //MinesweeperData.Input[cell.id] = if (isFlagInput) 2 else 1
             }
 
             MinesweeperCell.State.Flag -> {
                 if (MinesweeperManager.inputMode == InputMode.Flag) {
-                    //MinesweeperData.Input[cell.id] = 0
                     cell.state = MinesweeperCell.State.Empty
                 }
             }

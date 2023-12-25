@@ -1,5 +1,6 @@
 package com.vanbrusselgames.mindmix.sudoku
 
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 
@@ -25,18 +26,18 @@ data class SudokuPuzzleCell(
             mutableIsSelected.value = value
             _isSelected = value
         }
-    val mutableCellValue = mutableStateOf(_value)
+    val mutableCellValue = mutableIntStateOf(_value)
     var value
         get() = _value
         set(value) {
-            mutableCellValue.value = value
+            mutableCellValue.intValue = value
             _value = value
         }
     val mutableCellNotes = mutableStateListOf(*notes)
 
     fun setNumber(value: Int) {
         _value = value
-        mutableCellValue.value = value
+        mutableCellValue.intValue = value
     }
 
     fun setNote(value: Int) {
@@ -59,9 +60,7 @@ data class SudokuPuzzleCell(
 
         other as SudokuPuzzleCell
 
-        if (id != other.id) return false
-
-        return true
+        return id == other.id
     }
 
     override fun hashCode(): Int {
