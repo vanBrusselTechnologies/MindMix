@@ -2,6 +2,8 @@ package com.vanbrusselgames.mindmix
 
 import android.content.Context
 import android.util.Log
+import com.vanbrusselgames.mindmix.menu.MenuData
+import com.vanbrusselgames.mindmix.menu.MenuManager
 import com.vanbrusselgames.mindmix.minesweeper.MinesweeperData
 import com.vanbrusselgames.mindmix.minesweeper.MinesweeperManager
 import com.vanbrusselgames.mindmix.solitaire.SolitaireData
@@ -16,11 +18,6 @@ class DataManager {
         private const val filename = "save.vbg"
         private val fileDecoding = Charsets.UTF_8
         private lateinit var file: File
-
-        private enum class DataType { Sudoku, Solitaire, MineSweeper }
-
-        private val safeCodeMap =
-            mapOf(0 to DataType.Sudoku, 1 to DataType.Solitaire, 2 to DataType.MineSweeper)
 
         fun init(ctx: Context) {
             file = File(ctx.filesDir, filename)
@@ -37,23 +34,28 @@ class DataManager {
                         if (i == -1) continue
                         val safeCode = line.substring(0, i).toInt()
                         val json = line.substring(i + 1)
-                        when (safeCodeMap[safeCode]) {
-                            DataType.Sudoku -> {
+                        when (SceneManager.scenes[safeCode]) {
+                            SceneManager.Scene.SUDOKU -> {
                                 val data = Json.decodeFromString<SudokuData>(json)
                                 SudokuManager.loadFromFile(data)
                             }
 
-                            DataType.Solitaire -> {
+                            SceneManager.Scene.SOLITAIRE -> {
                                 val data = Json.decodeFromString<SolitaireData>(json)
                                 SolitaireManager.loadFromFile(data)
                             }
 
-                            DataType.MineSweeper -> {
+                            SceneManager.Scene.MINESWEEPER -> {
                                 val data = Json.decodeFromString<MinesweeperData>(json)
                                 MinesweeperManager.loadFromFile(data)
                             }
 
-                            else -> {}
+                            SceneManager.Scene.MENU -> {
+                                val data = Json.decodeFromString<MenuData>(json)
+                                MenuManager.loadFromFile(data)
+                            }
+
+                            null -> {}
                         }
 
                     } catch (e: Exception) {
@@ -69,13 +71,13 @@ class DataManager {
 
         fun save() {
             val str: StringBuilder = StringBuilder()
-            for (entry in safeCodeMap) {
+            for (entry in SceneManager.scenes) {
                 val dataString = when (entry.value) {
-                    DataType.Sudoku -> SudokuManager.saveToFile()
-                    DataType.Solitaire -> SolitaireManager.saveToFile()
-                    DataType.MineSweeper -> MinesweeperManager.saveToFile()
-                    else -> null
-                } ?: continue
+                    SceneManager.Scene.SUDOKU -> SudokuManager.saveToFile()
+                    SceneManager.Scene.SOLITAIRE -> SolitaireManager.saveToFile()
+                    SceneManager.Scene.MINESWEEPER -> MinesweeperManager.saveToFile()
+                    SceneManager.Scene.MENU -> MenuManager.saveToFile()
+                }
                 str.append("\n${entry.key}%$dataString")
             }
             file.writeText(str.toString().trim(), fileDecoding)

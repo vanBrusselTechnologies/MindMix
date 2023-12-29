@@ -57,7 +57,7 @@ class MenuLayout : BaseLayout() {
                 //GameWheel(false, gameCount, screenWidth, screenHeight)
                 GameWheel(true, gameCount, screenWidth, screenHeight)
                 Button(
-                    onClick = { menuUiHandler.startGameByIndex(MenuManager.getSelectedGameIndex()) },
+                    onClick = { menuUiHandler.startGame(MenuManager.selectedGame) },
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .offset(0.dp, screenHeight * -0.075f),

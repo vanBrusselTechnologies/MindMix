@@ -1,28 +1,36 @@
 package com.vanbrusselgames.mindmix.menu
 
+import com.vanbrusselgames.mindmix.SceneManager
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+
 class MenuManager {
     companion object Instance {
-        const val gameCount = 5
+        val games = SceneManager.scenes.filter { e -> e.value != SceneManager.Scene.MENU }
+        const val gameCount = 3
         const val withDuplicates = true
+        var selectedGame = SceneManager.Scene.SUDOKU
+        //private var selectedGameModeIndices = intArrayOf(0, 0, 0)
 
-        fun getSelectedGameIndex(): Int {
-            return menuData.selectedGameIndex
+        fun loadFromFile(data: MenuData) {
+            selectedGame = data.selectedGame
+            //selectedGameModeIndices = data.selectedGameModeIndices.toIntArray()
         }
 
-        fun setSelectedGameIndex(gameIndex: Int) {
-            menuData.selectedGameIndex = (gameIndex + gameCount * 10) % gameCount
+        fun saveToFile(): String {
+            return Json.encodeToString(
+                MenuData(selectedGame/*, selectedGameModeIndices.toList()*/)
+            )
         }
 
-        fun getSelectedGameModeIndex(gameIndex: Int = -1): Int {
-            val selectedGameIndex = if(gameIndex == -1) menuData.selectedGameIndex else gameIndex
-            return menuData.selectedGameModeIndexes[selectedGameIndex]
-        }
+        //fun getSelectedGameModeIndex(gameIndex: Int = -1): Int {
+        //    val selectedGameIndex = if (gameIndex == -1) selectedGameIndex else gameIndex
+        //    return selectedGameModeIndices[selectedGameIndex]
+        //}
 
-        fun setSelectedGameModeIndex(gameModeIndex: Int, gameIndex: Int = -1) {
-            val selectedGameIndex = if(gameIndex == -1) menuData.selectedGameIndex else gameIndex
-            menuData.selectedGameModeIndexes[selectedGameIndex] = gameModeIndex
-        }
-
-        private val menuData = MenuData
+        //fun setSelectedGameModeIndex(gameModeIndex: Int, gameIndex: Int = -1) {
+        //    val selectedGameIndex = if (gameIndex == -1) selectedGameIndex else gameIndex
+        //    selectedGameModeIndices[selectedGameIndex] = gameModeIndex
+        //}
     }
 }

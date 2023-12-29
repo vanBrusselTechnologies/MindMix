@@ -1,6 +1,7 @@
 package com.vanbrusselgames.mindmix.menu
 
-object MenuData {
-    var selectedGameIndex = 0
-    var selectedGameModeIndexes = intArrayOf(0,0,0,0,0)
-}
+import com.vanbrusselgames.mindmix.SceneManager
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class MenuData(val selectedGame: SceneManager.Scene/*, val selectedGameModeIndices: List<Int>*/)

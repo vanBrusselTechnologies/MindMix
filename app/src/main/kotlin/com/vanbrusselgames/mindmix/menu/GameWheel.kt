@@ -51,12 +51,13 @@ import kotlin.math.sqrt
 fun GameWheel(
     isInnerWheel: Boolean, gameCount: Int, screenWidth: Dp, screenHeight: Dp
 ) {
-    val withDupsFactor = if (isInnerWheel && MenuManager.withDuplicates) 2 else 1
+    val withDupsFactor = if (isInnerWheel && MenuManager.withDuplicates) 3 else 1
     val angleStep = if (isInnerWheel) 360f / gameCount / withDupsFactor else 360f / 22f
     val gameWheelSize = min(screenHeight.value / 425f, screenWidth.value / 225f)
     val wheelSizeFactor = if (isInnerWheel) 1f else 1.625f
     var canRotate by remember { mutableStateOf(false) }
-    var rotationAngle by remember { mutableFloatStateOf(0f) }
+    val id = MenuManager.games.filter { e -> e.value == MenuManager.selectedGame }.keys.first()
+    var rotationAngle by remember { mutableFloatStateOf(id * -angleStep) }
     val rotationAnimation by animateFloatAsState(
         targetValue = rotationAngle, animationSpec = spring(
             dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessVeryLow
@@ -87,8 +88,11 @@ fun GameWheel(
                 }, onDragEnd = {
                     if (canRotate) {
                         rotationAngle = round(rotationAngle / angleStep) * angleStep
-                        if (isInnerWheel) MenuManager.setSelectedGameIndex(-(rotationAngle / angleStep).roundToInt())
-                        else MenuManager.setSelectedGameModeIndex(-(rotationAngle / angleStep).roundToInt())
+                        if (isInnerWheel) {
+                            val index =
+                                ((-(rotationAngle / angleStep) + gameCount * 10) % gameCount).roundToInt()
+                            MenuManager.selectedGame = MenuManager.games[index]!!
+                        } //else MenuManager.setSelectedGameModeIndex(-(rotationAngle / angleStep).roundToInt())
                     }
                 })
             }
@@ -112,13 +116,18 @@ fun GameWheel(
                         .fillMaxHeight(0.225f / if (isInnerWheel) 1f else 1.75f)
                 ) {
                     val yOffset = -radius.dp * if (isInnerWheel) 0.625f else 0.225f
-                    when ((-i + 10 * gameCount) % gameCount) {
-                        SceneManager.Scene.MINESWEEPER.ordinal ->
-                            WheelItemImage("Minesweeper", R.drawable.game_icon_minesweeper, yOffset)
-                        SceneManager.Scene.SOLITAIRE.ordinal ->
-                            WheelItemImage("Solitaire", R.drawable.playingcards_detailed_clovers_a, yOffset)
-                        SceneManager.Scene.SUDOKU.ordinal ->
-                            WheelItemImage("Sudoku", R.drawable.game_icon_sudoku, yOffset)
+                    when (MenuManager.games[(-i + 10 * gameCount) % gameCount]) {
+                        SceneManager.Scene.MINESWEEPER -> WheelItemImage(
+                            "Minesweeper", R.drawable.game_icon_minesweeper, yOffset
+                        )
+
+                        SceneManager.Scene.SOLITAIRE -> WheelItemImage(
+                            "Solitaire", R.drawable.playingcards_detailed_clovers_a, yOffset
+                        )
+
+                        SceneManager.Scene.SUDOKU -> WheelItemImage(
+                            "Sudoku", R.drawable.game_icon_sudoku, yOffset
+                        )
 
                         else -> Icon(Icons.Filled.Person, "Game", Modifier.fillMaxSize())
                     }

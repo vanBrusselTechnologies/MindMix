@@ -15,8 +15,7 @@ class MenuUIHandler : BaseUIHandler() {
         Log.d("MindMix", "Back to menu")
     }
 
-    fun startGameByIndex(index: Int) {
-        Log.d("MindMix", "Selected gameIndex: $index")
-        SceneManager.loadScene(index)
+    fun startGame(game: SceneManager.Scene) {
+        SceneManager.loadScene(game)
     }
 }
