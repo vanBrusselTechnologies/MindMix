@@ -144,136 +144,135 @@ class SolitaireManager {
                 PlayingCard.CardIndex.K,
                 R.drawable.playingcards_detailed_diamonds_k
             ),
-            //todo: Add other cards drawableResId
             PlayingCard(
                 PlayingCard.CardType.HEARTS,
                 PlayingCard.CardIndex.A,
-                R.drawable.playingcards_detailed_clovers_a
+                R.drawable.playingcards_detailed_hearts_a
             ),
             PlayingCard(
                 PlayingCard.CardType.HEARTS,
                 PlayingCard.CardIndex.TWO,
-                R.drawable.playingcards_detailed_clovers_a
+                R.drawable.playingcards_detailed_hearts_2
             ),
             PlayingCard(
                 PlayingCard.CardType.HEARTS,
                 PlayingCard.CardIndex.THREE,
-                R.drawable.playingcards_detailed_clovers_a
+                R.drawable.playingcards_detailed_hearts_3
             ),
             PlayingCard(
                 PlayingCard.CardType.HEARTS,
                 PlayingCard.CardIndex.FOUR,
-                R.drawable.playingcards_detailed_clovers_a
+                R.drawable.playingcards_detailed_hearts_4
             ),
             PlayingCard(
                 PlayingCard.CardType.HEARTS,
                 PlayingCard.CardIndex.FIVE,
-                R.drawable.playingcards_detailed_clovers_a
+                R.drawable.playingcards_detailed_hearts_5
             ),
             PlayingCard(
                 PlayingCard.CardType.HEARTS,
                 PlayingCard.CardIndex.SIX,
-                R.drawable.playingcards_detailed_clovers_a
+                R.drawable.playingcards_detailed_hearts_6
             ),
             PlayingCard(
                 PlayingCard.CardType.HEARTS,
                 PlayingCard.CardIndex.SEVEN,
-                R.drawable.playingcards_detailed_clovers_a
+                R.drawable.playingcards_detailed_hearts_7
             ),
             PlayingCard(
                 PlayingCard.CardType.HEARTS,
                 PlayingCard.CardIndex.EIGHT,
-                R.drawable.playingcards_detailed_clovers_a
+                R.drawable.playingcards_detailed_hearts_8
             ),
             PlayingCard(
                 PlayingCard.CardType.HEARTS,
                 PlayingCard.CardIndex.NINE,
-                R.drawable.playingcards_detailed_clovers_a
+                R.drawable.playingcards_detailed_hearts_9
             ),
             PlayingCard(
                 PlayingCard.CardType.HEARTS,
                 PlayingCard.CardIndex.TEN,
-                R.drawable.playingcards_detailed_clovers_a
+                R.drawable.playingcards_detailed_hearts_10
             ),
             PlayingCard(
                 PlayingCard.CardType.HEARTS,
                 PlayingCard.CardIndex.J,
-                R.drawable.playingcards_detailed_clovers_a
+                R.drawable.playingcards_detailed_hearts_j
             ),
             PlayingCard(
                 PlayingCard.CardType.HEARTS,
                 PlayingCard.CardIndex.Q,
-                R.drawable.playingcards_detailed_clovers_a
+                R.drawable.playingcards_detailed_hearts_q
             ),
             PlayingCard(
                 PlayingCard.CardType.HEARTS,
                 PlayingCard.CardIndex.K,
-                R.drawable.playingcards_detailed_clovers_a
+                R.drawable.playingcards_detailed_hearts_k
             ),
             PlayingCard(
                 PlayingCard.CardType.SPADES,
                 PlayingCard.CardIndex.A,
-                R.drawable.playingcards_detailed_clovers_a
+                R.drawable.playingcards_detailed_spades_a
             ),
             PlayingCard(
                 PlayingCard.CardType.SPADES,
                 PlayingCard.CardIndex.TWO,
-                R.drawable.playingcards_detailed_clovers_a
+                R.drawable.playingcards_detailed_spades_2
             ),
             PlayingCard(
                 PlayingCard.CardType.SPADES,
                 PlayingCard.CardIndex.THREE,
-                R.drawable.playingcards_detailed_clovers_a
+                R.drawable.playingcards_detailed_spades_3
             ),
             PlayingCard(
                 PlayingCard.CardType.SPADES,
                 PlayingCard.CardIndex.FOUR,
-                R.drawable.playingcards_detailed_clovers_a
+                R.drawable.playingcards_detailed_spades_4
             ),
             PlayingCard(
                 PlayingCard.CardType.SPADES,
                 PlayingCard.CardIndex.FIVE,
-                R.drawable.playingcards_detailed_clovers_a
+                R.drawable.playingcards_detailed_spades_5
             ),
             PlayingCard(
                 PlayingCard.CardType.SPADES,
                 PlayingCard.CardIndex.SIX,
-                R.drawable.playingcards_detailed_clovers_a
+                R.drawable.playingcards_detailed_spades_6
             ),
             PlayingCard(
                 PlayingCard.CardType.SPADES,
                 PlayingCard.CardIndex.SEVEN,
-                R.drawable.playingcards_detailed_clovers_a
+                R.drawable.playingcards_detailed_spades_7
             ),
             PlayingCard(
                 PlayingCard.CardType.SPADES,
                 PlayingCard.CardIndex.EIGHT,
-                R.drawable.playingcards_detailed_clovers_a
+                R.drawable.playingcards_detailed_spades_8
             ),
             PlayingCard(
                 PlayingCard.CardType.SPADES,
                 PlayingCard.CardIndex.NINE,
-                R.drawable.playingcards_detailed_clovers_a
+                R.drawable.playingcards_detailed_spades_9
             ),
             PlayingCard(
                 PlayingCard.CardType.SPADES,
                 PlayingCard.CardIndex.TEN,
-                R.drawable.playingcards_detailed_clovers_a
+                R.drawable.playingcards_detailed_spades_10
             ),
             PlayingCard(
                 PlayingCard.CardType.SPADES,
                 PlayingCard.CardIndex.J,
-                R.drawable.playingcards_detailed_clovers_a
+                R.drawable.playingcards_detailed_spades_j
             ),
             PlayingCard(
                 PlayingCard.CardType.SPADES,
                 PlayingCard.CardIndex.Q,
-                R.drawable.playingcards_detailed_clovers_a
+                R.drawable.playingcards_detailed_spades_q
             ),
             PlayingCard(
                 PlayingCard.CardType.SPADES,
                 PlayingCard.CardIndex.K,
-                R.drawable.playingcards_detailed_clovers_a
+                R.drawable.playingcards_detailed_spades_k
             ),
         )
 
