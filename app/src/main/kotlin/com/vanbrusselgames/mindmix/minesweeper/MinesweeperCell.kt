@@ -1,28 +1,32 @@
 package com.vanbrusselgames.mindmix.minesweeper
 
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.graphics.Color
 
-data class MinesweeperCell(val id: Int, val isMine: Boolean){
-    private var _state = State.Empty
-    val mutableCellState = mutableStateOf(_state)
-    var state
-        get() = _state
+data class MinesweeperCell(val id: Int) {
+    var isMine = false
+    var pressed = false
+
+    var state = State.Empty
         set(value) {
-            _state = value
+            field = value
             mutableCellState.value = value
         }
-    val mineCount = getCellMineCount()
+    val mutableCellState = mutableStateOf(state)
 
-    enum class State{
-        Bomb,
-        Flag,
-        Number,
-        Empty
-    }
+    var mineCount: Int = 0
+        private set
 
-    private fun getCellMineCount(): Int {
+    val background = mutableStateOf(Color.White)
+
+    enum class State { Bomb, Flag, Number, Empty }
+
+    fun getCellMineCount() {
+        if (isMine) {
+            this.mineCount = 99
+            return
+        }
         val shortSide: Int = minOf(MinesweeperManager.sizeX, MinesweeperManager.sizeY)
-        if (isMine) return 99
         var mineCount = 0
         var i = -1
         while (i <= 1) {
@@ -36,6 +40,6 @@ data class MinesweeperCell(val id: Int, val isMine: Boolean){
             }
             i++
         }
-        return mineCount
+        this.mineCount = mineCount
     }
 }

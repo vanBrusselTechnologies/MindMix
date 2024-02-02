@@ -26,6 +26,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
@@ -51,21 +52,24 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 
 class MinesweeperLayout : BaseLayout() {
-
     override var uiHandler: BaseUIHandler = MinesweeperUIHandler()
     private var cellSize: Dp = 0.dp
 
     @Composable
     fun BaseScene() {
         super.BaseScene(isMenu = false, sceneSpecific = {
-            MinesweeperSpecificLayout()
+            val finished = minesweeperFinished.value
+            MinesweeperSpecificLayout(finished)
+            if (finished) GameFinishedPopUp(MinesweeperManager.cells.any { c -> c.state == MinesweeperCell.State.Bomb })
         })
     }
 
     @Composable
-    fun MinesweeperSpecificLayout() {
+    fun MinesweeperSpecificLayout(isBlurred: Boolean) {
         BoxWithConstraints(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .blur(if (isBlurred) 4.dp else 0.dp),
         ) {
             val maxWidth = maxWidth
             val maxHeight = maxHeight
@@ -105,7 +109,6 @@ class MinesweeperLayout : BaseLayout() {
                     Tools(false)
                 }
             }
-
         }
     }
 
@@ -140,7 +143,6 @@ class MinesweeperLayout : BaseLayout() {
 
                 cellSize = min(max(maxHeight, maxWidth) / 22f, min(maxHeight, maxWidth) / 16f).dp
 
-                val cells = MinesweeperManager.cells
                 Column {
                     for (j in 0 until MinesweeperManager.sizeY) {
                         Row {
@@ -151,7 +153,7 @@ class MinesweeperLayout : BaseLayout() {
                                     } else {
                                         MinesweeperManager.sizeY * (i + 1) - (j + 1)
                                     }
-                                MinesweeperCell(cells[cellIndex])
+                                MinesweeperCell(MinesweeperManager.cells[cellIndex])
                             }
                         }
                     }
@@ -162,10 +164,12 @@ class MinesweeperLayout : BaseLayout() {
 
     private fun onSelectCell(cell: MinesweeperCell) {
         if (MinesweeperManager.finished) return
+        cell.pressed = true
         when (cell.state) {
             MinesweeperCell.State.Empty -> {
                 if (MinesweeperManager.inputMode == InputMode.Flag) {
                     cell.state = MinesweeperCell.State.Flag
+                    MinesweeperManager.calculateMinesLeft()
                 } else {
                     if (cell.isMine) return showAllMines()
                     cell.state = MinesweeperCell.State.Number
@@ -181,6 +185,7 @@ class MinesweeperLayout : BaseLayout() {
             MinesweeperCell.State.Flag -> {
                 if (MinesweeperManager.inputMode == InputMode.Flag) {
                     cell.state = MinesweeperCell.State.Empty
+                    MinesweeperManager.calculateMinesLeft()
                 }
             }
 
@@ -189,18 +194,23 @@ class MinesweeperLayout : BaseLayout() {
     }
 
     @Composable
-    fun MinesweeperCell(cell: MinesweeperCell/*, onSelected: () -> Unit*/) {
+    fun MinesweeperCell(cell: MinesweeperCell) {
         Box(
-            Modifier
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
                 .size(cellSize)
                 .padding(PaddingValues(0.75f.dp))
-                .background(Color.White)
+                .background(cell.background.value)
                 .aspectRatio(1f)
         ) {
             val state by remember { cell.mutableCellState }
             when (state) {
                 MinesweeperCell.State.Empty -> return@Box
-                MinesweeperCell.State.Bomb -> MinesweeperMineCell()
+                MinesweeperCell.State.Bomb -> {
+                    if (cell.pressed) cell.background.value = Color.Red
+                    MinesweeperMineCell()
+                }
+
                 MinesweeperCell.State.Flag -> MinesweeperFlagCell()
                 MinesweeperCell.State.Number -> MinesweeperTextCell(cell.mineCount)
             }
@@ -233,28 +243,12 @@ class MinesweeperLayout : BaseLayout() {
 
     @Composable
     fun MinesweeperFlagCell() {
-        Box(Modifier.fillMaxSize()) {
-            Image(
-                painterResource(R.drawable.flag_red),
-                "Flag",
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .fillMaxSize()
-            )
-        }
+        Image(painterResource(R.drawable.flag_red), "Flag", Modifier.fillMaxSize())
     }
 
     @Composable
     fun MinesweeperMineCell() {
-        Box(Modifier.fillMaxSize()) {
-            Image(
-                painterResource(R.drawable.bomb),
-                "Bomb",
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .fillMaxSize()
-            )
-        }
+        Image(painterResource(R.drawable.bomb), "Bomb", Modifier.fillMaxSize())
     }
     //#endregion
 
@@ -263,12 +257,23 @@ class MinesweeperLayout : BaseLayout() {
     fun Tools(isHorizontal: Boolean) {
         if (isHorizontal) {
             Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight(0.95f)
+                        .fillMaxWidth(0.5f)
+                ) {
+                    Text(
+                        text = "Mines Left:\n${MinesweeperManager.minesLeft.intValue}",
+                        modifier = Modifier.align(Alignment.Center),
+                        textAlign = TextAlign.Center
+                    )
+                }
                 val painterId = remember { mutableIntStateOf(R.drawable.spade) }
                 Button(
                     onClick = { changeInputMode(painterId) },
                     modifier = Modifier
                         .aspectRatio(1f)
-                        .fillMaxHeight(),
+                        .fillMaxHeight(0.95f),
                     shape = RoundedCornerShape(10.dp),
                     enabled = !minesweeperFinished.value
                 ) {
@@ -280,6 +285,17 @@ class MinesweeperLayout : BaseLayout() {
             }
         } else {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight(0.5f)
+                        .fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Mines Left:\n${MinesweeperManager.minesLeft.intValue}",
+                        modifier = Modifier.align(Alignment.Center),
+                        textAlign = TextAlign.Center
+                    )
+                }
                 val painterId = remember { mutableIntStateOf(R.drawable.spade) }
                 Button(
                     onClick = { changeInputMode(painterId) },
@@ -304,4 +320,26 @@ class MinesweeperLayout : BaseLayout() {
             else R.drawable.spade
     }
     //#endregion
+
+    @Composable
+    fun GameFinishedPopUp(failed: Boolean) {
+        val title = if (failed) "Failed" else "Congrats"
+        val desc =
+            if (failed) "A mine exploded" else """You did great and solved puzzle in ${0} seconds!!
+                        |That's Awesome!
+                        |Share with your friends and challenge them to beat your time!""".trimMargin()
+        val reward = if (failed) 0 else 10
+        val onClickShare = if (failed) null else ({})
+        val onClickPlayAgain = {
+            MinesweeperManager.reset()
+            MinesweeperManager.loadPuzzle()
+        }
+        val onClickReturnToMenu = {
+            uiHandler.backToMenu()
+            MinesweeperManager.reset()
+        }
+        BaseGameFinishedPopUp(
+            title, desc, reward, onClickShare, onClickPlayAgain, onClickReturnToMenu
+        )
+    }
 }

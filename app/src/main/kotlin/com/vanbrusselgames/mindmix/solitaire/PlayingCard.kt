@@ -16,7 +16,7 @@ data class PlayingCard(val type: CardType, val index: CardIndex, val drawableRes
             mutableFrontVisible.value = value
         }
 
-    private var _currentStackId = -1
+    private var _currentStackId = 6
     val mutableCurrentStackId = mutableIntStateOf(_currentStackId)
     var currentStackId
         get() = _currentStackId
@@ -26,7 +26,7 @@ data class PlayingCard(val type: CardType, val index: CardIndex, val drawableRes
         }
     var currentStackIndex = -1
 
-    private var _offset = IntOffset(0, 0)
+    private var _offset = IntOffset.Zero
     val mutableOffset = mutableStateOf(_offset)
     var offset
         get() = _offset

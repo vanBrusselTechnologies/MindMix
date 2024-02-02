@@ -279,11 +279,14 @@ class SolitaireManager {
         private val movingCards: MutableList<PlayingCard> = mutableListOf()
         private val cardStacks: Array<MutableList<PlayingCard>> = Array(14) { mutableListOf() }
 
-
-        val solitaireFinished = mutableStateOf(false)
         var finished = false
+        val solitaireFinished = mutableStateOf(finished)
+
+        // couldGetFinished => button to finish game
+        var couldGetFinished = mutableStateOf(false)
 
         fun loadFromFile(data: SolitaireData) {
+            if (cardStacks.none { cs -> cs.isEmpty() }) return
             for (i in data.cardStacks.indices) {
                 data.cardStacks[i].forEachIndexed { j, k ->
                     var index = k
@@ -312,31 +315,36 @@ class SolitaireManager {
         }
 
         fun loadPuzzle() {
-            if (cardStacks.all { cs -> cs.isEmpty() }) {
-                val dupCards = cards.copyOf()
-                dupCards.shuffle()
-                var j = 0
-                for (i in 0 until 7) {
-                    cardStacks[7 + i] = dupCards.copyOfRange(j, j + i + 1).toMutableList()
-                    cardStacks[7 + i].last().frontVisible = true
-                    cardStacks[7 + i].forEachIndexed { index, card ->
-                        card.currentStackIndex = index
-                        card.currentStackId = 7 + i
-                    }
-                    j += i + 1
-                }
-                cardStacks[6] = dupCards.copyOfRange(j, dupCards.size).toMutableList()
-                cardStacks[6].forEachIndexed { index, card ->
+            if (cardStacks.none { cs -> cs.isEmpty() }) return
+            val dupCards = cards.copyOf()
+            dupCards.shuffle()
+            var j = 0
+            for (i in 0 until 7) {
+                cardStacks[7 + i] = dupCards.copyOfRange(j, j + i + 1).toMutableList()
+                cardStacks[7 + i].last().frontVisible = true
+                cardStacks[7 + i].forEachIndexed { index, card ->
                     card.currentStackIndex = index
-                    card.currentStackId = 6
+                    card.currentStackId = 7 + i
                 }
+                j += i + 1
+            }
+            cardStacks[6] = dupCards.copyOfRange(j, dupCards.size).toMutableList()
+            cardStacks[6].forEachIndexed { index, card ->
+                card.currentStackIndex = index
+                card.currentStackId = 6
             }
         }
 
         fun reset() {
             finished = false
             solitaireFinished.value = finished
-            cardStacks.fill(mutableListOf())
+            cardStacks.forEach { s -> s.clear() }
+            cards.forEach {
+                it.frontVisible = false
+                it.currentStackId = 6
+                it.currentStackIndex = 0
+                it.offset = IntOffset.Zero
+            }
         }
 
         fun resetRestStack() {
@@ -421,13 +429,14 @@ class SolitaireManager {
             }
 
             movingCards.forEach { card ->
-                card.offset = IntOffset(0, 0)
+                card.offset = IntOffset.Zero
             }
             movingCards.clear()
 
             if (firstCardStackId >= 7 && oldStack.size >= 1) {
                 oldStack.last().frontVisible = true
             }
+
             checkFinished()
         }
 
@@ -435,8 +444,8 @@ class SolitaireManager {
             val foundationStackId = floor(card.id / 13f).toInt()
             val foundation = cardStacks[foundationStackId]
             if (card.id % 13 == 0 || (foundation.size != 0 && foundation.last().id % 13 == card.id % 13 - 1)) {
-                foundation.add(card)
                 cardStacks[card.currentStackId].removeLast()
+                foundation.add(card)
                 card.currentStackId = foundationStackId
                 card.currentStackIndex = foundation.size - 1
                 return true
@@ -461,11 +470,9 @@ class SolitaireManager {
             while (lastStack.size > lastIndex) {
                 lastStack.removeAt(lastIndex)
             }
-            var i = 0
-            movingCards.forEach { c ->
+            movingCards.forEachIndexed { i, c ->
                 c.currentStackIndex = newStackSize + i
                 c.currentStackId = newStackId
-                i++
             }
             return true
         }
@@ -473,11 +480,19 @@ class SolitaireManager {
         private fun checkFinished() {
             finished = isFinished()
             solitaireFinished.value = finished
+            if (!finished) couldGetFinished.value = couldGetFinished()
         }
 
         private fun isFinished(): Boolean {
             for (card in cards) {
                 if (!card.frontVisible || card.currentStackId >= 4) return false
+            }
+            return true
+        }
+
+        private fun couldGetFinished(): Boolean {
+            for (card in cards) {
+                if (!card.frontVisible && card.currentStackId >= 7) return false
             }
             return true
         }

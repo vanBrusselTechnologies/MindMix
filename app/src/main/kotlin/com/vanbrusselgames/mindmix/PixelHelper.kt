@@ -1,20 +1,26 @@
 package com.vanbrusselgames.mindmix
 
 import android.content.res.Resources
+import android.os.Build
+import android.util.TypedValue
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 
 class PixelHelper {
-    companion object{
+    companion object {
         private lateinit var res: Resources
-        fun setResources(resources: Resources){
+        fun setResources(resources: Resources) {
             res = resources
         }
-        fun pxToSp(px: Float): TextUnit {
-            return (px / res.displayMetrics.scaledDensity).sp
-        }
+
         fun pxToSp(px: Int): TextUnit {
-            return (px / res.displayMetrics.scaledDensity).sp
+            return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                (px / res.displayMetrics.scaledDensity).sp
+            } else {
+                TypedValue.deriveDimension(
+                    TypedValue.COMPLEX_UNIT_SP, px.toFloat(), res.displayMetrics
+                ).sp
+            }
         }
     }
 }

@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
@@ -30,13 +31,13 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import com.vanbrusselgames.mindmix.BaseLayout
 import com.vanbrusselgames.mindmix.BaseUIHandler
 import com.vanbrusselgames.mindmix.PixelHelper.Companion.pxToSp
+import com.vanbrusselgames.mindmix.sudoku.SudokuManager.Instance.sudokuFinished
 import kotlin.math.floor
 
 class SudokuLayout : BaseLayout() {
@@ -44,13 +45,21 @@ class SudokuLayout : BaseLayout() {
 
     @Composable
     fun BaseScene() {
-        super.BaseScene(isMenu = false, sceneSpecific = { SudokuSpecificLayout() })
+        super.BaseScene(isMenu = false, sceneSpecific = {
+            val finished = sudokuFinished.value
+            SudokuSpecificLayout(sudokuFinished.value)
+            if (finished) GameFinishedPopUp()
+        })
     }
 
-    @Preview(apiLevel = 33)
     @Composable
-    fun SudokuSpecificLayout() {
-        BoxWithConstraints(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    fun SudokuSpecificLayout(isBlurred: Boolean) {
+        BoxWithConstraints(
+            Modifier
+                .fillMaxSize()
+                .blur(if (isBlurred) 4.dp else 0.dp),
+            contentAlignment = Alignment.Center
+        ) {
             val maxWidth = maxWidth
             val maxHeight = maxHeight
             if (maxWidth <= maxHeight) {
@@ -68,8 +77,7 @@ class SudokuLayout : BaseLayout() {
                 Row(
                     modifier = Modifier
                         .height(minSize)
-                        .width(minSize / 0.7f)
-                        .align(Alignment.Center),
+                        .width(minSize / 0.7f),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     SceneContent(true)
@@ -92,18 +100,22 @@ class SudokuLayout : BaseLayout() {
     //#region Grid
     @Composable
     fun SudokuGrid() {
-            Box(Modifier.aspectRatio(1f)
-                .background(Color.Black)) {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(9),
-                    userScrollEnabled = false,
-                    modifier = Modifier.align(Alignment.Center).fillMaxSize(0.99f)
-                ) {
-                    itemsIndexed(SudokuManager.cells) { _, cellData ->
-                        SudokuCell(cellData)
-                    }
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .aspectRatio(1f)
+                .background(Color.Black)
+        ) {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(9),
+                userScrollEnabled = false,
+                modifier = Modifier.fillMaxSize(0.99f)
+            ) {
+                itemsIndexed(SudokuManager.cells) { _, cellData ->
+                    SudokuCell(cellData)
                 }
             }
+        }
     }
 
     @Composable
@@ -114,33 +126,34 @@ class SudokuLayout : BaseLayout() {
         val padding = PaddingValues(
             start = if (vertIndex == 0) 2.dp else if (vertIndex == 1) 1.25.dp else 0.dp,
             end = if (vertIndex == 2) 2.dp else if (vertIndex == 1) 1.25.dp else 0.dp,
-            top = if(index < 9) 1.25.dp else if (horzIndex == 0f) 2.dp else if (horzIndex == 1f) 1.25.dp else 0.dp,
+            top = if (index < 9) 1.25.dp else if (horzIndex == 0f) 2.dp else if (horzIndex == 1f) 1.25.dp else 0.dp,
             bottom = if (horzIndex == 2f) 2.dp else if (horzIndex == 1f) 1.25.dp else 0.dp,
         )
         val colorScheme = MaterialTheme.colorScheme
-        BoxWithConstraints(Modifier
-            .fillMaxSize()
-            .padding(padding)
-            .aspectRatio(1f)
-            .clickable(enabled = (!cellData.isClue && !SudokuManager.sudokuFinished.value)) {
-                cellData.isSelected = true
+        BoxWithConstraints(contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .aspectRatio(1f)
+                .clickable(enabled = (!cellData.isClue && !SudokuManager.sudokuFinished.value)) {
+                    cellData.isSelected = true
 
-                val currSelectedCellId = SudokuManager.selectedCellIndex
-                if (currSelectedCellId != -1 && currSelectedCellId != cellData.id) {
-                    SudokuManager.cells[currSelectedCellId].isSelected = false
-                }
-
-                SudokuManager.selectedCellIndex = cellData.id
-            }
-            .drawBehind {
-                drawRect(
-                    when (true) {
-                        cellData.mutableIsIncorrect.value -> colorScheme.errorContainer
-                        cellData.mutableIsSelected.value -> colorScheme.primaryContainer
-                        else -> colorScheme.secondaryContainer
+                    val currSelectedCellId = SudokuManager.selectedCellIndex
+                    if (currSelectedCellId != -1 && currSelectedCellId != cellData.id) {
+                        SudokuManager.cells[currSelectedCellId].isSelected = false
                     }
-                )
-            }) {
+
+                    SudokuManager.selectedCellIndex = cellData.id
+                }
+                .drawBehind {
+                    drawRect(
+                        when (true) {
+                            cellData.mutableIsIncorrect.value -> colorScheme.errorContainer
+                            cellData.mutableIsSelected.value -> colorScheme.primaryContainer
+                            else -> colorScheme.secondaryContainer
+                        }
+                    )
+                }) {
             val space = pxToSp(minOf(constraints.maxHeight, constraints.minHeight))
             SudokuCellValueText(cellData, space)
         }
@@ -160,73 +173,86 @@ class SudokuLayout : BaseLayout() {
     fun SudokuRegularCellText(
         cellData: SudokuPuzzleCell, space: TextUnit, isClue: Boolean
     ) {
-        Box(Modifier.fillMaxSize()) {
-            val value = cellData.mutableCellValue.intValue
-            if (value == 0) return@Box
-            Text(
-                text = AnnotatedString(value.toString()),
-                color = when (true) {
-                    cellData.mutableIsIncorrect.value -> MaterialTheme.colorScheme.onErrorContainer
-                    cellData.mutableIsSelected.value -> MaterialTheme.colorScheme.onPrimaryContainer
-                    else -> MaterialTheme.colorScheme.onSecondaryContainer
-                },
-                textAlign = TextAlign.Center,
-                fontSize = space / 2f * if (isClue) 1.15f else 1f,
-                fontWeight = if (isClue) FontWeight.ExtraBold else FontWeight.Normal,
-                style = LocalTextStyle.current.merge(
-                    TextStyle(
-                        lineHeightStyle = LineHeightStyle(
-                            alignment = LineHeightStyle.Alignment.Center,
-                            trim = LineHeightStyle.Trim.Both
-                        ), fontFeatureSettings = "tnum"
-                    ),
+        val value = cellData.mutableCellValue.intValue
+        if (value == 0) return
+        Text(
+            text = AnnotatedString(value.toString()),
+            color = when (true) {
+                cellData.mutableIsIncorrect.value -> MaterialTheme.colorScheme.onErrorContainer
+                cellData.mutableIsSelected.value -> MaterialTheme.colorScheme.onPrimaryContainer
+                else -> MaterialTheme.colorScheme.onSecondaryContainer
+            },
+            textAlign = TextAlign.Center,
+            fontSize = space / 2f * if (isClue) 1.15f else 1f,
+            fontWeight = if (isClue) FontWeight.ExtraBold else FontWeight.Normal,
+            style = LocalTextStyle.current.merge(
+                TextStyle(
+                    lineHeightStyle = LineHeightStyle(
+                        alignment = LineHeightStyle.Alignment.Center,
+                        trim = LineHeightStyle.Trim.Both
+                    ), fontFeatureSettings = "tnum"
                 ),
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .scale(2f)
-            )
-        }
+            ),
+            modifier = Modifier.scale(1.9f)
+        )
     }
 
     @Composable
     fun SudokuNoteCellText(cellData: SudokuPuzzleCell, space: TextUnit) {
-        Box(Modifier.fillMaxSize()) {
-            val notes = cellData.mutableCellNotes
-            if (notes.none { n -> n }) return@Box
-            val str = StringBuilder()
-            var i = 0
-            while (i < 9) {
-                val hasNote = notes[i]
-                val rIndex = i % 3
-                if (i != 0 && rIndex == 0) str.append("\n")
-                i++
-                str.append(if (hasNote) i.toString() else "  ")
-                if (rIndex < 2) str.append(" ")
-            }
-            Text(
-                text = AnnotatedString(str.toString()),
-                color = when (true) {
-                    cellData.mutableIsIncorrect.value -> MaterialTheme.colorScheme.onErrorContainer
-                    cellData.mutableIsSelected.value -> MaterialTheme.colorScheme.onPrimaryContainer
-                    else -> MaterialTheme.colorScheme.onSecondaryContainer
-                },
-                textAlign = TextAlign.Center,
-                fontSize = space / 6f,
-                lineHeight = space / 6f,
-                fontWeight = FontWeight.Normal,
-                style = LocalTextStyle.current.merge(
-                    TextStyle(
-                        lineHeightStyle = LineHeightStyle(
-                            alignment = LineHeightStyle.Alignment.Center,
-                            trim = LineHeightStyle.Trim.Both
-                        ), fontFeatureSettings = "tnum"
-                    )
-                ),
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .scale(2f)
-            )
+        val notes = cellData.mutableCellNotes
+        if (notes.none { n -> n }) return
+        val str = StringBuilder()
+        var i = 0
+        while (i < 9) {
+            val hasNote = notes[i]
+            val rIndex = i % 3
+            if (i != 0 && rIndex == 0) str.append("\n")
+            i++
+            str.append(if (hasNote) i.toString() else "  ")
+            if (rIndex < 2) str.append(" ")
         }
+        Text(
+            text = AnnotatedString(str.toString()),
+            color = when (true) {
+                cellData.mutableIsIncorrect.value -> MaterialTheme.colorScheme.onErrorContainer
+                cellData.mutableIsSelected.value -> MaterialTheme.colorScheme.onPrimaryContainer
+                else -> MaterialTheme.colorScheme.onSecondaryContainer
+            },
+            textAlign = TextAlign.Center,
+            fontSize = space / 6f,
+            lineHeight = space / 6f,
+            fontWeight = FontWeight.Normal,
+            style = LocalTextStyle.current.merge(
+                TextStyle(
+                    lineHeightStyle = LineHeightStyle(
+                        alignment = LineHeightStyle.Alignment.Center,
+                        trim = LineHeightStyle.Trim.Both
+                    ), fontFeatureSettings = "tnum"
+                )
+            ),
+            modifier = Modifier.scale(1.9f)
+        )
     }
     //#endregion
+
+    @Composable
+    fun GameFinishedPopUp() {
+        val title = "Congrats"
+        val desc = """You did great and solved puzzle in ${0} seconds!!
+                        |That's Awesome!
+                        |Share with your friends and challenge them to beat your time!""".trimMargin()
+        val reward = 10
+        val onClickShare = {}
+        val onClickPlayAgain = {
+            SudokuManager.reset()
+            SudokuManager.loadPuzzle()
+        }
+        val onClickReturnToMenu = {
+            uiHandler.backToMenu()
+            SudokuManager.reset()
+        }
+        BaseGameFinishedPopUp(
+            title, desc, reward, onClickShare, onClickPlayAgain, onClickReturnToMenu
+        )
+    }
 }

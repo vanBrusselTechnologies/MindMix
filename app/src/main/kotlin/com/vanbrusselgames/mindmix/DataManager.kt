@@ -13,18 +13,14 @@ import com.vanbrusselgames.mindmix.sudoku.SudokuManager
 import kotlinx.serialization.json.Json
 import java.io.File
 
-class DataManager {
+class DataManager(ctx: Context) {
     companion object {
         private const val filename = "save.vbg"
         private val fileDecoding = Charsets.UTF_8
         private lateinit var file: File
+        private var loaded = false
 
-        fun init(ctx: Context) {
-            file = File(ctx.filesDir, filename)
-            file.createNewFile()
-        }
-
-        fun load() {
+        private fun load() {
             try {
                 val content = file.readLines(fileDecoding)
                 for (line in content) {
@@ -67,6 +63,7 @@ class DataManager {
                 Log.e("MindMix", "Error loading file: ${e.message}")
                 Log.e("MindMix", e.toString())
             }
+            loaded = true
         }
 
         fun save() {
@@ -82,5 +79,11 @@ class DataManager {
             }
             file.writeText(str.toString().trim(), fileDecoding)
         }
+    }
+
+    init {
+        file = File(ctx.filesDir, filename)
+        file.createNewFile()
+        if(!loaded) load()
     }
 }

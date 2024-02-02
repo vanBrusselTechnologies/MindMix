@@ -38,63 +38,58 @@ class MenuLayout : BaseLayout() {
 
     @Composable
     fun BaseScene() {
-        super.BaseScene(isMenu = true, sceneSpecific = {
-            SetLayoutGameWheel()
-        })
+        super.BaseScene(isMenu = true, sceneSpecific = { SetLayoutGameWheel() })
     }
 
     @Composable
     fun SetLayoutGameWheel() {
-        val playGameButtonSize = minOf(screenHeight / 300f, screenWidth / 250f)
+        Box(
+            contentAlignment = Alignment.BottomCenter,
+            modifier = Modifier.fillMaxSize(),
+        ) {
+            GameWheel(MenuManager.gameCount, screenWidth, screenHeight)
+            PlayButton(Modifier.align(Alignment.BottomCenter))
+        }
+    }
+
+    @Composable
+    fun PlayButton(modifier: Modifier) {
+        val playGameButtonSize = minOf(screenHeight / 400f, screenWidth / 250f)
         val iconSize = minOf(62.75f * playGameButtonSize * 0.4f, 25f * playGameButtonSize)
-        Box(Modifier.fillMaxSize()) {
-            Box(
-                Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxSize()
+        Button(
+            onClick = { menuUiHandler.startGame(MenuManager.selectedGame) },
+            modifier = modifier.offset(0.dp, screenHeight * -0.05f),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            )
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically, modifier = Modifier
             ) {
-                val gameCount = MenuManager.gameCount
-                //GameWheel(false, gameCount, screenWidth, screenHeight)
-                GameWheel(true, gameCount, screenWidth, screenHeight)
-                Button(
-                    onClick = { menuUiHandler.startGame(MenuManager.selectedGame) },
+                Icon(
+                    Icons.Filled.PlayArrow,
+                    "Play",
+                    tint = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .offset(0.dp, screenHeight * -0.075f),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    )
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically, modifier = Modifier
-                    ) {
-                        Icon(
-                            Icons.Filled.PlayArrow,
-                            "Play",
-                            tint = MaterialTheme.colorScheme.onPrimary,
-                            modifier = Modifier
-                                .size(iconSize)
-                                .aspectRatio(1f)
-                        )
-                        AutoSizeText(
-                            text = AnnotatedString(
-                                text = "Play", paragraphStyle = ParagraphStyle(
-                                    lineHeightStyle = LineHeightStyle(
-                                        alignment = LineHeightStyle.Alignment.Center,
-                                        trim = LineHeightStyle.Trim.Both
-                                    )
-                                )
-                            ),
-                            textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            modifier = Modifier.size(
-                                62.75f * playGameButtonSize - iconSize * 2f / 3f,
-                                25f * playGameButtonSize
+                        .size(iconSize)
+                        .aspectRatio(1f)
+                )
+                AutoSizeText(
+                    text = AnnotatedString(
+                        text = "Play", paragraphStyle = ParagraphStyle(
+                            lineHeightStyle = LineHeightStyle(
+                                alignment = LineHeightStyle.Alignment.Center,
+                                trim = LineHeightStyle.Trim.Both
                             )
                         )
-                    }
-                }
+                    ),
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.size(
+                        62.75f * playGameButtonSize - iconSize * 2f / 3f, 25f * playGameButtonSize
+                    )
+                )
             }
         }
     }

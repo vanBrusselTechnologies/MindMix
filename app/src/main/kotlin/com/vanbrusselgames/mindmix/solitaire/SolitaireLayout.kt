@@ -7,30 +7,34 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import androidx.compose.ui.zIndex
 import com.vanbrusselgames.mindmix.BaseLayout
 import com.vanbrusselgames.mindmix.BaseUIHandler
 import com.vanbrusselgames.mindmix.R
+import com.vanbrusselgames.mindmix.solitaire.SolitaireManager.Instance.solitaireFinished
 import kotlin.math.roundToInt
 
 class SolitaireLayout : BaseLayout() {
@@ -56,13 +60,20 @@ class SolitaireLayout : BaseLayout() {
     @Composable
     fun BaseScene() {
         super.BaseScene(isMenu = false, sceneSpecific = {
-            SolitaireSpecificLayout()
+            val finished = solitaireFinished.value
+            SolitaireSpecificLayout(finished)
+            if (finished) GameFinishedPopUp()
         })
     }
 
     @Composable
-    fun SolitaireSpecificLayout() {
-        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    fun SolitaireSpecificLayout(isBlurred: Boolean) {
+        Box(
+            Modifier
+                .fillMaxSize()
+                .blur(if (isBlurred) 4.dp else 0.dp),
+            contentAlignment = Alignment.Center
+        ) {
             Box(Modifier.fillMaxSize(0.95f), contentAlignment = Alignment.TopCenter) {
                 BoxWithConstraints {
                     val maxHeight = constraints.maxHeight
@@ -93,22 +104,16 @@ class SolitaireLayout : BaseLayout() {
         }
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun BackgroundTopRow(modifier: Modifier) {
-        LazyRow {
-            items(items = arr) { i ->
+        Row {
+            for (i in arr) {
                 when (i) {
                     4 -> Box(modifier)
                     5 -> Box(modifier)
-                    6 -> Card(modifier.alpha(0.75f)) {
-                        Box(
-                            Modifier
-                                .fillMaxSize()
-                                .clickable {
-                                    SolitaireManager.resetRestStack()
-                                }) {
-                            StackBackground(R.drawable.reload_sign, i)
-                        }
+                    6 -> Card({ SolitaireManager.resetRestStack() }, modifier.alpha(0.75f)) {
+                        StackBackground(R.drawable.reload_sign, i)
                     }
 
                     else -> Card(modifier.alpha(0.75f)) {
@@ -128,8 +133,8 @@ class SolitaireLayout : BaseLayout() {
 
     @Composable
     fun BackgroundLowerRow(modifier: Modifier, cardHeight: Dp) {
-        LazyRow(Modifier.height(18 * distanceBetweenCards * cardHeight)) {
-            items(items = arr) { _ ->
+        Row(Modifier.height(18 * distanceBetweenCards * cardHeight)) {
+            for (i in arr) {
                 Card(modifier.alpha(0.5f)) {}
             }
         }
@@ -143,13 +148,14 @@ class SolitaireLayout : BaseLayout() {
             targetValue = baseOffset + card.mutableOffset.value, label = "moveCardToStack"
         )
         val zIndex =
-            card.currentStackIndex * 0.01f + if (currentStackId == 6 || offset == baseOffset) 0 else if(currentStackId == 5) 10 else 20
+            card.currentStackIndex * 0.01f + if (currentStackId == 6 || offset == baseOffset) 0 else if (currentStackId == 5) 10 else 20
         Image(painterResource(if (card.mutableFrontVisible.value) card.drawableResId else R.drawable.playingcards_detailed_back),
             "Playing card",
             modifier
                 .zIndex(zIndex)
                 .offset { offset }
-            .clickable(enabled = !SolitaireManager.solitaireFinished.value) {
+                .clickable {
+                    if (SolitaireManager.solitaireFinished.value) return@clickable
                     if (currentStackId == 6) {
                         SolitaireManager.turnFromRestStack(card)
                     } else {
@@ -186,5 +192,27 @@ class SolitaireLayout : BaseLayout() {
                 )
             }
         }
+    }
+
+    @Preview(apiLevel = 33)
+    @Composable
+    fun GameFinishedPopUp() {
+        val title = "Congrats"
+        val desc = """You did great and solved puzzle in ${0} seconds!!
+                        |That's Awesome!
+                        |Share with your friends and challenge them to beat your time!""".trimMargin()
+        val reward = 10
+        val onClickShare = {}
+        val onClickPlayAgain = {
+            SolitaireManager.reset()
+            SolitaireManager.loadPuzzle()
+        }
+        val onClickReturnToMenu = {
+            uiHandler.backToMenu()
+            SolitaireManager.reset()
+        }
+        BaseGameFinishedPopUp(
+            title, desc, reward, onClickShare, onClickPlayAgain, onClickReturnToMenu
+        )
     }
 }

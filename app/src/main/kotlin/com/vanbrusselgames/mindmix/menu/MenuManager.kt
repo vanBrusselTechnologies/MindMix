@@ -9,7 +9,7 @@ class MenuManager {
         val games = SceneManager.scenes.filter { e -> e.value != SceneManager.Scene.MENU }
         const val gameCount = 3
         const val withDuplicates = true
-        var selectedGame = SceneManager.Scene.SUDOKU
+        var selectedGame = SceneManager.Scene.MINESWEEPER
         //private var selectedGameModeIndices = intArrayOf(0, 0, 0)
 
         fun loadFromFile(data: MenuData) {

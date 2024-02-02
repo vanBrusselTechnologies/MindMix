@@ -7,6 +7,8 @@ import android.view.WindowInsetsController
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -27,16 +29,23 @@ import com.vanbrusselgames.mindmix.sudoku.SudokuLayout
 import com.vanbrusselgames.mindmix.sudoku.SudokuManager
 import com.vanbrusselgames.mindmix.ui.theme.MindMixTheme
 
-
 class MainActivity : ComponentActivity() {
+    companion object {
+        lateinit var networkMonitor: NetworkMonitor
+        lateinit var adManager: AdManager
+        lateinit var dataManager: DataManager
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AuthManager.start(this)
 
+        networkMonitor = NetworkMonitor(this)
+        adManager = AdManager(this)
+        dataManager = DataManager(applicationContext)
+
         PixelHelper.setResources(resources)
         setFullScreen(actionBar, window)
-        DataManager.init(applicationContext)
-        DataManager.load()
 
         setContent {
             MindMixTheme {
@@ -47,7 +56,11 @@ class MainActivity : ComponentActivity() {
                     contentColor = MaterialTheme.colorScheme.onBackground
                 ) {
                     SceneManager.navController = rememberNavController()
-                    NavHost(navController = SceneManager.navController, startDestination = "main", Modifier.fillMaxSize()) {
+                    NavHost(navController = SceneManager.navController,
+                        startDestination = "main",
+                        Modifier.fillMaxSize(),
+                        enterTransition = { fadeIn() },
+                        exitTransition = { fadeOut() }) {
                         composable("main") { MenuLayout().BaseScene() }
                         composable("menu") { MenuLayout().BaseScene() }
                         composable(
@@ -79,24 +92,34 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-}
 
-fun setFullScreen(actionBar: android.app.ActionBar?, window: android.view.Window) {
-    actionBar?.hide()
-    WindowCompat.setDecorFitsSystemWindows(window, false)
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
-        window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-    } else {
-        window.insetsController?.apply {
-            hide(WindowInsets.Type.statusBars())
-            systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        }
+    override fun onPause() {
+        super.onPause()
+        DataManager.save()
     }
-    WindowInsetsControllerCompat(
-        window, window.decorView
-    ).let { controller ->
-        controller.hide(WindowInsetsCompat.Type.systemBars())
-        controller.systemBarsBehavior =
-            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (!hasFocus) DataManager.save()
+    }
+
+    private fun setFullScreen(actionBar: android.app.ActionBar?, window: android.view.Window) {
+        actionBar?.hide()
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        } else {
+            window.insetsController?.apply {
+                hide(WindowInsets.Type.statusBars())
+                systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
+        }
+        WindowInsetsControllerCompat(
+            window, window.decorView
+        ).let { controller ->
+            controller.hide(WindowInsetsCompat.Type.systemBars())
+            controller.systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
     }
 }

@@ -1,6 +1,8 @@
 package com.vanbrusselgames.mindmix.minesweeper
 
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.graphics.Color
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.math.pow
@@ -19,7 +21,11 @@ class MinesweeperManager {
 
         val cellCount
             get() = sizeX * sizeY
-        var cells = arrayOf<MinesweeperCell>()
+        var cells = Array(cellCount) { MinesweeperCell(it) }
+
+        val minesLeft = mutableIntStateOf(-1)
+
+        private var isLoaded = false
 
         enum class PuzzleType {
             Classic
@@ -30,15 +36,19 @@ class MinesweeperManager {
         }
 
         fun loadFromFile(data: MinesweeperData) {
+            if (isLoaded) return
             finished = data.finished
             minesweeperFinished.value = finished
             if (data.mines.isEmpty()) return
+            minesLeft.intValue = data.mines.size
             for (index in data.mines) mines[index] = true
-            cells = Array(cellCount) { MinesweeperCell(it, mines[it]) }
             val stateEntries = MinesweeperCell.State.entries
-            for (i in data.input.indices) {
-                cells[i].state = stateEntries[data.input[i]]
+            cells.forEachIndexed { i, c ->
+                c.isMine = mines[i]
+                c.getCellMineCount()
+                c.state = stateEntries[data.input[i]]
             }
+            isLoaded = true
         }
 
         fun saveToFile(): String {
@@ -52,27 +62,37 @@ class MinesweeperManager {
         }
 
         fun loadPuzzle() {
-            if (cells.isEmpty()) {
-                val difficulty = 0
-                val mineCount = 25 + (10f * 1.75f.pow(difficulty)).toInt()
-                var i = 0
-                while (i < mineCount) {
-                    val rand: Int = Random.nextInt(cellCount)
-                    val isMine = mines[rand]
-                    if (!isMine) {
-                        mines[rand] = true
-                        i++
-                    }
+            if (isLoaded) return
+            val difficulty = 0
+            val mineCount = 25 + (10f * 1.75f.pow(difficulty)).toInt()
+            var i = 0
+            while (i < mineCount) {
+                val rand: Int = Random.nextInt(cellCount)
+                val isMine = mines[rand]
+                if (!isMine) {
+                    mines[rand] = true
+                    i++
                 }
-                cells = Array(cellCount) { MinesweeperCell(it, mines[it]) }
             }
+            cells.forEachIndexed { j, c ->
+                c.isMine = mines[j]
+                c.getCellMineCount()
+            }
+            minesLeft.intValue = mineCount
+            isLoaded = true
         }
 
         fun reset() {
             finished = false
             minesweeperFinished.value = finished
             mines.fill(false)
-            cells = arrayOf()
+            cells.forEach { c ->
+                c.isMine = false
+                c.state = MinesweeperCell.State.Empty
+                c.pressed = false
+                c.background.value = Color.White
+            }
+            isLoaded = false
         }
 
         fun findOtherSafeCells(cell: MinesweeperCell, tmp: MutableList<Int>) {
@@ -106,10 +126,19 @@ class MinesweeperManager {
             var i = -1
             while (i < cellCount - 1) {
                 i++
-                if (!cells[i].isMine || cells[i].state != MinesweeperCell.State.Empty/*MinesweeperData.Input[i] != 0*/) continue
+                if (!cells[i].isMine || cells[i].state != MinesweeperCell.State.Empty) continue
                 cells[i].state = MinesweeperCell.State.Bomb
             }
             minesweeperFinished.value = true
+        }
+
+        fun calculateMinesLeft() {
+            var count = 0
+            cells.forEach { c ->
+                if (c.isMine) count++
+                if (c.state == MinesweeperCell.State.Flag) count--
+            }
+            minesLeft.intValue = count
         }
 
         fun checkFinished() {
