@@ -1,12 +1,12 @@
 package com.vanbrusselgames.mindmix.sudoku
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class SudokuManager {
     companion object Instance {
-        private lateinit var solution: IntArray
         var inputMode: InputMode = InputMode.Normal
         private lateinit var puzzle: SudokuPuzzle
         var cells: Array<SudokuPuzzleCell> = arrayOf()
@@ -42,7 +42,17 @@ class SudokuManager {
             sudokuFinished.value = finished
 
             val clues = cells.map { c -> if (c.isClue) c.value else 0 }.toIntArray()
-            solution = SudokuPuzzle.getSolution(clues)
+            val solution: IntArray
+            try {
+                solution = SudokuPuzzle.getSolution(clues)
+            } catch (e: IllegalArgumentException) {
+                Log.e("MindMix", e.toString())
+                Log.e("MindMix", "Saved Sudoku puzzle is not valid, loading new puzzle")
+                loadPuzzle()
+                //todo: Show dialog, option to start new game
+
+                return
+            }
             puzzle = SudokuPuzzle(solution)
 
             if (checkConflictingCells) {
@@ -64,7 +74,6 @@ class SudokuManager {
 
             if (cells.isEmpty()) {
                 puzzle = createPuzzle(size = size)
-                solution = SudokuPuzzle.getSolution(puzzle)
                 val clues = SudokuPuzzle.createClues(puzzle, 60)
                 cells = Array(size * size) { SudokuPuzzleCell(it, clues[it] != 0, clues[it]) }
             }
@@ -138,7 +147,7 @@ class SudokuManager {
             try {
                 if (cells.any { c -> c.value == 0 }) return false
                 val input = cells.map { c -> c.value }.toIntArray()
-                return solution.contentEquals(input)
+                return SudokuPuzzle.getSolution(input).contentEquals(input)
             } catch (_: Exception) {
                 return false
             }

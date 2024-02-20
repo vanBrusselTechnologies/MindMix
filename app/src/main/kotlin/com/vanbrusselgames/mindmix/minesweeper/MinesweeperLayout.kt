@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableIntState
@@ -202,7 +203,7 @@ class MinesweeperLayout : BaseLayout() {
             modifier = Modifier
                 .size(cellSize)
                 .padding(PaddingValues(0.75f.dp))
-                .background(cell.background.value)
+                .background(if(cell.background.value == Color.Red) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.secondaryContainer)
                 .aspectRatio(1f)
         ) {
             val state by remember { cell.mutableCellState }
@@ -224,7 +225,7 @@ class MinesweeperLayout : BaseLayout() {
         BoxWithConstraints(Modifier.fillMaxSize()) {
             Text(
                 text = AnnotatedString(if (value == 0) "-" else value.toString()),
-                color = Color.Black,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
                 textAlign = TextAlign.Center,
                 fontSize = pxToSp(minOf(constraints.maxHeight, constraints.minHeight)) / 2f,
                 fontWeight = FontWeight.Bold,

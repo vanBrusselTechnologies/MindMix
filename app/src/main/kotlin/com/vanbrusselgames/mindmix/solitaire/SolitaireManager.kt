@@ -1,5 +1,6 @@
 package com.vanbrusselgames.mindmix.solitaire
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.IntOffset
@@ -7,7 +8,6 @@ import androidx.core.math.MathUtils.clamp
 import com.vanbrusselgames.mindmix.R
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlin.math.absoluteValue
 import kotlin.math.floor
 import kotlin.math.roundToInt
 
@@ -282,17 +282,25 @@ class SolitaireManager {
         var finished = false
         val solitaireFinished = mutableStateOf(finished)
 
-        // couldGetFinished => button to finish game
+        //todo: couldGetFinished => button to finish game
         var couldGetFinished = mutableStateOf(false)
 
         fun loadFromFile(data: SolitaireData) {
-            if (cardStacks.none { cs -> cs.isEmpty() }) return
+            if (!cardStacks.all { cs -> cs.isEmpty() }) return
+
+            if (!checkValid(data.cardStacks)) {
+                Log.e("MindMix", "Saved Solitaire puzzle is not valid, loading new puzzle")
+                reset()
+                loadPuzzle()
+                return
+            }
+
             for (i in data.cardStacks.indices) {
                 data.cardStacks[i].forEachIndexed { j, k ->
                     var index = k
                     var frontVisible = true
                     if (index < 0) {
-                        index = (index + 1).absoluteValue
+                        index = -1 * index - 1
                         frontVisible = false
                     }
                     val c = cards[index]
@@ -307,15 +315,42 @@ class SolitaireManager {
         }
 
         fun saveToFile(): String {
-            val stacks = MutableList(14) { listOf<Int>() }
+            val stacks = Array(14) { listOf<Int>() }
             for (i in cardStacks.indices) {
                 stacks[i] = cardStacks[i].map { c -> if (c.frontVisible) c.id else -1 * c.id - 1 }
             }
-            return Json.encodeToString(SolitaireData(stacks, finished))
+            return Json.encodeToString(SolitaireData(stacks.asList(), finished))
+        }
+
+        private fun checkValid(cardStacks: List<List<Int>>): Boolean {
+            for (i in cardStacks.indices) {
+                if (i < 7) continue
+                val visibleStack = mutableListOf<Int>()
+                var visibleCount = 0
+                cardStacks[i].forEach { k ->
+                    if (k < 0 && visibleCount != 0) return false
+                    if (k >= 0) {
+                        visibleStack.add(k + visibleCount)
+                        visibleCount += 1
+                    }
+                }
+                if (visibleCount <= 1) continue
+                var color = (visibleStack[0] / 13)
+                if (color >= 2) color = 3 - color
+                visibleStack.forEachIndexed { j, v ->
+                    if (j != 0) {
+                        var c = v / 13
+                        if (c >= 2) c = 3 - c
+                        if (c != color) color = c
+                        else return false
+                    }
+                }
+            }
+            return true
         }
 
         fun loadPuzzle() {
-            if (cardStacks.none { cs -> cs.isEmpty() }) return
+            if (!cardStacks.all { cs -> cs.isEmpty() }) return
             val dupCards = cards.copyOf()
             dupCards.shuffle()
             var j = 0
@@ -332,6 +367,10 @@ class SolitaireManager {
             cardStacks[6].forEachIndexed { index, card ->
                 card.currentStackIndex = index
                 card.currentStackId = 6
+            }
+            val stacks = Array(14) { listOf<Int>() }
+            for (i in cardStacks.indices) {
+                stacks[i] = cardStacks[i].map { c -> if (c.frontVisible) c.id else -1 * c.id - 1 }
             }
         }
 
