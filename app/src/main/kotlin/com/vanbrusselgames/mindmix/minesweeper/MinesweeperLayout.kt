@@ -36,6 +36,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.vanbrusselgames.mindmix.BaseLayout
@@ -124,6 +125,7 @@ class MinesweeperLayout : BaseLayout() {
         ) {
             BoxWithConstraints(modifier = Modifier
                 .align(Alignment.Center)
+                .background(Color.Black)
                 .pointerInput(Unit) {
                     detectTapGestures { offset ->
                         if (MinesweeperManager.finished) return@detectTapGestures

@@ -60,6 +60,7 @@ fun GameWheel(gameCount: Int, screenWidth: Dp, screenHeight: Dp) {
         ), label = "gameWheelTurn"
     )
     val scale = 5f
+
     Box(
         Modifier
             .fillMaxSize()
@@ -81,9 +82,10 @@ fun GameWheel(gameCount: Int, screenWidth: Dp, screenHeight: Dp) {
             modifier = Modifier
                 .fillMaxSize()
                 .offset(0.dp, (1f - 2f / scale) * screenHeight)
-                .graphicsLayer(
-                    rotationZ = rotationAnimation, transformOrigin = TransformOrigin.Center
-                )
+                .graphicsLayer {
+                    transformOrigin = TransformOrigin.Center
+                    rotationZ = rotationAnimation
+                }
         ) {
             if (gameCount == 0) return
             val realAngle = (rotationAngle % 360 + 360) % 360
