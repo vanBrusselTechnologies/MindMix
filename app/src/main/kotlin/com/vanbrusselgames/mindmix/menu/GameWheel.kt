@@ -4,7 +4,9 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
@@ -77,16 +79,14 @@ fun GameWheel(gameCount: Int, screenWidth: Dp, screenHeight: Dp) {
                     finishedRotate = true
                 })
             }) {
-        Box(
-            contentAlignment = Alignment.Center,
+        Box(contentAlignment = Alignment.Center,
             modifier = Modifier
                 .fillMaxSize()
                 .offset(0.dp, (1f - 2f / scale) * screenHeight)
                 .graphicsLayer {
                     transformOrigin = TransformOrigin.Center
                     rotationZ = rotationAnimation
-                }
-        ) {
+                }) {
             if (gameCount == 0) return
             val realAngle = (rotationAngle % 360 + 360) % 360
             val selectedItem = (realAngle / angleStep).roundToInt()
@@ -121,15 +121,16 @@ fun WheelItem(
     val offsetY = cos(angle * Math.PI / 180f) * radius * s
     val maxHeight = h * 0.4f * (1 + 0.75f * selectedFactor)
     val maxWidth = w * 0.5f * (1 + 0.375f * selectedFactor)
-    Box(
-        modifier = Modifier
-            .offset(-offsetX.dp, -offsetY.dp)
-            .heightIn(max = maxHeight)
-            .widthIn(max = maxWidth)
-            .aspectRatio(3f / 5f)
-            .rotate(-index * angleStep)
-            .offset(0.dp, -0.1f * h * selectedFactor)
-    ) {
+    Box(modifier = Modifier
+        .offset(-offsetX.dp, -offsetY.dp)
+        .heightIn(max = maxHeight)
+        .widthIn(max = maxWidth)
+        .aspectRatio(3f / 5f)
+        .rotate(-index * angleStep)
+        .offset(0.dp, -0.1f * h * selectedFactor)
+        .clickable(remember { MutableInteractionSource() }, null, isSelected) {
+            MenuUIHandler.startGame(MenuManager.selectedGame)
+        }) {
         when (game) {
             SceneManager.Scene.MINESWEEPER -> WheelItemImage(
                 "Minesweeper", R.drawable.game_icon_minesweeper
@@ -149,7 +150,7 @@ fun WheelItem(
 }
 
 @Composable
-fun WheelItemImage(name: String, imageResourceId: Int) {
+private fun WheelItemImage(name: String, imageResourceId: Int) {
     Column(
         Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally
     ) {

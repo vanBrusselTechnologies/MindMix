@@ -1,6 +1,5 @@
 package com.vanbrusselgames.mindmix
 
-import android.util.Log
 import androidx.navigation.NavHostController
 
 class SceneManager {
@@ -14,7 +13,7 @@ class SceneManager {
             mapOf(0 to Scene.SUDOKU, 1 to Scene.SOLITAIRE, 2 to Scene.MINESWEEPER, 3 to Scene.MENU)
 
         fun loadScene(scene: Scene) {
-            Log.d("MindMix", "scene:  ${scene.name.lowercase()}")
+            Logger.d("scene:  ${scene.name.lowercase()}")
             openScene(scene)
         }
 

@@ -1,6 +1,5 @@
 package com.vanbrusselgames.mindmix
 
-import android.util.Log
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.text.InlineTextContent
@@ -118,13 +117,13 @@ fun AutoSizeText(
                     combinedTextStyle =
                         combinedTextStyle.copy(fontSize = possibleFontSizes[++index])
                 } catch (_: Exception) {
-                    Log.w("MindMix", "AutoSizeText: Text cannot be shrunk further")
+                    Logger.w("AutoSizeText: Text cannot be shrunk further")
                     break
                 }
             }
 
             // To see produced list values and the number of iterations, uncomment the next line
-            // Log.d("MindMix", "counter = $counter, step = $step, [$max, $min] [${possibleFontSizes.first()}, ${possibleFontSizes.last()}]")
+            // Logger.d("counter = $counter, step = $step, [$max, $min] [${possibleFontSizes.first()}, ${possibleFontSizes.last()}]")
             // Example:
             // counter = 4, step = 1.0.sp, [27.636364.sp, 1.0.sp] [27.0.sp, 1.0.sp]
             // counter = 7, step = 1.0.sp, [70.181816.sp, 1.0.sp] [70.0.sp, 1.0.sp]

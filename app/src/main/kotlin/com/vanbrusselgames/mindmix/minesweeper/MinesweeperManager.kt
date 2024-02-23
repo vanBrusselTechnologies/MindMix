@@ -3,6 +3,8 @@ package com.vanbrusselgames.mindmix.minesweeper
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.vanbrusselgames.mindmix.Logger
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.math.pow
@@ -10,6 +12,7 @@ import kotlin.random.Random
 
 class MinesweeperManager {
     companion object Instance {
+        val gameName = "Minesweeper"
         var inputMode: InputMode = InputMode.Normal
         val minesweeperFinished = mutableStateOf(false)
         var sizeX = 16
@@ -63,6 +66,9 @@ class MinesweeperManager {
 
         fun loadPuzzle() {
             if (isLoaded) return
+            Logger.logEvent(FirebaseAnalytics.Event.LEVEL_START) {
+                param(FirebaseAnalytics.Param.LEVEL_NAME, gameName)
+            }
             val difficulty = 0
             val mineCount = 25 + (10f * 1.75f.pow(difficulty)).toInt()
             var i = 0
@@ -123,6 +129,10 @@ class MinesweeperManager {
         fun showAllMines() {
             if (finished) return
             finished = true
+            Logger.logEvent(FirebaseAnalytics.Event.LEVEL_END) {
+                param(FirebaseAnalytics.Param.LEVEL_NAME, gameName)
+                param(FirebaseAnalytics.Param.SUCCESS, 0)
+            }
             var i = -1
             while (i < cellCount - 1) {
                 i++
@@ -144,6 +154,12 @@ class MinesweeperManager {
         fun checkFinished() {
             finished = isFinished()
             minesweeperFinished.value = finished
+            if (finished) {
+                Logger.logEvent(FirebaseAnalytics.Event.LEVEL_END) {
+                    param(FirebaseAnalytics.Param.LEVEL_NAME, gameName)
+                    param(FirebaseAnalytics.Param.SUCCESS, 1)
+                }
+            }
         }
 
         private fun isFinished(): Boolean {

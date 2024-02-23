@@ -1,12 +1,15 @@
 package com.vanbrusselgames.mindmix.sudoku
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.vanbrusselgames.mindmix.Logger
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class SudokuManager {
     companion object Instance {
+        const val gameName = "Sudoku"
+
         var inputMode: InputMode = InputMode.Normal
         private lateinit var puzzle: SudokuPuzzle
         var cells: Array<SudokuPuzzleCell> = arrayOf()
@@ -42,18 +45,14 @@ class SudokuManager {
             sudokuFinished.value = finished
 
             val clues = cells.map { c -> if (c.isClue) c.value else 0 }.toIntArray()
-            val solution: IntArray
             try {
-                solution = SudokuPuzzle.getSolution(clues)
+                puzzle = SudokuPuzzle(SudokuPuzzle.getSolution(clues))
             } catch (e: IllegalArgumentException) {
-                Log.e("MindMix", e.toString())
-                Log.e("MindMix", "Saved Sudoku puzzle is not valid, loading new puzzle")
+                Logger.e(e.toString())
+                Logger.e("Saved Sudoku puzzle is not valid, loading new puzzle")
                 loadPuzzle()
-                //todo: Show dialog, option to start new game
-
                 return
             }
-            puzzle = SudokuPuzzle(solution)
 
             if (checkConflictingCells) {
                 cells.forEach { c -> checkConflictingCell(c.id) }
@@ -70,13 +69,15 @@ class SudokuManager {
         }
 
         fun loadPuzzle() {
-            val size = 9
-
-            if (cells.isEmpty()) {
-                puzzle = createPuzzle(size = size)
-                val clues = SudokuPuzzle.createClues(puzzle, 60)
-                cells = Array(size * size) { SudokuPuzzleCell(it, clues[it] != 0, clues[it]) }
+            if (cells.isNotEmpty()) return
+            Logger.logEvent(FirebaseAnalytics.Event.LEVEL_START) {
+                param(FirebaseAnalytics.Param.LEVEL_NAME, gameName)
             }
+            val size = 9
+            puzzle = createPuzzle(size = size)
+            val clues = SudokuPuzzle.createClues(puzzle, 60)
+            cells = Array(size * size) { SudokuPuzzleCell(it, clues[it] != 0, clues[it]) }
+
         }
 
         fun reset() {
@@ -112,23 +113,24 @@ class SudokuManager {
                 if (index == n) continue
                 when (true) {
                     (cells[index].value == 0) -> {
-                        var i = 0
-                        while (i < 9) {
-                            i++
-                            if (!cells[index].hasNote(i)) continue
-                            if (i != cells[n].value) continue
-                            cells[index].isIncorrect = true
-                            return
+                        if (cells[n].value == 0) {
+                            if (!isSecondary && cells[n].isIncorrect) {
+                                checkConflictingCell(n, true)
+                            }
+                            continue
                         }
+                        if (!cells[index].hasNote(cells[n].value)) continue
+                        cells[index].isIncorrect = true
+                        isConflicting = true
                     }
 
                     (cells[index].value == cells[n].value) -> {
                         cells[index].isIncorrect = true
-                        isConflicting = true
                         if (!isSecondary) checkConflictingCell(n, true)
+                        isConflicting = true
                     }
 
-                    (!isSecondary && cells[index].isIncorrect) -> {
+                    (!isSecondary && cells[n].isIncorrect) -> {
                         checkConflictingCell(n, true)
                     }
 
@@ -141,6 +143,12 @@ class SudokuManager {
         fun checkFinished() {
             finished = isFinished()
             sudokuFinished.value = finished
+            if (finished) {
+                Logger.logEvent(FirebaseAnalytics.Event.LEVEL_END) {
+                    param(FirebaseAnalytics.Param.LEVEL_NAME, gameName)
+                    param(FirebaseAnalytics.Param.SUCCESS, 1)
+                }
+            }
         }
 
         private fun isFinished(): Boolean {

@@ -4,14 +4,12 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.compose.runtime.MutableState
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.MobileAds
-import com.google.android.gms.ads.RequestConfiguration
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.google.android.ump.ConsentInformation
@@ -60,9 +58,6 @@ class AdManager(private val activity: MainActivity) {
 
             requestConsent()
 
-            // todo: REMOVE BEFORE RELEASE!
-            RequestConfiguration.Builder().setTestDeviceIds(listOf("F1806CD8F6635D31CC64DCEBAB3E2DE3"))
-
             // Check if you can initialize the Google Mobile Ads SDK in parallel
             // while checking for new consent information. Consent obtained in
             // the previous session can be used to request ads.
@@ -83,9 +78,11 @@ class AdManager(private val activity: MainActivity) {
             UserMessagingPlatform.loadAndShowConsentFormIfRequired(activity) { loadAndShowError ->
                 if (loadAndShowError != null) {
                     // Consent gathering failed.
-                    Log.w(
-                        "MindMix", String.format(
-                            "ConsentLoadAndShowError %s: %s", loadAndShowError.errorCode, loadAndShowError.message
+                    Logger.w(
+                        String.format(
+                            "ConsentLoadAndShowError %s: %s",
+                            loadAndShowError.errorCode,
+                            loadAndShowError.message
                         )
                     )
                 }
@@ -93,8 +90,8 @@ class AdManager(private val activity: MainActivity) {
             }
         }, { requestConsentError ->
             // Consent gathering failed.
-            Log.w(
-                "MindMix", String.format(
+            Logger.w(
+                String.format(
                     "ConsentInfoUpdateError: %s: %s",
                     requestConsentError.errorCode,
                     requestConsentError.message
@@ -111,8 +108,8 @@ class AdManager(private val activity: MainActivity) {
             val statusMap = initializationStatus.adapterStatusMap
             for (adapterClass in statusMap.keys) {
                 val status = statusMap[adapterClass]
-                Log.d(
-                    "MindMix", String.format(
+                Logger.d(
+                    String.format(
                         "Adapter name: %s, Description: %s, Latency: %d",
                         adapterClass,
                         status!!.description,
@@ -134,12 +131,12 @@ class AdManager(private val activity: MainActivity) {
                 override fun onAdFailedToLoad(adError: LoadAdError) {
                     rewardedAd = null
                     loading = false
-                    Log.d("MindMix", "Ad failed to load.")
+                    Logger.d("Ad failed to load.")
                     Firebase.crashlytics.log("AdLoadingError: $adError")
                 }
 
                 override fun onAdLoaded(ad: RewardedAd) {
-                    Log.d("MindMix", "Ad was loaded.")
+                    Logger.d("Ad was loaded.")
                     rewardedAd = ad
                     loading = false
                     notifyStateAdLoaded()
@@ -165,7 +162,7 @@ class AdManager(private val activity: MainActivity) {
             if (rewardedAd == null) loadAds()
         } else requestConsent()
 
-        if(adLoadedStates.size == 0) return
+        if (adLoadedStates.size == 0) return
 
         mainHandler.postDelayed(object : Runnable {
             override fun run() {
@@ -184,7 +181,7 @@ class AdManager(private val activity: MainActivity) {
                 // Handle the reward.
                 val rewardAmount = rewardItem.amount
                 val rewardType = rewardItem.type
-                Log.d("MindMix", "User earned the reward: ${rewardAmount}x $rewardType")
+                Logger.d("User earned the reward: ${rewardAmount}x $rewardType")
                 onReward(rewardAmount)
                 loadAds()
             }
@@ -192,7 +189,7 @@ class AdManager(private val activity: MainActivity) {
             if (adLoadedState != null) {
                 adLoadedState.value = false
             }
-            Log.d("MindMix", "The rewarded ad wasn't ready yet.")
+            Logger.w("The rewarded ad is not ready yet.")
             checkAdLoaded(adLoadedState)
         }
     }
@@ -201,32 +198,32 @@ class AdManager(private val activity: MainActivity) {
         rewardedAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
             override fun onAdClicked() {
                 // Called when a click is recorded for an ad.
-                Log.d("MindMix", "Ad was clicked.")
+                Logger.d("Ad was clicked.")
             }
 
             override fun onAdDismissedFullScreenContent() {
                 // Called when ad is dismissed.
                 // Set the ad reference to null so you don't show the ad a second time.
-                Log.d("MindMix", "Ad dismissed fullscreen content.")
+                Logger.d("Ad dismissed fullscreen content.")
                 rewardedAd = null
                 loadAds()
             }
 
             override fun onAdFailedToShowFullScreenContent(adError: AdError) {
                 // Called when ad fails to show.
-                Log.e("MindMix", "Ad failed to show fullscreen content.")
+                Logger.e("Ad failed to show fullscreen content.")
                 rewardedAd = null
                 loadAds()
             }
 
             override fun onAdImpression() {
                 // Called when an impression is recorded for an ad.
-                Log.d("MindMix", "Ad recorded an impression.")
+                Logger.d("Ad recorded an impression.")
             }
 
             override fun onAdShowedFullScreenContent() {
                 // Called when ad is shown.
-                Log.d("MindMix", "Ad showed fullscreen content.")
+                Logger.d("Ad showed fullscreen content.")
             }
         }
     }

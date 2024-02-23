@@ -1,6 +1,5 @@
 package com.vanbrusselgames.mindmix.sudoku
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -11,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -36,7 +36,9 @@ class SudokuNumPad {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(if (horizontal) 2 else 5),
                 userScrollEnabled = false,
-                modifier = Modifier.aspectRatio(if (horizontal) 1f / 2.5f else 2.5f).fillMaxSize()
+                modifier = Modifier
+                    .aspectRatio(if (horizontal) 1f / 2.5f else 2.5f)
+                    .fillMaxSize()
             ) {
                 itemsIndexed(List(10) { 0 }) { index, _ ->
                     SudokuNumPadCell(index, value = index + 1)
@@ -46,7 +48,7 @@ class SudokuNumPad {
 
         @Composable
         private fun SudokuNumPadCell(index: Int, value: Int) {
-            val inputMode = remember { mutableStateOf(InputMode.Normal) }
+            val inputMode = remember { mutableStateOf(SudokuManager.inputMode) }
             val padding = PaddingValues(
                 start = 2.dp,
                 end = 2.dp,
@@ -76,9 +78,14 @@ class SudokuNumPad {
                 }
                 if (value == 10) {
                     val imagePainter = if (inputMode.value == InputMode.Normal) {
-                        painterResource(id = R.drawable.pencil)
-                    } else painterResource(id = R.drawable.note_paper)
-                    Image(imagePainter, "", Modifier.scale(0.9f))
+                        painterResource(id = R.drawable.outline_stylus_24)
+                    } else painterResource(id = R.drawable.outline_edit_note_24)
+                    Icon(
+                        imagePainter, "",
+                        Modifier
+                            .fillMaxSize()
+                            .scale(0.9f)
+                    )
                 }
             }
         }

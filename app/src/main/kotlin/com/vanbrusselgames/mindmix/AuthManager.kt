@@ -35,7 +35,6 @@ class AuthManager {
                 this.isAuthenticated = isAuthenticated
 
                 if (isAuthenticated) {
-                    //firebaseAuthWithPlayGames(activity, gamesSignInClient.requestServerSideAccess())
                     gamesSignInClient.requestServerSideAccess(
                         getString(activity, R.string.default_web_client_id), false
                     ).addOnCompleteListener { task ->
@@ -53,19 +52,17 @@ class AuthManager {
         }
 
         private fun firebaseAuthWithPlayGames(activity: Activity, serverAuthCode: String) {
-            //Log.d(TAG, "firebaseAuthWithPlayGames:" + acct.id!!)
-
             val auth = Firebase.auth
             val credential = PlayGamesAuthProvider.getCredential(serverAuthCode)
             auth.signInWithCredential(credential).addOnCompleteListener(activity) { task ->
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
-                    //Log.d(TAG, "signInWithCredential:success")
+                    //Logger.d("signInWithCredential:success")
                     val user = auth.currentUser
                     //updateUI(user)
                 } else {
                     // If sign in fails, display a message to the user.
-                    //Log.w(TAG, "signInWithCredential:failure", task.exception)
+                    //Logger.w("signInWithCredential:failure", task.exception)
                     /*Toast.makeText(
                         baseContext,
                         "Authentication failed.",

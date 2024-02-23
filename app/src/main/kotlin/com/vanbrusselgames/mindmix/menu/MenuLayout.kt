@@ -28,12 +28,10 @@ import com.vanbrusselgames.mindmix.BaseUIHandler
 class MenuLayout : BaseLayout() {
 
     override var uiHandler: BaseUIHandler
-    private val menuUiHandler: MenuUIHandler
 
     init {
         val x = MenuUIHandler()
         uiHandler = x
-        menuUiHandler = x
     }
 
     @Composable
@@ -57,7 +55,7 @@ class MenuLayout : BaseLayout() {
         val playGameButtonSize = minOf(screenHeight / 400f, screenWidth / 250f)
         val iconSize = minOf(62.75f * playGameButtonSize * 0.4f, 25f * playGameButtonSize)
         Button(
-            onClick = { menuUiHandler.startGame(MenuManager.selectedGame) },
+            onClick = { MenuUIHandler.startGame(MenuManager.selectedGame) },
             modifier = modifier.offset(0.dp, screenHeight * -0.05f),
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary,

@@ -1,10 +1,11 @@
 package com.vanbrusselgames.mindmix.solitaire
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.IntOffset
 import androidx.core.math.MathUtils.clamp
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.vanbrusselgames.mindmix.Logger
 import com.vanbrusselgames.mindmix.R
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -13,6 +14,8 @@ import kotlin.math.roundToInt
 
 class SolitaireManager {
     companion object Instance {
+        val gameName = "Solitaire"
+
         val cards = arrayOf(
             PlayingCard(
                 PlayingCard.CardType.CLOVERS,
@@ -289,7 +292,7 @@ class SolitaireManager {
             if (!cardStacks.all { cs -> cs.isEmpty() }) return
 
             if (!checkValid(data.cardStacks)) {
-                Log.e("MindMix", "Saved Solitaire puzzle is not valid, loading new puzzle")
+                Logger.e("Saved Solitaire puzzle is not valid, loading new puzzle")
                 reset()
                 loadPuzzle()
                 return
@@ -351,6 +354,9 @@ class SolitaireManager {
 
         fun loadPuzzle() {
             if (!cardStacks.all { cs -> cs.isEmpty() }) return
+            Logger.logEvent(FirebaseAnalytics.Event.LEVEL_START) {
+                param(FirebaseAnalytics.Param.LEVEL_NAME, gameName)
+            }
             val dupCards = cards.copyOf()
             dupCards.shuffle()
             var j = 0
@@ -520,6 +526,12 @@ class SolitaireManager {
             finished = isFinished()
             solitaireFinished.value = finished
             if (!finished) couldGetFinished.value = couldGetFinished()
+            else {
+                Logger.logEvent(FirebaseAnalytics.Event.LEVEL_END) {
+                    param(FirebaseAnalytics.Param.LEVEL_NAME, gameName)
+                    param(FirebaseAnalytics.Param.SUCCESS, 1)
+                }
+            }
         }
 
         private fun isFinished(): Boolean {

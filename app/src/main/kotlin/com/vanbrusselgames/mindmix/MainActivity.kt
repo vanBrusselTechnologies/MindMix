@@ -38,6 +38,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Logger.start(this)
         AuthManager.start(this)
 
         networkMonitor = NetworkMonitor(this)

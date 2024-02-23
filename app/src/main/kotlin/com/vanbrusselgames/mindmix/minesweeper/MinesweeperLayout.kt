@@ -37,7 +37,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.vanbrusselgames.mindmix.BaseLayout
@@ -203,7 +202,7 @@ class MinesweeperLayout : BaseLayout() {
             modifier = Modifier
                 .size(cellSize)
                 .padding(PaddingValues(0.75f.dp))
-                .background(if(cell.background.value == Color.Red) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.secondaryContainer)
+                .background(if (cell.background.value == Color.Red) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.secondaryContainer)
                 .aspectRatio(1f)
         ) {
             val state by remember { cell.mutableCellState }
@@ -331,6 +330,7 @@ class MinesweeperLayout : BaseLayout() {
             if (failed) "A mine exploded" else """You did great and solved puzzle in ${0} seconds!!
                         |That's Awesome!
                         |Share with your friends and challenge them to beat your time!""".trimMargin()
+        //Logger.logEvent(FirebaseAnalytics.Event.EARN_VIRTUAL_CURRENCY)
         val reward = if (failed) 0 else 10
         val onClickShare = if (failed) null else ({})
         val onClickPlayAgain = {

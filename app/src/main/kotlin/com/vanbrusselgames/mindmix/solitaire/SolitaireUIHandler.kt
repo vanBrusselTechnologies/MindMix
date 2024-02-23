@@ -1,11 +1,11 @@
 package com.vanbrusselgames.mindmix.solitaire
 
-import android.util.Log
 import com.vanbrusselgames.mindmix.BaseUIHandler
+import com.vanbrusselgames.mindmix.Logger
 
 class SolitaireUIHandler : BaseUIHandler() {
 
     override fun openSettings() {
-        Log.d("MindMix", "Show Settings")
+        Logger.d("Show Settings")
     }
 }

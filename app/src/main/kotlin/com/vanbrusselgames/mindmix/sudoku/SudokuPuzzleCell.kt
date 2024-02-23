@@ -49,11 +49,6 @@ data class SudokuPuzzleCell(
 
     fun hasNote(index: Int = -1): Boolean = notes[index - 1]
 
-    fun clearNotes(){
-        notes.fill(false)
-        mutableCellNotes.fill(false)
-    }
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

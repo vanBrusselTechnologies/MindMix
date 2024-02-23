@@ -1,11 +1,11 @@
 package com.vanbrusselgames.mindmix.minesweeper
 
-import android.util.Log
 import com.vanbrusselgames.mindmix.BaseUIHandler
+import com.vanbrusselgames.mindmix.Logger
 
 class MinesweeperUIHandler : BaseUIHandler() {
 
     override fun openSettings() {
-        Log.d("MindMix", "Show Settings")
+        Logger.d("Show Settings")
     }
 }

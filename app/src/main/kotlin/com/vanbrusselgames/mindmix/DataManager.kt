@@ -1,7 +1,6 @@
 package com.vanbrusselgames.mindmix
 
 import android.content.Context
-import android.util.Log
 import com.vanbrusselgames.mindmix.menu.MenuData
 import com.vanbrusselgames.mindmix.menu.MenuManager
 import com.vanbrusselgames.mindmix.minesweeper.MinesweeperData
@@ -55,13 +54,13 @@ class DataManager(ctx: Context) {
                         }
 
                     } catch (e: Exception) {
-                        Log.e("MindMix", "Error reading line of safe file: ${e.message}")
-                        Log.e("MindMix", e.toString())
+                        Logger.e("Error reading line of safe file: ${e.message}")
+                        Logger.e(e.toString())
                     }
                 }
             } catch (e: Exception) {
-                Log.e("MindMix", "Error loading file: ${e.message}")
-                Log.e("MindMix", e.toString())
+                Logger.e("Error loading file: ${e.message}")
+                Logger.e(e.toString())
             }
             loaded = true
         }
