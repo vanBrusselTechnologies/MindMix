@@ -8,7 +8,7 @@ import kotlinx.serialization.json.Json
 
 class SudokuManager {
     companion object Instance {
-        const val gameName = "Sudoku"
+        private const val gameName = "Sudoku"
 
         var inputMode: InputMode = InputMode.Normal
         private lateinit var puzzle: SudokuPuzzle

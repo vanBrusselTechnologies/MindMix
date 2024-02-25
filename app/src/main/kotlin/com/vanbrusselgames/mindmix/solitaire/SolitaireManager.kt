@@ -14,7 +14,7 @@ import kotlin.math.roundToInt
 
 class SolitaireManager {
     companion object Instance {
-        val gameName = "Solitaire"
+        private const val gameName = "Solitaire"
 
         val cards = arrayOf(
             PlayingCard(
@@ -310,6 +310,7 @@ class SolitaireManager {
                     c.currentStackId = i
                     c.currentStackIndex = j
                     c.frontVisible = frontVisible
+                    if (frontVisible && i > 7 && j + 1 == data.cardStacks[i].size) c.isLast = true
                     cardStacks[i].add(c)
                 }
             }
@@ -362,7 +363,9 @@ class SolitaireManager {
             var j = 0
             for (i in 0 until 7) {
                 cardStacks[7 + i] = dupCards.copyOfRange(j, j + i + 1).toMutableList()
-                cardStacks[7 + i].last().frontVisible = true
+                val lastCard = cardStacks[7 + i].last()
+                lastCard.frontVisible = true
+                lastCard.isLast = true
                 cardStacks[7 + i].forEachIndexed { index, card ->
                     card.currentStackIndex = index
                     card.currentStackId = 7 + i
@@ -386,6 +389,7 @@ class SolitaireManager {
             cardStacks.forEach { s -> s.clear() }
             cards.forEach {
                 it.frontVisible = false
+                it.isLast = false
                 it.currentStackId = 6
                 it.currentStackIndex = 0
                 it.offset = IntOffset.Zero
@@ -400,6 +404,7 @@ class SolitaireManager {
                 card.currentStackIndex = i
                 card.currentStackId = 6
                 card.frontVisible = false
+                card.isLast = false
             }
         }
 
@@ -409,6 +414,7 @@ class SolitaireManager {
                 card.currentStackIndex = cardStacks[5].size
                 card.currentStackId = 5
                 card.frontVisible = true
+                card.isLast = true
                 cardStacks[5].add(card)
                 cardStacks[6].removeAt(cardStacks[6].size - 1)
             }
@@ -480,6 +486,7 @@ class SolitaireManager {
 
             if (firstCardStackId >= 7 && oldStack.size >= 1) {
                 oldStack.last().frontVisible = true
+                oldStack.last().isLast = true
             }
 
             checkFinished()
@@ -493,6 +500,7 @@ class SolitaireManager {
                 foundation.add(card)
                 card.currentStackId = foundationStackId
                 card.currentStackIndex = foundation.size - 1
+                card.isLast = true
                 return true
             }
             return false
@@ -508,6 +516,7 @@ class SolitaireManager {
                 val lastCardNewStack = newStack.last()
                 if (lastCardNewStack.id % 13 != card.id % 13 + 1) return false
                 if (!((card.id in 13..38 && lastCardNewStack.id !in 13..38) || (card.id !in 13..38 && lastCardNewStack.id in 13..38))) return false
+                lastCardNewStack.isLast = false
             }
             newStack.addAll(movingCards)
             val lastIndex = card.currentStackIndex

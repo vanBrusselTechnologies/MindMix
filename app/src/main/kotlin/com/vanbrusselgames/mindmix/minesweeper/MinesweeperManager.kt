@@ -12,7 +12,7 @@ import kotlin.random.Random
 
 class MinesweeperManager {
     companion object Instance {
-        val gameName = "Minesweeper"
+        private const val gameName = "Minesweeper"
         var inputMode: InputMode = InputMode.Normal
         val minesweeperFinished = mutableStateOf(false)
         var sizeX = 16

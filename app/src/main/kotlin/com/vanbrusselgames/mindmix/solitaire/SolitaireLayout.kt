@@ -1,9 +1,6 @@
 package com.vanbrusselgames.mindmix.solitaire
 
-import androidx.compose.animation.core.animateIntOffsetAsState
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -12,24 +9,20 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
-import androidx.compose.ui.zIndex
 import com.vanbrusselgames.mindmix.BaseLayout
 import com.vanbrusselgames.mindmix.BaseUIHandler
 import com.vanbrusselgames.mindmix.R
@@ -42,8 +35,8 @@ class SolitaireLayout : BaseLayout() {
         private const val cardPixelHeight = 819f
         private const val cardPixelWidth = 566f
         private const val cardAspectRatio = cardPixelWidth / cardPixelHeight
-        private var distanceBetweenCards = 0.175f
-        private var cardHeight = 0f
+        var distanceBetweenCards = 0.175f
+        var cardHeight = 0f
         var cardWidth = 0f
 
         fun calculateBaseOffsetByStackData(stackId: Int, stackIndex: Int): IntOffset {
@@ -91,7 +84,7 @@ class SolitaireLayout : BaseLayout() {
 
                     Background(modifier = modifier, cardHeight = cardHeightInDp)
 
-                    SolitaireManager.cards.forEach { PlayingCard(it, modifier) }
+                    SolitaireManager.cards.forEach { it.Composable(modifier) }
                 }
             }
         }
@@ -146,45 +139,6 @@ class SolitaireLayout : BaseLayout() {
                 Card(modifier.alpha(0.5f)) {}
             }
         }
-    }
-
-    @Composable
-    fun PlayingCard(card: PlayingCard, modifier: Modifier) {
-        val currentStackId by card.mutableCurrentStackId
-        val baseOffset = calculateBaseOffsetByStackData(currentStackId, card.currentStackIndex)
-        val offset by animateIntOffsetAsState(
-            targetValue = baseOffset + card.mutableOffset.value, label = "moveCardToStack"
-        )
-        val zIndex =
-            card.currentStackIndex * 0.01f + if (currentStackId == 6 || offset == baseOffset) 0 else if (currentStackId == 5) 10 else 20
-        Image(painterResource(if (card.mutableFrontVisible.value) card.drawableResId else R.drawable.playingcards_detailed_back),
-            "Playing card",
-            modifier
-                .zIndex(zIndex)
-                .offset { offset }
-                .clickable {
-                    if (solitaireFinished.value) return@clickable
-                    if (currentStackId == 6) {
-                        SolitaireManager.turnFromRestStack(card)
-                    } else {
-                        if (!card.frontVisible || zIndex >= 20f) return@clickable
-                        SolitaireManager.startMoveCard(card)
-                        SolitaireManager.onReleaseMovingCards()
-                    }
-                }
-                .pointerInput(Unit) {
-                    detectDragGestures(onDragStart = {
-                        if (SolitaireManager.finished || !card.frontVisible) return@detectDragGestures
-                        SolitaireManager.startMoveCard(card)
-                    }, onDragCancel = {
-                        SolitaireManager.onReleaseMovingCards()
-                    }, onDragEnd = {
-                        SolitaireManager.onReleaseMovingCards()
-                    }, onDrag = { change, offset ->
-                        change.consume()
-                        SolitaireManager.moveCards(offset)
-                    })
-                })
     }
 
     @Composable
