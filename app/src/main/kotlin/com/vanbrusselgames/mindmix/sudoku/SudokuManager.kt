@@ -113,12 +113,10 @@ class SudokuManager {
                 if (index == n) continue
                 when (true) {
                     (cells[index].value == 0) -> {
-                        if (cells[n].value == 0) {
-                            if (!isSecondary && cells[n].isIncorrect) {
-                                checkConflictingCell(n, true)
-                            }
-                            continue
+                        if (!isSecondary && cells[n].isIncorrect) {
+                            checkConflictingCell(n, true)
                         }
+                        if (cells[n].value == 0) continue
                         if (!cells[index].hasNote(cells[n].value)) continue
                         cells[index].isIncorrect = true
                         isConflicting = true

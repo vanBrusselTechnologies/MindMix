@@ -7,11 +7,16 @@ import android.view.WindowInsetsController
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -20,6 +25,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.google.firebase.Firebase
+import com.google.firebase.appcheck.appCheck
+import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
+import com.google.firebase.initialize
 import com.vanbrusselgames.mindmix.menu.MenuLayout
 import com.vanbrusselgames.mindmix.minesweeper.MinesweeperLayout
 import com.vanbrusselgames.mindmix.minesweeper.MinesweeperManager
@@ -28,18 +37,33 @@ import com.vanbrusselgames.mindmix.solitaire.SolitaireManager
 import com.vanbrusselgames.mindmix.sudoku.SudokuLayout
 import com.vanbrusselgames.mindmix.sudoku.SudokuManager
 import com.vanbrusselgames.mindmix.ui.theme.MindMixTheme
+import kotlinx.coroutines.CoroutineScope
 
 class MainActivity : ComponentActivity() {
     companion object {
         lateinit var networkMonitor: NetworkMonitor
         lateinit var adManager: AdManager
         lateinit var dataManager: DataManager
+
+        lateinit var snackbarHostState: SnackbarHostState
+        lateinit var scope: CoroutineScope
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Logger.start(this)
+        Firebase.initialize(this)
+        Firebase.appCheck.installAppCheckProviderFactory(
+            PlayIntegrityAppCheckProviderFactory.getInstance(),
+        )
         AuthManager.start(this)
+        ReviewManager.start(this)
+        UpdateManager.start(this,
+            registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result: ActivityResult ->
+                if (result.resultCode != RESULT_OK) {
+                    Logger.w("Update flow failed! Result code: " + result.resultCode)
+                }
+            })
 
         networkMonitor = NetworkMonitor(this)
         adManager = AdManager(this)
@@ -50,6 +74,8 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MindMixTheme {
+                scope = rememberCoroutineScope()
+                snackbarHostState = remember { SnackbarHostState() }
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),

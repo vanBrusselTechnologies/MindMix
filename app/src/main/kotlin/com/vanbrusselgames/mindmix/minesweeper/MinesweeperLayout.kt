@@ -17,13 +17,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableIntState
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -245,7 +247,7 @@ class MinesweeperLayout : BaseLayout() {
 
     @Composable
     fun MinesweeperFlagCell() {
-        Image(painterResource(R.drawable.flag_red), "Flag", Modifier.fillMaxSize())
+        Icon(painterResource(R.drawable.baseline_flag_24), "Flag", Modifier.fillMaxSize())
     }
 
     @Composable
@@ -270,19 +272,29 @@ class MinesweeperLayout : BaseLayout() {
                         textAlign = TextAlign.Center
                     )
                 }
-                val painterId = remember { mutableIntStateOf(R.drawable.spade) }
+                val inputMode = remember { mutableStateOf(MinesweeperManager.inputMode) }
+
                 Button(
-                    onClick = { changeInputMode(painterId) },
+                    onClick = { changeInputMode(inputMode) },
                     modifier = Modifier
                         .aspectRatio(1f)
                         .fillMaxHeight(0.95f),
                     shape = RoundedCornerShape(10.dp),
+                    colors = ButtonColors(
+                        MaterialTheme.colorScheme.secondaryContainer,
+                        MaterialTheme.colorScheme.onSecondaryContainer,
+                        MaterialTheme.colorScheme.secondaryContainer,
+                        MaterialTheme.colorScheme.onSecondaryContainer
+                    ),
                     enabled = !minesweeperFinished.value
                 ) {
-                    Image(
-                        painter = painterResource(painterId.intValue),
-                        contentDescription = "inputType: ${MinesweeperManager.inputMode.name}"
-                    )
+                    if (inputMode.value == InputMode.Flag) {
+                        Icon(
+                            painterResource(R.drawable.baseline_flag_24),
+                            "inputType: Flag",
+                            Modifier.fillMaxSize()
+                        )
+                    } else Image(painterResource(R.drawable.spade), "inputType: Spade")
                 }
             }
         } else {
@@ -298,28 +310,29 @@ class MinesweeperLayout : BaseLayout() {
                         textAlign = TextAlign.Center
                     )
                 }
-                val painterId = remember { mutableIntStateOf(R.drawable.spade) }
+                val inputMode = remember { mutableStateOf(MinesweeperManager.inputMode) }
                 Button(
-                    onClick = { changeInputMode(painterId) },
+                    onClick = { changeInputMode(inputMode) },
                     modifier = Modifier
                         .aspectRatio(1f)
                         .fillMaxWidth(),
                     shape = RoundedCornerShape(10.dp),
                     enabled = !minesweeperFinished.value
                 ) {
-                    Image(
-                        painter = painterResource(painterId.intValue),
-                        contentDescription = "inputType: ${MinesweeperManager.inputMode.name}"
-                    )
+                    if (inputMode.value == InputMode.Flag) {
+                        Icon(
+                            painterResource(R.drawable.baseline_flag_24),
+                            "inputType: Flag",
+                            Modifier.fillMaxSize()
+                        )
+                    } else Image(painterResource(R.drawable.spade), "inputType: Spade")
                 }
             }
         }
     }
 
-    private fun changeInputMode(painterId: MutableIntState) {
-        painterId.intValue =
-            if (MinesweeperManager.changeInputMode() == InputMode.Flag) R.drawable.flag_red
-            else R.drawable.spade
+    private fun changeInputMode(inputMode: MutableState<InputMode>) {
+        inputMode.value = MinesweeperManager.changeInputMode()
     }
     //#endregion
 

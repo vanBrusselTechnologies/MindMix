@@ -310,7 +310,7 @@ class SolitaireManager {
                     c.currentStackId = i
                     c.currentStackIndex = j
                     c.frontVisible = frontVisible
-                    if (frontVisible && i > 7 && j + 1 == data.cardStacks[i].size) c.isLast = true
+                    if (i < 7 || (frontVisible && j + 1 == data.cardStacks[i].size)) c.isLast = true
                     cardStacks[i].add(c)
                 }
             }
@@ -424,7 +424,7 @@ class SolitaireManager {
             if (movingCards.size != 0) return
             if (!card.frontVisible) return
             val stackId = card.currentStackId
-            if (stackId == 5) {
+            if (stackId <= 5) {
                 movingCards.add(cardStacks[5].last())
                 return
             }
@@ -433,6 +433,9 @@ class SolitaireManager {
             for (i in index until stack.size) {
                 val c = stack[i]
                 movingCards.add(c)
+            }
+            if (index != 0 && stackId >= 7) {
+                stack[index - 1].isLast = true
             }
         }
 
@@ -448,9 +451,10 @@ class SolitaireManager {
             if (movingCards.size == 0) return
             val firstCard = movingCards[0]
             val firstCardStackId = firstCard.currentStackId
+            val firstCardStackIndex = firstCard.currentStackIndex
             val oldStack = cardStacks[firstCardStackId]
             val currentOffset = SolitaireLayout.calculateBaseOffsetByStackData(
-                firstCardStackId, firstCard.currentStackIndex
+                firstCardStackId, firstCardStackIndex
             ) + firstCard.offset
 
             val baseOffsetUpperLeft = SolitaireLayout.calculateBaseOffsetByStackData(0, 1)
@@ -478,18 +482,18 @@ class SolitaireManager {
                 foundNewStack = moveCardsToStack(firstCard, stackId)
                 stackId++
             }
+            if (!foundNewStack && firstCardStackIndex != 0) {
+                oldStack[firstCardStackIndex - 1].isLast = false
+            }
 
             movingCards.forEach { card ->
                 card.offset = IntOffset.Zero
             }
             movingCards.clear()
 
-            if (firstCardStackId >= 7 && oldStack.size >= 1) {
-                oldStack.last().frontVisible = true
-                oldStack.last().isLast = true
-            }
+            if (firstCardStackId >= 7 && oldStack.size >= 1) oldStack.last().frontVisible = true
 
-            checkFinished()
+            if (foundNewStack) checkFinished()
         }
 
         private fun moveCardToFoundation(card: PlayingCard): Boolean {

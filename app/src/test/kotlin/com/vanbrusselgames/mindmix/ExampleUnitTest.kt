@@ -11,15 +11,18 @@ import kotlin.system.measureTimeMillis
 class ExampleUnitTest {
     @Test
     fun benchmark() {
+
+        val times = 1_000_000
+
         println("\n\n\n\nStart Test!\n")
         var t = 0
-        val times = 100000
+
         val elapsed = measureTimeMillis {
             while (t < times) {
                 t++
             }
         }
-        println("average elapsed Time: ${elapsed / times}")
-        println("\nEnd Test!\n\n\n\n")
+        println("(average) elapsed Time: ${elapsed / times}")
+        println("\nEnd Test2!\n\n\n\n")
     }
 }

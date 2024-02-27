@@ -10,16 +10,18 @@ class MenuManager {
         const val gameCount = 3
         const val withDuplicates = true
         var selectedGame = SceneManager.Scene.MINESWEEPER
+        var coins = 0
         //private var selectedGameModeIndices = intArrayOf(0, 0, 0)
 
         fun loadFromFile(data: MenuData) {
             selectedGame = data.selectedGame
+            coins = data.coins
             //selectedGameModeIndices = data.selectedGameModeIndices.toIntArray()
         }
 
         fun saveToFile(): String {
             return Json.encodeToString(
-                MenuData(selectedGame/*, selectedGameModeIndices.toList()*/)
+                MenuData(selectedGame, coins/*, selectedGameModeIndices.toList()*/)
             )
         }
 

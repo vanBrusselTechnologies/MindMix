@@ -7,6 +7,7 @@ import com.google.android.gms.games.PlayGames
 import com.google.android.gms.games.PlayGamesSdk
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.PlayGamesAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -14,18 +15,11 @@ import com.google.firebase.ktx.Firebase
 class AuthManager {
     companion object {
         var isAuthenticated = false
-        private lateinit var auth: FirebaseAuth
+        private val auth: FirebaseAuth = Firebase.auth
+        var currentUser: FirebaseUser? = auth.currentUser
 
         fun start(activity: Activity) {
             PlayGamesSdk.initialize(activity)
-            auth = Firebase.auth
-
-            // Check if user is signed in (non-null) and update UI accordingly.
-            //val currentUser = auth.currentUser
-            //updateUI(currentUser)
-
-            //val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
-            //    .requestServerAuthCode(getString(activity, R.string.default_web_client_id)).build()
 
             val gamesSignInClient = PlayGames.getGamesSignInClient(activity)
 
@@ -57,14 +51,14 @@ class AuthManager {
             auth.signInWithCredential(credential).addOnCompleteListener(activity) { task ->
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
-                    //Logger.d("signInWithCredential:success")
-                    val user = auth.currentUser
+                    Logger.d("signInWithCredential:success")
+                    currentUser = auth.currentUser
                     //updateUI(user)
                 } else {
                     // If sign in fails, display a message to the user.
-                    //Logger.w("signInWithCredential:failure", task.exception)
+                    Logger.w("signInWithCredential:failure", task.exception!!)
                     /*Toast.makeText(
-                        baseContext,
+                        activity,
                         "Authentication failed.",
                         Toast.LENGTH_SHORT,
                     ).show()*/

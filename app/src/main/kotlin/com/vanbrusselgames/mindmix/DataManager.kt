@@ -1,6 +1,9 @@
 package com.vanbrusselgames.mindmix
 
 import android.content.Context
+import com.google.firebase.Firebase
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.storage
 import com.vanbrusselgames.mindmix.menu.MenuData
 import com.vanbrusselgames.mindmix.menu.MenuManager
 import com.vanbrusselgames.mindmix.minesweeper.MinesweeperData
@@ -9,6 +12,8 @@ import com.vanbrusselgames.mindmix.solitaire.SolitaireData
 import com.vanbrusselgames.mindmix.solitaire.SolitaireManager
 import com.vanbrusselgames.mindmix.sudoku.SudokuData
 import com.vanbrusselgames.mindmix.sudoku.SudokuManager
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.json.Json
 import java.io.File
 
@@ -18,10 +23,30 @@ class DataManager(ctx: Context) {
         private val fileDecoding = Charsets.UTF_8
         private lateinit var file: File
         private var loaded = false
+        private val storage = Firebase.storage
+
+        private val storagePath: StorageReference?
+            get() {
+                val cUser = AuthManager.currentUser ?: return null
+                //todo: Remove _ in filename below
+                return storage.reference.child("Users/${cUser.uid}/_$filename")
+            }
 
         private fun load() {
             try {
+                //todo: Try download online file
+
                 val content = file.readLines(fileDecoding)
+                if (content.isNotEmpty() && content[0].startsWith("@@@")) {
+                    val totalContent = content.joinToString("\n")
+                    val coinsString = Regex("int///munten:::[0-9]+,,,").find(totalContent)?.value
+                    val coins = coinsString?.split(",,,")?.get(0)?.substring(15)?.toInt()
+                    if (coins != null) {
+                        MenuManager.coins = coins
+                        save()
+                    }
+                    return
+                }
                 for (line in content) {
                     try {
                         if (line.isEmpty()) continue
@@ -54,18 +79,16 @@ class DataManager(ctx: Context) {
                         }
 
                     } catch (e: Exception) {
-                        Logger.e("Error reading line of safe file: ${e.message}")
-                        Logger.e(e.toString())
+                        Logger.e("Error reading line of save file", e)
                     }
                 }
             } catch (e: Exception) {
-                Logger.e("Error loading file: ${e.message}")
-                Logger.e(e.toString())
+                Logger.e("Error loading save file", e)
             }
             loaded = true
         }
 
-        fun save() {
+        fun save(withPublish: Boolean = true) {
             val str: StringBuilder = StringBuilder()
             for (entry in SceneManager.scenes) {
                 val dataString = when (entry.value) {
@@ -77,12 +100,24 @@ class DataManager(ctx: Context) {
                 str.append("\n${entry.key}%$dataString")
             }
             file.writeText(str.toString().trim(), fileDecoding)
+            if (withPublish) storagePath?.putStream(file.inputStream())
         }
     }
 
     init {
         file = File(ctx.filesDir, filename)
         file.createNewFile()
-        if(!loaded) load()
+        if (!loaded) load()
+        MainActivity.scope.launch {
+            autoSave(0)
+        }
+    }
+
+    private suspend fun autoSave(i: Int) {
+        withTimeout(60000) {
+            Logger.d("Save ${if (i == 5) "with publish" else ""}")
+            save(i == 5)
+            autoSave(i + 1)
+        }
     }
 }
