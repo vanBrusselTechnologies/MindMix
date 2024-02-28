@@ -69,7 +69,7 @@ class MinesweeperManager {
             Logger.logEvent(FirebaseAnalytics.Event.LEVEL_START) {
                 param(FirebaseAnalytics.Param.LEVEL_NAME, gameName)
             }
-            val difficulty = 0
+            val difficulty = 1
             val mineCount = 25 + (10f * 1.75f.pow(difficulty)).toInt()
             var i = 0
             while (i < mineCount) {

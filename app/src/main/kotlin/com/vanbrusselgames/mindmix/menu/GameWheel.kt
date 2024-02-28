@@ -16,9 +16,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -32,6 +29,7 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -68,10 +66,12 @@ fun GameWheel(gameCount: Int, screenWidth: Dp, screenHeight: Dp) {
             .fillMaxSize()
             .pointerInput(Unit) {
                 detectDragGestures(onDrag = { change, dragAmount ->
+                    if (Settings.visible.value) return@detectDragGestures
                     change.consume()
                     rotationAngle += dragAmount.x / 8f
                     finishedRotate = false
                 }, onDragEnd = {
+                    if (Settings.visible.value) return@detectDragGestures
                     rotationAngle = round(rotationAngle / angleStep) * angleStep
                     val index =
                         (((rotationAngle / angleStep) % gameCount + gameCount) % gameCount).roundToInt()
@@ -129,28 +129,29 @@ fun WheelItem(
         .rotate(-index * angleStep)
         .offset(0.dp, -0.1f * h * selectedFactor)
         .clickable(remember { MutableInteractionSource() }, null, isSelected) {
-            MenuUIHandler.startGame(MenuManager.selectedGame)
+            if (!Settings.visible.value) MenuUIHandler.startGame(MenuManager.selectedGame)
         }) {
         when (game) {
             SceneManager.Scene.MINESWEEPER -> WheelItemImage(
-                "Minesweeper", R.drawable.game_icon_minesweeper
+                R.string.minesweeper_name, R.drawable.game_icon_minesweeper
             )
 
             SceneManager.Scene.SOLITAIRE -> WheelItemImage(
-                "Solitaire", R.drawable.playingcards_detailed_clovers_a
+                R.string.solitaire_name, R.drawable.playingcards_detailed_clovers_a
             )
 
             SceneManager.Scene.SUDOKU -> WheelItemImage(
-                "Sudoku", R.drawable.game_icon_sudoku
+                R.string.sudoku_name, R.drawable.game_icon_sudoku
             )
 
-            else -> Icon(Icons.Filled.Person, "Game", Modifier.fillMaxSize())
+            else -> {}
         }
     }
 }
 
 @Composable
-private fun WheelItemImage(name: String, imageResourceId: Int) {
+private fun WheelItemImage(nameId: Int, imageResourceId: Int) {
+    val name = stringResource(nameId)
     Column(
         Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -162,7 +163,6 @@ private fun WheelItemImage(name: String, imageResourceId: Int) {
             textAlign = TextAlign.Center,
             maxLines = 1
         )
-
         Image(painterResource(imageResourceId), name, modifier = Modifier.fillMaxSize())
     }
 }

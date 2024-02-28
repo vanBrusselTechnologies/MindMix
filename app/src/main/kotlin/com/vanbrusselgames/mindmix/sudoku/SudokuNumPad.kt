@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.vanbrusselgames.mindmix.AutoSizeText
+import com.vanbrusselgames.mindmix.BaseLayout
 import com.vanbrusselgames.mindmix.R
 import com.vanbrusselgames.mindmix.sudoku.SudokuManager.Instance.InputMode
 
@@ -61,7 +62,7 @@ class SudokuNumPad {
                     .aspectRatio(1f)
                     .padding(padding)
                     .background(MaterialTheme.colorScheme.secondaryContainer)
-                    .clickable(enabled = !SudokuManager.sudokuFinished.value) {
+                    .clickable(enabled = !SudokuManager.sudokuFinished.value && !BaseLayout.disableTopRowButtons.value) {
                         if (value != 10) onClickNumPadCell(index)
                         else changeInputMode(inputMode)
                     }) {

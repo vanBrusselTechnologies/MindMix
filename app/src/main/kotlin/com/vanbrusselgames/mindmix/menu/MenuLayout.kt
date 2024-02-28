@@ -15,6 +15,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.style.LineHeightStyle
@@ -24,6 +26,7 @@ import androidx.compose.ui.unit.times
 import com.vanbrusselgames.mindmix.AutoSizeText
 import com.vanbrusselgames.mindmix.BaseLayout
 import com.vanbrusselgames.mindmix.BaseUIHandler
+import com.vanbrusselgames.mindmix.R
 
 class MenuLayout : BaseLayout() {
 
@@ -36,14 +39,19 @@ class MenuLayout : BaseLayout() {
 
     @Composable
     fun BaseScene() {
-        super.BaseScene(isMenu = true, sceneSpecific = { SetLayoutGameWheel() })
+        super.BaseScene(isMenu = true, sceneSpecific = {
+            SetLayoutGameWheel()
+            Settings.Screen()
+        })
     }
 
     @Composable
     fun SetLayoutGameWheel() {
         Box(
             contentAlignment = Alignment.BottomCenter,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .blur(if (Settings.visible.value) 4.dp else 0.dp),
         ) {
             GameWheel(MenuManager.gameCount, screenWidth, screenHeight)
             PlayButton(Modifier.align(Alignment.BottomCenter))
@@ -55,7 +63,7 @@ class MenuLayout : BaseLayout() {
         val playGameButtonSize = minOf(screenHeight / 400f, screenWidth / 250f)
         val iconSize = minOf(62.75f * playGameButtonSize * 0.4f, 25f * playGameButtonSize)
         Button(
-            onClick = { MenuUIHandler.startGame(MenuManager.selectedGame) },
+            onClick = { if(!Settings.visible.value) MenuUIHandler.startGame(MenuManager.selectedGame) },
             modifier = modifier.offset(0.dp, screenHeight * -0.05f),
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary,
@@ -75,7 +83,7 @@ class MenuLayout : BaseLayout() {
                 )
                 AutoSizeText(
                     text = AnnotatedString(
-                        text = "Play", paragraphStyle = ParagraphStyle(
+                        text = stringResource(R.string.play), paragraphStyle = ParagraphStyle(
                             lineHeightStyle = LineHeightStyle(
                                 alignment = LineHeightStyle.Alignment.Center,
                                 trim = LineHeightStyle.Trim.Both

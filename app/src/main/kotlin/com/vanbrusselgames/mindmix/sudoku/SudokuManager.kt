@@ -75,7 +75,7 @@ class SudokuManager {
             }
             val size = 9
             puzzle = createPuzzle(size = size)
-            val clues = SudokuPuzzle.createClues(puzzle, 60)
+            val clues = SudokuPuzzle.createClues(puzzle, 40)
             cells = Array(size * size) { SudokuPuzzleCell(it, clues[it] != 0, clues[it]) }
 
         }

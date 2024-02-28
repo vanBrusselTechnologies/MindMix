@@ -285,7 +285,6 @@ class SolitaireManager {
         var finished = false
         val solitaireFinished = mutableStateOf(finished)
 
-        //todo: couldGetFinished => button to finish game
         var couldGetFinished = mutableStateOf(false)
 
         fun loadFromFile(data: SolitaireData) {
@@ -316,6 +315,7 @@ class SolitaireManager {
             }
             finished = data.finished
             solitaireFinished.value = finished
+            if (!finished) couldGetFinished.value = couldGetFinished()
         }
 
         fun saveToFile(): String {
@@ -425,7 +425,7 @@ class SolitaireManager {
             if (!card.frontVisible) return
             val stackId = card.currentStackId
             if (stackId <= 5) {
-                movingCards.add(cardStacks[5].last())
+                movingCards.add(cardStacks[stackId].last())
                 return
             }
             val stack = cardStacks[stackId]
@@ -482,7 +482,7 @@ class SolitaireManager {
                 foundNewStack = moveCardsToStack(firstCard, stackId)
                 stackId++
             }
-            if (!foundNewStack && firstCardStackIndex != 0) {
+            if (firstCardStackId >= 7 && !foundNewStack && firstCardStackIndex != 0) {
                 oldStack[firstCardStackIndex - 1].isLast = false
             }
 
@@ -535,11 +535,12 @@ class SolitaireManager {
             return true
         }
 
-        private fun checkFinished() {
+        fun checkFinished() {
             finished = isFinished()
             solitaireFinished.value = finished
-            if (!finished) couldGetFinished.value = couldGetFinished()
-            else {
+            if (!finished) {
+                couldGetFinished.value = couldGetFinished()
+            } else {
                 Logger.logEvent(FirebaseAnalytics.Event.LEVEL_END) {
                     param(FirebaseAnalytics.Param.LEVEL_NAME, gameName)
                     param(FirebaseAnalytics.Param.SUCCESS, 1)
@@ -555,10 +556,7 @@ class SolitaireManager {
         }
 
         private fun couldGetFinished(): Boolean {
-            for (card in cards) {
-                if (!card.frontVisible && card.currentStackId >= 7) return false
-            }
-            return true
+            return !cards.any { !it.frontVisible && it.currentStackId >= 7 }
         }
     }
 }

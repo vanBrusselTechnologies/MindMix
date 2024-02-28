@@ -1,6 +1,27 @@
 <resources>
     <string name="app_name">MindMix</string>
-    <string name="game_services_project_id">528380549151</string>
-    <string name="default_web_client_id">528380549151-l079h9g6e2hpo6biq15j58o96p39j8pd.apps.googleusercontent.com</string>
-    <string name="admob_application_id">ca-app-pub-7048585956228368~3762816385</string>
+    <string name="game_services_project_id" translatable="false">528380549151</string>
+    <string name="default_web_client_id" translatable="false">528380549151-l079h9g6e2hpo6biq15j58o96p39j8pd.apps.googleusercontent.com</string>
+    <string name="admob_application_id" translatable="false">ca-app-pub-7048585956228368~3762816385</string>
+    <string name="minesweeper_name">Minesweeper</string>
+    <string name="solitaire_name">Solitaire</string>
+    <string name="sudoku_name">Sudoku</string>
+    <string name="back_to_menu">Return to menu</string>
+    <string name="play_again">Play again</string>
+    <string name="share">Share</string>
+    <string name="loading">Loading…</string>
+    <string name="signin">Sign In</string>
+    <string name="connected">Connected</string>
+    <string name="play">Play</string>
+    <string name="request_data_deletion">Request data deletion</string>
+    <string name="settings">Settings</string>
+    <string name="mines_left">Mines Left:</string>
+    <string name="sudoku_desc">A Sudoku puzzle consists of 81 cells which are divided into nine columns, rows and regions.\n\nThe task is now to place the numbers from 1 to 9 into the empty cells in such a way that in every row, column and 3x3 region each number appears only once.</string>
+    <string name="solitaire_desc">The goal of the game is to move all of the cards to the \'foundations\' these are four additional stacks of cards. At the start of the game these stacks are empty. Each stack represents a suit (hearts, clubs, etc). They must be stacked by suit and in order, starting with the Ace, then the 2, 3, 4, … ending with the Queen and then King.\n\nCards that are face up and showing may be moved from the stock pile or the columns to the foundation stacks or to other columns. To move a card to a column, it must be one less in rank and the opposite color. Stacks of cards may be moved from one column to another as long as they maintain the same order (highest to lowest, alternating colors). If you get an empty column, you can start a new column with a King.\n\nTo get new cards from the stock pile, you turn one card at a time face up into the stack next to the stock pile called the waist stack. You can only play the top card off the waist stack. If you run out of stock cards, turn the waist stack over to make a new stock pile and start again.</string>
+    <string name="minesweeper_desc">In Minesweeper, mines are scattered throughout a board, which is divided into cells. Cells have three states: uncovered, covered and flagged. A covered cell is blank and clickable, while an uncovered cell is exposed. Flagged cells are those marked by the player to indicate a potential mine location.\n\nIf a player uncovers a mined cell, the game ends, as there is only 1 life per game. Otherwise, the uncovered cell displays either a number, indicating the number of mines diagonally and/or adjacent to it, or a blank tile (\'\'-\'\'), and all adjacent non-mined cells will automatically be uncovered. In flag-mode, clicking on a cell will flag it, causing a flag to appear on it. Flagged cells are still considered covered, and a player can click on them to uncover them, although they must first be unflagged with an additional flag-mode click. You can switch between normal and flagmode by clicking the button with spade/flag icon.</string>
+    <string name="finish_game">Finish game</string>
+    <string name="minesweeper_failed">Unfortunately! One of the mines has exploded!</string>
+    <string name="minesweeper_success">Well done! You cleared all the mines!</string>
+    <string name="sudoku_success">Well done! You solved the sudoku!</string>
+    <string name="solitaire_success">Well done! You solved the solitaire!</string>
 </resources>

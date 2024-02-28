@@ -1,6 +1,8 @@
 package com.vanbrusselgames.mindmix
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import com.google.firebase.Firebase
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.storage
@@ -12,8 +14,6 @@ import com.vanbrusselgames.mindmix.solitaire.SolitaireData
 import com.vanbrusselgames.mindmix.solitaire.SolitaireManager
 import com.vanbrusselgames.mindmix.sudoku.SudokuData
 import com.vanbrusselgames.mindmix.sudoku.SudokuManager
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.json.Json
 import java.io.File
 
@@ -24,12 +24,12 @@ class DataManager(ctx: Context) {
         private lateinit var file: File
         private var loaded = false
         private val storage = Firebase.storage
+        private var isAutoSaving = false
 
         private val storagePath: StorageReference?
             get() {
                 val cUser = AuthManager.currentUser ?: return null
-                //todo: Remove _ in filename below
-                return storage.reference.child("Users/${cUser.uid}/_$filename")
+                return storage.reference.child("Users/${cUser.uid}/$filename")
             }
 
         private fun load() {
@@ -71,7 +71,11 @@ class DataManager(ctx: Context) {
                             }
 
                             SceneManager.Scene.MENU -> {
-                                val data = Json.decodeFromString<MenuData>(json)
+                                //todo: Remove in 1.1.1
+                                val menuJson = if(json.contains("\"coins\":")) json else {
+                                    json.substring(0, json.length - 1) + ",\"coins\":" + "}"
+                                }
+                                val data = Json.decodeFromString<MenuData>(menuJson)
                                 MenuManager.loadFromFile(data)
                             }
 
@@ -100,7 +104,10 @@ class DataManager(ctx: Context) {
                 str.append("\n${entry.key}%$dataString")
             }
             file.writeText(str.toString().trim(), fileDecoding)
-            if (withPublish) storagePath?.putStream(file.inputStream())
+            if (withPublish) {
+                storagePath?.putStream(file.inputStream())
+                file.inputStream().close()
+            }
         }
     }
 
@@ -108,16 +115,19 @@ class DataManager(ctx: Context) {
         file = File(ctx.filesDir, filename)
         file.createNewFile()
         if (!loaded) load()
-        MainActivity.scope.launch {
-            autoSave(0)
-        }
+        autoSave()
     }
 
-    private suspend fun autoSave(i: Int) {
-        withTimeout(60000) {
-            Logger.d("Save ${if (i == 5) "with publish" else ""}")
-            save(i == 5)
-            autoSave(i + 1)
-        }
+    var autoSaveCount = 0
+    private fun autoSave() {
+        if (isAutoSaving) return
+        isAutoSaving = true
+        val mainHandler = Handler(Looper.getMainLooper())
+        mainHandler.post(object : Runnable {
+            override fun run() {
+                save(autoSaveCount++ % 10 == 0)
+                mainHandler.postDelayed(this, 30000)
+            }
+        })
     }
 }

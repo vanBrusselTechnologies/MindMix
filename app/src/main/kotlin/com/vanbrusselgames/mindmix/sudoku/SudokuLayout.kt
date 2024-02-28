@@ -27,6 +27,7 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -39,6 +40,7 @@ import androidx.compose.ui.unit.min
 import com.vanbrusselgames.mindmix.BaseLayout
 import com.vanbrusselgames.mindmix.BaseUIHandler
 import com.vanbrusselgames.mindmix.PixelHelper.Companion.pxToSp
+import com.vanbrusselgames.mindmix.R
 import com.vanbrusselgames.mindmix.sudoku.SudokuManager.Instance.sudokuFinished
 import kotlin.math.floor
 
@@ -49,7 +51,10 @@ class SudokuLayout : BaseLayout() {
     fun BaseScene() {
         super.BaseScene(isMenu = false, sceneSpecific = {
             val finished = sudokuFinished.value
-            SudokuSpecificLayout(sudokuFinished.value)
+            SudokuSpecificLayout(finished || disableTopRowButtons.value)
+            if (helpOpened.value) GameHelp(
+                titleId = R.string.sudoku_name, descriptionId = R.string.sudoku_desc
+            )
             if (finished) GameFinishedPopUp()
         })
     }
@@ -137,7 +142,7 @@ class SudokuLayout : BaseLayout() {
                 .fillMaxSize()
                 .padding(padding)
                 .aspectRatio(1f)
-                .clickable(enabled = (!cell.isClue && !sudokuFinished.value)) {
+                .clickable(enabled = (!cell.isClue && !sudokuFinished.value && !disableTopRowButtons.value)) {
                     cell.isSelected = true
 
                     val currSelectedCellId = SudokuManager.selectedCellIndex
@@ -177,12 +182,13 @@ class SudokuLayout : BaseLayout() {
     ) {
         val value = cell.mutableCellValue.intValue
         if (value == 0) return
+        val colorScheme = MaterialTheme.colorScheme
         Text(
             text = AnnotatedString(value.toString()),
             color = when (true) {
-                cell.mutableIsIncorrect.value -> MaterialTheme.colorScheme.onErrorContainer
-                cell.mutableIsSelected.value -> MaterialTheme.colorScheme.onPrimaryContainer
-                else -> MaterialTheme.colorScheme.onSecondaryContainer
+                cell.mutableIsIncorrect.value -> colorScheme.onErrorContainer
+                cell.mutableIsSelected.value -> colorScheme.onPrimaryContainer
+                else -> colorScheme.onSecondaryContainer
             },
             textAlign = TextAlign.Center,
             fontSize = space / 2f * if (isClue) 1.15f else 1f,
@@ -230,8 +236,7 @@ class SudokuLayout : BaseLayout() {
                     lineHeightStyle = LineHeightStyle(
                         alignment = LineHeightStyle.Alignment.Center,
                         trim = LineHeightStyle.Trim.Both
-                    ),
-                    fontFamily = FontFamily(Typeface.MONOSPACE)
+                    ), fontFamily = FontFamily(Typeface.MONOSPACE)
                 )
             ),
             modifier = Modifier.scale(1.625f)
@@ -241,13 +246,14 @@ class SudokuLayout : BaseLayout() {
 
     @Composable
     fun GameFinishedPopUp() {
-        val title = "Congrats"
-        val desc = """You did great and solved puzzle in ${0} seconds!!
-                        |That's Awesome!
-                        |Share with your friends and challenge them to beat your time!""".trimMargin()
+        val title = stringResource(R.string.sudoku_name)//"Congrats / Smart / Well done"
+        val desc = stringResource(R.string.sudoku_success)
+            //"""You did great and solved puzzle in ${0} seconds!!
+            //     |That's Awesome!
+            //     |Share with your friends and challenge them to beat your time!""".trimMargin()
         //Logger.logEvent(FirebaseAnalytics.Event.EARN_VIRTUAL_CURRENCY)
         val reward = 10
-        val onClickShare = {}
+        //val onClickShare = {}
         val onClickPlayAgain = {
             SudokuManager.reset()
             SudokuManager.loadPuzzle()
@@ -257,7 +263,7 @@ class SudokuLayout : BaseLayout() {
             SudokuManager.reset()
         }
         BaseGameFinishedPopUp(
-            title, desc, reward, onClickShare, onClickPlayAgain, onClickReturnToMenu
+            title, desc, reward, null, onClickPlayAgain, onClickReturnToMenu
         )
     }
 }

@@ -9,6 +9,8 @@ import com.google.firebase.analytics.logEvent
 class Logger {
     companion object {
         private lateinit var analytics: FirebaseAnalytics
+        private const val TAG = "MindMix"
+
         fun start(activity: MainActivity) {
             analytics = FirebaseAnalytics.getInstance(activity)
         }
@@ -18,27 +20,27 @@ class Logger {
         }
 
         fun d(msg: String) {
-            Log.d("MindMix", msg)
+            Log.d(TAG, msg)
         }
 
         fun d(msg: String, tr: Throwable) {
-            Log.d("MindMix", msg, tr)
+            Log.d(TAG, msg, tr)
         }
 
         fun e(msg: String) {
-            Log.e("MindMix", msg)
+            Log.e(TAG, msg)
         }
 
         fun e(msg: String, tr: Throwable) {
-            Log.e("MindMix", msg, tr)
+            Log.e(TAG, msg, tr)
         }
 
         fun w(msg: String) {
-            Log.w("MindMix", msg)
+            Log.w(TAG, msg)
         }
 
         fun w(msg: String, tr: Throwable) {
-            Log.w("MindMix", msg, tr)
+            Log.w(TAG, msg, tr)
         }
     }
 }

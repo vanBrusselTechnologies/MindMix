@@ -8,5 +8,8 @@ abstract class BaseUIHandler {
         SceneManager.loadScene(SceneManager.Scene.MENU)
     }
 
-    open fun openShop() {}
+    fun openHelp(){
+        BaseLayout.helpOpened.value = true
+        BaseLayout.disableTopRowButtons.value = true
+    }
 }

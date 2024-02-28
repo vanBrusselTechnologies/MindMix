@@ -1,5 +1,6 @@
 package com.vanbrusselgames.mindmix.menu
 
+import com.vanbrusselgames.mindmix.BaseLayout
 import com.vanbrusselgames.mindmix.BaseUIHandler
 import com.vanbrusselgames.mindmix.Logger
 import com.vanbrusselgames.mindmix.SceneManager
@@ -7,8 +8,8 @@ import com.vanbrusselgames.mindmix.SceneManager
 class MenuUIHandler : BaseUIHandler() {
 
     override fun openSettings() {
-        super.openSettings()
-        Logger.d("Show Settings")
+        Settings.visible.value = true
+        BaseLayout.disableTopRowButtons.value = true
     }
 
     override fun backToMenu() {
@@ -19,5 +20,7 @@ class MenuUIHandler : BaseUIHandler() {
         fun startGame(game: SceneManager.Scene) {
             SceneManager.loadScene(game)
         }
+
+        fun openShop() {}
     }
 }

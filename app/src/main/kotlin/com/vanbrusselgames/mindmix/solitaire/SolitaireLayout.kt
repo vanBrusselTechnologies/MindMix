@@ -10,8 +10,10 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,13 +21,17 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import com.vanbrusselgames.mindmix.BaseLayout
 import com.vanbrusselgames.mindmix.BaseUIHandler
+import com.vanbrusselgames.mindmix.DataManager
 import com.vanbrusselgames.mindmix.R
+import com.vanbrusselgames.mindmix.solitaire.SolitaireManager.Instance.cards
+import com.vanbrusselgames.mindmix.solitaire.SolitaireManager.Instance.couldGetFinished
 import com.vanbrusselgames.mindmix.solitaire.SolitaireManager.Instance.solitaireFinished
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -54,7 +60,10 @@ class SolitaireLayout : BaseLayout() {
     fun BaseScene() {
         super.BaseScene(isMenu = false, sceneSpecific = {
             val finished = solitaireFinished.value
-            SolitaireSpecificLayout(finished)
+            SolitaireSpecificLayout(finished || disableTopRowButtons.value)
+            if (helpOpened.value) GameHelp(
+                titleId = R.string.solitaire_name, descriptionId = R.string.solitaire_desc
+            )
             if (finished) GameFinishedPopUp()
         })
     }
@@ -84,7 +93,22 @@ class SolitaireLayout : BaseLayout() {
 
                     Background(modifier = modifier, cardHeight = cardHeightInDp)
 
-                    SolitaireManager.cards.forEach { it.Composable(modifier) }
+                    cards.forEach { it.Composable(modifier) }
+
+                    if (couldGetFinished.value) Button(onClick = {
+                        cards.forEach {
+                            it.currentStackId = it.type.ordinal
+                            it.currentStackIndex = it.index.ordinal
+                            it.offset = IntOffset.Zero
+                            it.isLast = true
+                            it.frontVisible = true
+                        }
+                        SolitaireManager.checkFinished()
+                    }, modifier = Modifier.align(Alignment.BottomCenter)) {
+                        Icon(painterResource(R.drawable.baseline_flag_24), "Finish flag")
+                        Spacer(Modifier.width(2.dp))
+                        Text(stringResource(R.string.finish_game))
+                    }
                 }
             }
         }
@@ -112,7 +136,8 @@ class SolitaireLayout : BaseLayout() {
                                 painterResource(id = R.drawable.outline_autorenew_24),
                                 "Stock",
                                 Modifier
-                                    .align(Alignment.Center).fillMaxSize()
+                                    .align(Alignment.Center)
+                                    .fillMaxSize()
                             )
                         }
                     }
@@ -158,13 +183,14 @@ class SolitaireLayout : BaseLayout() {
 
     @Composable
     fun GameFinishedPopUp() {
-        val title = "Congrats"
-        val desc = """You did great and solved puzzle in ${0} seconds!!
-                        |That's Awesome!
-                        |Share with your friends and challenge them to beat your time!""".trimMargin()
+        val title = stringResource(R.string.solitaire_name)//"Congrats / Smart / Well done"
+        val desc = stringResource(R.string.solitaire_success)
+        //"""You did great and solved puzzle in ${0} seconds!!
+        //     |That's Awesome!
+        //     |Share with your friends and challenge them to beat your time!""".trimMargin()
         //Logger.logEvent(FirebaseAnalytics.Event.EARN_VIRTUAL_CURRENCY)
         val reward = 10
-        val onClickShare = {}
+        //val onClickShare = {}
         val onClickPlayAgain = {
             SolitaireManager.reset()
             SolitaireManager.loadPuzzle()
@@ -174,7 +200,7 @@ class SolitaireLayout : BaseLayout() {
             SolitaireManager.reset()
         }
         BaseGameFinishedPopUp(
-            title, desc, reward, onClickShare, onClickPlayAgain, onClickReturnToMenu
+            title, desc, reward, null, onClickPlayAgain, onClickReturnToMenu
         )
     }
 }
