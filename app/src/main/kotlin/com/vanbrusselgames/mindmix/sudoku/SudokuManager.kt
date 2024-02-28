@@ -17,8 +17,8 @@ class SudokuManager {
 
         var checkConflictingCells = true
         var autoEditNotes = true
-        val sudokuFinished = mutableStateOf(false)
         var finished = false
+        val sudokuFinished = mutableStateOf(finished)
 
         enum class PuzzleType {
             Classic
@@ -29,6 +29,11 @@ class SudokuManager {
         }
 
         fun loadFromFile(data: SudokuData) {
+            if(data.finished){
+                reset()
+                loadPuzzle()
+                return
+            }
             val cellList = mutableListOf<SudokuPuzzleCell>()
             var clueId = 0
             for (i in data.input.indices) {
@@ -41,8 +46,6 @@ class SudokuManager {
                 cellList.add(SudokuPuzzleCell(i, isClue, data.input[i], notes))
             }
             cells = cellList.toTypedArray()
-            finished = data.finished
-            sudokuFinished.value = finished
 
             val clues = cells.map { c -> if (c.isClue) c.value else 0 }.toIntArray()
             try {

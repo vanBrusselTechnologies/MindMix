@@ -30,7 +30,7 @@ android {
         applicationId = "com.vanBrusselGames.MindMix"
         minSdk = 21
         targetSdk = 34
-        versionCode = 82
+        versionCode = 86
         versionName = "1.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

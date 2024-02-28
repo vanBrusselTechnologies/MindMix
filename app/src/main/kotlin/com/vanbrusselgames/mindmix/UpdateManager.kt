@@ -9,6 +9,7 @@ import com.google.android.play.core.appupdate.AppUpdateInfo
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.appupdate.AppUpdateOptions
+import com.google.android.play.core.install.InstallStateUpdatedListener
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
@@ -16,13 +17,13 @@ import kotlinx.coroutines.launch
 
 class UpdateManager {
     companion object {
-        private const val DAYS_FOR_FLEXIBLE_UPDATE = 0
+        //private const val DAYS_FOR_FLEXIBLE_UPDATE = 3
         private lateinit var appUpdateManager: AppUpdateManager
 
         fun start(
             activity: Activity, activityResultLauncher: ActivityResultLauncher<IntentSenderRequest>
         ) {
-            if(this::appUpdateManager.isInitialized) return
+            if (this::appUpdateManager.isInitialized) return
             appUpdateManager = AppUpdateManagerFactory.create(activity)
             val appUpdateInfoTask = appUpdateManager.appUpdateInfo
             appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
@@ -38,10 +39,8 @@ class UpdateManager {
                     )
                 ) {
                     requestUpdate(appUpdateInfo, activityResultLauncher, AppUpdateType.IMMEDIATE)
-                } else if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE && (appUpdateInfo.clientVersionStalenessDays()
-                        ?: -1) >= DAYS_FOR_FLEXIBLE_UPDATE && appUpdateInfo.isUpdateTypeAllowed(
-                        AppUpdateType.FLEXIBLE
-                    )
+                } else if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE && /*(appUpdateInfo.clientVersionStalenessDays() ?: -1) >= DAYS_FOR_FLEXIBLE_UPDATE &&*/
+                    appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)
                 ) {
                     requestUpdate(appUpdateInfo, activityResultLauncher, AppUpdateType.FLEXIBLE)
                 }
@@ -53,21 +52,26 @@ class UpdateManager {
             activityResultLauncher: ActivityResultLauncher<IntentSenderRequest>,
             appUpdateType: Int
         ) {
-            // Create a listener to track request state updates.
-            /*val listener = InstallStateUpdatedListener { state ->
-                // (Optional) Provide a download progress bar.
-                /*if (state.installStatus() == InstallStatus.DOWNLOADING) {
-                    val bytesDownloaded = state.bytesDownloaded()
-                    val totalBytesToDownload = state.totalBytesToDownload()
-                    // Show update progress bar.
-                }*/
-                // Log state or install the update.
-                if(state.installStatus() == InstallStatus.INSTALLED) {
-                    appUpdateManager.unregisterListener(this)
+            if(appUpdateType == AppUpdateType.FLEXIBLE){
+                // Create a listener to track request state updates.
+                val listener = InstallStateUpdatedListener { state ->
+                    // (Optional) Provide a download progress bar.
+                    /*if (state.installStatus() == InstallStatus.DOWNLOADING) {
+                        val bytesDownloaded = state.bytesDownloaded()
+                        val totalBytesToDownload = state.totalBytesToDownload()
+                        // Show update progress bar.
+                    }*/
+                    if (state.installStatus() == InstallStatus.DOWNLOADED) {
+                        // If the update is downloaded but not installed,
+                        // notify the user to complete the update.
+                        popupSnackbarForCompleteUpdate()
+                    }
+                    //else if(state.installStatus() == InstallStatus.INSTALLED) {
+                    //    appUpdateManager.unregisterListener(listener)
+                    //}
                 }
+                appUpdateManager.registerListener(listener)
             }
-            appUpdateManager.registerListener(listener)*/
-            Logger.d("Request update")
 
             appUpdateManager.startUpdateFlowForResult(
                 appUpdateInfo,

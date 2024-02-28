@@ -288,7 +288,11 @@ class SolitaireManager {
         var couldGetFinished = mutableStateOf(false)
 
         fun loadFromFile(data: SolitaireData) {
-            if (!cardStacks.all { cs -> cs.isEmpty() }) return
+            if(data.finished){
+                reset()
+                loadPuzzle()
+                return
+            }
 
             if (!checkValid(data.cardStacks)) {
                 Logger.e("Saved Solitaire puzzle is not valid, loading new puzzle")
@@ -313,8 +317,6 @@ class SolitaireManager {
                     cardStacks[i].add(c)
                 }
             }
-            finished = data.finished
-            solitaireFinished.value = finished
             if (!finished) couldGetFinished.value = couldGetFinished()
         }
 

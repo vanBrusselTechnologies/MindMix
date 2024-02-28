@@ -6,7 +6,6 @@ import android.view.WindowInsets
 import android.view.WindowInsetsController
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.fadeIn
@@ -18,6 +17,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -71,53 +71,54 @@ class MainActivity : ComponentActivity() {
 
         PixelHelper.setResources(resources)
         setFullScreen(actionBar, window)
-
-        setContent {
-            MindMixTheme {
-                scope = rememberCoroutineScope()
-                snackbarHostState = remember { SnackbarHostState() }
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background,
-                    contentColor = MaterialTheme.colorScheme.onBackground
-                ) {
-                    SceneManager.navController = rememberNavController()
-                    NavHost(navController = SceneManager.navController,
-                        startDestination = "main",
-                        Modifier.fillMaxSize(),
-                        enterTransition = { fadeIn() },
-                        exitTransition = { fadeOut() }) {
-                        composable("main") { MenuLayout().BaseScene() }
-                        composable("menu") { MenuLayout().BaseScene() }
-                        composable(
-                            "solitaire?mode={mode}",
-                            arguments = listOf(navArgument("mode") { defaultValue = "0" })
-                        ) { backStackEntry ->
-                            val mode = backStackEntry.arguments?.getString("mode")
-                            SolitaireManager.loadPuzzle()
-                            SolitaireLayout().BaseScene()
-                        }
-                        composable(
-                            "sudoku?mode={mode}",
-                            arguments = listOf(navArgument("mode") { defaultValue = "0" })
-                        ) { backStackEntry ->
-                            val mode = backStackEntry.arguments?.getString("mode")
-                            SudokuManager.loadPuzzle()
-                            SudokuLayout().BaseScene()
-                        }
-                        composable(
-                            "minesweeper?mode={mode}",
-                            arguments = listOf(navArgument("mode") { defaultValue = "0" })
-                        ) { backStackEntry ->
-                            val mode = backStackEntry.arguments?.getString("mode")
-                            MinesweeperManager.loadPuzzle()
-                            MinesweeperLayout().BaseScene()
+        setContentView(ComposeView(this).apply {
+            setContent {
+                MindMixTheme {
+                    scope = rememberCoroutineScope()
+                    snackbarHostState = remember { SnackbarHostState() }
+                    // A surface container using the 'background' color from the theme
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.background,
+                        contentColor = MaterialTheme.colorScheme.onBackground
+                    ) {
+                        SceneManager.navController = rememberNavController()
+                        NavHost(navController = SceneManager.navController,
+                            startDestination = "main",
+                            Modifier.fillMaxSize(),
+                            enterTransition = { fadeIn() },
+                            exitTransition = { fadeOut() }) {
+                            composable("main") { MenuLayout().BaseScene() }
+                            composable("menu") { MenuLayout().BaseScene() }
+                            composable(
+                                "solitaire?mode={mode}",
+                                arguments = listOf(navArgument("mode") { defaultValue = "0" })
+                            ) { backStackEntry ->
+                                val mode = backStackEntry.arguments?.getString("mode")
+                                SolitaireManager.loadPuzzle()
+                                SolitaireLayout().BaseScene()
+                            }
+                            composable(
+                                "sudoku?mode={mode}",
+                                arguments = listOf(navArgument("mode") { defaultValue = "0" })
+                            ) { backStackEntry ->
+                                val mode = backStackEntry.arguments?.getString("mode")
+                                SudokuManager.loadPuzzle()
+                                SudokuLayout().BaseScene()
+                            }
+                            composable(
+                                "minesweeper?mode={mode}",
+                                arguments = listOf(navArgument("mode") { defaultValue = "0" })
+                            ) { backStackEntry ->
+                                val mode = backStackEntry.arguments?.getString("mode")
+                                MinesweeperManager.loadPuzzle()
+                                MinesweeperLayout().BaseScene()
+                            }
                         }
                     }
                 }
             }
-        }
+        })
     }
 
     override fun onPause() {

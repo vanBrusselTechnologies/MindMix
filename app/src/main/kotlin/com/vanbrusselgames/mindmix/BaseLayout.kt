@@ -44,6 +44,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.vanbrusselgames.mindmix.menu.MenuManager
 
 abstract class BaseLayout {
     companion object {
@@ -159,17 +161,20 @@ abstract class BaseLayout {
         sceneSpecific: @Composable () -> Unit = {}
     ) {
         val adManager = remember { MainActivity.adManager }
+        val rewarded = remember { mutableStateOf(false) }
+        if (!rewarded.value) {
+            MenuManager.coins += reward
+            logEarnedCurrencyReward(reward)
+            DataManager.save()
+            rewarded.value = true
+        }
         disableTopRowButtons.value = true
-        DataManager.save()
         Box(Modifier.fillMaxSize(), Alignment.Center) {
             Box(
                 Modifier.fillMaxSize(0.95f), Alignment.Center
             ) {
                 Card(
                     Modifier.alpha(0.9f), elevation = CardDefaults.cardElevation(20.dp)
-                    //colors = CardDefaults.cardColors(
-                    //    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
-                    //)
                 ) {
                     Column(
                         Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally
@@ -193,9 +198,12 @@ abstract class BaseLayout {
                                 if (!adShown) {
                                     Spacer(Modifier.width(16.dp))
                                     Button(onClick = {
-                                        adManager.showAd(adLoaded) { reward ->
+                                        adManager.showAd(adLoaded) { adReward ->
                                             adShown = true
-                                            bonus = reward
+                                            bonus = adReward
+                                            MenuManager.coins += reward * bonus
+                                            DataManager.save()
+                                            logEarnedCurrencyReward(reward * bonus)
                                         }
                                     }, enabled = adLoaded.value) {
                                         Icon(
@@ -248,6 +256,14 @@ abstract class BaseLayout {
                     }
                 }
             }
+        }
+    }
+
+    fun logEarnedCurrencyReward(reward: Int) {
+        Logger.logEvent(FirebaseAnalytics.Event.EARN_VIRTUAL_CURRENCY) {
+            param(FirebaseAnalytics.Param.VIRTUAL_CURRENCY_NAME, "Coin")
+            param(FirebaseAnalytics.Param.VALUE, reward.toDouble())
+            param(FirebaseAnalytics.Param.CURRENCY, "EUR")
         }
     }
 

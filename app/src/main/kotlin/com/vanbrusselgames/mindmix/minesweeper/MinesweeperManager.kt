@@ -39,9 +39,11 @@ class MinesweeperManager {
         }
 
         fun loadFromFile(data: MinesweeperData) {
-            if (isLoaded) return
-            finished = data.finished
-            minesweeperFinished.value = finished
+            if(data.finished){
+                reset()
+                loadPuzzle()
+                return
+            }
             if (data.mines.isEmpty()) return
             minesLeft.intValue = data.mines.size
             for (index in data.mines) mines[index] = true
