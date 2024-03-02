@@ -24,4 +24,6 @@
     <string name="minesweeper_success">Well done! You cleared all the mines!</string>
     <string name="sudoku_success">Well done! You solved the sudoku!</string>
     <string name="solitaire_success">Well done! You solved the solitaire!</string>
+    <string name="continue_game">Continue</string>
+    <string name="flexible_update_downloaded">An update has just been downloaded.</string>
 </resources>

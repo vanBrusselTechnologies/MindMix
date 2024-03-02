@@ -1,6 +1,7 @@
 package com.vanbrusselgames.mindmix
 
 import android.app.Activity
+import android.content.Context
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.compose.material3.SnackbarDuration
@@ -30,29 +31,30 @@ class UpdateManager {
                 if (appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED) {
                     // If the update is downloaded but not installed,
                     // notify the user to complete the update.
-                    popupSnackbarForCompleteUpdate()
+                    popupSnackbarForCompleteUpdate(activity)
                 } else if (appUpdateInfo.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) {
                     // If an in-app update is already running, resume the update.
-                    requestUpdate(appUpdateInfo, activityResultLauncher, AppUpdateType.IMMEDIATE)
+                    requestUpdate(activity, appUpdateInfo, activityResultLauncher, AppUpdateType.IMMEDIATE)
                 } else if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE && appUpdateInfo.updatePriority() >= 4 /* high priority */ && appUpdateInfo.isUpdateTypeAllowed(
                         AppUpdateType.IMMEDIATE
                     )
                 ) {
-                    requestUpdate(appUpdateInfo, activityResultLauncher, AppUpdateType.IMMEDIATE)
+                    requestUpdate(activity, appUpdateInfo, activityResultLauncher, AppUpdateType.IMMEDIATE)
                 } else if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE && /*(appUpdateInfo.clientVersionStalenessDays() ?: -1) >= DAYS_FOR_FLEXIBLE_UPDATE &&*/
                     appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)
                 ) {
-                    requestUpdate(appUpdateInfo, activityResultLauncher, AppUpdateType.FLEXIBLE)
+                    requestUpdate(activity, appUpdateInfo, activityResultLauncher, AppUpdateType.FLEXIBLE)
                 }
             }
         }
 
         private fun requestUpdate(
+            ctx: Context,
             appUpdateInfo: AppUpdateInfo,
             activityResultLauncher: ActivityResultLauncher<IntentSenderRequest>,
             appUpdateType: Int
         ) {
-            if(appUpdateType == AppUpdateType.FLEXIBLE){
+            if (appUpdateType == AppUpdateType.FLEXIBLE) {
                 // Create a listener to track request state updates.
                 val listener = InstallStateUpdatedListener { state ->
                     // (Optional) Provide a download progress bar.
@@ -64,9 +66,9 @@ class UpdateManager {
                     if (state.installStatus() == InstallStatus.DOWNLOADED) {
                         // If the update is downloaded but not installed,
                         // notify the user to complete the update.
-                        popupSnackbarForCompleteUpdate()
+                        popupSnackbarForCompleteUpdate(ctx)
                     }
-                    //else if(state.installStatus() == InstallStatus.INSTALLED) {
+                    //else if (state.installStatus() == InstallStatus.INSTALLED) {
                     //    appUpdateManager.unregisterListener(listener)
                     //}
                 }
@@ -80,16 +82,17 @@ class UpdateManager {
             )
         }
 
-        private fun popupSnackbarForCompleteUpdate() {
+        private fun popupSnackbarForCompleteUpdate(ctx: Context) {
             MainActivity.scope.launch {
                 val result = MainActivity.snackbarHostState.showSnackbar(
-                    message = "An update has just been downloaded.",
+                    message = ctx.resources.getString(R.string.flexible_update_downloaded),
                     actionLabel = "Restart",
                     duration = SnackbarDuration.Indefinite,
                     withDismissAction = false
                 )
                 when (result) {
                     SnackbarResult.ActionPerformed -> {
+                        DataManager.save(false)
                         appUpdateManager.completeUpdate()
                         MainActivity.snackbarHostState.currentSnackbarData?.dismiss()
                     }

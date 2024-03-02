@@ -1,8 +1,8 @@
 package com.vanbrusselgames.mindmix.menu
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,17 +32,18 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vanbrusselgames.mindmix.AuthManager
 import com.vanbrusselgames.mindmix.BaseLayout
-import com.vanbrusselgames.mindmix.Logger
 import com.vanbrusselgames.mindmix.R
 
 
 class Settings {
     companion object {
-        private const val baseDataDeletionUrl =
+        private const val DATA_DELETION_URL =
             "https://docs.google.com/forms/d/e/1FAIpQLSf-_Yo6db7aYUt3qcEBq-rxCgjVCN1uVcWeeZ_oXQyZH8DIyQ/viewform?usp=pp_url&entry.2052602114="
         val visible = mutableStateOf(false)
 
@@ -69,28 +70,24 @@ class Settings {
                             }
                             Column(
                                 Modifier
-                                    .padding(16.dp)
-                                    .fillMaxWidth(0.9f),
+                                    .padding(24.dp)
+                                    .width(IntrinsicSize.Max),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
                                     text = stringResource(R.string.settings),
+                                    Modifier.fillMaxWidth(),
                                     fontSize = 36.sp,
-                                    fontWeight = FontWeight.ExtraBold
+                                    fontWeight = FontWeight.ExtraBold,
+                                    textAlign = TextAlign.Center
                                 )
                                 Spacer(Modifier.height(20.dp))
-                                Row(
-                                    horizontalArrangement = Arrangement.spacedBy(
-                                        space = 8.dp, alignment = Alignment.CenterHorizontally
-                                    ), verticalAlignment = Alignment.CenterVertically
-                                ) {
-
-                                }
 
                                 val signedIn =
                                     remember { mutableStateOf(AuthManager.isAuthenticated && AuthManager.currentUser != null) }
                                 Button(
                                     { AuthManager.signIn(signedIn) },
+                                    Modifier.fillMaxWidth(),
                                     shape = RoundedCornerShape(6.dp),
                                     enabled = !signedIn.value
                                 ) {
@@ -112,9 +109,9 @@ class Settings {
                                 Button(
                                     {
                                         val userId = AuthManager.currentUser?.uid ?: ""
-                                        Logger.d(baseDataDeletionUrl + userId)
-                                        uriHandler.openUri(baseDataDeletionUrl + userId)
-                                    }, colors = ButtonDefaults.buttonColors(
+                                        uriHandler.openUri(DATA_DELETION_URL + userId)
+                                    }, Modifier.fillMaxWidth(),
+                                    colors = ButtonDefaults.buttonColors(
                                         containerColor = colorScheme.error,
                                         contentColor = colorScheme.onError
                                     ), shape = RoundedCornerShape(6.dp)
@@ -124,7 +121,9 @@ class Settings {
                                 Spacer(Modifier.height(8.dp))
                                 Text(
                                     "User ID: ${AuthManager.currentUser?.uid ?: ""}",
-                                    fontSize = 10.sp
+                                    Modifier.fillMaxWidth(),
+                                    fontSize = 10.sp,
+                                    textAlign = TextAlign.Center
                                 )
                             }
                         }
@@ -133,4 +132,12 @@ class Settings {
             }
         }
     }
+}
+
+@Preview(locale = "nl")
+@Preview
+@Composable
+fun Prev_Screen() {
+    Settings.visible.value = true
+    Settings.Screen()
 }

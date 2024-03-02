@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.times
 import androidx.compose.ui.zIndex
+import com.vanbrusselgames.mindmix.BaseLayout
 import com.vanbrusselgames.mindmix.PixelHelper
 import com.vanbrusselgames.mindmix.R
 import kotlin.math.roundToInt
@@ -77,6 +78,28 @@ data class PlayingCard(val type: CardType, val index: CardIndex, val drawableRes
             mutableIsLast.value = value
         }
 
+    private val icon = when (type) {
+        CardType.CLOVERS -> R.drawable.clover
+        CardType.DIAMONDS -> R.drawable.diamonds
+        CardType.HEARTS -> R.drawable.hearts
+        CardType.SPADES -> R.drawable.spades
+    }
+
+    private val indexString = when (index) {
+        CardIndex.A -> "A"
+        CardIndex.J -> "J"
+        CardIndex.Q -> "Q"
+        CardIndex.K -> "K"
+        else -> (index.ordinal + 1).toString()
+    }
+
+    private val indexColor = when (type) {
+        CardType.CLOVERS -> Color.Black
+        CardType.DIAMONDS -> Color.Red
+        CardType.HEARTS -> Color.Red
+        CardType.SPADES -> Color.Black
+    }
+
     enum class CardType {
         CLOVERS, DIAMONDS, HEARTS, SPADES
     }
@@ -98,8 +121,8 @@ data class PlayingCard(val type: CardType, val index: CardIndex, val drawableRes
         val mod = modifier
             .zIndex(zIndex)
             .offset { offset }
-            .clickable {
-                if (SolitaireManager.solitaireFinished.value) return@clickable
+            .clickable(onClickLabel = "${type.name.replaceFirstChar{ it.titlecase()}} $indexString") {
+                if (SolitaireManager.solitaireFinished.value || BaseLayout.disableTopRowButtons.value) return@clickable
                 if (currentStackId == 6) {
                     SolitaireManager.turnFromRestStack(this)
                 } else {
@@ -110,7 +133,7 @@ data class PlayingCard(val type: CardType, val index: CardIndex, val drawableRes
             }
             .pointerInput(Unit) {
                 detectDragGestures(onDragStart = {
-                    if (SolitaireManager.finished || !frontVisible) return@detectDragGestures
+                    if (SolitaireManager.finished || !frontVisible || BaseLayout.disableTopRowButtons.value) return@detectDragGestures
                     SolitaireManager.startMoveCard(this@PlayingCard)
                 }, onDragCancel = {
                     SolitaireManager.onReleaseMovingCards()
@@ -133,28 +156,6 @@ data class PlayingCard(val type: CardType, val index: CardIndex, val drawableRes
             "Playing card",
             modifier
         )
-    }
-
-    private val icon = when (type) {
-        CardType.CLOVERS -> R.drawable.clover
-        CardType.DIAMONDS -> R.drawable.diamonds
-        CardType.HEARTS -> R.drawable.hearts
-        CardType.SPADES -> R.drawable.spades
-    }
-
-    private val indexString = when (index) {
-        CardIndex.A -> "A"
-        CardIndex.J -> "J"
-        CardIndex.Q -> "Q"
-        CardIndex.K -> "K"
-        else -> (index.ordinal + 1).toString()
-    }
-
-    private val indexColor = when (type) {
-        CardType.CLOVERS -> Color.Black
-        CardType.DIAMONDS -> Color.Red
-        CardType.HEARTS -> Color.Red
-        CardType.SPADES -> Color.Black
     }
 
     @Composable

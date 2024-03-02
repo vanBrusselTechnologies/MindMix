@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -28,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import com.vanbrusselgames.mindmix.BaseLayout
 import com.vanbrusselgames.mindmix.BaseUIHandler
-import com.vanbrusselgames.mindmix.DataManager
+import com.vanbrusselgames.mindmix.GameMenu
 import com.vanbrusselgames.mindmix.R
 import com.vanbrusselgames.mindmix.solitaire.SolitaireManager.Instance.cards
 import com.vanbrusselgames.mindmix.solitaire.SolitaireManager.Instance.couldGetFinished
@@ -38,9 +39,9 @@ import kotlin.math.roundToInt
 
 class SolitaireLayout : BaseLayout() {
     companion object {
-        private const val cardPixelHeight = 819f
-        private const val cardPixelWidth = 566f
-        private const val cardAspectRatio = cardPixelWidth / cardPixelHeight
+        private const val CARD_PIXEL_HEIGHT = 819f
+        private const val CARD_PIXEL_WIDTH = 566f
+        private const val CARD_ASPECT_RATIO = CARD_PIXEL_WIDTH / CARD_PIXEL_HEIGHT
         var distanceBetweenCards = 0.175f
         var cardHeight = 0f
         var cardWidth = 0f
@@ -57,15 +58,17 @@ class SolitaireLayout : BaseLayout() {
     private val arr = arrayOf(0, 1, 2, 3, 4, 5, 6)
 
     @Composable
-    fun BaseScene() {
-        super.BaseScene(isMenu = false, sceneSpecific = {
-            val finished = solitaireFinished.value
-            SolitaireSpecificLayout(finished || disableTopRowButtons.value)
-            if (helpOpened.value) GameHelp(
-                titleId = R.string.solitaire_name, descriptionId = R.string.solitaire_desc
-            )
-            if (finished) GameFinishedPopUp()
-        })
+    fun Scene() {
+        BaseScene {
+            SolitaireSpecificLayout(disableTopRowButtons.value)
+            if (helpOpened.value) {
+                GameHelp(titleId = R.string.solitaire_name, descriptionId = R.string.solitaire_desc)
+            }
+            if (GameMenu.visible.value) {
+                GameMenu.Screen(R.string.solitaire_name) { SolitaireManager.startNewGame() }
+            }
+            if (solitaireFinished.value) GameFinishedPopUp()
+        }
     }
 
     @Composable
@@ -73,8 +76,7 @@ class SolitaireLayout : BaseLayout() {
         Box(
             Modifier
                 .fillMaxSize()
-                .blur(if (isBlurred) 4.dp else 0.dp),
-            contentAlignment = Alignment.Center
+                .blur(if (isBlurred) 4.dp else 0.dp), Alignment.Center
         ) {
             Box(Modifier.fillMaxSize(0.95f), contentAlignment = Alignment.TopCenter) {
                 BoxWithConstraints {
@@ -82,32 +84,44 @@ class SolitaireLayout : BaseLayout() {
                     val maxWidth = constraints.maxWidth
                     val maxCardHeight = maxHeight / 4.2375f
                     cardHeight =
-                        if (maxWidth / maxHeight > cardAspectRatio) maxCardHeight else maxWidth / 7f / cardAspectRatio
-                    cardWidth = cardHeight * cardAspectRatio
+                        if (maxWidth / maxHeight > CARD_ASPECT_RATIO) maxCardHeight else maxWidth / 7f / CARD_ASPECT_RATIO
+                    cardWidth = cardHeight * CARD_ASPECT_RATIO
                     distanceBetweenCards = min(maxCardHeight / cardHeight, 2f) * 0.175f
                     val cardHeightInDp = with(LocalDensity.current) { cardHeight.toDp() }
                     val modifier = Modifier
-                        .width(cardHeightInDp * cardAspectRatio)
+                        .width(cardHeightInDp * CARD_ASPECT_RATIO)
                         .height(cardHeightInDp)
-                        .aspectRatio(cardAspectRatio)
+                        .aspectRatio(CARD_ASPECT_RATIO)
 
                     Background(modifier = modifier, cardHeight = cardHeightInDp)
 
                     cards.forEach { it.Composable(modifier) }
 
-                    if (couldGetFinished.value) Button(onClick = {
-                        cards.forEach {
-                            it.currentStackId = it.type.ordinal
-                            it.currentStackIndex = it.index.ordinal
-                            it.offset = IntOffset.Zero
-                            it.isLast = true
-                            it.frontVisible = true
+                    if (couldGetFinished.value && !solitaireFinished.value) {
+                        var colors = ButtonDefaults.buttonColors()
+                        colors = colors.copy(
+                            disabledContainerColor = colors.containerColor,
+                            disabledContentColor = colors.contentColor
+                        )
+                        Button(
+                            onClick = {
+                                cards.forEach {
+                                    it.currentStackId = it.type.ordinal
+                                    it.currentStackIndex = it.index.ordinal
+                                    it.offset = IntOffset.Zero
+                                    it.isLast = true
+                                    it.frontVisible = true
+                                }
+                                SolitaireManager.checkFinished()
+                            },
+                            modifier = Modifier.align(Alignment.BottomCenter),
+                            enabled = !disableTopRowButtons.value,
+                            colors = colors
+                        ) {
+                            Icon(painterResource(R.drawable.baseline_flag_24), "Finish flag")
+                            Spacer(Modifier.width(2.dp))
+                            Text(stringResource(R.string.finish_game))
                         }
-                        SolitaireManager.checkFinished()
-                    }, modifier = Modifier.align(Alignment.BottomCenter)) {
-                        Icon(painterResource(R.drawable.baseline_flag_24), "Finish flag")
-                        Spacer(Modifier.width(2.dp))
-                        Text(stringResource(R.string.finish_game))
                     }
                 }
             }
@@ -130,7 +144,7 @@ class SolitaireLayout : BaseLayout() {
                 when (i) {
                     4 -> Box(modifier)
                     5 -> Box(modifier)
-                    6 -> Card({ SolitaireManager.resetRestStack() }, modifier.alpha(0.75f)) {
+                    6 -> Card({ SolitaireManager.resetRestStack() }, modifier.alpha(0.75f), !disableTopRowButtons.value) {
                         Box(Modifier.fillMaxSize()) {
                             Icon(
                                 painterResource(id = R.drawable.outline_autorenew_24),
@@ -188,16 +202,13 @@ class SolitaireLayout : BaseLayout() {
         //"""You did great and solved puzzle in ${0} seconds!!
         //     |That's Awesome!
         //     |Share with your friends and challenge them to beat your time!""".trimMargin()
-        //Logger.logEvent(FirebaseAnalytics.Event.EARN_VIRTUAL_CURRENCY)
         val reward = 10
         //val onClickShare = {}
         val onClickPlayAgain = {
-            SolitaireManager.reset()
-            SolitaireManager.loadPuzzle()
+            SolitaireManager.startNewGame()
         }
         val onClickReturnToMenu = {
-            uiHandler.backToMenu()
-            SolitaireManager.reset()
+            SolitaireManager.startNewGame()
         }
         BaseGameFinishedPopUp(
             title, desc, reward, null, onClickPlayAgain, onClickReturnToMenu

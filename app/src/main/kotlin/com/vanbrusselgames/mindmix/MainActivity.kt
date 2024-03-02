@@ -88,15 +88,15 @@ class MainActivity : ComponentActivity() {
                             Modifier.fillMaxSize(),
                             enterTransition = { fadeIn() },
                             exitTransition = { fadeOut() }) {
-                            composable("main") { MenuLayout().BaseScene() }
-                            composable("menu") { MenuLayout().BaseScene() }
+                            composable("main") { MenuLayout().Scene() }
+                            composable("menu") { MenuLayout().Scene() }
                             composable(
                                 "solitaire?mode={mode}",
                                 arguments = listOf(navArgument("mode") { defaultValue = "0" })
                             ) { backStackEntry ->
                                 val mode = backStackEntry.arguments?.getString("mode")
                                 SolitaireManager.loadPuzzle()
-                                SolitaireLayout().BaseScene()
+                                SolitaireLayout().Scene()
                             }
                             composable(
                                 "sudoku?mode={mode}",
@@ -104,7 +104,7 @@ class MainActivity : ComponentActivity() {
                             ) { backStackEntry ->
                                 val mode = backStackEntry.arguments?.getString("mode")
                                 SudokuManager.loadPuzzle()
-                                SudokuLayout().BaseScene()
+                                SudokuLayout().Scene()
                             }
                             composable(
                                 "minesweeper?mode={mode}",
@@ -112,7 +112,7 @@ class MainActivity : ComponentActivity() {
                             ) { backStackEntry ->
                                 val mode = backStackEntry.arguments?.getString("mode")
                                 MinesweeperManager.loadPuzzle()
-                                MinesweeperLayout().BaseScene()
+                                MinesweeperLayout().Scene()
                             }
                         }
                     }

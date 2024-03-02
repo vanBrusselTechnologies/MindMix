@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import com.vanbrusselgames.mindmix.BaseLayout
 import com.vanbrusselgames.mindmix.BaseUIHandler
+import com.vanbrusselgames.mindmix.GameMenu
 import com.vanbrusselgames.mindmix.PixelHelper.Companion.pxToSp
 import com.vanbrusselgames.mindmix.R
 import com.vanbrusselgames.mindmix.sudoku.SudokuManager.Instance.sudokuFinished
@@ -48,15 +49,17 @@ class SudokuLayout : BaseLayout() {
     override var uiHandler: BaseUIHandler = SudokuUIHandler()
 
     @Composable
-    fun BaseScene() {
-        super.BaseScene(isMenu = false, sceneSpecific = {
-            val finished = sudokuFinished.value
-            SudokuSpecificLayout(finished || disableTopRowButtons.value)
+    fun Scene() {
+        BaseScene {
+            SudokuSpecificLayout(disableTopRowButtons.value)
             if (helpOpened.value) GameHelp(
                 titleId = R.string.sudoku_name, descriptionId = R.string.sudoku_desc
             )
-            if (finished) GameFinishedPopUp()
-        })
+            if (GameMenu.visible.value) {
+                GameMenu.Screen(R.string.sudoku_name) { SudokuManager.startNewGame() }
+            }
+            if (sudokuFinished.value) GameFinishedPopUp()
+        }
     }
 
     @Composable
@@ -65,7 +68,7 @@ class SudokuLayout : BaseLayout() {
             Modifier
                 .fillMaxSize()
                 .blur(if (isBlurred) 4.dp else 0.dp),
-            contentAlignment = Alignment.Center
+            Alignment.Center
         ) {
             val maxWidth = maxWidth
             val maxHeight = maxHeight
@@ -198,8 +201,7 @@ class SudokuLayout : BaseLayout() {
                     lineHeightStyle = LineHeightStyle(
                         alignment = LineHeightStyle.Alignment.Center,
                         trim = LineHeightStyle.Trim.Both
-                    )//,
-                    //fontFamily = FontFamily(Typeface.MONOSPACE)
+                    )//, fontFamily = FontFamily(Typeface.MONOSPACE)
                 ),
             ),
             modifier = Modifier.scale(1.9f)
@@ -248,19 +250,16 @@ class SudokuLayout : BaseLayout() {
     fun GameFinishedPopUp() {
         val title = stringResource(R.string.sudoku_name)//"Congrats / Smart / Well done"
         val desc = stringResource(R.string.sudoku_success)
-            //"""You did great and solved puzzle in ${0} seconds!!
-            //     |That's Awesome!
-            //     |Share with your friends and challenge them to beat your time!""".trimMargin()
-        //Logger.logEvent(FirebaseAnalytics.Event.EARN_VIRTUAL_CURRENCY)
+        //"""You did great and solved puzzle in ${0} seconds!!
+        //     |That's Awesome!
+        //     |Share with your friends and challenge them to beat your time!""".trimMargin()
         val reward = 10
         //val onClickShare = {}
         val onClickPlayAgain = {
-            SudokuManager.reset()
-            SudokuManager.loadPuzzle()
+            SudokuManager.startNewGame()
         }
         val onClickReturnToMenu = {
-            uiHandler.backToMenu()
-            SudokuManager.reset()
+            SudokuManager.startNewGame()
         }
         BaseGameFinishedPopUp(
             title, desc, reward, null, onClickPlayAgain, onClickReturnToMenu

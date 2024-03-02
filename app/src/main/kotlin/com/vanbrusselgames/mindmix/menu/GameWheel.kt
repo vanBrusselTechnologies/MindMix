@@ -46,7 +46,7 @@ import kotlin.math.sin
 
 @Composable
 fun GameWheel(gameCount: Int, screenWidth: Dp, screenHeight: Dp) {
-    val withDupsFactor = if (MenuManager.withDuplicates) 2 else 1
+    val withDupsFactor = if (MenuManager.ADD_DUPLICATES) 2 else 1
     val wheelItemCount = gameCount * withDupsFactor
     val angleStep = 360f / wheelItemCount
     val gameWheelSize = min(screenHeight.value / 250f, screenWidth.value / 150f)
@@ -112,7 +112,7 @@ fun WheelItem(
     s: Float
 ) {
     val gameIndex = (index + 10 * gameCount) % gameCount
-    val game = MenuManager.games[gameIndex]
+    val game = MenuManager.games[gameIndex]!!
     val angle = index * angleStep
     val selectedFactor by animateFloatAsState(
         targetValue = if (isSelected) 1f else 0f, label = "selectedFactor"
@@ -128,7 +128,7 @@ fun WheelItem(
         .aspectRatio(3f / 5f)
         .rotate(-index * angleStep)
         .offset(0.dp, -0.1f * h * selectedFactor)
-        .clickable(remember { MutableInteractionSource() }, null, isSelected) {
+        .clickable(remember { MutableInteractionSource() }, null, isSelected, "Play game: ${game.name.lowercase()}") {
             if (!Settings.visible.value) MenuUIHandler.startGame(MenuManager.selectedGame)
         }) {
         when (game) {
@@ -144,7 +144,7 @@ fun WheelItem(
                 R.string.sudoku_name, R.drawable.game_icon_sudoku
             )
 
-            else -> {}
+            SceneManager.Scene.MENU -> {}
         }
     }
 }

@@ -38,22 +38,22 @@ class MenuLayout : BaseLayout() {
     }
 
     @Composable
-    fun BaseScene() {
-        super.BaseScene(isMenu = true, sceneSpecific = {
+    fun Scene() {
+        BaseScene(true) {
             SetLayoutGameWheel()
             Settings.Screen()
-        })
+        }
     }
 
     @Composable
     fun SetLayoutGameWheel() {
         Box(
-            contentAlignment = Alignment.BottomCenter,
-            modifier = Modifier
+            Modifier
                 .fillMaxSize()
                 .blur(if (Settings.visible.value) 4.dp else 0.dp),
+            Alignment.BottomCenter
         ) {
-            GameWheel(MenuManager.gameCount, screenWidth, screenHeight)
+            GameWheel(MenuManager.GAME_COUNT, screenWidth, screenHeight)
             PlayButton(Modifier.align(Alignment.BottomCenter))
         }
     }
@@ -63,7 +63,7 @@ class MenuLayout : BaseLayout() {
         val playGameButtonSize = minOf(screenHeight / 400f, screenWidth / 250f)
         val iconSize = minOf(62.75f * playGameButtonSize * 0.4f, 25f * playGameButtonSize)
         Button(
-            onClick = { if(!Settings.visible.value) MenuUIHandler.startGame(MenuManager.selectedGame) },
+            onClick = { if (!Settings.visible.value) MenuUIHandler.startGame(MenuManager.selectedGame) },
             modifier = modifier.offset(0.dp, screenHeight * -0.05f),
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary,

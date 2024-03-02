@@ -7,8 +7,8 @@ import kotlinx.serialization.json.Json
 class MenuManager {
     companion object Instance {
         val games = SceneManager.scenes.filter { e -> e.value != SceneManager.Scene.MENU }
-        const val gameCount = 3
-        const val withDuplicates = true
+        const val GAME_COUNT = 3
+        const val ADD_DUPLICATES = true
         var selectedGame = SceneManager.Scene.MINESWEEPER
         var coins = 0
         //private var selectedGameModeIndices = intArrayOf(0, 0, 0)

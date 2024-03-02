@@ -5,7 +5,7 @@
     <string name="solitaire_name">Solitaire</string>
     <string name="sudoku_name">Sudoku</string>
     <string name="back_to_menu">Terug naar menu</string>
-    <string name="play_again">Start opnieuw</string>
+    <string name="play_again">Start nieuw spel</string>
     <string name="share">Delen</string>
     <string name="loading">Aan het laden…</string>
     <string name="signin">Inloggen</string>
@@ -22,4 +22,6 @@
     <string name="minesweeper_success">Goed gedaan! Je hebt alle bommen opgeruimd!</string>
     <string name="sudoku_success">Goed gedaan! Je hebt de sudoku opgelost!</string>
     <string name="solitaire_success">Goed gedaan! Je hebt de solitaire opgelost!</string>
+    <string name="continue_game">Doorgaan</string>
+    <string name="flexible_update_downloaded">Er is zojuist een update gedownload.</string>
 </resources>

@@ -5,6 +5,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.IntOffset
 import androidx.core.math.MathUtils.clamp
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.vanbrusselgames.mindmix.BaseLayout
 import com.vanbrusselgames.mindmix.Logger
 import com.vanbrusselgames.mindmix.R
 import kotlinx.serialization.encodeToString
@@ -14,7 +15,7 @@ import kotlin.math.roundToInt
 
 class SolitaireManager {
     companion object Instance {
-        private const val gameName = "Solitaire"
+        private const val GAME_NAME = "Solitaire"
 
         val cards = arrayOf(
             PlayingCard(
@@ -288,16 +289,14 @@ class SolitaireManager {
         var couldGetFinished = mutableStateOf(false)
 
         fun loadFromFile(data: SolitaireData) {
-            if(data.finished){
-                reset()
-                loadPuzzle()
+            if (data.finished) {
+                startNewGame()
                 return
             }
 
             if (!checkValid(data.cardStacks)) {
                 Logger.e("Saved Solitaire puzzle is not valid, loading new puzzle")
-                reset()
-                loadPuzzle()
+                startNewGame()
                 return
             }
 
@@ -317,7 +316,7 @@ class SolitaireManager {
                     cardStacks[i].add(c)
                 }
             }
-            if (!finished) couldGetFinished.value = couldGetFinished()
+            couldGetFinished.value = couldGetFinished()
         }
 
         fun saveToFile(): String {
@@ -356,9 +355,10 @@ class SolitaireManager {
         }
 
         fun loadPuzzle() {
+            if (finished) reset()
             if (!cardStacks.all { cs -> cs.isEmpty() }) return
             Logger.logEvent(FirebaseAnalytics.Event.LEVEL_START) {
-                param(FirebaseAnalytics.Param.LEVEL_NAME, gameName)
+                param(FirebaseAnalytics.Param.LEVEL_NAME, GAME_NAME)
             }
             val dupCards = cards.copyOf()
             dupCards.shuffle()
@@ -383,11 +383,13 @@ class SolitaireManager {
             for (i in cardStacks.indices) {
                 stacks[i] = cardStacks[i].map { c -> if (c.frontVisible) c.id else -1 * c.id - 1 }
             }
+            couldGetFinished.value = couldGetFinished()
         }
 
-        fun reset() {
+        private fun reset() {
             finished = false
             solitaireFinished.value = finished
+            BaseLayout.disableTopRowButtons.value = false
             cardStacks.forEach { s -> s.clear() }
             cards.forEach {
                 it.frontVisible = false
@@ -396,6 +398,11 @@ class SolitaireManager {
                 it.currentStackIndex = 0
                 it.offset = IntOffset.Zero
             }
+        }
+
+        fun startNewGame() {
+            reset()
+            loadPuzzle()
         }
 
         fun resetRestStack() {
@@ -543,8 +550,9 @@ class SolitaireManager {
             if (!finished) {
                 couldGetFinished.value = couldGetFinished()
             } else {
+                BaseLayout.disableTopRowButtons.value = finished
                 Logger.logEvent(FirebaseAnalytics.Event.LEVEL_END) {
-                    param(FirebaseAnalytics.Param.LEVEL_NAME, gameName)
+                    param(FirebaseAnalytics.Param.LEVEL_NAME, GAME_NAME)
                     param(FirebaseAnalytics.Param.SUCCESS, 1)
                 }
             }

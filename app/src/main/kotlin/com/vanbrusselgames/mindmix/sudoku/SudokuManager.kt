@@ -2,13 +2,14 @@ package com.vanbrusselgames.mindmix.sudoku
 
 import androidx.compose.runtime.mutableStateOf
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.vanbrusselgames.mindmix.BaseLayout
 import com.vanbrusselgames.mindmix.Logger
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class SudokuManager {
     companion object Instance {
-        private const val gameName = "Sudoku"
+        private const val GAME_NAME = "Sudoku"
 
         var inputMode: InputMode = InputMode.Normal
         private lateinit var puzzle: SudokuPuzzle
@@ -29,9 +30,8 @@ class SudokuManager {
         }
 
         fun loadFromFile(data: SudokuData) {
-            if(data.finished){
-                reset()
-                loadPuzzle()
+            if (data.finished) {
+                startNewGame()
                 return
             }
             val cellList = mutableListOf<SudokuPuzzleCell>()
@@ -72,9 +72,10 @@ class SudokuManager {
         }
 
         fun loadPuzzle() {
+            if (finished) reset()
             if (cells.isNotEmpty()) return
             Logger.logEvent(FirebaseAnalytics.Event.LEVEL_START) {
-                param(FirebaseAnalytics.Param.LEVEL_NAME, gameName)
+                param(FirebaseAnalytics.Param.LEVEL_NAME, GAME_NAME)
             }
             val size = 9
             puzzle = createPuzzle(size = size)
@@ -83,10 +84,16 @@ class SudokuManager {
 
         }
 
-        fun reset() {
+        private fun reset() {
             finished = false
             sudokuFinished.value = finished
+            BaseLayout.disableTopRowButtons.value = false
             cells = arrayOf()
+        }
+
+        fun startNewGame() {
+            reset()
+            loadPuzzle()
         }
 
         private fun createPuzzle(
@@ -145,8 +152,9 @@ class SudokuManager {
             finished = isFinished()
             sudokuFinished.value = finished
             if (finished) {
+                BaseLayout.disableTopRowButtons.value = finished
                 Logger.logEvent(FirebaseAnalytics.Event.LEVEL_END) {
-                    param(FirebaseAnalytics.Param.LEVEL_NAME, gameName)
+                    param(FirebaseAnalytics.Param.LEVEL_NAME, GAME_NAME)
                     param(FirebaseAnalytics.Param.SUCCESS, 1)
                 }
             }

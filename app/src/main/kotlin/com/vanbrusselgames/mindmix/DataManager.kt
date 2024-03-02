@@ -19,7 +19,7 @@ import java.io.File
 
 class DataManager(ctx: Context) {
     companion object {
-        private const val filename = "save.vbg"
+        private const val FILE_NAME = "save.vbg"
         private val fileDecoding = Charsets.UTF_8
         private lateinit var file: File
         private var loaded = false
@@ -29,24 +29,13 @@ class DataManager(ctx: Context) {
         private val storagePath: StorageReference?
             get() {
                 val cUser = AuthManager.currentUser ?: return null
-                return storage.reference.child("Users/${cUser.uid}/$filename")
+                return storage.reference.child("Users/${cUser.uid}/$FILE_NAME")
             }
 
         private fun load() {
             try {
-                //todo: Try download online file
-
+                //todo: Download online file
                 val content = file.readLines(fileDecoding)
-                if (content.isNotEmpty() && content[0].startsWith("@@@")) {
-                    val totalContent = content.joinToString("\n")
-                    val coinsString = Regex("int///munten:::[0-9]+,,,").find(totalContent)?.value
-                    val coins = coinsString?.split(",,,")?.get(0)?.substring(15)?.toInt()
-                    if (coins != null) {
-                        MenuManager.coins = coins
-                        save()
-                    }
-                    return
-                }
                 for (line in content) {
                     try {
                         if (line.isEmpty()) continue
@@ -71,11 +60,7 @@ class DataManager(ctx: Context) {
                             }
 
                             SceneManager.Scene.MENU -> {
-                                //todo: Remove in 1.1.1
-                                val menuJson = if(json.contains("\"coins\":")) json else {
-                                    json.substring(0, json.length - 1) + ",\"coins\":" + "}"
-                                }
-                                val data = Json.decodeFromString<MenuData>(menuJson)
+                                val data = Json.decodeFromString<MenuData>(json)
                                 MenuManager.loadFromFile(data)
                             }
 
@@ -112,10 +97,37 @@ class DataManager(ctx: Context) {
     }
 
     init {
-        file = File(ctx.filesDir, filename)
+        file = File(ctx.filesDir, FILE_NAME)
         file.createNewFile()
+        keepCoinsFromOldSaveFile(ctx)
         if (!loaded) load()
         autoSave()
+    }
+
+
+    //todo: Remove in 1.1.1: Old Save Data object
+    /**
+     * Function copies coins from OLD save data file to MenuManager to save into NEW save data file
+     */
+    private fun keepCoinsFromOldSaveFile(ctx: Context) {
+        try {
+            val file = File(ctx.getExternalFilesDir(null), FILE_NAME)
+            if (file.exists()) {
+                val content = file.readLines(fileDecoding)
+                if (content.isNotEmpty() && content[0].startsWith("@@@")) {
+                    val totalContent = content.joinToString("\n")
+                    val coinsString = Regex("int///munten:::[0-9]+,,,").find(totalContent)?.value
+                    val coins = coinsString?.split(",,,")?.get(0)?.substring(15)?.toInt()
+                    if (coins != null) {
+                        MenuManager.coins = coins
+                        save()
+                    }
+                }
+                file.delete()
+            }
+        } catch (e: Exception) {
+            Logger.e("Error loading OLD save file", e)
+        }
     }
 
     var autoSaveCount = 0

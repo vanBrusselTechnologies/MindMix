@@ -30,7 +30,7 @@ android {
         applicationId = "com.vanBrusselGames.MindMix"
         minSdk = 21
         targetSdk = 34
-        versionCode = 86
+        versionCode = 91
         versionName = "1.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -80,7 +80,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
+    implementation(platform("com.google.firebase:firebase-bom:32.7.3"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-appcheck-playintegrity")
     implementation("com.google.firebase:firebase-auth")
@@ -96,7 +96,7 @@ dependencies {
     implementation("com.google.android.play:review-ktx:2.0.1")
     implementation("com.google.android.ump:user-messaging-platform:2.2.0")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
     implementation("androidx.navigation:navigation-compose:2.7.7")
 
     testImplementation("junit:junit:4.13.2")

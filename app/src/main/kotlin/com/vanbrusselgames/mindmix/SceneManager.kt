@@ -13,7 +13,6 @@ class SceneManager {
             mapOf(0 to Scene.SUDOKU, 1 to Scene.SOLITAIRE, 2 to Scene.MINESWEEPER, 3 to Scene.MENU)
 
         fun loadScene(scene: Scene) {
-            Logger.d("scene:  ${scene.name.lowercase()}")
             openScene(scene)
         }
 

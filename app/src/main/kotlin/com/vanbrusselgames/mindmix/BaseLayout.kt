@@ -15,8 +15,8 @@ import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
@@ -62,7 +62,7 @@ abstract class BaseLayout {
     abstract var uiHandler: BaseUIHandler
 
     @Composable
-    open fun BaseScene(sceneSpecific: @Composable () -> Unit?, isMenu: Boolean = false) {
+    open fun BaseScene(isMenu: Boolean = false, sceneSpecific: @Composable () -> Unit?) {
         val localCurrentConfig = LocalConfiguration.current
         screenHeight = localCurrentConfig.screenHeightDp.dp
         screenWidth = localCurrentConfig.screenWidthDp.dp
@@ -88,17 +88,17 @@ abstract class BaseLayout {
         ) {
             if (!disableTopRowButtons.value) {
                 if (!isMenu) {
-
+                    //todo Add App settings
                     IconButton(
-                        onClick = { uiHandler.backToMenu() },
+                        onClick = { BaseUIHandler.openGameMenu() },
                         modifier = Modifier
                             .size(topRowButtonSize)
                             .padding(padding)
                             .align(Alignment.TopStart)
                     ) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                            contentDescription = "Back",
+                            imageVector = Icons.Default.Menu,
+                            contentDescription = "Open game menu",
                             Modifier.fillMaxSize(0.9f)
                         )
                     }
@@ -106,7 +106,7 @@ abstract class BaseLayout {
                         Modifier.align(Alignment.TopEnd)
                     ) {
                         IconButton(
-                            onClick = { uiHandler.openHelp() },
+                            onClick = { BaseUIHandler.openHelp() },
                             modifier = Modifier
                                 .size(topRowButtonSize)
                                 .padding(padding)
@@ -119,7 +119,6 @@ abstract class BaseLayout {
                         }
                     }
                 }
-                //todo Add App settings
                 else Row(
                     Modifier.align(Alignment.TopEnd)
                 ) {
@@ -157,7 +156,7 @@ abstract class BaseLayout {
         reward: Int = 0,
         onClickShare: (() -> Unit)? = null,
         onClickPlayAgain: (() -> Unit)? = null,
-        onClickReturnToMenu: (() -> Unit)? = null,
+        onClickReturnToMenu: (() -> Unit),
         sceneSpecific: @Composable () -> Unit = {}
     ) {
         val adManager = remember { MainActivity.adManager }
@@ -241,16 +240,15 @@ abstract class BaseLayout {
                                     Text(stringResource(R.string.play_again))
                                 }
                             }
-                            if (onClickReturnToMenu != null) {
-                                Button({
-                                    onClickReturnToMenu()
-                                    disableTopRowButtons.value = false
-                                }) {
-                                    Text(
-                                        stringResource(R.string.back_to_menu),
-                                        textAlign = TextAlign.Center
-                                    )
-                                }
+                            Button({
+                                BaseUIHandler.backToMenu()
+                                onClickReturnToMenu()
+                                disableTopRowButtons.value = false
+                            }) {
+                                Text(
+                                    stringResource(R.string.back_to_menu),
+                                    textAlign = TextAlign.Center
+                                )
                             }
                         }
                     }
@@ -259,7 +257,7 @@ abstract class BaseLayout {
         }
     }
 
-    fun logEarnedCurrencyReward(reward: Int) {
+    private fun logEarnedCurrencyReward(reward: Int) {
         Logger.logEvent(FirebaseAnalytics.Event.EARN_VIRTUAL_CURRENCY) {
             param(FirebaseAnalytics.Param.VIRTUAL_CURRENCY_NAME, "Coin")
             param(FirebaseAnalytics.Param.VALUE, reward.toDouble())

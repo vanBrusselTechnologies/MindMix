@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.vanbrusselgames.mindmix.BaseLayout
 import com.vanbrusselgames.mindmix.Logger
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -12,13 +13,13 @@ import kotlin.random.Random
 
 class MinesweeperManager {
     companion object Instance {
-        private const val gameName = "Minesweeper"
+        private const val GAME_NAME = "Minesweeper"
         var inputMode: InputMode = InputMode.Normal
-        val minesweeperFinished = mutableStateOf(false)
         var sizeX = 16
         var sizeY = 22
 
         var finished = false
+        val minesweeperFinished = mutableStateOf(false)
 
         val mines = BooleanArray(sizeX * sizeY) { false }
 
@@ -39,9 +40,8 @@ class MinesweeperManager {
         }
 
         fun loadFromFile(data: MinesweeperData) {
-            if(data.finished){
-                reset()
-                loadPuzzle()
+            if (data.finished) {
+                startNewGame()
                 return
             }
             if (data.mines.isEmpty()) return
@@ -53,6 +53,7 @@ class MinesweeperManager {
                 c.getCellMineCount()
                 c.state = stateEntries[data.input[i]]
             }
+            calculateMinesLeft()
             isLoaded = true
         }
 
@@ -67,9 +68,10 @@ class MinesweeperManager {
         }
 
         fun loadPuzzle() {
+            if (finished) reset()
             if (isLoaded) return
             Logger.logEvent(FirebaseAnalytics.Event.LEVEL_START) {
-                param(FirebaseAnalytics.Param.LEVEL_NAME, gameName)
+                param(FirebaseAnalytics.Param.LEVEL_NAME, GAME_NAME)
             }
             val difficulty = 1
             val mineCount = 25 + (10f * 1.75f.pow(difficulty)).toInt()
@@ -90,9 +92,10 @@ class MinesweeperManager {
             isLoaded = true
         }
 
-        fun reset() {
+        private fun reset() {
             finished = false
             minesweeperFinished.value = finished
+            BaseLayout.disableTopRowButtons.value = false
             mines.fill(false)
             cells.forEach { c ->
                 c.isMine = false
@@ -101,6 +104,11 @@ class MinesweeperManager {
                 c.background.value = Color.White
             }
             isLoaded = false
+        }
+
+        fun startNewGame() {
+            reset()
+            loadPuzzle()
         }
 
         fun findOtherSafeCells(cell: MinesweeperCell, tmp: MutableList<Int>) {
@@ -132,7 +140,7 @@ class MinesweeperManager {
             if (finished) return
             finished = true
             Logger.logEvent(FirebaseAnalytics.Event.LEVEL_END) {
-                param(FirebaseAnalytics.Param.LEVEL_NAME, gameName)
+                param(FirebaseAnalytics.Param.LEVEL_NAME, GAME_NAME)
                 param(FirebaseAnalytics.Param.SUCCESS, 0)
             }
             var i = -1
@@ -141,7 +149,8 @@ class MinesweeperManager {
                 if (!cells[i].isMine || cells[i].state != MinesweeperCell.State.Empty) continue
                 cells[i].state = MinesweeperCell.State.Bomb
             }
-            minesweeperFinished.value = true
+            minesweeperFinished.value = finished
+            BaseLayout.disableTopRowButtons.value = true
         }
 
         fun calculateMinesLeft() {
@@ -155,10 +164,11 @@ class MinesweeperManager {
 
         fun checkFinished() {
             finished = isFinished()
-            minesweeperFinished.value = finished
             if (finished) {
+                minesweeperFinished.value = finished
+                BaseLayout.disableTopRowButtons.value = finished
                 Logger.logEvent(FirebaseAnalytics.Event.LEVEL_END) {
-                    param(FirebaseAnalytics.Param.LEVEL_NAME, gameName)
+                    param(FirebaseAnalytics.Param.LEVEL_NAME, GAME_NAME)
                     param(FirebaseAnalytics.Param.SUCCESS, 1)
                 }
             }

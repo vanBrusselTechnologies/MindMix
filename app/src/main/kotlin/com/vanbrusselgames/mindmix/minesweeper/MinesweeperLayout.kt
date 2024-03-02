@@ -40,10 +40,13 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.vanbrusselgames.mindmix.BaseLayout
 import com.vanbrusselgames.mindmix.BaseUIHandler
+import com.vanbrusselgames.mindmix.GameMenu
 import com.vanbrusselgames.mindmix.PixelHelper.Companion.pxToSp
 import com.vanbrusselgames.mindmix.R
 import com.vanbrusselgames.mindmix.minesweeper.MinesweeperManager.Instance.InputMode
@@ -60,21 +63,23 @@ class MinesweeperLayout : BaseLayout() {
     private var cellSize: Dp = 0.dp
 
     @Composable
-    fun BaseScene() {
-        super.BaseScene(isMenu = false, sceneSpecific = {
-            val finished = minesweeperFinished.value
-            MinesweeperSpecificLayout(finished || disableTopRowButtons.value)
+    fun Scene() {
+        BaseScene {
+            MinesweeperSpecificLayout(disableTopRowButtons.value)
             if (helpOpened.value) GameHelp(
                 titleId = R.string.minesweeper_name, descriptionId = R.string.minesweeper_desc
             )
-            if (finished) GameFinishedPopUp(MinesweeperManager.cells.any { c -> c.state == MinesweeperCell.State.Bomb })
-        })
+            if (GameMenu.visible.value) {
+                GameMenu.Screen(R.string.minesweeper_name) { MinesweeperManager.startNewGame() }
+            }
+            if (minesweeperFinished.value) GameFinishedPopUp(MinesweeperManager.cells.any { c -> c.state == MinesweeperCell.State.Bomb })
+        }
     }
 
     @Composable
     fun MinesweeperSpecificLayout(isBlurred: Boolean) {
         BoxWithConstraints(
-            modifier = Modifier
+            Modifier
                 .fillMaxSize()
                 .blur(if (isBlurred) 4.dp else 0.dp),
         ) {
@@ -256,7 +261,7 @@ class MinesweeperLayout : BaseLayout() {
 
     @Composable
     fun MinesweeperMineCell() {
-        Image(painterResource(R.drawable.outline_bomb_24), "Bomb", Modifier.fillMaxSize())
+        Icon(painterResource(R.drawable.outline_bomb_24), "Bomb", Modifier.fillMaxSize())
     }
     //#endregion
 
@@ -270,16 +275,14 @@ class MinesweeperLayout : BaseLayout() {
             MaterialTheme.colorScheme.onSecondaryContainer
         )
         if (isHorizontal) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    modifier = Modifier
-                        .weight(0.25f)
-                        .aspectRatio(1f)
-                ) {
+            Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
+                Spacer(modifier = Modifier.weight(1f))
+                Box(modifier = Modifier.weight(2f)) {
                     Text(
                         text = "${stringResource(R.string.mines_left)}\n${MinesweeperManager.minesLeft.intValue}",
                         modifier = Modifier.align(Alignment.Center),
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        fontSize = 22.5.sp
                     )
                 }
                 val inputMode = remember { mutableStateOf(MinesweeperManager.inputMode) }
@@ -287,7 +290,39 @@ class MinesweeperLayout : BaseLayout() {
                 Button(
                     onClick = { changeInputMode(inputMode) },
                     modifier = Modifier
-                        .weight(0.25f)
+                        .weight(2f)
+                        .aspectRatio(1f),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = colors,
+                    enabled = !disableTopRowButtons.value
+                ) {
+                    if (inputMode.value == InputMode.Flag) {
+                        Icon(
+                            painterResource(R.drawable.baseline_flag_24),
+                            "inputType: Flag",
+                            Modifier.fillMaxSize()
+                        )
+                    } else Image(painterResource(R.drawable.spade), "inputType: Spade")
+                }
+                Spacer(modifier = Modifier.weight(1f))
+            }
+        } else {
+            Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+                Spacer(modifier = Modifier.weight(1f))
+                Box(modifier = Modifier.weight(2f)) {
+                    Text(
+                        text = "${stringResource(R.string.mines_left)}\n${MinesweeperManager.minesLeft.intValue}",
+                        modifier = Modifier.align(Alignment.Center),
+                        textAlign = TextAlign.Center,
+                        fontSize = 22.5.sp
+                    )
+                }
+                val inputMode = remember { mutableStateOf(MinesweeperManager.inputMode) }
+
+                Button(
+                    onClick = { changeInputMode(inputMode) },
+                    modifier = Modifier
+                        .weight(2f)
                         .aspectRatio(1f),
                     shape = RoundedCornerShape(10.dp),
                     colors = colors,
@@ -301,46 +336,13 @@ class MinesweeperLayout : BaseLayout() {
                         )
                     } else Image(painterResource(R.drawable.spade), "inputType: Spade")
                 }
-            }
-        } else {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Box(
-                    modifier = Modifier
-                        .weight(0.25f)
-                        .aspectRatio(1f)
-                ) {
-                    Text(
-                        text = "${stringResource(R.string.mines_left)}\n${MinesweeperManager.minesLeft.intValue}",
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .fillMaxSize(),
-                        textAlign = TextAlign.Center
-                    )
-                }
-                val inputMode = remember { mutableStateOf(MinesweeperManager.inputMode) }
-                Button(
-                    onClick = { changeInputMode(inputMode) },
-                    modifier = Modifier
-                        .weight(0.25f)
-                        .aspectRatio(1f),
-                    shape = RoundedCornerShape(10.dp),
-                    colors = colors,
-                    enabled = !minesweeperFinished.value
-                ) {
-                    if (inputMode.value == InputMode.Flag) {
-                        Icon(
-                            painterResource(R.drawable.baseline_flag_24),
-                            "inputType Flag",
-                            Modifier.fillMaxSize()
-                        )
-                    } else Image(painterResource(R.drawable.spade), "inputType Spade")
-                }
+                Spacer(modifier = Modifier.weight(1f))
             }
         }
     }
 
     private fun changeInputMode(inputMode: MutableState<InputMode>) {
-        if (!disableTopRowButtons.value) inputMode.value = MinesweeperManager.changeInputMode()
+        inputMode.value = MinesweeperManager.changeInputMode()
     }
     //#endregion
 
@@ -353,19 +355,22 @@ class MinesweeperLayout : BaseLayout() {
         //if (failed) "A mine exploded" else """You did great and solved puzzle in ${0} seconds!!
         //     |That's Awesome!
         //     |Share with your friends and challenge them to beat your time!""".trimMargin()
-        //Logger.logEvent(FirebaseAnalytics.Event.EARN_VIRTUAL_CURRENCY)
         val reward = if (failed) 0 else 10
         //val onClickShare = if (failed) null else ({})
         val onClickPlayAgain = {
-            MinesweeperManager.reset()
-            MinesweeperManager.loadPuzzle()
+            MinesweeperManager.startNewGame()
         }
         val onClickReturnToMenu = {
-            uiHandler.backToMenu()
-            MinesweeperManager.reset()
+            MinesweeperManager.startNewGame()
         }
         BaseGameFinishedPopUp(
             title, desc, reward, null, onClickPlayAgain, onClickReturnToMenu
         )
     }
+}
+
+@Preview
+@Composable
+private fun Prev_Scene() {
+    MinesweeperLayout().MinesweeperSpecificLayout(false)
 }

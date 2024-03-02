@@ -41,22 +41,20 @@ class AuthManager {
                             firebaseAuthWithPlayGames(activity, serverAuthToken)
                         }
                     }
-                }/*else {
-                    // Disable your integration with Play Games Services or show a
-                    // login button to ask  players to sign-in. Clicking it should
-                    // call gamesSignInClient.signIn().
-                }*/
+                }
             }
         }
 
-        private fun firebaseAuthWithPlayGames(activity: Activity, serverAuthCode: String, signedIn: MutableState<Boolean>? = null) {
+        private fun firebaseAuthWithPlayGames(
+            activity: Activity, serverAuthCode: String, signedIn: MutableState<Boolean>? = null
+        ) {
             val auth = Firebase.auth
             val credential = PlayGamesAuthProvider.getCredential(serverAuthCode)
             auth.signInWithCredential(credential).addOnCompleteListener(activity) { task ->
                 if (task.isSuccessful) {
                     Logger.d("signInWithCredential:success")
                     currentUser = auth.currentUser
-                    if(signedIn != null) signedIn.value = true
+                    if (signedIn != null) signedIn.value = true
                 } else {
                     // If sign in fails, display a message to the user.
                     Logger.w("signInWithCredential:failure", task.exception!!)
@@ -69,23 +67,24 @@ class AuthManager {
             }
         }
 
-        fun signIn(signedIn: MutableState<Boolean>){
-            gamesSignInClient.signIn().addOnCompleteListener { isAuthenticatedTask: Task<AuthenticationResult> ->
-                val isAuthenticated =
-                    isAuthenticatedTask.isSuccessful && isAuthenticatedTask.result.isAuthenticated
-                this.isAuthenticated = isAuthenticated
+        fun signIn(signedIn: MutableState<Boolean>) {
+            gamesSignInClient.signIn()
+                .addOnCompleteListener { isAuthenticatedTask: Task<AuthenticationResult> ->
+                    val isAuthenticated =
+                        isAuthenticatedTask.isSuccessful && isAuthenticatedTask.result.isAuthenticated
+                    this.isAuthenticated = isAuthenticated
 
-                if (isAuthenticated) {
-                    gamesSignInClient.requestServerSideAccess(
-                        getString(activity, R.string.default_web_client_id), false
-                    ).addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            val serverAuthToken = task.result
-                            firebaseAuthWithPlayGames(activity, serverAuthToken, signedIn)
+                    if (isAuthenticated) {
+                        gamesSignInClient.requestServerSideAccess(
+                            getString(activity, R.string.default_web_client_id), false
+                        ).addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                val serverAuthToken = task.result
+                                firebaseAuthWithPlayGames(activity, serverAuthToken, signedIn)
+                            }
                         }
                     }
                 }
-            }
         }
     }
 }
