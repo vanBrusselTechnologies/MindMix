@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.times
 import com.vanbrusselgames.mindmix.AutoSizeText
 import com.vanbrusselgames.mindmix.R
 import com.vanbrusselgames.mindmix.SceneManager
+import com.vanbrusselgames.mindmix.Settings
 import kotlin.math.cos
 import kotlin.math.min
 import kotlin.math.round

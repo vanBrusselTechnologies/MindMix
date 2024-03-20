@@ -1,4 +1,4 @@
-package com.vanbrusselgames.mindmix.solitaire
+package com.vanbrusselgames.mindmix.games.solitaire
 
 import com.vanbrusselgames.mindmix.BaseUIHandler
 import com.vanbrusselgames.mindmix.Logger

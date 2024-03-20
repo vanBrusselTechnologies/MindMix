@@ -1,5 +1,9 @@
 package com.vanbrusselgames.mindmix
 
+import com.vanbrusselgames.mindmix.games.GameHelp
+import com.vanbrusselgames.mindmix.games.GameMenu
+import com.vanbrusselgames.mindmix.games.GameTimer
+
 abstract class BaseUIHandler {
     open fun openSettings() {}
 
@@ -10,12 +14,14 @@ abstract class BaseUIHandler {
         }
 
         fun openGameMenu(){
+            GameTimer.pauseAll()
             GameMenu.visible.value = true
             BaseLayout.disableTopRowButtons.value = true
         }
 
         fun openHelp() {
-            BaseLayout.helpOpened.value = true
+            GameTimer.pauseAll()
+            GameHelp.visible.value = true
             BaseLayout.disableTopRowButtons.value = true
         }
     }

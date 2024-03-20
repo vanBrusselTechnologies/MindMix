@@ -1,4 +1,4 @@
-package com.vanbrusselgames.mindmix.solitaire
+package com.vanbrusselgames.mindmix.games.solitaire
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -29,11 +29,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import com.vanbrusselgames.mindmix.BaseLayout
 import com.vanbrusselgames.mindmix.BaseUIHandler
-import com.vanbrusselgames.mindmix.GameMenu
 import com.vanbrusselgames.mindmix.R
-import com.vanbrusselgames.mindmix.solitaire.SolitaireManager.Instance.cards
-import com.vanbrusselgames.mindmix.solitaire.SolitaireManager.Instance.couldGetFinished
-import com.vanbrusselgames.mindmix.solitaire.SolitaireManager.Instance.solitaireFinished
+import com.vanbrusselgames.mindmix.games.GameHelp
+import com.vanbrusselgames.mindmix.games.GameMenu
+import com.vanbrusselgames.mindmix.games.solitaire.SolitaireManager.Instance.cards
+import com.vanbrusselgames.mindmix.games.solitaire.SolitaireManager.Instance.couldGetFinished
+import com.vanbrusselgames.mindmix.games.solitaire.SolitaireManager.Instance.solitaireFinished
+import com.vanbrusselgames.mindmix.games.solitaire.SolitaireManager.Instance.timer
+import kotlin.math.floor
+import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 
@@ -61,13 +65,18 @@ class SolitaireLayout : BaseLayout() {
     fun Scene() {
         BaseScene {
             SolitaireSpecificLayout(disableTopRowButtons.value)
-            if (helpOpened.value) {
-                GameHelp(titleId = R.string.solitaire_name, descriptionId = R.string.solitaire_desc)
-            }
-            if (GameMenu.visible.value) {
-                GameMenu.Screen(R.string.solitaire_name) { SolitaireManager.startNewGame() }
-            }
+            GameHelp.Screen(R.string.solitaire_name, R.string.solitaire_desc, timer)
+            GameMenu.Screen(R.string.solitaire_name, timer) { SolitaireManager.startNewGame() }
+            SolitaireSettings()
             if (solitaireFinished.value) GameFinishedPopUp()
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .blur(if (disableTopRowButtons.value) blurStrength else 0.dp),
+                Alignment.BottomCenter
+            ) {
+                timer.Timer()
+            }
         }
     }
 
@@ -76,7 +85,7 @@ class SolitaireLayout : BaseLayout() {
         Box(
             Modifier
                 .fillMaxSize()
-                .blur(if (isBlurred) 4.dp else 0.dp), Alignment.Center
+                .blur(if (isBlurred) blurStrength else 0.dp), Alignment.Center
         ) {
             Box(Modifier.fillMaxSize(0.95f), contentAlignment = Alignment.TopCenter) {
                 BoxWithConstraints {
@@ -114,7 +123,7 @@ class SolitaireLayout : BaseLayout() {
                                 }
                                 SolitaireManager.checkFinished()
                             },
-                            modifier = Modifier.align(Alignment.BottomCenter),
+                            Modifier.align(Alignment.BottomCenter),
                             enabled = !disableTopRowButtons.value,
                             colors = colors
                         ) {
@@ -144,7 +153,11 @@ class SolitaireLayout : BaseLayout() {
                 when (i) {
                     4 -> Box(modifier)
                     5 -> Box(modifier)
-                    6 -> Card({ SolitaireManager.resetRestStack() }, modifier.alpha(0.75f), !disableTopRowButtons.value) {
+                    6 -> Card(
+                        { SolitaireManager.resetRestStack() },
+                        modifier.alpha(0.75f),
+                        !disableTopRowButtons.value
+                    ) {
                         Box(Modifier.fillMaxSize()) {
                             Icon(
                                 painterResource(id = R.drawable.outline_autorenew_24),
@@ -199,19 +212,19 @@ class SolitaireLayout : BaseLayout() {
     fun GameFinishedPopUp() {
         val title = stringResource(R.string.solitaire_name)//"Congrats / Smart / Well done"
         val desc = stringResource(R.string.solitaire_success)
-        //"""You did great and solved puzzle in ${0} seconds!!
-        //     |That's Awesome!
-        //     |Share with your friends and challenge them to beat your time!""".trimMargin()
-        val reward = 10
+        val minutes = max(1f, timer.currentMillis / 1000f / 60f)
+        val reward = max(1, floor(MAX_REWARD / minutes).toInt())
         //val onClickShare = {}
         val onClickPlayAgain = {
             SolitaireManager.startNewGame()
         }
-        val onClickReturnToMenu = {
-            SolitaireManager.startNewGame()
-        }
         BaseGameFinishedPopUp(
-            title, desc, reward, null, onClickPlayAgain, onClickReturnToMenu
-        )
+            title, desc, reward, null, onClickPlayAgain, null
+        ){
+            Text(text = "TIME: ${timer.formatTime(true)}")
+            //"""You did great and solved puzzle in ${0} seconds!!
+            //     |That's Awesome!
+            //     |Share with your friends and challenge them to beat your time!""".trimMargin()
+        }
     }
 }

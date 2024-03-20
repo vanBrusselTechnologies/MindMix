@@ -1,4 +1,4 @@
-package com.vanbrusselgames.mindmix
+package com.vanbrusselgames.mindmix.games
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,13 +29,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.vanbrusselgames.mindmix.BaseLayout
+import com.vanbrusselgames.mindmix.BaseUIHandler
+import com.vanbrusselgames.mindmix.R
 
 class GameMenu {
     companion object {
         val visible = mutableStateOf(false)
 
         @Composable
-        fun Screen(gameNameId: Int, startNewGame: () -> Unit) {
+        fun Screen(gameNameId: Int, timer: GameTimer? = null, startNewGame: () -> Unit) {
             if (!visible.value) return
             Box(Modifier.fillMaxSize(), Alignment.Center) {
                 Box(Modifier.fillMaxSize(0.95f), Alignment.Center) {
@@ -56,12 +59,11 @@ class GameMenu {
                                 fontWeight = FontWeight.ExtraBold
                             )
                             Spacer(Modifier.height(15.dp))
-                            Button(
-                                {
-                                    visible.value = false
-                                    BaseLayout.disableTopRowButtons.value = false
-                                }, Modifier.fillMaxWidth(), shape = RoundedCornerShape(6.dp)
-                            ) {
+                            Button({
+                                timer?.resume()
+                                visible.value = false
+                                BaseLayout.disableTopRowButtons.value = false
+                            }, Modifier.fillMaxWidth(), shape = RoundedCornerShape(6.dp)) {
                                 Icon(Icons.Default.PlayArrow, contentDescription = "Continue")
                                 Spacer(Modifier.width(8.dp))
                                 Text(stringResource(R.string.continue_game))
@@ -100,7 +102,7 @@ class GameMenu {
 @Preview(locale = "nl")
 @Preview
 @Composable
-fun Prev_Screen() {
+fun Prev_GameMenu_Screen() {
     GameMenu.visible.value = true
-    GameMenu.Screen(R.string.sudoku_name){}
+    GameMenu.Screen(R.string.sudoku_name) {}
 }

@@ -1,4 +1,4 @@
-package com.vanbrusselgames.mindmix.sudoku
+package com.vanbrusselgames.mindmix.games.sudoku
 
 import kotlinx.serialization.Serializable
 
@@ -7,7 +7,8 @@ data class SudokuData(
     val clues: List<Int>,
     val input: List<Int>,
     val inputNotes: List<List<Int>>,
-    val finished: Boolean
+    val finished: Boolean,
+    val difficulty: Difficulty = SudokuManager.difficulty
 )
 //var CheckConflictingCells = true      Preference -> DataStore
 //var AutoEditNotes = true              Preference -> DataStore

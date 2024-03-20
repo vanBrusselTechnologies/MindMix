@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
@@ -49,9 +48,10 @@ import com.vanbrusselgames.mindmix.menu.MenuManager
 
 abstract class BaseLayout {
     companion object {
-        var helpOpened = mutableStateOf(false)
         var disableTopRowButtons = mutableStateOf(false)
     }
+
+    protected val blurStrength = 10.dp
 
     private val topRowButtonSize = 48.dp
     private val padding = topRowButtonSize / 100f
@@ -118,8 +118,7 @@ abstract class BaseLayout {
                             )
                         }
                     }
-                }
-                else Row(
+                } else Row(
                     Modifier.align(Alignment.TopEnd)
                 ) {
                     /*if (isMenu) {
@@ -156,8 +155,8 @@ abstract class BaseLayout {
         reward: Int = 0,
         onClickShare: (() -> Unit)? = null,
         onClickPlayAgain: (() -> Unit)? = null,
-        onClickReturnToMenu: (() -> Unit),
-        sceneSpecific: @Composable () -> Unit = {}
+        onClickReturnToMenu: (() -> Unit)? = null,
+        sceneSpecific: (@Composable () -> Unit)? = null
     ) {
         val adManager = remember { MainActivity.adManager }
         val rewarded = remember { mutableStateOf(false) }
@@ -179,7 +178,12 @@ abstract class BaseLayout {
                         Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(text = title, fontSize = 25.sp, fontWeight = FontWeight.ExtraBold)
+                        Spacer(Modifier.height(2.dp))
                         Text(text = description, textAlign = TextAlign.Center)
+                        if(sceneSpecific != null) {
+                            Spacer(Modifier.height(2.dp))
+                            sceneSpecific()
+                        }
                         if (reward != 0) {
                             Spacer(Modifier.height(8.dp))
                             Row(
@@ -217,7 +221,6 @@ abstract class BaseLayout {
                                 }
                             }
                         }
-                        sceneSpecific()
                         Spacer(Modifier.height(8.dp))
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(
@@ -242,7 +245,7 @@ abstract class BaseLayout {
                             }
                             Button({
                                 BaseUIHandler.backToMenu()
-                                onClickReturnToMenu()
+                                if (onClickReturnToMenu != null) onClickReturnToMenu()
                                 disableTopRowButtons.value = false
                             }) {
                                 Text(
@@ -262,41 +265,6 @@ abstract class BaseLayout {
             param(FirebaseAnalytics.Param.VIRTUAL_CURRENCY_NAME, "Coin")
             param(FirebaseAnalytics.Param.VALUE, reward.toDouble())
             param(FirebaseAnalytics.Param.CURRENCY, "EUR")
-        }
-    }
-
-    @Composable
-    fun GameHelp(titleId: Int, descriptionId: Int) {
-        val title = stringResource(titleId)
-        val description = stringResource(descriptionId)
-
-        Box(Modifier.fillMaxSize(), Alignment.Center) {
-            Box(
-                Modifier.fillMaxSize(0.95f), Alignment.Center
-            ) {
-                Card(
-                    Modifier.alpha(0.9f), elevation = CardDefaults.cardElevation(20.dp)
-                ) {
-                    Box(Modifier.align(Alignment.CenterHorizontally)) {
-                        IconButton(
-                            onClick = {
-                                helpOpened.value = false
-                                disableTopRowButtons.value = false
-                            }, Modifier.align(Alignment.TopEnd)
-                        ) {
-                            Icon(Icons.Default.Close, contentDescription = "Close")
-                        }
-                        Column(
-                            Modifier.padding(16.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(text = title, fontSize = 32.sp, fontWeight = FontWeight.ExtraBold)
-                            Spacer(Modifier.height(16.dp))
-                            Text(text = description, textAlign = TextAlign.Center)
-                        }
-                    }
-                }
-            }
         }
     }
 }

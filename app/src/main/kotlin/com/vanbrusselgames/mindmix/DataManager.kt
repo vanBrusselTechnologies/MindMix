@@ -6,17 +6,24 @@ import android.os.Looper
 import com.google.firebase.Firebase
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.storage
+import com.vanbrusselgames.mindmix.games.minesweeper.MinesweeperData
+import com.vanbrusselgames.mindmix.games.minesweeper.MinesweeperManager
+import com.vanbrusselgames.mindmix.games.solitaire.SolitaireData
+import com.vanbrusselgames.mindmix.games.solitaire.SolitaireManager
+import com.vanbrusselgames.mindmix.games.sudoku.SudokuData
+import com.vanbrusselgames.mindmix.games.sudoku.SudokuLoader
+import com.vanbrusselgames.mindmix.games.sudoku.SudokuManager
 import com.vanbrusselgames.mindmix.menu.MenuData
 import com.vanbrusselgames.mindmix.menu.MenuManager
-import com.vanbrusselgames.mindmix.minesweeper.MinesweeperData
-import com.vanbrusselgames.mindmix.minesweeper.MinesweeperManager
-import com.vanbrusselgames.mindmix.solitaire.SolitaireData
-import com.vanbrusselgames.mindmix.solitaire.SolitaireManager
-import com.vanbrusselgames.mindmix.sudoku.SudokuData
-import com.vanbrusselgames.mindmix.sudoku.SudokuManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import java.io.File
 
+@OptIn(DelicateCoroutinesApi::class)
 class DataManager(ctx: Context) {
     companion object {
         private const val FILE_NAME = "save.vbg"
@@ -46,7 +53,7 @@ class DataManager(ctx: Context) {
                         when (SceneManager.scenes[safeCode]) {
                             SceneManager.Scene.SUDOKU -> {
                                 val data = Json.decodeFromString<SudokuData>(json)
-                                SudokuManager.loadFromFile(data)
+                                SudokuLoader.loadFromFile(data)
                             }
 
                             SceneManager.Scene.SOLITAIRE -> {
@@ -78,6 +85,7 @@ class DataManager(ctx: Context) {
         }
 
         fun save(withPublish: Boolean = true) {
+            if (!loaded) return
             val str: StringBuilder = StringBuilder()
             for (entry in SceneManager.scenes) {
                 val dataString = when (entry.value) {
@@ -99,34 +107,9 @@ class DataManager(ctx: Context) {
     init {
         file = File(ctx.filesDir, FILE_NAME)
         file.createNewFile()
-        keepCoinsFromOldSaveFile(ctx)
-        if (!loaded) load()
-        autoSave()
-    }
-
-
-    //todo: Remove in 1.1.1: Old Save Data object
-    /**
-     * Function copies coins from OLD save data file to MenuManager to save into NEW save data file
-     */
-    private fun keepCoinsFromOldSaveFile(ctx: Context) {
-        try {
-            val file = File(ctx.getExternalFilesDir(null), FILE_NAME)
-            if (file.exists()) {
-                val content = file.readLines(fileDecoding)
-                if (content.isNotEmpty() && content[0].startsWith("@@@")) {
-                    val totalContent = content.joinToString("\n")
-                    val coinsString = Regex("int///munten:::[0-9]+,,,").find(totalContent)?.value
-                    val coins = coinsString?.split(",,,")?.get(0)?.substring(15)?.toInt()
-                    if (coins != null) {
-                        MenuManager.coins = coins
-                        save()
-                    }
-                }
-                file.delete()
-            }
-        } catch (e: Exception) {
-            Logger.e("Error loading OLD save file", e)
+        CoroutineScope(Dispatchers.IO).launch {
+            if (!loaded) load()
+            autoSave()
         }
     }
 
@@ -137,8 +120,8 @@ class DataManager(ctx: Context) {
         val mainHandler = Handler(Looper.getMainLooper())
         mainHandler.post(object : Runnable {
             override fun run() {
-                save(autoSaveCount++ % 10 == 0)
-                mainHandler.postDelayed(this, 30000)
+                save(autoSaveCount++ % 12 == 0)
+                mainHandler.postDelayed(this, 5000)
             }
         })
     }

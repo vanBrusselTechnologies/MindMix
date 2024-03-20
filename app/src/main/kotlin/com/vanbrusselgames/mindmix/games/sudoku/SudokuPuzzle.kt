@@ -1,11 +1,11 @@
-package com.vanbrusselgames.mindmix.sudoku
+package com.vanbrusselgames.mindmix.games.sudoku
 
 import kotlin.math.sqrt
 import kotlin.random.Random
 
 class SudokuPuzzle private constructor(private val n: Int) {
-    private val boxSize: Int = sqrt(n.toFloat()).toInt()
-    private var cells: Array<IntArray> = Array(n * n) { IntArray(n) }
+    private val boxSize = sqrt(n.toFloat()).toInt()
+    private var cells = Array(n * n) { IntArray(n) }
 
     init {
         val a1 = IntArray(n) { 1 + it }
@@ -148,6 +148,29 @@ class SudokuPuzzle private constructor(private val n: Int) {
                 clues = workingClues
                 if (clues.filter { c -> c != 0 }.size <= maxClues) return clues
             }
+        }
+
+        fun peers(cell: Int, size: Int): IntArray {
+            val n = sqrt(size.toFloat()).toInt()
+            val boxSize = sqrt(n.toFloat()).toInt()
+            val key = Pair(n, cell)
+            if (SavedPeers.containsKey(key)) return SavedPeers[key]!!
+            val items = mutableListOf<Int>()
+            var i = 0
+
+            while (i < n * n) {
+                if (isPeer(cell, i, n, boxSize)) items.add(i)
+                i++
+            }
+            SavedPeers[key] = items.toIntArray()
+            return SavedPeers[key]!!
+        }
+
+        private fun isPeer(c1: Int, c2: Int, n: Int, boxSize: Int): Boolean {
+            return (c1 / n == c2 / n //Cells in same row
+                    || c1 % n == c2 % n //Cells in same column
+                    || (c1 / (n * boxSize) == c2 / (n * boxSize) && c1 % n / boxSize == c2 % n / boxSize)) //Cells in same box
+                    && c1 != c2 //Cell is not peer to itself
         }
     }
 

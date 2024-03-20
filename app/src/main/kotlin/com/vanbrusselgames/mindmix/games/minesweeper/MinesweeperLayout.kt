@@ -1,4 +1,4 @@
-package com.vanbrusselgames.mindmix.minesweeper
+package com.vanbrusselgames.mindmix.games.minesweeper
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -40,19 +40,19 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vanbrusselgames.mindmix.BaseLayout
 import com.vanbrusselgames.mindmix.BaseUIHandler
-import com.vanbrusselgames.mindmix.GameMenu
 import com.vanbrusselgames.mindmix.PixelHelper.Companion.pxToSp
 import com.vanbrusselgames.mindmix.R
-import com.vanbrusselgames.mindmix.minesweeper.MinesweeperManager.Instance.InputMode
-import com.vanbrusselgames.mindmix.minesweeper.MinesweeperManager.Instance.findOtherSafeCells
-import com.vanbrusselgames.mindmix.minesweeper.MinesweeperManager.Instance.minesweeperFinished
-import com.vanbrusselgames.mindmix.minesweeper.MinesweeperManager.Instance.showAllMines
+import com.vanbrusselgames.mindmix.games.GameHelp
+import com.vanbrusselgames.mindmix.games.GameMenu
+import com.vanbrusselgames.mindmix.games.minesweeper.MinesweeperManager.Instance.InputMode
+import com.vanbrusselgames.mindmix.games.minesweeper.MinesweeperManager.Instance.findOtherSafeCells
+import com.vanbrusselgames.mindmix.games.minesweeper.MinesweeperManager.Instance.minesweeperFinished
+import com.vanbrusselgames.mindmix.games.minesweeper.MinesweeperManager.Instance.showAllMines
 import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
@@ -66,12 +66,9 @@ class MinesweeperLayout : BaseLayout() {
     fun Scene() {
         BaseScene {
             MinesweeperSpecificLayout(disableTopRowButtons.value)
-            if (helpOpened.value) GameHelp(
-                titleId = R.string.minesweeper_name, descriptionId = R.string.minesweeper_desc
-            )
-            if (GameMenu.visible.value) {
-                GameMenu.Screen(R.string.minesweeper_name) { MinesweeperManager.startNewGame() }
-            }
+            GameHelp.Screen(R.string.minesweeper_name, R.string.minesweeper_desc)
+            GameMenu.Screen(R.string.minesweeper_name) { MinesweeperManager.startNewGame() }
+            MinesweeperSettings()
             if (minesweeperFinished.value) GameFinishedPopUp(MinesweeperManager.cells.any { c -> c.state == MinesweeperCell.State.Bomb })
         }
     }
@@ -81,7 +78,7 @@ class MinesweeperLayout : BaseLayout() {
         BoxWithConstraints(
             Modifier
                 .fillMaxSize()
-                .blur(if (isBlurred) 4.dp else 0.dp),
+                .blur(if (isBlurred) blurStrength else 0.dp),
         ) {
             val maxWidth = maxWidth
             val maxHeight = maxHeight
@@ -289,12 +286,12 @@ class MinesweeperLayout : BaseLayout() {
 
                 Button(
                     onClick = { changeInputMode(inputMode) },
-                    modifier = Modifier
+                    Modifier
                         .weight(2f)
                         .aspectRatio(1f),
-                    shape = RoundedCornerShape(10.dp),
-                    colors = colors,
-                    enabled = !disableTopRowButtons.value
+                    enabled = !disableTopRowButtons.value,
+                    RoundedCornerShape(10.dp),
+                    colors
                 ) {
                     if (inputMode.value == InputMode.Flag) {
                         Icon(
@@ -321,12 +318,12 @@ class MinesweeperLayout : BaseLayout() {
 
                 Button(
                     onClick = { changeInputMode(inputMode) },
-                    modifier = Modifier
+                    Modifier
                         .weight(2f)
                         .aspectRatio(1f),
-                    shape = RoundedCornerShape(10.dp),
-                    colors = colors,
-                    enabled = !minesweeperFinished.value
+                    enabled = !minesweeperFinished.value,
+                    RoundedCornerShape(10.dp),
+                    colors
                 ) {
                     if (inputMode.value == InputMode.Flag) {
                         Icon(
@@ -367,10 +364,4 @@ class MinesweeperLayout : BaseLayout() {
             title, desc, reward, null, onClickPlayAgain, onClickReturnToMenu
         )
     }
-}
-
-@Preview
-@Composable
-private fun Prev_Scene() {
-    MinesweeperLayout().MinesweeperSpecificLayout(false)
 }

@@ -1,4 +1,4 @@
-package com.vanbrusselgames.mindmix.sudoku
+package com.vanbrusselgames.mindmix.games.sudoku
 
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
@@ -6,9 +6,10 @@ import androidx.compose.runtime.mutableStateOf
 
 data class SudokuPuzzleCell(
     val id: Int,
-    val isClue: Boolean,
+    var isClue: Boolean,
     private var _value: Int = 0,
-    var notes: Array<Boolean> = Array(9) { false }
+    val size: Int = 9,
+    val notes: Array<Boolean> = Array(size) { false }
 ) {
     private var _isIncorrect = false
     val mutableIsIncorrect = mutableStateOf(_isIncorrect)
@@ -29,10 +30,7 @@ data class SudokuPuzzleCell(
     val mutableCellValue = mutableIntStateOf(_value)
     var value
         get() = _value
-        set(value) {
-            mutableCellValue.intValue = value
-            _value = value
-        }
+        set(value) = setNumber(value)
     val mutableCellNotes = mutableStateListOf(*notes)
 
     fun setNumber(value: Int) {
@@ -47,7 +45,16 @@ data class SudokuPuzzleCell(
         mutableCellNotes[i] = !noteSet
     }
 
-    fun hasNote(index: Int = -1): Boolean = notes[index - 1]
+    fun hasNote(value: Int): Boolean = notes[value - 1]
+
+    fun reset(){
+        setNumber(0)
+        notes.fill(false)
+        mutableCellNotes.fill(false)
+        isClue = false
+        isSelected = false
+        isIncorrect = false
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

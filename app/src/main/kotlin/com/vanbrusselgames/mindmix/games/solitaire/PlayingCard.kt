@@ -1,4 +1,4 @@
-package com.vanbrusselgames.mindmix.solitaire
+package com.vanbrusselgames.mindmix.games.solitaire
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateIntOffsetAsState
@@ -108,6 +108,10 @@ data class PlayingCard(val type: CardType, val index: CardIndex, val drawableRes
         A, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, J, Q, K
     }
 
+    enum class CardVisualType {
+        DETAILED, SIMPLE
+    }
+
     @Composable
     fun Composable(modifier: Modifier) {
         val currentStackId by mutableCurrentStackId
@@ -121,7 +125,7 @@ data class PlayingCard(val type: CardType, val index: CardIndex, val drawableRes
         val mod = modifier
             .zIndex(zIndex)
             .offset { offset }
-            .clickable(onClickLabel = "${type.name.replaceFirstChar{ it.titlecase()}} $indexString") {
+            .clickable(onClickLabel = "${type.name.replaceFirstChar { it.titlecase() }} $indexString") {
                 if (SolitaireManager.solitaireFinished.value || BaseLayout.disableTopRowButtons.value) return@clickable
                 if (currentStackId == 6) {
                     SolitaireManager.turnFromRestStack(this)
@@ -132,6 +136,7 @@ data class PlayingCard(val type: CardType, val index: CardIndex, val drawableRes
                 }
             }
             .pointerInput(Unit) {
+                //todo: .clickable{} to .pointerInput{detectTapGestures {  }}
                 detectDragGestures(onDragStart = {
                     if (SolitaireManager.finished || !frontVisible || BaseLayout.disableTopRowButtons.value) return@detectDragGestures
                     SolitaireManager.startMoveCard(this@PlayingCard)
@@ -144,8 +149,7 @@ data class PlayingCard(val type: CardType, val index: CardIndex, val drawableRes
                     SolitaireManager.moveCards(offset)
                 })
             }
-        val detailed = false
-        if (detailed) DetailedCard(mod)
+        if (SolitaireManager.cardVisualType.value == CardVisualType.DETAILED) DetailedCard(mod)
         else SimpleCard(mod)
     }
 

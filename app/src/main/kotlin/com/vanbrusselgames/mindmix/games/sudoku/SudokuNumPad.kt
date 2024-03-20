@@ -1,4 +1,4 @@
-package com.vanbrusselgames.mindmix.sudoku
+package com.vanbrusselgames.mindmix.games.sudoku
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,7 +27,6 @@ import androidx.compose.ui.unit.dp
 import com.vanbrusselgames.mindmix.AutoSizeText
 import com.vanbrusselgames.mindmix.BaseLayout
 import com.vanbrusselgames.mindmix.R
-import com.vanbrusselgames.mindmix.sudoku.SudokuManager.Instance.InputMode
 
 class SudokuNumPad {
 

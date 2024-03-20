@@ -15,8 +15,6 @@ import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.google.android.ump.ConsentInformation
 import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.UserMessagingPlatform
-import com.google.firebase.Firebase
-import com.google.firebase.crashlytics.crashlytics
 import java.util.concurrent.atomic.AtomicBoolean
 
 class AdManager(private val activity: MainActivity) {
@@ -51,6 +49,7 @@ class AdManager(private val activity: MainActivity) {
         private var sdkInitialized = false
     }
 
+
     init {
         if (!initialized) {
             initialized = true
@@ -68,6 +67,7 @@ class AdManager(private val activity: MainActivity) {
             loadAds()
         }
     }
+
 
     private fun requestConsent() {
         if (loadingConsentInformation) return
@@ -131,8 +131,7 @@ class AdManager(private val activity: MainActivity) {
                 override fun onAdFailedToLoad(adError: LoadAdError) {
                     rewardedAd = null
                     loading = false
-                    Logger.d("Ad failed to load.")
-                    Firebase.crashlytics.log("AdLoadingError: $adError")
+                    Logger.d("AdLoadingError: $adError")
                 }
 
                 override fun onAdLoaded(ad: RewardedAd) {

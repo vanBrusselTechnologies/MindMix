@@ -27,6 +27,7 @@ import com.vanbrusselgames.mindmix.AutoSizeText
 import com.vanbrusselgames.mindmix.BaseLayout
 import com.vanbrusselgames.mindmix.BaseUIHandler
 import com.vanbrusselgames.mindmix.R
+import com.vanbrusselgames.mindmix.Settings
 
 class MenuLayout : BaseLayout() {
 
@@ -41,7 +42,7 @@ class MenuLayout : BaseLayout() {
     fun Scene() {
         BaseScene(true) {
             SetLayoutGameWheel()
-            Settings.Screen()
+            MenuSettings()
         }
     }
 
@@ -50,7 +51,7 @@ class MenuLayout : BaseLayout() {
         Box(
             Modifier
                 .fillMaxSize()
-                .blur(if (Settings.visible.value) 4.dp else 0.dp),
+                .blur(if (Settings.visible.value) 6.dp else 0.dp),
             Alignment.BottomCenter
         ) {
             GameWheel(MenuManager.GAME_COUNT, screenWidth, screenHeight)

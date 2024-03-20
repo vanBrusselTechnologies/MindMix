@@ -1,11 +1,11 @@
-package com.vanbrusselgames.mindmix.sudoku
+package com.vanbrusselgames.mindmix.games.minesweeper
 
 import com.vanbrusselgames.mindmix.BaseUIHandler
 import com.vanbrusselgames.mindmix.Logger
 
-class SudokuUIHandler : BaseUIHandler() {
+class MinesweeperUIHandler : BaseUIHandler() {
 
-    override fun openSettings(){
+    override fun openSettings() {
         Logger.d("Show Settings")
     }
 }

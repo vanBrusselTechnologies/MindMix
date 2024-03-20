@@ -1,4 +1,4 @@
-package com.vanbrusselgames.mindmix.minesweeper
+package com.vanbrusselgames.mindmix.games.minesweeper
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color

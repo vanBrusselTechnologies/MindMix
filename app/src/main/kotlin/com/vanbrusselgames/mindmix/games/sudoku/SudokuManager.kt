@@ -1,4 +1,4 @@
-package com.vanbrusselgames.mindmix.sudoku
+package com.vanbrusselgames.mindmix.games.sudoku
 
 import androidx.compose.runtime.mutableStateOf
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -9,58 +9,16 @@ import kotlinx.serialization.json.Json
 
 class SudokuManager {
     companion object Instance {
-        private const val GAME_NAME = "Sudoku"
-
         var inputMode: InputMode = InputMode.Normal
-        private lateinit var puzzle: SudokuPuzzle
+        var loadedPuzzle: LoadedPuzzle? = null
         var cells: Array<SudokuPuzzleCell> = arrayOf()
         var selectedCellIndex: Int = -1
 
-        var checkConflictingCells = true
-        var autoEditNotes = true
+        var checkConflictingCells = false
+        var autoEditNotes = false
         var finished = false
         val sudokuFinished = mutableStateOf(finished)
-
-        enum class PuzzleType {
-            Classic
-        }
-
-        enum class InputMode {
-            Normal, Note
-        }
-
-        fun loadFromFile(data: SudokuData) {
-            if (data.finished) {
-                startNewGame()
-                return
-            }
-            val cellList = mutableListOf<SudokuPuzzleCell>()
-            var clueId = 0
-            for (i in data.input.indices) {
-                val isClue = data.clues[clueId] == i
-                if (isClue) clueId++
-                val notes = Array(9) { false }
-                for (i2 in data.inputNotes[i]) {
-                    notes[i2] = true
-                }
-                cellList.add(SudokuPuzzleCell(i, isClue, data.input[i], notes))
-            }
-            cells = cellList.toTypedArray()
-
-            val clues = cells.map { c -> if (c.isClue) c.value else 0 }.toIntArray()
-            try {
-                puzzle = SudokuPuzzle(SudokuPuzzle.getSolution(clues))
-            } catch (e: IllegalArgumentException) {
-                Logger.e(e.toString())
-                Logger.e("Saved Sudoku puzzle is not valid, loading new puzzle")
-                loadPuzzle()
-                return
-            }
-
-            if (checkConflictingCells) {
-                cells.forEach { c -> checkConflictingCell(c.id) }
-            }
-        }
+        var difficulty: Difficulty = Difficulty.EASY
 
         fun saveToFile(): String {
             val clues = cells.filter { c -> c.isClue }.map { c -> c.id }
@@ -71,42 +29,52 @@ class SudokuManager {
             return Json.encodeToString(SudokuData(clues, input, notes, finished))
         }
 
-        fun loadPuzzle() {
+        fun startPuzzle() {
             if (finished) reset()
-            if (cells.isNotEmpty()) return
-            Logger.logEvent(FirebaseAnalytics.Event.LEVEL_START) {
-                param(FirebaseAnalytics.Param.LEVEL_NAME, GAME_NAME)
+            if (loadedPuzzle != null) return
+            SudokuLoader.requestPuzzle(difficulty) { p ->
+                loadedPuzzle = p
+                if(cells.size == p.size * p.size){
+                    cells.forEach {
+                        it.isClue = p.clues[it.id] != 0
+                        it.value = p.clues[it.id]
+                    }
+                }
+                else {
+                    cells = Array(p.size * p.size) { SudokuPuzzleCell(it, p.clues[it] != 0, p.clues[it], p.size) }
+                }
+                if (checkConflictingCells) {
+                    cells.forEach { c -> checkConflictingCell(c.id) }
+                }
+                SudokuLoader.puzzleLoaded.value = true
             }
-            val size = 9
-            puzzle = createPuzzle(size = size)
-            val clues = SudokuPuzzle.createClues(puzzle, 40)
-            cells = Array(size * size) { SudokuPuzzleCell(it, clues[it] != 0, clues[it]) }
-
         }
 
         private fun reset() {
             finished = false
             sudokuFinished.value = finished
             BaseLayout.disableTopRowButtons.value = false
-            cells = arrayOf()
+            SudokuLoader.removePuzzle(loadedPuzzle)
+            cells.forEach {
+                it.reset()
+            }
+            loadedPuzzle = null
+            selectedCellIndex = -1
         }
 
         fun startNewGame() {
             reset()
-            loadPuzzle()
-        }
-
-        private fun createPuzzle(
-            type: PuzzleType = PuzzleType.Classic, size: Int = 9
-        ): SudokuPuzzle {
-            return if (type == PuzzleType.Classic) SudokuPuzzle.randomGrid(size)
-            else SudokuPuzzle.randomGrid(0)
+            startPuzzle()
+            Logger.logEvent(FirebaseAnalytics.Event.LEVEL_START) {
+                param(FirebaseAnalytics.Param.LEVEL_NAME, GAME_NAME)
+            }
         }
 
         fun autoChangeNotes(index: Int) {
-            if (index >= 81) return
+            if (loadedPuzzle == null) return
+            if (index >= cells.size) return
             if (cells[index].value == 0) return
-            val indices: IntArray = puzzle.peers(index)
+            val indices: IntArray = SudokuPuzzle.peers(index, cells.size)
             val number: Int = cells[index].value
             for (n: Int in indices) {
                 if (index == n) continue
@@ -116,8 +84,9 @@ class SudokuManager {
         }
 
         fun checkConflictingCell(index: Int = 0, isSecondary: Boolean = false) {
-            if (index >= 81 || index < 0 || cells[index].isClue) return
-            val indices: IntArray = puzzle.peers(index)
+            if (loadedPuzzle == null) return
+            if (index >= cells.size || index < 0 || cells[index].isClue) return
+            val indices: IntArray = SudokuPuzzle.peers(index, cells.size)
             var isConflicting = false
             for (n: Int in indices) {
                 if (index == n) continue

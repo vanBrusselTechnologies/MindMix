@@ -13,6 +13,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.PlayGamesAuthProvider
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 
 class AuthManager {
@@ -54,6 +55,7 @@ class AuthManager {
                 if (task.isSuccessful) {
                     Logger.d("signInWithCredential:success")
                     currentUser = auth.currentUser
+                    currentUser?.uid?.let { Firebase.crashlytics.setUserId(it) }
                     if (signedIn != null) signedIn.value = true
                 } else {
                     // If sign in fails, display a message to the user.

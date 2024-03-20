@@ -1,4 +1,4 @@
-package com.vanbrusselgames.mindmix.minesweeper
+package com.vanbrusselgames.mindmix.games.minesweeper
 
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -25,11 +25,11 @@ class MinesweeperManager {
 
         val cellCount
             get() = sizeX * sizeY
-        var cells = Array(cellCount) { MinesweeperCell(it) }
+        var cells = Array(cellCount) {
+            MinesweeperCell(it)
+        }
 
         val minesLeft = mutableIntStateOf(-1)
-
-        private var isLoaded = false
 
         enum class PuzzleType {
             Classic
@@ -54,7 +54,6 @@ class MinesweeperManager {
                 c.state = stateEntries[data.input[i]]
             }
             calculateMinesLeft()
-            isLoaded = true
         }
 
         fun saveToFile(): String {
@@ -69,7 +68,7 @@ class MinesweeperManager {
 
         fun loadPuzzle() {
             if (finished) reset()
-            if (isLoaded) return
+            if (mines.any { it }) return
             Logger.logEvent(FirebaseAnalytics.Event.LEVEL_START) {
                 param(FirebaseAnalytics.Param.LEVEL_NAME, GAME_NAME)
             }
@@ -89,7 +88,6 @@ class MinesweeperManager {
                 c.getCellMineCount()
             }
             minesLeft.intValue = mineCount
-            isLoaded = true
         }
 
         private fun reset() {
@@ -103,7 +101,6 @@ class MinesweeperManager {
                 c.pressed = false
                 c.background.value = Color.White
             }
-            isLoaded = false
         }
 
         fun startNewGame() {
