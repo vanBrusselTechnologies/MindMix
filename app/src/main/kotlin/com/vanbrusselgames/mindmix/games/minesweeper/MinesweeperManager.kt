@@ -1,5 +1,7 @@
 package com.vanbrusselgames.mindmix.games.minesweeper
 
+import androidx.collection.MutableIntList
+import androidx.collection.mutableIntListOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
@@ -8,6 +10,7 @@ import com.vanbrusselgames.mindmix.BaseLayout
 import com.vanbrusselgames.mindmix.Logger
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlin.math.min
 import kotlin.math.pow
 import kotlin.random.Random
 
@@ -20,6 +23,9 @@ class MinesweeperManager {
 
         var finished = false
         val minesweeperFinished = mutableStateOf(false)
+
+        var safeStart = false
+        var autoFlag = false
 
         val mines = BooleanArray(sizeX * sizeY) { false }
 
@@ -53,6 +59,7 @@ class MinesweeperManager {
                 c.getCellMineCount()
                 c.state = stateEntries[data.input[i]]
             }
+            if (autoFlag) autoFlag()
             calculateMinesLeft()
         }
 
@@ -88,6 +95,18 @@ class MinesweeperManager {
                 c.getCellMineCount()
             }
             minesLeft.intValue = mineCount
+
+            if (safeStart) {
+                while (true) {
+                    val randomIndex: Int = Random.nextInt(cellCount)
+                    val c = cells[randomIndex]
+                    if (c.isMine || c.mineCount != 0) continue
+                    c.state = MinesweeperCell.State.Number
+                    findOtherSafeCells(c)
+                    if (autoFlag) autoFlag()
+                    break
+                }
+            }
         }
 
         private fun reset() {
@@ -108,7 +127,7 @@ class MinesweeperManager {
             loadPuzzle()
         }
 
-        fun findOtherSafeCells(cell: MinesweeperCell, tmp: MutableList<Int>) {
+        fun findOtherSafeCells(cell: MinesweeperCell) {
             val index = cell.id
             var i = -1
             while (i <= 1) {
@@ -126,8 +145,7 @@ class MinesweeperManager {
                     val nextCell = cells[mineIndex]
                     if (nextCell.state != MinesweeperCell.State.Empty) continue
                     nextCell.state = MinesweeperCell.State.Number
-                    tmp.add(mineIndex)
-                    if (nextCell.mineCount == 0) findOtherSafeCells(nextCell, tmp)
+                    if (nextCell.mineCount == 0) findOtherSafeCells(nextCell)
                 }
                 i++
             }
@@ -182,6 +200,36 @@ class MinesweeperManager {
         fun changeInputMode(): InputMode {
             inputMode = if (inputMode == InputMode.Flag) InputMode.Normal else InputMode.Flag
             return inputMode
+        }
+
+        fun autoFlag() {
+            var autoPlacedFlag = false
+            for (c in cells) {
+                if (!c.isMine || c.state != MinesweeperCell.State.Empty) continue
+                if (!canBeAutoFlagged(c.id, mutableIntListOf(c.id))) continue
+                c.state = MinesweeperCell.State.Flag
+                autoPlacedFlag = true
+            }
+            if (autoPlacedFlag) calculateMinesLeft()
+        }
+
+        private fun canBeAutoFlagged(mineIndex: Int, safeIndexes: MutableIntList): Boolean {
+            val size = min(sizeX, sizeY)
+            for (i in 0 until 3) {
+                for (j in 0 until 3) {
+                    val index = mineIndex + i - 1 + (j - 1) * size
+                    if (index == mineIndex) continue
+                    if (index < 0 || index >= cells.size) continue
+                    if (safeIndexes.contains(index)) continue
+                    if ((index % size == 0 && i == 2) || (mineIndex % size == 0 && i == 0)) continue
+                    if (cells[index].state == MinesweeperCell.State.Number) continue
+                    if (!cells[index].isMine) return false
+                    safeIndexes.add(index)
+                    if (!canBeAutoFlagged(index, safeIndexes)) return false
+                }
+            }
+
+            return true
         }
     }
 }

@@ -15,15 +15,11 @@ import com.vanbrusselgames.mindmix.games.sudoku.SudokuLoader
 import com.vanbrusselgames.mindmix.games.sudoku.SudokuManager
 import com.vanbrusselgames.mindmix.menu.MenuData
 import com.vanbrusselgames.mindmix.menu.MenuManager
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import java.io.File
 
-@OptIn(DelicateCoroutinesApi::class)
 class DataManager(ctx: Context) {
     companion object {
         private const val FILE_NAME = "save.vbg"
@@ -107,9 +103,10 @@ class DataManager(ctx: Context) {
     init {
         file = File(ctx.filesDir, FILE_NAME)
         file.createNewFile()
-        CoroutineScope(Dispatchers.IO).launch {
+        runBlocking(Dispatchers.IO) {
             if (!loaded) load()
             autoSave()
+            true
         }
     }
 

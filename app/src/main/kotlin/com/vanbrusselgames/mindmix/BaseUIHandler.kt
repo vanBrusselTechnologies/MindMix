@@ -5,9 +5,12 @@ import com.vanbrusselgames.mindmix.games.GameMenu
 import com.vanbrusselgames.mindmix.games.GameTimer
 
 abstract class BaseUIHandler {
-    open fun openSettings() {}
-
     companion object {
+        fun openSettings() {
+            Settings.visible.value = true
+            BaseLayout.disableTopRowButtons.value = true
+        }
+
         fun backToMenu() {
             DataManager.save()
             SceneManager.loadScene(SceneManager.Scene.MENU)

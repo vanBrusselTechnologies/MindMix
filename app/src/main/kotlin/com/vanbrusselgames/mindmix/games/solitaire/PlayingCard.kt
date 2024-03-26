@@ -5,6 +5,7 @@ import androidx.compose.animation.core.animateIntOffsetAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -43,31 +44,25 @@ import kotlin.math.roundToInt
 data class PlayingCard(val type: CardType, val index: CardIndex, val drawableResId: Int) {
     val id = type.ordinal * 13 + index.ordinal
 
-    private var _frontVisible = false
-    private val mutableFrontVisible = mutableStateOf(_frontVisible)
-    var frontVisible
-        get() = _frontVisible
+    private val mutableFrontVisible = mutableStateOf(false)
+    var frontVisible = false
         set(value) {
-            _frontVisible = value
+            field = value
             mutableFrontVisible.value = value
         }
 
-    private var _currentStackId = 6
-    private val mutableCurrentStackId = mutableIntStateOf(_currentStackId)
-    var currentStackId
-        get() = _currentStackId
+    private val mutableCurrentStackId = mutableIntStateOf(6)
+    var currentStackId = 6
         set(value) {
-            _currentStackId = value
+            field = value
             mutableCurrentStackId.intValue = value
         }
     var currentStackIndex = -1
 
-    private var _offset = IntOffset.Zero
-    private val mutableOffset = mutableStateOf(_offset)
-    var offset
-        get() = _offset
+    private val mutableOffset = mutableStateOf(IntOffset.Zero)
+    var offset = IntOffset.Zero
         set(value) {
-            _offset = value
+            field = value
             mutableOffset.value = value
         }
 

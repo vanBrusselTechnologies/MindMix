@@ -26,4 +26,16 @@
     <string name="solitaire_success">Well done! You solved the solitaire!</string>
     <string name="continue_game">Continue</string>
     <string name="flexible_update_downloaded">An update has just been downloaded.</string>
+    <string name="auto_edit_notes">Auto-edit candidates</string>
+    <string name="double_number_warning">Warning for double digits</string>
+    <string name="card_type">Card type</string>
+    <string name="card_type_simple">Simple</string>
+    <string name="card_type_detailed">Detailed</string>
+    <string name="system">System</string>
+    <string name="dark_theme">Dark theme</string>
+    <string name="light_theme">Light theme</string>
+    <string name="theme">Theme</string>
+    <string name="auto_flag">Automatically place flags</string>
+    <string name="safe_area">Start with safe area</string>
+    <string name="time">Time:</string>
 </resources>

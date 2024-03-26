@@ -31,13 +31,6 @@ import com.vanbrusselgames.mindmix.Settings
 
 class MenuLayout : BaseLayout() {
 
-    override var uiHandler: BaseUIHandler
-
-    init {
-        val x = MenuUIHandler()
-        uiHandler = x
-    }
-
     @Composable
     fun Scene() {
         BaseScene(true) {

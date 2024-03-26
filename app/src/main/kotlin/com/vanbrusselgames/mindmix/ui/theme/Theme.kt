@@ -69,3 +69,9 @@ fun MindMixTheme(
         content = content
     )
 }
+
+enum class SelectedTheme {
+    System,
+    Dark,
+    Light
+}

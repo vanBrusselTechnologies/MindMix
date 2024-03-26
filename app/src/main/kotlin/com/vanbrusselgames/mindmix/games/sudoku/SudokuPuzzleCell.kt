@@ -6,37 +6,40 @@ import androidx.compose.runtime.mutableStateOf
 
 data class SudokuPuzzleCell(
     val id: Int,
-    var isClue: Boolean,
-    private var _value: Int = 0,
+    private val _isClue: Boolean,
+    private val _value: Int = 0,
     val size: Int = 9,
     val notes: Array<Boolean> = Array(size) { false }
 ) {
-    private var _isIncorrect = false
-    val mutableIsIncorrect = mutableStateOf(_isIncorrect)
-    var isIncorrect
-        get() = _isIncorrect
+
+    val mutableIsIncorrect = mutableStateOf(false)
+    var isIncorrect = false
         set(value) {
+            field = value
             mutableIsIncorrect.value = value
-            _isIncorrect = value
         }
-    private var _isSelected = false
-    val mutableIsSelected = mutableStateOf(_isSelected)
-    var isSelected
-        get() = _isSelected
+
+    val mutableIsSelected = mutableStateOf(false)
+    var isSelected = false
         set(value) {
+            field = value
             mutableIsSelected.value = value
-            _isSelected = value
         }
+
     val mutableCellValue = mutableIntStateOf(_value)
-    var value
-        get() = _value
-        set(value) = setNumber(value)
+    var value = _value
+        set(value) {
+            field = value
+            mutableCellValue.intValue = value
+        }
     val mutableCellNotes = mutableStateListOf(*notes)
 
-    fun setNumber(value: Int) {
-        _value = value
-        mutableCellValue.intValue = value
-    }
+    val mutableIsClue = mutableStateOf(_isClue)
+    var isClue = _isClue
+        set(value) {
+            field = value
+            mutableIsClue.value = _isClue
+        }
 
     fun setNote(value: Int) {
         val i = value - 1
@@ -47,8 +50,7 @@ data class SudokuPuzzleCell(
 
     fun hasNote(value: Int): Boolean = notes[value - 1]
 
-    fun reset(){
-        setNumber(0)
+    fun reset() {
         notes.fill(false)
         mutableCellNotes.fill(false)
         isClue = false

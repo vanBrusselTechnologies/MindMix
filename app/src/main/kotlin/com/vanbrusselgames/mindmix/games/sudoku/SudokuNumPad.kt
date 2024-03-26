@@ -94,7 +94,7 @@ class SudokuNumPad {
             val gridCellIndex = SudokuManager.selectedCellIndex
             if (gridCellIndex == -1) return
             if (SudokuManager.inputMode == InputMode.Normal) {
-                SudokuManager.cells[gridCellIndex].setNumber(numPadCellIndex + 1)
+                SudokuManager.cells[gridCellIndex].value = numPadCellIndex + 1
                 SudokuManager.checkFinished()
                 if (SudokuManager.finished) {
                     SudokuManager.selectedCellIndex = -1

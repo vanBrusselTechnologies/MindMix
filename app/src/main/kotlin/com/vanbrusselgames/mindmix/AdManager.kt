@@ -131,7 +131,7 @@ class AdManager(private val activity: MainActivity) {
                 override fun onAdFailedToLoad(adError: LoadAdError) {
                     rewardedAd = null
                     loading = false
-                    Logger.d("AdLoadingError: $adError")
+                    Logger.w("AdLoadingError: $adError")
                 }
 
                 override fun onAdLoaded(ad: RewardedAd) {

@@ -21,7 +21,7 @@ class Settings {
         val visible = mutableStateOf(false)
 
         @Composable
-        fun Screen(timer: GameTimer? = null, content: @Composable ()-> Unit) {
+        fun Screen(timer: GameTimer? = null, content: @Composable () -> Unit) {
             if (!visible.value) return
             Box(Modifier.fillMaxSize(), Alignment.Center) {
                 Box(Modifier.fillMaxSize(0.95f), Alignment.Center) {

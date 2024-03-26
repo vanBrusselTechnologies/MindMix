@@ -44,7 +44,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vanbrusselgames.mindmix.BaseLayout
-import com.vanbrusselgames.mindmix.BaseUIHandler
 import com.vanbrusselgames.mindmix.PixelHelper.Companion.pxToSp
 import com.vanbrusselgames.mindmix.R
 import com.vanbrusselgames.mindmix.games.GameHelp
@@ -59,7 +58,6 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 
 class MinesweeperLayout : BaseLayout() {
-    override var uiHandler: BaseUIHandler = MinesweeperUIHandler()
     private var cellSize: Dp = 0.dp
 
     @Composable
@@ -184,10 +182,9 @@ class MinesweeperLayout : BaseLayout() {
                     if (cell.isMine) return showAllMines()
                     cell.state = MinesweeperCell.State.Number
                     if (cell.mineCount == 0) {
-                        val tempCheckList = mutableListOf(-1)
-                        findOtherSafeCells(cell, tempCheckList)
-                        tempCheckList.sort()
+                        findOtherSafeCells(cell)
                     }
+                    if(MinesweeperManager.autoFlag) MinesweeperManager.autoFlag()
                     MinesweeperManager.checkFinished()
                 }
             }

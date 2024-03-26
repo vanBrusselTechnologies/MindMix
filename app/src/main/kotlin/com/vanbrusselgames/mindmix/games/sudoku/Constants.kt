@@ -13,11 +13,3 @@ enum class PuzzleType {
 }
 
 const val GAME_NAME = "Sudoku"
-
-val CluesPerDifficulty: Map<Difficulty, Int> = mapOf(
-    Difficulty.EASY to 50,
-    Difficulty.MEDIUM to 30,
-    Difficulty.HARD to 17,
-    Difficulty.EXPERT to 22,
-    //4 to 17
-)

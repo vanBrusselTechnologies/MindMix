@@ -24,4 +24,16 @@
     <string name="solitaire_success">Goed gedaan! Je hebt de solitaire opgelost!</string>
     <string name="continue_game">Doorgaan</string>
     <string name="flexible_update_downloaded">Er is zojuist een update gedownload.</string>
+    <string name="auto_edit_notes">Notities automatisch bijwerken</string>
+    <string name="double_number_warning">Waarschuwing bij dubbele getallen</string>
+    <string name="card_type">Kaart type</string>
+    <string name="card_type_simple">Simpel</string>
+    <string name="card_type_detailed">Gedetailleerd</string>
+    <string name="system">Systeem</string>
+    <string name="dark_theme">Donker thema</string>
+    <string name="light_theme">Licht thema</string>
+    <string name="theme">Thema</string>
+    <string name="auto_flag">Automatisch vlaggen plaatsen</string>
+    <string name="safe_area">Start met veilig gebied</string>
+    <string name="time">"Tijd: "</string>
 </resources>

@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -80,6 +81,16 @@ class GameMenu {
                                 )
                                 Spacer(Modifier.width(8.dp))
                                 Text(stringResource(R.string.play_again))
+                            }
+                            Spacer(Modifier.height(2.dp))
+                            Button({
+                                BaseUIHandler.openSettings()
+                                visible.value = false
+                                BaseLayout.disableTopRowButtons.value = true
+                            }, Modifier.fillMaxWidth(), shape = RoundedCornerShape(6.dp)) {
+                                Icon(Icons.Default.Settings, "Settings")
+                                Spacer(Modifier.width(8.dp))
+                                Text(stringResource(R.string.settings))
                             }
                             Spacer(Modifier.height(2.dp))
                             Button({

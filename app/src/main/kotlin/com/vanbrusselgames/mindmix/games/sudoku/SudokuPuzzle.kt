@@ -1,5 +1,6 @@
 package com.vanbrusselgames.mindmix.games.sudoku
 
+import androidx.collection.mutableIntListOf
 import kotlin.math.sqrt
 import kotlin.random.Random
 
@@ -134,14 +135,22 @@ class SudokuPuzzle private constructor(private val n: Int) {
                 clues[clueI] = puzzle.cells[clueI][0]
                 clueI++
             }
+            val testedClues = mutableIntListOf()
             while (true) {
+                if (testedClues.size == size) return clues
                 //Pick a random cell to blank
                 val clueCell: Int = Random.nextInt(clues.size)
-                if (clues[clueCell] == 0) continue
+
+                if (testedClues.contains(clueCell)) continue
+                if (clues[clueCell] == 0) {
+                    testedClues.add(clueCell)
+                    continue
+                }
                 val workingClues: IntArray = clues.copyOf()
                 workingClues[clueCell] = 0
                 if (multiSolve(SudokuPuzzle(workingClues), 2).size > 1) {
                     if (maxClues == 0) return clues
+                    testedClues.add(clueCell)
                     continue
                 }
 
@@ -195,15 +204,9 @@ class SudokuPuzzle private constructor(private val n: Int) {
 
         val peers = puzzle.peers(cellIndex)
         for (peerIndex in peers) {
-            var i = 0
-            val newPeersList = mutableListOf<Int>()
-            while (i < puzzle.cells[peerIndex].size) {
-                if (puzzle.cells[peerIndex][i] != value) newPeersList.add(puzzle.cells[peerIndex][i])
-                i++
-            }
-            val newPeers = newPeersList.toIntArray()
+            val newPeers = puzzle.cells[peerIndex].filter { it != value }
             if (newPeers.isEmpty()) return null
-            puzzle.cells[peerIndex] = newPeers
+            puzzle.cells[peerIndex] = newPeers.toIntArray()
         }
 
         return puzzle

@@ -320,7 +320,7 @@ class SolitaireManager {
                 }
             }
             couldGetFinished.value = couldGetFinished()
-            timer.start(data.millis)
+            timer.set(data.millis)
         }
 
         fun saveToFile(): String {
@@ -329,9 +329,7 @@ class SolitaireManager {
                 stacks[i] = cardStacks[i].map { c -> if (c.frontVisible) c.id else -1 * c.id - 1 }
             }
             return Json.encodeToString(
-                SolitaireData(
-                    stacks.asList(), finished, timer.currentMillis
-                )
+                SolitaireData(stacks.asList(), finished, timer.currentMillis)
             )
         }
 

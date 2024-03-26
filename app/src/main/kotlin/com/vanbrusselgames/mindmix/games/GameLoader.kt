@@ -7,20 +7,17 @@ import kotlinx.coroutines.launch
 class GameLoader {
     companion object {
         private var initialized = false
-        private lateinit var sudokuLoader: SudokuLoader
 
         suspend fun init() {
             if (!initialized) {
                 initialized = true
-                sudokuLoader = SudokuLoader()
-
                 startLoading()
             }
         }
 
         private suspend fun startLoading() {
             coroutineScope {
-                launch(coroutineContext) { sudokuLoader.startLoading() }
+                launch(coroutineContext) { SudokuLoader.startLoading() }
             }
         }
     }

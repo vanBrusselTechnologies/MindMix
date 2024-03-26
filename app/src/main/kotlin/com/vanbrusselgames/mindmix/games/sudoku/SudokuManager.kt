@@ -11,6 +11,10 @@ class SudokuManager {
     companion object Instance {
         var inputMode: InputMode = InputMode.Normal
         var loadedPuzzle: LoadedPuzzle? = null
+            set(p) {
+                field = p
+                if (p != null) onPuzzleLoaded(p)
+            }
         var cells: Array<SudokuPuzzleCell> = arrayOf()
         var selectedCellIndex: Int = -1
 
@@ -18,7 +22,26 @@ class SudokuManager {
         var autoEditNotes = false
         var finished = false
         val sudokuFinished = mutableStateOf(finished)
-        var difficulty: Difficulty = Difficulty.EASY
+        var difficulty: Difficulty = Difficulty.MEDIUM
+
+        private fun onPuzzleLoaded(p: LoadedPuzzle) {
+            if (cells.size == p.size * p.size) {
+                cells.forEach {
+                    it.isClue = p.clues[it.id] != 0
+                    it.value = p.clues[it.id]
+                }
+            } else {
+                cells = Array(p.size * p.size) {
+                    SudokuPuzzleCell(
+                        it, p.clues[it] != 0, p.clues[it], p.size
+                    )
+                }
+            }
+            if (checkConflictingCells) {
+                cells.forEach { c -> checkConflictingCell(c.id) }
+            }
+            SudokuLoader.puzzleLoaded.value = true
+        }
 
         fun saveToFile(): String {
             val clues = cells.filter { c -> c.isClue }.map { c -> c.id }
@@ -34,19 +57,6 @@ class SudokuManager {
             if (loadedPuzzle != null) return
             SudokuLoader.requestPuzzle(difficulty) { p ->
                 loadedPuzzle = p
-                if(cells.size == p.size * p.size){
-                    cells.forEach {
-                        it.isClue = p.clues[it.id] != 0
-                        it.value = p.clues[it.id]
-                    }
-                }
-                else {
-                    cells = Array(p.size * p.size) { SudokuPuzzleCell(it, p.clues[it] != 0, p.clues[it], p.size) }
-                }
-                if (checkConflictingCells) {
-                    cells.forEach { c -> checkConflictingCell(c.id) }
-                }
-                SudokuLoader.puzzleLoaded.value = true
             }
         }
 
@@ -88,10 +98,11 @@ class SudokuManager {
             if (index >= cells.size || index < 0 || cells[index].isClue) return
             val indices: IntArray = SudokuPuzzle.peers(index, cells.size)
             var isConflicting = false
+            val v = cells[index].value
             for (n: Int in indices) {
                 if (index == n) continue
                 when (true) {
-                    (cells[index].value == 0) -> {
+                    (v == 0) -> {
                         if (!isSecondary && cells[n].isIncorrect) {
                             checkConflictingCell(n, true)
                         }
@@ -101,13 +112,13 @@ class SudokuManager {
                         isConflicting = true
                     }
 
-                    (cells[index].value == cells[n].value) -> {
+                    (v == cells[n].value) -> {
                         cells[index].isIncorrect = true
                         if (!isSecondary) checkConflictingCell(n, true)
                         isConflicting = true
                     }
 
-                    (!isSecondary && cells[n].isIncorrect) -> {
+                    (!isSecondary && cells[n].isIncorrect || cells[n].value == 0 && cells[n].hasNote(v)) -> {
                         checkConflictingCell(n, true)
                     }
 

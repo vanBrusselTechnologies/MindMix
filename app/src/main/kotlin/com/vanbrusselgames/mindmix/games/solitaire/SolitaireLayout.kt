@@ -58,7 +58,6 @@ class SolitaireLayout : BaseLayout() {
         }
     }
 
-    override var uiHandler: BaseUIHandler = SolitaireUIHandler()
     private val arr = arrayOf(0, 1, 2, 3, 4, 5, 6)
 
     @Composable
@@ -220,8 +219,8 @@ class SolitaireLayout : BaseLayout() {
         }
         BaseGameFinishedPopUp(
             title, desc, reward, null, onClickPlayAgain, null
-        ){
-            Text(text = "TIME: ${timer.formatTime(true)}")
+        ) {
+            Text(text = "${stringResource(R.string.time)}${timer.formatTime(true)}")
             //"""You did great and solved puzzle in ${0} seconds!!
             //     |That's Awesome!
             //     |Share with your friends and challenge them to beat your time!""".trimMargin()

@@ -12,6 +12,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
@@ -42,7 +43,9 @@ import com.vanbrusselgames.mindmix.games.minesweeper.MinesweeperLayout
 import com.vanbrusselgames.mindmix.games.solitaire.SolitaireLayout
 import com.vanbrusselgames.mindmix.games.sudoku.SudokuLayout
 import com.vanbrusselgames.mindmix.menu.MenuLayout
+import com.vanbrusselgames.mindmix.menu.MenuManager
 import com.vanbrusselgames.mindmix.ui.theme.MindMixTheme
+import com.vanbrusselgames.mindmix.ui.theme.SelectedTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -53,7 +56,6 @@ class MainActivity : ComponentActivity() {
     companion object {
         lateinit var networkMonitor: NetworkMonitor
         lateinit var adManager: AdManager
-        lateinit var dataManager: DataManager
 
         lateinit var snackbarHostState: SnackbarHostState
         lateinit var scope: CoroutineScope
@@ -67,12 +69,29 @@ class MainActivity : ComponentActivity() {
 
         PixelHelper.setResources(resources)
         setFullScreen(actionBar, window)
+        CoroutineScope(Dispatchers.IO).launch {
+            Firebase.initialize(this@MainActivity)
+            Firebase.appCheck.installAppCheckProviderFactory(
+                PlayIntegrityAppCheckProviderFactory.getInstance()
+            )
+            AuthManager.start(this@MainActivity)
+
+            GameLoader.init()
+        }
+
+        loadPreferences(applicationContext.dataStore)
+        DataManager(this)
+
         setContentView(ComposeView(this).apply {
             setContent {
-                MindMixTheme {
+                val darkTheme = when (MenuManager.theme.value) {
+                    SelectedTheme.System -> isSystemInDarkTheme()
+                    SelectedTheme.Dark -> true
+                    SelectedTheme.Light -> false
+                }
+                MindMixTheme(darkTheme) {
                     scope = rememberCoroutineScope()
                     snackbarHostState = remember { SnackbarHostState() }
-                    LoadPreferences()
                     // A surface container using the 'background' color from the theme
                     Surface(
                         modifier = Modifier.fillMaxSize(),
@@ -135,20 +154,8 @@ class MainActivity : ComponentActivity() {
                 }
             })
 
-        CoroutineScope(Dispatchers.IO).launch {
-            Firebase.initialize(this@MainActivity)
-            Firebase.appCheck.installAppCheckProviderFactory(
-                PlayIntegrityAppCheckProviderFactory.getInstance(),
-            )
-            AuthManager.start(this@MainActivity)
-
-            dataManager = DataManager(this@MainActivity)
-            GameLoader.init()
-        }
-
         CoroutineScope(Dispatchers.Main).launch {
             adManager = AdManager(this@MainActivity)
-
             ReviewManager.start(this@MainActivity)
         }
     }

@@ -59,8 +59,6 @@ abstract class BaseLayout {
     protected var screenHeight = 0.dp
     protected var screenWidth = 0.dp
 
-    abstract var uiHandler: BaseUIHandler
-
     @Composable
     open fun BaseScene(isMenu: Boolean = false, sceneSpecific: @Composable () -> Unit?) {
         val localCurrentConfig = LocalConfiguration.current
@@ -88,7 +86,6 @@ abstract class BaseLayout {
         ) {
             if (!disableTopRowButtons.value) {
                 if (!isMenu) {
-                    //todo Add App settings
                     IconButton(
                         onClick = { BaseUIHandler.openGameMenu() },
                         modifier = Modifier
@@ -113,7 +110,7 @@ abstract class BaseLayout {
                         ) {
                             Icon(
                                 painterResource(R.drawable.outline_help_24),
-                                "Settings",
+                                "Help",
                                 Modifier.fillMaxSize(0.9f),
                             )
                         }
@@ -134,7 +131,7 @@ abstract class BaseLayout {
                     }
                 }*/
                     IconButton(
-                        onClick = { uiHandler.openSettings() },
+                        onClick = { BaseUIHandler.openSettings() },
                         modifier = Modifier
                             .size(topRowButtonSize)
                             .padding(padding)

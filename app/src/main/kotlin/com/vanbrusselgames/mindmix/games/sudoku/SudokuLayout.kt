@@ -38,7 +38,6 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import com.vanbrusselgames.mindmix.BaseLayout
-import com.vanbrusselgames.mindmix.BaseUIHandler
 import com.vanbrusselgames.mindmix.PixelHelper.Companion.pxToSp
 import com.vanbrusselgames.mindmix.R
 import com.vanbrusselgames.mindmix.games.GameHelp
@@ -48,7 +47,6 @@ import com.vanbrusselgames.mindmix.games.sudoku.SudokuManager.Instance.sudokuFin
 import kotlin.math.floor
 
 class SudokuLayout : BaseLayout() {
-    override var uiHandler: BaseUIHandler = SudokuUIHandler()
 
     @Composable
     fun Scene() {
@@ -146,7 +144,7 @@ class SudokuLayout : BaseLayout() {
                 .fillMaxSize()
                 .padding(padding)
                 .aspectRatio(1f)
-                .clickable(enabled = (!cell.isClue && !sudokuFinished.value && !disableTopRowButtons.value)) {
+                .clickable(enabled = (!cell.mutableIsClue.value && !sudokuFinished.value && !disableTopRowButtons.value)) {
                     cell.isSelected = true
 
                     val currSelectedCellId = SudokuManager.selectedCellIndex
@@ -174,7 +172,7 @@ class SudokuLayout : BaseLayout() {
     fun SudokuCellValueText(cell: SudokuPuzzleCell, space: TextUnit) {
         val isNoteInput = !cell.isClue && cell.mutableCellValue.intValue == 0
         if (!isNoteInput) {
-            SudokuRegularCellText(cell = cell, space = space, isClue = cell.isClue)
+            SudokuRegularCellText(cell = cell, space = space, isClue = cell.mutableIsClue.value)
         } else {
             SudokuNoteCellText(cell = cell, space = space)
         }

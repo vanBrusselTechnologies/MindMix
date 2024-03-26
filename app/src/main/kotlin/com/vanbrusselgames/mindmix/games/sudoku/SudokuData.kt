@@ -10,5 +10,3 @@ data class SudokuData(
     val finished: Boolean,
     val difficulty: Difficulty = SudokuManager.difficulty
 )
-//var CheckConflictingCells = true      Preference -> DataStore
-//var AutoEditNotes = true              Preference -> DataStore

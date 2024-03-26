@@ -1,11 +1,14 @@
 package com.vanbrusselgames.mindmix.menu
 
+import androidx.compose.runtime.mutableStateOf
 import com.vanbrusselgames.mindmix.SceneManager
+import com.vanbrusselgames.mindmix.ui.theme.SelectedTheme
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class MenuManager {
     companion object Instance {
+        val theme = mutableStateOf(SelectedTheme.System)
         val games = SceneManager.scenes.filter { e -> e.value != SceneManager.Scene.MENU }
         const val GAME_COUNT = 3
         const val ADD_DUPLICATES = true
