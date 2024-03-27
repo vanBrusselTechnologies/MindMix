@@ -38,7 +38,7 @@ data class SudokuPuzzleCell(
     var isClue = _isClue
         set(value) {
             field = value
-            mutableIsClue.value = _isClue
+            mutableIsClue.value = value
         }
 
     fun setNote(value: Int) {

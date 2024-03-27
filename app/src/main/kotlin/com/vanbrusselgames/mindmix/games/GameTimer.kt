@@ -10,6 +10,7 @@ import com.vanbrusselgames.mindmix.BaseLayout
 import com.vanbrusselgames.mindmix.SceneManager
 import kotlinx.coroutines.delay
 import kotlin.math.floor
+import kotlin.math.max
 
 class GameTimer {
     companion object {
@@ -34,9 +35,9 @@ class GameTimer {
     private var currentTime = mutableLongStateOf(0)
 
     fun start() {
-        running.value = true
         startMillis = System.currentTimeMillis()
         currentMillis = 0L
+        running.value = true
     }
 
     fun set(millis: Long) {
@@ -82,13 +83,13 @@ class GameTimer {
 
         currentTime = remember { mutableLongStateOf(currentMillis) }
 
-        val seconds = currentTime.longValue / 1000
+        val seconds = max(currentTime.longValue / 1000f, 0f)
         Text(
             text = String.format(
                 "%02d:%02d:%02d",
                 floor(seconds / 3600f).toInt(),
                 (floor(seconds / 60f) % 60).toInt(),
-                seconds % 60
+                (seconds % 60).toInt()
             )
         )
         if (running.value) {
