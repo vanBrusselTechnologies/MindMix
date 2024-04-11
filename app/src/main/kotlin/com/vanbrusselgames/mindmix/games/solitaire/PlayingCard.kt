@@ -131,7 +131,6 @@ data class PlayingCard(val type: CardType, val index: CardIndex, val drawableRes
                 }
             }
             .pointerInput(Unit) {
-                //todo: .clickable{} to .pointerInput{detectTapGestures {  }}
                 detectDragGestures(onDragStart = {
                     if (SolitaireManager.finished || !frontVisible || BaseLayout.activeOverlapUI.value) return@detectDragGestures
                     SolitaireManager.startMoveCard(this@PlayingCard)
@@ -144,8 +143,10 @@ data class PlayingCard(val type: CardType, val index: CardIndex, val drawableRes
                     SolitaireManager.moveCards(offset)
                 })
             }
-        if (SolitaireManager.cardVisualType.value == CardVisualType.DETAILED) DetailedCard(mod)
-        else SimpleCard(mod)
+        when (SolitaireManager.cardVisualType.value) {
+            CardVisualType.DETAILED -> DetailedCard(mod)
+            CardVisualType.SIMPLE -> SimpleCard(mod)
+        }
     }
 
     @Composable

@@ -7,7 +7,6 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.vanbrusselgames.mindmix.BaseLayout
-import com.vanbrusselgames.mindmix.Logger
 import com.vanbrusselgames.mindmix.SceneManager
 import kotlinx.coroutines.delay
 import kotlin.math.floor

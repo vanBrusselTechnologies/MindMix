@@ -37,7 +37,6 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import com.vanbrusselgames.mindmix.BaseLayout
-import com.vanbrusselgames.mindmix.Logger
 import com.vanbrusselgames.mindmix.PixelHelper.Companion.pxToSp
 import com.vanbrusselgames.mindmix.R
 import com.vanbrusselgames.mindmix.games.GameFinished
@@ -120,7 +119,6 @@ class SudokuLayout : BaseLayout() {
                 userScrollEnabled = false,
                 modifier = Modifier.fillMaxSize(0.99f)
             ) {
-                Logger.d(" 3::: " + SudokuManager.cells.map{it.value}.joinToString(""))
                 itemsIndexed(SudokuManager.cells) { _, cell ->
                     SudokuCell(cell)
                 }
