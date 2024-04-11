@@ -8,7 +8,7 @@ abstract class BaseUIHandler {
     companion object {
         fun openSettings() {
             Settings.visible.value = true
-            BaseLayout.disableTopRowButtons.value = true
+            BaseLayout.activeOverlapUI.value = true
         }
 
         fun backToMenu() {
@@ -19,13 +19,13 @@ abstract class BaseUIHandler {
         fun openGameMenu(){
             GameTimer.pauseAll()
             GameMenu.visible.value = true
-            BaseLayout.disableTopRowButtons.value = true
+            BaseLayout.activeOverlapUI.value = true
         }
 
         fun openHelp() {
             GameTimer.pauseAll()
             GameHelp.visible.value = true
-            BaseLayout.disableTopRowButtons.value = true
+            BaseLayout.activeOverlapUI.value = true
         }
     }
 }

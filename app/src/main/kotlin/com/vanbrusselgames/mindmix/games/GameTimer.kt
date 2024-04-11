@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.vanbrusselgames.mindmix.BaseLayout
+import com.vanbrusselgames.mindmix.Logger
 import com.vanbrusselgames.mindmix.SceneManager
 import kotlinx.coroutines.delay
 import kotlin.math.floor
@@ -77,7 +78,7 @@ class GameTimer {
 
     @Composable
     fun Timer() {
-        if (!BaseLayout.disableTopRowButtons.value && SceneManager.currentScene != SceneManager.Scene.MENU) {
+        if (!BaseLayout.activeOverlapUI.value && SceneManager.currentScene != SceneManager.Scene.MENU) {
             resume()
         }
 

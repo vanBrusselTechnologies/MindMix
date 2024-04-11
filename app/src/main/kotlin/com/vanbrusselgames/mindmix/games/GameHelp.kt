@@ -47,7 +47,7 @@ class GameHelp {
                                 onClick = {
                                     timer?.resume()
                                     visible.value = false
-                                    BaseLayout.disableTopRowButtons.value = false
+                                    BaseLayout.activeOverlapUI.value = false
                                 }, Modifier.align(Alignment.TopEnd)
                             ) {
                                 Icon(Icons.Default.Close, contentDescription = "Close")

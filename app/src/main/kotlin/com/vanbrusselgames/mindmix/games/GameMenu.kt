@@ -63,7 +63,7 @@ class GameMenu {
                             Button({
                                 timer?.resume()
                                 visible.value = false
-                                BaseLayout.disableTopRowButtons.value = false
+                                BaseLayout.activeOverlapUI.value = false
                             }, Modifier.fillMaxWidth(), shape = RoundedCornerShape(6.dp)) {
                                 Icon(Icons.Default.PlayArrow, contentDescription = "Continue")
                                 Spacer(Modifier.width(8.dp))
@@ -73,7 +73,7 @@ class GameMenu {
                             Button({
                                 startNewGame()
                                 visible.value = false
-                                BaseLayout.disableTopRowButtons.value = false
+                                BaseLayout.activeOverlapUI.value = false
                             }, Modifier.fillMaxWidth(), shape = RoundedCornerShape(6.dp)) {
                                 Icon(
                                     painter = painterResource(R.drawable.outline_autorenew_24),
@@ -86,7 +86,7 @@ class GameMenu {
                             Button({
                                 BaseUIHandler.openSettings()
                                 visible.value = false
-                                BaseLayout.disableTopRowButtons.value = true
+                                BaseLayout.activeOverlapUI.value = true
                             }, Modifier.fillMaxWidth(), shape = RoundedCornerShape(6.dp)) {
                                 Icon(Icons.Default.Settings, "Settings")
                                 Spacer(Modifier.width(8.dp))
@@ -96,7 +96,7 @@ class GameMenu {
                             Button({
                                 BaseUIHandler.backToMenu()
                                 visible.value = false
-                                BaseLayout.disableTopRowButtons.value = false
+                                BaseLayout.activeOverlapUI.value = false
                             }, Modifier.fillMaxWidth(), shape = RoundedCornerShape(6.dp)) {
                                 Icon(Icons.Default.Home, contentDescription = "Back to menu")
                                 Spacer(Modifier.width(8.dp))

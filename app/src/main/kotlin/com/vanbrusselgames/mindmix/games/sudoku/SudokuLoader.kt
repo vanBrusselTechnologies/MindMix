@@ -52,12 +52,11 @@ class SudokuLoader {
                 }
                 cellList.add(SudokuPuzzleCell(i, isClue, data.input[i], size, notes))
             }
-            SudokuManager.cells = cellList.toTypedArray()
-
-            val clues = SudokuManager.cells.map { c -> if (c.isClue) c.value else 0 }.toIntArray()
+            val clues = cellList.map { c -> if (c.isClue) c.value else 0 }.toIntArray()
             try {
                 val p = LoadedPuzzle(size, data.difficulty, clues)
                 SudokuManager.loadedPuzzle = p
+                SudokuManager.cells = cellList.toTypedArray()
                 loadedPuzzles.add(0, p)
                 if (SudokuManager.checkConflictingCells) {
                     SudokuManager.cells.forEach { c -> SudokuManager.checkConflictingCell(c.id) }
@@ -84,8 +83,7 @@ class SudokuLoader {
                         try {
                             val size = 9
                             val clues = SudokuPuzzle.createClues(
-                                input = createPuzzle(size = size),
-                                maxClues = 17
+                                input = createPuzzle(size = size), maxClues = 17
                             )
                             val p = LoadedPuzzle(size, Difficulty.MEDIUM, clues)
                             loadedPuzzles.add(p)

@@ -5,7 +5,6 @@ import androidx.compose.animation.core.animateIntOffsetAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -39,6 +38,7 @@ import androidx.compose.ui.zIndex
 import com.vanbrusselgames.mindmix.BaseLayout
 import com.vanbrusselgames.mindmix.PixelHelper
 import com.vanbrusselgames.mindmix.R
+import com.vanbrusselgames.mindmix.games.GameFinished
 import kotlin.math.roundToInt
 
 data class PlayingCard(val type: CardType, val index: CardIndex, val drawableResId: Int) {
@@ -121,7 +121,7 @@ data class PlayingCard(val type: CardType, val index: CardIndex, val drawableRes
             .zIndex(zIndex)
             .offset { offset }
             .clickable(onClickLabel = "${type.name.replaceFirstChar { it.titlecase() }} $indexString") {
-                if (SolitaireManager.solitaireFinished.value || BaseLayout.disableTopRowButtons.value) return@clickable
+                if (GameFinished.visible.value || BaseLayout.activeOverlapUI.value) return@clickable
                 if (currentStackId == 6) {
                     SolitaireManager.turnFromRestStack(this)
                 } else {
@@ -133,7 +133,7 @@ data class PlayingCard(val type: CardType, val index: CardIndex, val drawableRes
             .pointerInput(Unit) {
                 //todo: .clickable{} to .pointerInput{detectTapGestures {  }}
                 detectDragGestures(onDragStart = {
-                    if (SolitaireManager.finished || !frontVisible || BaseLayout.disableTopRowButtons.value) return@detectDragGestures
+                    if (SolitaireManager.finished || !frontVisible || BaseLayout.activeOverlapUI.value) return@detectDragGestures
                     SolitaireManager.startMoveCard(this@PlayingCard)
                 }, onDragCancel = {
                     SolitaireManager.onReleaseMovingCards()

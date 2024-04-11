@@ -46,11 +46,11 @@ import androidx.compose.ui.unit.sp
 import com.vanbrusselgames.mindmix.BaseLayout
 import com.vanbrusselgames.mindmix.PixelHelper.Companion.pxToSp
 import com.vanbrusselgames.mindmix.R
+import com.vanbrusselgames.mindmix.games.GameFinished
 import com.vanbrusselgames.mindmix.games.GameHelp
 import com.vanbrusselgames.mindmix.games.GameMenu
 import com.vanbrusselgames.mindmix.games.minesweeper.MinesweeperManager.Instance.InputMode
 import com.vanbrusselgames.mindmix.games.minesweeper.MinesweeperManager.Instance.findOtherSafeCells
-import com.vanbrusselgames.mindmix.games.minesweeper.MinesweeperManager.Instance.minesweeperFinished
 import com.vanbrusselgames.mindmix.games.minesweeper.MinesweeperManager.Instance.showAllMines
 import kotlin.math.floor
 import kotlin.math.max
@@ -63,11 +63,11 @@ class MinesweeperLayout : BaseLayout() {
     @Composable
     fun Scene() {
         BaseScene {
-            MinesweeperSpecificLayout(disableTopRowButtons.value)
+            MinesweeperSpecificLayout(activeOverlapUI.value)
             GameHelp.Screen(R.string.minesweeper_name, R.string.minesweeper_desc)
             GameMenu.Screen(R.string.minesweeper_name) { MinesweeperManager.startNewGame() }
+            GameFinished.Screen(onClickPlayAgain = { MinesweeperManager.startNewGame() })
             MinesweeperSettings()
-            if (minesweeperFinished.value) GameFinishedPopUp(MinesweeperManager.cells.any { c -> c.state == MinesweeperCell.State.Bomb })
         }
     }
 
@@ -135,7 +135,7 @@ class MinesweeperLayout : BaseLayout() {
                 .pointerInput(Unit) {
                     detectTapGestures { offset ->
                         if (MinesweeperManager.finished) return@detectTapGestures
-                        if (disableTopRowButtons.value) return@detectTapGestures
+                        if (activeOverlapUI.value) return@detectTapGestures
                         val column = floor(offset.x / cellSize.toPx())
                         val row = floor(offset.y / cellSize.toPx())
                         val cellIndex = if (MinesweeperManager.sizeX < MinesweeperManager.sizeY) {
@@ -184,7 +184,7 @@ class MinesweeperLayout : BaseLayout() {
                     if (cell.mineCount == 0) {
                         findOtherSafeCells(cell)
                     }
-                    if(MinesweeperManager.autoFlag) MinesweeperManager.autoFlag()
+                    if (MinesweeperManager.autoFlag) MinesweeperManager.autoFlag()
                     MinesweeperManager.checkFinished()
                 }
             }
@@ -286,7 +286,7 @@ class MinesweeperLayout : BaseLayout() {
                     Modifier
                         .weight(2f)
                         .aspectRatio(1f),
-                    enabled = !disableTopRowButtons.value,
+                    enabled = !activeOverlapUI.value,
                     RoundedCornerShape(10.dp),
                     colors
                 ) {
@@ -318,7 +318,7 @@ class MinesweeperLayout : BaseLayout() {
                     Modifier
                         .weight(2f)
                         .aspectRatio(1f),
-                    enabled = !minesweeperFinished.value,
+                    enabled = !GameFinished.visible.value,
                     RoundedCornerShape(10.dp),
                     colors
                 ) {
@@ -339,26 +339,4 @@ class MinesweeperLayout : BaseLayout() {
         inputMode.value = MinesweeperManager.changeInputMode()
     }
     //#endregion
-
-    @Composable
-    fun GameFinishedPopUp(failed: Boolean) {
-        val title = stringResource(R.string.minesweeper_name)
-        //if (failed) "Failed" else "Congrats / Smart / Well done"
-        val desc =
-            if (failed) stringResource(R.string.minesweeper_failed) else stringResource(R.string.minesweeper_success)
-        //if (failed) "A mine exploded" else """You did great and solved puzzle in ${0} seconds!!
-        //     |That's Awesome!
-        //     |Share with your friends and challenge them to beat your time!""".trimMargin()
-        val reward = if (failed) 0 else 10
-        //val onClickShare = if (failed) null else ({})
-        val onClickPlayAgain = {
-            MinesweeperManager.startNewGame()
-        }
-        val onClickReturnToMenu = {
-            MinesweeperManager.startNewGame()
-        }
-        BaseGameFinishedPopUp(
-            title, desc, reward, null, onClickPlayAgain, onClickReturnToMenu
-        )
-    }
 }

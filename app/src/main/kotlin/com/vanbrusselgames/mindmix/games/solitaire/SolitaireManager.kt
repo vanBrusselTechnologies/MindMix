@@ -8,10 +8,12 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.vanbrusselgames.mindmix.BaseLayout
 import com.vanbrusselgames.mindmix.Logger
 import com.vanbrusselgames.mindmix.R
+import com.vanbrusselgames.mindmix.games.GameFinished
 import com.vanbrusselgames.mindmix.games.GameTimer
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.math.floor
+import kotlin.math.max
 import kotlin.math.roundToInt
 
 class SolitaireManager {
@@ -285,7 +287,6 @@ class SolitaireManager {
         private val cardStacks: Array<MutableList<PlayingCard>> = Array(14) { mutableListOf() }
 
         var finished = false
-        val solitaireFinished = mutableStateOf(finished)
 
         var couldGetFinished = mutableStateOf(false)
 
@@ -396,8 +397,7 @@ class SolitaireManager {
 
         private fun reset() {
             finished = false
-            solitaireFinished.value = finished
-            BaseLayout.disableTopRowButtons.value = false
+            BaseLayout.activeOverlapUI.value = false
             cardStacks.forEach { s -> s.clear() }
             cards.forEach {
                 it.frontVisible = false
@@ -556,16 +556,15 @@ class SolitaireManager {
 
         fun checkFinished() {
             finished = isFinished()
-            solitaireFinished.value = finished
             if (!finished) {
                 couldGetFinished.value = couldGetFinished()
             } else {
                 timer.stop()
-                BaseLayout.disableTopRowButtons.value = finished
                 Logger.logEvent(FirebaseAnalytics.Event.LEVEL_END) {
                     param(FirebaseAnalytics.Param.LEVEL_NAME, GAME_NAME)
                     param(FirebaseAnalytics.Param.SUCCESS, 1)
                 }
+                onGameFinished()
             }
         }
 
@@ -578,6 +577,14 @@ class SolitaireManager {
 
         private fun couldGetFinished(): Boolean {
             return !cards.any { !it.frontVisible && it.currentStackId >= 7 }
+        }
+
+        private fun onGameFinished() {
+            val titleId = R.string.solitaire_name//"Congrats / Smart / Well done"
+            val descId = R.string.solitaire_success
+            val minutes = max(1f, timer.currentMillis / 1000f / 60f)
+            val reward = max(1, floor(MAX_REWARD / minutes).toInt())
+            GameFinished.onGameFinished(titleId, descId, reward)
         }
     }
 }

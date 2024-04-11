@@ -35,6 +35,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.appcheck.appCheck
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
 import com.google.firebase.initialize
+import com.vanbrusselgames.mindmix.games.GameFinished
 import com.vanbrusselgames.mindmix.games.GameHelp
 import com.vanbrusselgames.mindmix.games.GameLoader
 import com.vanbrusselgames.mindmix.games.GameMenu
@@ -136,7 +137,7 @@ class MainActivity : ComponentActivity() {
                     }
                     BackHandler {
                         if (SceneManager.currentScene != SceneManager.Scene.MENU) {
-                            if (BaseLayout.disableTopRowButtons.value) {
+                            if (BaseLayout.activeOverlapUI.value) {
                                 disableUI()
                             } else {
                                 onLoseFocus()
@@ -175,9 +176,9 @@ class MainActivity : ComponentActivity() {
     private fun onLoseFocus() {
         GameTimer.pauseAll()
         DataManager.save()
-        if (!BaseLayout.disableTopRowButtons.value && SceneManager.currentScene != SceneManager.Scene.MENU) {
+        if (!BaseLayout.activeOverlapUI.value && SceneManager.currentScene != SceneManager.Scene.MENU) {
             GameMenu.visible.value = true
-            BaseLayout.disableTopRowButtons.value = true
+            BaseLayout.activeOverlapUI.value = true
         }
     }
 
@@ -202,10 +203,10 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun disableUI() {
+        if (GameFinished.visible.value) return
         if (Settings.visible.value || GameMenu.visible.value || GameHelp.visible.value) {
-            BaseLayout.disableTopRowButtons.value = false
-        } // else: GameFinished visible, so don't enable top row buttons
-        // todo: Rewrite to if(GameFinished.visible.value){}
+            BaseLayout.activeOverlapUI.value = false
+        }
         Settings.visible.value = false
         GameMenu.visible.value = false
         GameHelp.visible.value = false

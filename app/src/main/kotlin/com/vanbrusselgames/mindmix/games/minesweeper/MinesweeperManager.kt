@@ -3,11 +3,12 @@ package com.vanbrusselgames.mindmix.games.minesweeper
 import androidx.collection.MutableIntList
 import androidx.collection.mutableIntListOf
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.vanbrusselgames.mindmix.BaseLayout
 import com.vanbrusselgames.mindmix.Logger
+import com.vanbrusselgames.mindmix.R
+import com.vanbrusselgames.mindmix.games.GameFinished
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.math.min
@@ -22,7 +23,6 @@ class MinesweeperManager {
         var sizeY = 22
 
         var finished = false
-        val minesweeperFinished = mutableStateOf(false)
 
         var safeStart = false
         var autoFlag = false
@@ -111,8 +111,7 @@ class MinesweeperManager {
 
         private fun reset() {
             finished = false
-            minesweeperFinished.value = finished
-            BaseLayout.disableTopRowButtons.value = false
+            BaseLayout.activeOverlapUI.value = false
             mines.fill(false)
             cells.forEach { c ->
                 c.isMine = false
@@ -164,8 +163,7 @@ class MinesweeperManager {
                 if (!cells[i].isMine || cells[i].state != MinesweeperCell.State.Empty) continue
                 cells[i].state = MinesweeperCell.State.Bomb
             }
-            minesweeperFinished.value = finished
-            BaseLayout.disableTopRowButtons.value = true
+            onGameFinished(false)
         }
 
         fun calculateMinesLeft() {
@@ -180,12 +178,11 @@ class MinesweeperManager {
         fun checkFinished() {
             finished = isFinished()
             if (finished) {
-                minesweeperFinished.value = finished
-                BaseLayout.disableTopRowButtons.value = finished
                 Logger.logEvent(FirebaseAnalytics.Event.LEVEL_END) {
                     param(FirebaseAnalytics.Param.LEVEL_NAME, GAME_NAME)
                     param(FirebaseAnalytics.Param.SUCCESS, 1)
                 }
+                onGameFinished(true)
             }
         }
 
@@ -230,6 +227,17 @@ class MinesweeperManager {
             }
 
             return true
+        }
+
+        private fun onGameFinished(success: Boolean) {
+            val titleId = R.string.minesweeper_name
+            //if (failed) "Failed" else "Congrats / Smart / Well done"
+            val descId = if (!success) R.string.minesweeper_failed else R.string.minesweeper_success
+            //if (failed) "A mine exploded" else """You did great and solved puzzle in ${0} seconds!!
+            //     |That's Awesome!
+            //     |Share with your friends and challenge them to beat your time!""".trimMargin()
+            val reward = if (!success) 0 else 10
+            GameFinished.onGameFinished(titleId, descId, reward)
         }
     }
 }

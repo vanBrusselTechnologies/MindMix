@@ -1,9 +1,10 @@
 package com.vanbrusselgames.mindmix.games.sudoku
 
-import androidx.compose.runtime.mutableStateOf
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.vanbrusselgames.mindmix.BaseLayout
 import com.vanbrusselgames.mindmix.Logger
+import com.vanbrusselgames.mindmix.R
+import com.vanbrusselgames.mindmix.games.GameFinished
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -21,7 +22,6 @@ class SudokuManager {
         var checkConflictingCells = false
         var autoEditNotes = false
         var finished = false
-        val sudokuFinished = mutableStateOf(finished)
         var difficulty: Difficulty = Difficulty.MEDIUM
 
         private fun onPuzzleLoaded(p: LoadedPuzzle) {
@@ -32,9 +32,7 @@ class SudokuManager {
                 }
             } else {
                 cells = Array(p.size * p.size) {
-                    SudokuPuzzleCell(
-                        it, p.clues[it] != 0, p.clues[it], p.size
-                    )
+                    SudokuPuzzleCell(it, p.clues[it] != 0, p.clues[it], p.size)
                 }
             }
             if (checkConflictingCells) {
@@ -62,8 +60,7 @@ class SudokuManager {
 
         private fun reset() {
             finished = false
-            sudokuFinished.value = finished
-            BaseLayout.disableTopRowButtons.value = false
+            BaseLayout.activeOverlapUI.value = false
             SudokuLoader.removePuzzle(loadedPuzzle)
             cells.forEach {
                 it.reset()
@@ -130,13 +127,12 @@ class SudokuManager {
 
         fun checkFinished() {
             finished = isFinished()
-            sudokuFinished.value = finished
             if (finished) {
-                BaseLayout.disableTopRowButtons.value = finished
                 Logger.logEvent(FirebaseAnalytics.Event.LEVEL_END) {
                     param(FirebaseAnalytics.Param.LEVEL_NAME, GAME_NAME)
                     param(FirebaseAnalytics.Param.SUCCESS, 1)
                 }
+                onGameFinished()
             }
         }
 
@@ -148,6 +144,16 @@ class SudokuManager {
             } catch (_: Exception) {
                 return false
             }
+        }
+
+        private fun onGameFinished() {
+            val titleId = R.string.sudoku_name//"Congrats / Smart / Well done"
+            val descId = R.string.sudoku_success
+            //"""You did great and solved puzzle in ${0} seconds!!
+            //     |That's Awesome!
+            //     |Share with your friends and challenge them to beat your time!""".trimMargin()
+            val reward = 10
+            GameFinished.onGameFinished(titleId, descId, reward)
         }
     }
 }

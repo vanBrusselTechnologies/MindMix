@@ -16,16 +16,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import com.vanbrusselgames.mindmix.AutoSizeText
 import com.vanbrusselgames.mindmix.BaseLayout
-import com.vanbrusselgames.mindmix.BaseUIHandler
 import com.vanbrusselgames.mindmix.R
 import com.vanbrusselgames.mindmix.Settings
 
@@ -47,13 +48,16 @@ class MenuLayout : BaseLayout() {
                 .blur(if (Settings.visible.value) 6.dp else 0.dp),
             Alignment.BottomCenter
         ) {
+            val localCurrentConfig = LocalConfiguration.current
+            val screenHeight = localCurrentConfig.screenHeightDp.dp
+            val screenWidth = localCurrentConfig.screenWidthDp.dp
             GameWheel(MenuManager.GAME_COUNT, screenWidth, screenHeight)
-            PlayButton(Modifier.align(Alignment.BottomCenter))
+            PlayButton(Modifier.align(Alignment.BottomCenter), screenWidth, screenHeight)
         }
     }
 
     @Composable
-    fun PlayButton(modifier: Modifier) {
+    fun PlayButton(modifier: Modifier, screenWidth: Dp, screenHeight: Dp) {
         val playGameButtonSize = minOf(screenHeight / 400f, screenWidth / 250f)
         val iconSize = minOf(62.75f * playGameButtonSize * 0.4f, 25f * playGameButtonSize)
         Button(

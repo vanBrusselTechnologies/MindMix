@@ -27,7 +27,6 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -38,12 +37,13 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import com.vanbrusselgames.mindmix.BaseLayout
+import com.vanbrusselgames.mindmix.Logger
 import com.vanbrusselgames.mindmix.PixelHelper.Companion.pxToSp
 import com.vanbrusselgames.mindmix.R
+import com.vanbrusselgames.mindmix.games.GameFinished
 import com.vanbrusselgames.mindmix.games.GameHelp
 import com.vanbrusselgames.mindmix.games.GameLoadingScreen
 import com.vanbrusselgames.mindmix.games.GameMenu
-import com.vanbrusselgames.mindmix.games.sudoku.SudokuManager.Instance.sudokuFinished
 import kotlin.math.floor
 
 class SudokuLayout : BaseLayout() {
@@ -54,11 +54,11 @@ class SudokuLayout : BaseLayout() {
             if (!SudokuLoader.puzzleLoaded.value) {
                 return@BaseScene GameLoadingScreen()
             }
-            SudokuSpecificLayout(disableTopRowButtons.value)
+            SudokuSpecificLayout(activeOverlapUI.value)
             GameHelp.Screen(R.string.sudoku_name, R.string.sudoku_desc)
             GameMenu.Screen(R.string.sudoku_name) { SudokuManager.startNewGame() }
+            GameFinished.Screen(onClickPlayAgain = { SudokuManager.startNewGame() })
             SudokuSettings()
-            if (sudokuFinished.value) GameFinishedPopUp()
         }
     }
 
@@ -120,6 +120,7 @@ class SudokuLayout : BaseLayout() {
                 userScrollEnabled = false,
                 modifier = Modifier.fillMaxSize(0.99f)
             ) {
+                Logger.d(" 3::: " + SudokuManager.cells.map{it.value}.joinToString(""))
                 itemsIndexed(SudokuManager.cells) { _, cell ->
                     SudokuCell(cell)
                 }
@@ -144,7 +145,7 @@ class SudokuLayout : BaseLayout() {
                 .fillMaxSize()
                 .padding(padding)
                 .aspectRatio(1f)
-                .clickable(enabled = (!cell.mutableIsClue.value && !sudokuFinished.value && !disableTopRowButtons.value)) {
+                .clickable(enabled = (!cell.mutableIsClue.value && !GameFinished.visible.value && !activeOverlapUI.value)) {
                     cell.isSelected = true
 
                     val currSelectedCellId = SudokuManager.selectedCellIndex
@@ -244,21 +245,4 @@ class SudokuLayout : BaseLayout() {
         )
     }
     //#endregion
-
-    @Composable
-    fun GameFinishedPopUp() {
-        val title = stringResource(R.string.sudoku_name)//"Congrats / Smart / Well done"
-        val desc = stringResource(R.string.sudoku_success)
-        //"""You did great and solved puzzle in ${0} seconds!!
-        //     |That's Awesome!
-        //     |Share with your friends and challenge them to beat your time!""".trimMargin()
-        val reward = 10
-        //val onClickShare = {}
-        val onClickPlayAgain = {
-            SudokuManager.startNewGame()
-        }
-        BaseGameFinishedPopUp(
-            title, desc, reward, null, onClickPlayAgain, null
-        )
-    }
 }
