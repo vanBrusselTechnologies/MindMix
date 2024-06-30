@@ -36,4 +36,10 @@
     <string name="auto_flag">Automatisch vlaggen plaatsen</string>
     <string name="safe_area">Start met veilig gebied</string>
     <string name="time">"Tijd: "</string>
+    <string name="difficulty_easy">Gemakkelijk</string>
+    <string name="difficulty_medium">Gemiddeld</string>
+    <string name="difficulty_hard">Moeilijk</string>
+    <string name="difficulty_expert">Expert</string>
+    <string name="difficulty_master">Meester</string>
+    <string name="difficulty_label">Moelijkheidsgraad</string>
 </resources>

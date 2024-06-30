@@ -39,11 +39,11 @@ fun loadPreferences(dataStore: DataStore<Preferences>) {
     runBlocking {
         dataStore.data.map { pref ->
             if (pref[PREF_KEY_SUDOKU__CHECK_CONFLICTING_CELLS] != null) {
-                SudokuManager.checkConflictingCells =
+                SudokuManager.checkConflictingCells.value =
                     pref[PREF_KEY_SUDOKU__CHECK_CONFLICTING_CELLS]!!
             }
             if (pref[PREF_KEY_SUDOKU__AUTO_EDIT_NOTES] != null) {
-                SudokuManager.autoEditNotes = pref[PREF_KEY_SUDOKU__AUTO_EDIT_NOTES]!!
+                SudokuManager.autoEditNotes.value = pref[PREF_KEY_SUDOKU__AUTO_EDIT_NOTES]!!
             }
             if (pref[PREF_KEY_SOLITAIRE__CARD_TYPE] != null) {
                 SolitaireManager.cardVisualType.value = PlayingCard.CardVisualType.entries.first {

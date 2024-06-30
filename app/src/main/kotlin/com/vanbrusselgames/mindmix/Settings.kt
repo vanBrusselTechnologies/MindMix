@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
@@ -13,7 +12,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.unit.dp
 import com.vanbrusselgames.mindmix.games.GameTimer
 
 class Settings {
@@ -25,10 +23,7 @@ class Settings {
             if (!visible.value) return
             Box(Modifier.fillMaxSize(), Alignment.Center) {
                 Box(Modifier.fillMaxSize(0.95f), Alignment.Center) {
-                    Card(
-                        Modifier.alpha(0.9f),
-                        elevation = CardDefaults.cardElevation(20.dp),
-                    ) {
+                    Card(Modifier.alpha(0.9f)) {
                         Box(
                             Modifier.align(Alignment.CenterHorizontally)
                         ) {

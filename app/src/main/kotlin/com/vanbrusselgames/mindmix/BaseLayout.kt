@@ -22,10 +22,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
+import com.vanbrusselgames.mindmix.menu.MenuManager
 
 abstract class BaseLayout {
     companion object {
-        var activeOverlapUI = mutableStateOf(false)
+        val activeOverlapUI = mutableStateOf(false)
     }
 
     protected val blurStrength = 10.dp
@@ -35,7 +36,7 @@ abstract class BaseLayout {
     private val topRowHeight = (topRowButtonSize + 2f * padding)
 
     @Composable
-    open fun BaseScene(isMenu: Boolean = false, sceneSpecific: @Composable () -> Unit?) {
+    fun BaseScene(isMenu: Boolean = false, sceneSpecific: @Composable () -> Unit?) {
         Scaffold(topBar = { TopBar(isMenu) }, snackbarHost = {
             SnackbarHost(hostState = MainActivity.snackbarHostState)
         }, modifier = Modifier.safeDrawingPadding()) {
@@ -103,8 +104,10 @@ abstract class BaseLayout {
                     }
                 }*/
                     IconButton(
-                        onClick = { BaseUIHandler.openSettings() },
-                        modifier = Modifier
+                        onClick = {
+                            MenuManager.settingsGame.value = SceneManager.Scene.MENU
+                            BaseUIHandler.openSettings()
+                        }, modifier = Modifier
                             .size(topRowButtonSize)
                             .padding(padding)
                     ) {

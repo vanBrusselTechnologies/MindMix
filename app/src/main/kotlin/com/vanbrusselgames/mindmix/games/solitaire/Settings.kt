@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
@@ -31,8 +32,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.vanbrusselgames.mindmix.BaseUIHandler
 import com.vanbrusselgames.mindmix.PREF_KEY_SOLITAIRE__CARD_TYPE
 import com.vanbrusselgames.mindmix.R
 import com.vanbrusselgames.mindmix.Settings
@@ -71,10 +74,9 @@ fun SolitaireSettings() {
             ) {
                 Text(
                     stringResource(R.string.card_type),
-                    Modifier.padding(16.dp),
+                    Modifier.padding(24.dp),
                     defaultButtonColors.contentColor
                 )
-                Spacer(Modifier.width(12.dp))
                 Spacer(Modifier.weight(1f))
                 ExposedDropdownMenuBox(
                     dropdownExpanded,
@@ -89,7 +91,7 @@ fun SolitaireSettings() {
                     )
                     TextField(value = textFieldValue,
                         {},
-                        modifier = Modifier.menuAnchor(),
+                        modifier = Modifier.menuAnchor().widthIn(1.dp, Dp.Infinity),
                         readOnly = true,
                         trailingIcon = {
                             ExposedDropdownMenuDefaults.TrailingIcon(dropdownExpanded)
@@ -133,7 +135,7 @@ fun SolitaireSettings() {
 @Composable
 fun Prev_Settings_Screen() {
     MindMixTheme {
-        Settings.visible.value = true
+        BaseUIHandler.openSettings()
         SolitaireSettings()
     }
 }

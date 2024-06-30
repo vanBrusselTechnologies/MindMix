@@ -1,169 +1,137 @@
 package com.vanbrusselgames.mindmix.menu
 
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.times
-import com.vanbrusselgames.mindmix.AutoSizeText
-import com.vanbrusselgames.mindmix.R
+import com.vanbrusselgames.mindmix.BaseLayout.Companion.activeOverlapUI
+import com.vanbrusselgames.mindmix.Logger
 import com.vanbrusselgames.mindmix.SceneManager
-import com.vanbrusselgames.mindmix.Settings
-import kotlin.math.cos
-import kotlin.math.min
+import kotlinx.coroutines.launch
 import kotlin.math.round
 import kotlin.math.roundToInt
-import kotlin.math.sin
 
-@Composable
-fun GameWheel(gameCount: Int, screenWidth: Dp, screenHeight: Dp) {
+const val radius = 250f
+
+data class GameWheel(val gameCount: Int) {
     val withDupsFactor = if (MenuManager.ADD_DUPLICATES) 2 else 1
     val wheelItemCount = gameCount * withDupsFactor
     val angleStep = 360f / wheelItemCount
-    val gameWheelSize = min(screenHeight.value / 250f, screenWidth.value / 150f)
-    val radius = gameWheelSize * 30f
-    val id = MenuManager.games.filter { g -> g.value == MenuManager.selectedGame }.keys.first()
-    var rotationAngle by remember { mutableFloatStateOf(id * angleStep) }
-    var finishedRotate by remember { mutableStateOf(true) }
-    val rotationAnimation by animateFloatAsState(
-        targetValue = rotationAngle, animationSpec = spring(
-            dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessVeryLow
-        ), label = "gameWheelTurn"
-    )
-    val scale = 5f
+
+    var selectedId =
+        MenuManager.games.filter { g -> g.value == MenuManager.selectedGame }.keys.first()
+    var rotationAngle = selectedId * angleStep
+}
+
+@Composable
+fun GameWheel(model: GameWheel) {
+    val anim = remember { Animatable(model.rotationAngle) }
+    val coroutineScope = rememberCoroutineScope()
+    val draggableState = rememberDraggableState(onDelta = {
+        model.rotationAngle += it / 8f
+        coroutineScope.launch {
+            anim.animateTo(
+                model.rotationAngle, animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessVeryLow
+                )
+            )
+        }
+    })
+
+    val items =
+        rememberWheelItems(model.wheelItemCount, model.gameCount, model.selectedId, model.angleStep)
+
+    val onDragEnd = {
+        coroutineScope.launch {
+            model.rotationAngle = round(model.rotationAngle / model.angleStep) * model.angleStep
+            val index =
+                (((model.rotationAngle / model.angleStep) % model.gameCount + model.gameCount) % model.gameCount).roundToInt()
+            MenuManager.selectedGame = MenuManager.games[index]!!
+
+            val realAngle = (model.rotationAngle % 360 + 360) % 360
+            val selectedItem = (realAngle / model.angleStep).roundToInt()
+            items[selectedItem].isSelected.value = true
+            model.selectedId = selectedItem
+
+            anim.animateTo(
+                model.rotationAngle, spring(Spring.DampingRatioLowBouncy, Spring.StiffnessVeryLow)
+            )
+        }
+    }
 
     Box(
-        Modifier
+        contentAlignment = Alignment.BottomCenter, modifier = Modifier
             .fillMaxSize()
-            .pointerInput(Unit) {
-                detectDragGestures(onDrag = { change, dragAmount ->
-                    if (Settings.visible.value) return@detectDragGestures
-                    change.consume()
-                    rotationAngle += dragAmount.x / 8f
-                    finishedRotate = false
-                }, onDragEnd = {
-                    if (Settings.visible.value) return@detectDragGestures
-                    rotationAngle = round(rotationAngle / angleStep) * angleStep
-                    val index =
-                        (((rotationAngle / angleStep) % gameCount + gameCount) % gameCount).roundToInt()
-                    MenuManager.selectedGame = MenuManager.games[index]!!
-                    finishedRotate = true
+            .draggable(draggableState,
+                Orientation.Horizontal,
+                enabled = !activeOverlapUI.value,
+                onDragStarted = {
+                    val realAngle = (model.rotationAngle % 360 + 360) % 360
+                    val selectedItem = (realAngle / model.angleStep).roundToInt()
+                    items[selectedItem].isSelected.value = false
+                },
+                onDragStopped = {
+                    onDragEnd()
                 })
-            }) {
+    ) {
         Box(contentAlignment = Alignment.Center,
             modifier = Modifier
-                .fillMaxSize()
-                .offset(0.dp, (1f - 2f / scale) * screenHeight)
+                .height(350.dp)
+                .offset(0.dp, 250.dp)
                 .graphicsLayer {
                     transformOrigin = TransformOrigin.Center
-                    rotationZ = rotationAnimation
+                    rotationZ = anim.value
                 }) {
-            if (gameCount == 0) return
-            val realAngle = (rotationAngle % 360 + 360) % 360
-            val selectedItem = (realAngle / angleStep).roundToInt()
-            for (i in 0 until wheelItemCount) {
-                val isSelected = if (finishedRotate) i == selectedItem else false
-                WheelItem(
-                    i, isSelected, gameCount, radius, angleStep, screenHeight, screenWidth, scale
-                )
+            for (i in items) {
+                WheelItem(i)
             }
         }
     }
 }
 
 @Composable
-fun WheelItem(
-    index: Int,
-    isSelected: Boolean,
-    gameCount: Int,
-    radius: Float,
-    angleStep: Float,
-    h: Dp,
-    w: Dp,
-    s: Float
-) {
-    val gameIndex = (index + 10 * gameCount) % gameCount
-    val game = MenuManager.games[gameIndex]!!
-    val angle = index * angleStep
-    val selectedFactor by animateFloatAsState(
-        targetValue = if (isSelected) 1f else 0f, label = "selectedFactor"
-    )
-    val offsetX = sin(angle * Math.PI / 180f) * radius * s
-    val offsetY = cos(angle * Math.PI / 180f) * radius * s
-    val maxHeight = h * 0.4f * (1 + 0.75f * selectedFactor)
-    val maxWidth = w * 0.5f * (1 + 0.375f * selectedFactor)
-    Box(modifier = Modifier
-        .offset(-offsetX.dp, -offsetY.dp)
-        .heightIn(max = maxHeight)
-        .widthIn(max = maxWidth)
-        .aspectRatio(3f / 5f)
-        .rotate(-index * angleStep)
-        .offset(0.dp, -0.1f * h * selectedFactor)
-        .clickable(remember { MutableInteractionSource() }, null, isSelected, "Play game: ${game.name.lowercase()}") {
-            if (!Settings.visible.value) MenuUIHandler.startGame(MenuManager.selectedGame)
-        }) {
-        when (game) {
-            SceneManager.Scene.MINESWEEPER -> WheelItemImage(
-                R.string.minesweeper_name, R.drawable.game_icon_minesweeper
-            )
+fun rememberWheelItems(
+    wheelItemCount: Int, gameCount: Int, selectedId: Int, angleStep: Float
+): List<WheelItem> {
+    val localConfig = LocalConfiguration.current
+    return remember(localConfig) {
+        val screenHeight = localConfig.screenHeightDp
+        val screenWidth = localConfig.screenWidthDp
+        val minScreenSize = screenHeight.coerceAtMost(screenWidth) - 300f
+        val growthFactor = 100f.coerceAtMost(minScreenSize)
 
-            SceneManager.Scene.SOLITAIRE -> WheelItemImage(
-                R.string.solitaire_name, R.drawable.playingcards_detailed_clovers_a
-            )
+        List(wheelItemCount) { i ->
+            val item = WheelItem(MenuManager.games[i % gameCount]!!)
+            item.growthFactor = growthFactor
+            item.offsetY = -60f * (growthFactor / 100f)
+            item.radius = radius
+            item.angle = i * angleStep
+            item.isSelected.value = i == selectedId
 
-            SceneManager.Scene.SUDOKU -> WheelItemImage(
-                R.string.sudoku_name, R.drawable.game_icon_sudoku
-            )
-
-            SceneManager.Scene.MENU -> {}
+            item
         }
     }
 }
 
+@PreviewScreenSizes
 @Composable
-private fun WheelItemImage(nameId: Int, imageResourceId: Int) {
-    val name = stringResource(nameId)
-    Column(
-        Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        AutoSizeText(
-            text = AnnotatedString(name),
-            modifier = Modifier
-                .fillMaxHeight(0.25f)
-                .fillMaxWidth(),
-            textAlign = TextAlign.Center,
-            maxLines = 1
-        )
-        Image(painterResource(imageResourceId), name, modifier = Modifier.fillMaxSize())
-    }
+private fun PrevWheel() {
+    MenuManager.selectedGame = SceneManager.Scene.SUDOKU
+    GameWheel(GameWheel(3))
 }

@@ -30,14 +30,18 @@ class DataManager(ctx: Context) {
         private var isAutoSaving = false
 
         private val storagePath: StorageReference?
-            get() {
-                val cUser = AuthManager.currentUser ?: return null
-                return storage.reference.child("Users/${cUser.uid}/$FILE_NAME")
+            get() = AuthManager.userId.value.let {
+                when (it) {
+                    "" -> return null
+                    else -> return storage.reference.child("Users/${it}/$FILE_NAME")
+                }
             }
+
+        private val jsonParser = Json { ignoreUnknownKeys = true }
 
         private fun load() {
             try {
-                //todo: Download online file
+                //todo: Download online file from firebase
                 val content = file.readLines(fileDecoding)
                 for (line in content) {
                     try {
@@ -48,22 +52,22 @@ class DataManager(ctx: Context) {
                         val json = line.substring(i + 1)
                         when (SceneManager.scenes[safeCode]) {
                             SceneManager.Scene.SUDOKU -> {
-                                val data = Json.decodeFromString<SudokuData>(json)
+                                val data = jsonParser.decodeFromString<SudokuData>(json)
                                 SudokuLoader.loadFromFile(data)
                             }
 
                             SceneManager.Scene.SOLITAIRE -> {
-                                val data = Json.decodeFromString<SolitaireData>(json)
+                                val data = jsonParser.decodeFromString<SolitaireData>(json)
                                 SolitaireManager.loadFromFile(data)
                             }
 
                             SceneManager.Scene.MINESWEEPER -> {
-                                val data = Json.decodeFromString<MinesweeperData>(json)
+                                val data = jsonParser.decodeFromString<MinesweeperData>(json)
                                 MinesweeperManager.loadFromFile(data)
                             }
 
                             SceneManager.Scene.MENU -> {
-                                val data = Json.decodeFromString<MenuData>(json)
+                                val data = jsonParser.decodeFromString<MenuData>(json)
                                 MenuManager.loadFromFile(data)
                             }
 

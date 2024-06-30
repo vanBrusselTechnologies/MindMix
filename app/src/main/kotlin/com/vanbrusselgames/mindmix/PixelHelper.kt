@@ -8,12 +8,7 @@ import androidx.compose.ui.unit.sp
 
 class PixelHelper {
     companion object {
-        private lateinit var res: Resources
-        fun setResources(resources: Resources) {
-            res = resources
-        }
-
-        fun pxToSp(px: Int): TextUnit {
+        fun pxToSp(res: Resources, px: Int): TextUnit {
             return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                 (px / res.displayMetrics.scaledDensity).sp
             } else {

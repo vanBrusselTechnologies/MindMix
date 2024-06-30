@@ -14,8 +14,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -24,9 +26,9 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
+import androidx.compose.ui.zIndex
 import com.vanbrusselgames.mindmix.BaseLayout
 import com.vanbrusselgames.mindmix.R
 import com.vanbrusselgames.mindmix.games.GameFinished
@@ -34,9 +36,10 @@ import com.vanbrusselgames.mindmix.games.GameHelp
 import com.vanbrusselgames.mindmix.games.GameMenu
 import com.vanbrusselgames.mindmix.games.solitaire.SolitaireManager.Instance.cards
 import com.vanbrusselgames.mindmix.games.solitaire.SolitaireManager.Instance.couldGetFinished
+import com.vanbrusselgames.mindmix.games.solitaire.SolitaireManager.Instance.restStackEnabled
 import com.vanbrusselgames.mindmix.games.solitaire.SolitaireManager.Instance.timer
+import kotlinx.coroutines.launch
 import kotlin.math.min
-import kotlin.math.roundToInt
 
 class SolitaireLayout : BaseLayout() {
     companion object {
@@ -46,13 +49,6 @@ class SolitaireLayout : BaseLayout() {
         var distanceBetweenCards = 0.175f
         var cardHeight = 0f
         var cardWidth = 0f
-
-        fun calculateBaseOffsetByStackData(stackId: Int, stackIndex: Int): IntOffset {
-            val x = (stackId % 7) * cardWidth
-            val y =
-                if (stackId < 7) 0f else (1 + (0.5f + stackIndex) * distanceBetweenCards) * cardHeight
-            return IntOffset(x.roundToInt(), y.roundToInt())
-        }
     }
 
     private val arr = arrayOf(0, 1, 2, 3, 4, 5, 6)
@@ -105,28 +101,39 @@ class SolitaireLayout : BaseLayout() {
 
                     Background(modifier, cardHeightInDp)
 
-                    cards.forEach { it.Composable(modifier) }
+                    val coroutineScope = rememberCoroutineScope()
+                    cards.forEach {
+                        coroutineScope.launch {
+                            it.calculateBaseOffset()
+                            it.animOffset.animateTo(it.baseOffset)
+                            it.isMoving = false
+                            it.recalculateZIndex()
+                        }
+                        PlayingCard(it, modifier)
+                    }
 
                     if (couldGetFinished.value && !GameFinished.visible.value) {
-                        var colors = ButtonDefaults.buttonColors()
-                        colors = colors.copy(
-                            disabledContainerColor = colors.containerColor,
-                            disabledContentColor = colors.contentColor
-                        )
                         Button(
                             onClick = {
                                 cards.forEach {
-                                    it.currentStackId = it.type.ordinal
-                                    it.currentStackIndex = it.index.ordinal
-                                    it.offset = IntOffset.Zero
-                                    it.isLast = true
-                                    it.frontVisible = true
+                                    it.stackId = it.type.ordinal
+                                    it.stackIndex = it.index.ordinal
+                                    it.isMoving = false
+                                    it.isLast.value = true
+                                    it.frontVisible.value = true
+                                    it.recalculateZIndex()
+                                    it.calculateBaseOffset()
                                 }
                                 SolitaireManager.checkFinished()
                             },
-                            Modifier.align(Alignment.BottomCenter),
+                            Modifier.align(Alignment.BottomCenter).zIndex(20f),
                             enabled = !activeOverlapUI.value,
-                            colors = colors
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary,
+                                disabledContainerColor = MaterialTheme.colorScheme.primary,
+                                disabledContentColor = MaterialTheme.colorScheme.onPrimary,
+                            )
                         ) {
                             Icon(painterResource(R.drawable.baseline_flag_24), "Finish flag")
                             Spacer(Modifier.width(2.dp))
@@ -149,13 +156,14 @@ class SolitaireLayout : BaseLayout() {
 
     @Composable
     fun BackgroundTopRow(modifier: Modifier) {
+        val coroutineScope = rememberCoroutineScope()
         Row {
             for (i in arr) {
                 when (i) {
                     4 -> Box(modifier)
                     5 -> Box(modifier)
-                    6 -> Card(
-                        { SolitaireManager.resetRestStack() },
+                    6 -> if (!restStackEnabled.value) Box(modifier) else Card(
+                        { SolitaireManager.resetRestStack(coroutineScope) },
                         modifier.alpha(0.75f),
                         !activeOverlapUI.value
                     ) {

@@ -15,8 +15,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,6 +31,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -41,6 +42,7 @@ import com.vanbrusselgames.mindmix.Logger
 import com.vanbrusselgames.mindmix.MainActivity
 import com.vanbrusselgames.mindmix.R
 import com.vanbrusselgames.mindmix.menu.MenuManager
+import com.vanbrusselgames.mindmix.ui.theme.MindMixTheme
 
 class GameFinished {
     companion object {
@@ -71,14 +73,9 @@ class GameFinished {
             sceneSpecific: (@Composable () -> Unit)? = null
         ) {
             if (!visible.value) return
-            val adManager = remember { MainActivity.adManager }
             Box(Modifier.fillMaxSize(), Alignment.Center) {
-                Box(
-                    Modifier.fillMaxSize(0.95f), Alignment.Center
-                ) {
-                    Card(
-                        Modifier.alpha(0.9f), elevation = CardDefaults.cardElevation(20.dp)
-                    ) {
+                Box(Modifier.fillMaxSize(0.95f), Alignment.Center) {
+                    Card(Modifier.alpha(0.9f)) {
                         Column(
                             Modifier.padding(16.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
@@ -101,6 +98,7 @@ class GameFinished {
                                     horizontalArrangement = Arrangement.SpaceEvenly,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
+                                    val adManager = remember { MainActivity.adManager }
                                     var adShown by remember { mutableStateOf(false) }
                                     var bonus by remember { mutableIntStateOf(0) }
                                     val adLoaded = remember { mutableStateOf(false) }
@@ -177,6 +175,17 @@ class GameFinished {
                 param(FirebaseAnalytics.Param.VALUE, reward.toDouble())
                 param(FirebaseAnalytics.Param.CURRENCY, "EUR")
             }
+        }
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun PreviewGameFinished() {
+    MindMixTheme {
+        Surface {
+            GameFinished.visible.value = true
+            GameFinished.Screen()
         }
     }
 }

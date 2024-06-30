@@ -16,7 +16,6 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,6 +26,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,10 +43,7 @@ class GameMenu {
             if (!visible.value) return
             Box(Modifier.fillMaxSize(), Alignment.Center) {
                 Box(Modifier.fillMaxSize(0.95f), Alignment.Center) {
-                    Card(
-                        Modifier.alpha(0.9f),
-                        elevation = CardDefaults.cardElevation(20.dp),
-                    ) {
+                    Card(Modifier.alpha(0.9f)) {
                         Column(
                             Modifier
                                 .padding(24.dp)
@@ -59,7 +56,7 @@ class GameMenu {
                                 fontSize = 36.sp,
                                 fontWeight = FontWeight.ExtraBold
                             )
-                            Spacer(Modifier.height(15.dp))
+                            Spacer(Modifier.height(10.dp))
                             Button({
                                 timer?.resume()
                                 visible.value = false
@@ -67,9 +64,8 @@ class GameMenu {
                             }, Modifier.fillMaxWidth(), shape = RoundedCornerShape(6.dp)) {
                                 Icon(Icons.Default.PlayArrow, contentDescription = "Continue")
                                 Spacer(Modifier.width(8.dp))
-                                Text(stringResource(R.string.continue_game))
+                                Text(stringResource(R.string.continue_game), Modifier.weight(1f), textAlign = TextAlign.Center)
                             }
-                            Spacer(Modifier.height(2.dp))
                             Button({
                                 startNewGame()
                                 visible.value = false
@@ -80,9 +76,8 @@ class GameMenu {
                                     contentDescription = "Start new game"
                                 )
                                 Spacer(Modifier.width(8.dp))
-                                Text(stringResource(R.string.play_again))
+                                Text(stringResource(R.string.play_again), Modifier.weight(1f), textAlign = TextAlign.Center)
                             }
-                            Spacer(Modifier.height(2.dp))
                             Button({
                                 BaseUIHandler.openSettings()
                                 visible.value = false
@@ -90,9 +85,8 @@ class GameMenu {
                             }, Modifier.fillMaxWidth(), shape = RoundedCornerShape(6.dp)) {
                                 Icon(Icons.Default.Settings, "Settings")
                                 Spacer(Modifier.width(8.dp))
-                                Text(stringResource(R.string.settings))
+                                Text(stringResource(R.string.settings), Modifier.weight(1f), textAlign = TextAlign.Center)
                             }
-                            Spacer(Modifier.height(2.dp))
                             Button({
                                 BaseUIHandler.backToMenu()
                                 visible.value = false
@@ -100,7 +94,7 @@ class GameMenu {
                             }, Modifier.fillMaxWidth(), shape = RoundedCornerShape(6.dp)) {
                                 Icon(Icons.Default.Home, contentDescription = "Back to menu")
                                 Spacer(Modifier.width(8.dp))
-                                Text(stringResource(R.string.back_to_menu))
+                                Text(stringResource(R.string.back_to_menu), Modifier.weight(1f), textAlign = TextAlign.Center)
                             }
                         }
                     }
@@ -114,6 +108,6 @@ class GameMenu {
 @Preview
 @Composable
 fun Prev_GameMenu_Screen() {
-    GameMenu.visible.value = true
+    BaseUIHandler.openGameMenu()
     GameMenu.Screen(R.string.sudoku_name) {}
 }

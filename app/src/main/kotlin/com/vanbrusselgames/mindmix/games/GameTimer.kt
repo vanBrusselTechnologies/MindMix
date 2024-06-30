@@ -33,6 +33,7 @@ class GameTimer {
     private var startMillis = 0L
     private var pausedAt = 0L
     private var currentTime = mutableLongStateOf(0)
+    var penaltyMillis = 0L
 
     fun start() {
         startMillis = System.currentTimeMillis()
@@ -70,6 +71,8 @@ class GameTimer {
 
     fun addMillis(millis: Long) {
         // todo: keep penalty seconds separated
+        //  penaltyMillis += millis
+
         startMillis -= millis
         currentMillis += millis
         currentTime.longValue = currentMillis

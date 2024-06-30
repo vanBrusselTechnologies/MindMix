@@ -10,6 +10,11 @@ import com.vanbrusselgames.mindmix.Logger
 import com.vanbrusselgames.mindmix.R
 import com.vanbrusselgames.mindmix.games.GameFinished
 import com.vanbrusselgames.mindmix.games.GameTimer
+import com.vanbrusselgames.mindmix.games.solitaire.SolitaireLayout.Companion.cardHeight
+import com.vanbrusselgames.mindmix.games.solitaire.SolitaireLayout.Companion.cardWidth
+import com.vanbrusselgames.mindmix.games.solitaire.SolitaireLayout.Companion.distanceBetweenCards
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.math.floor
@@ -288,7 +293,8 @@ class SolitaireManager {
 
         var finished = false
 
-        var couldGetFinished = mutableStateOf(false)
+        val couldGetFinished = mutableStateOf(false)
+        val restStackEnabled = mutableStateOf(true)
 
         val cardVisualType = mutableStateOf(PlayingCard.CardVisualType.SIMPLE)
 
@@ -313,24 +319,32 @@ class SolitaireManager {
                         frontVisible = false
                     }
                     val c = cards[index]
-                    c.currentStackId = i
-                    c.currentStackIndex = j
-                    c.frontVisible = frontVisible
-                    if (i < 7 || (frontVisible && j + 1 == data.cardStacks[i].size)) c.isLast = true
+                    c.stackId = i
+                    c.stackIndex = j
+                    c.visible.value = !(i == 6 && j != 0)
+                    c.frontVisible.value = frontVisible
+                    if (i < 7 || (frontVisible && j + 1 == data.cardStacks[i].size)) c.isLast.value =
+                        true
+                    c.recalculateZIndex()
+                    c.calculateBaseOffset()
                     cardStacks[i].add(c)
                 }
             }
             couldGetFinished.value = couldGetFinished()
             timer.set(data.millis)
+            timer.addMillis(data.penaltyMillis)
+
+            if (cardStacks[6].size == 0 && cardStacks[5].size <= 1) restStackEnabled.value = false
         }
 
         fun saveToFile(): String {
             val stacks = Array(14) { listOf<Int>() }
             for (i in cardStacks.indices) {
-                stacks[i] = cardStacks[i].map { c -> if (c.frontVisible) c.id else -1 * c.id - 1 }
+                stacks[i] =
+                    cardStacks[i].map { c -> if (c.frontVisible.value) c.id else -1 * c.id - 1 }
             }
             return Json.encodeToString(
-                SolitaireData(stacks.asList(), finished, timer.currentMillis)
+                SolitaireData(stacks.asList(), finished, timer.currentMillis, timer.penaltyMillis)
             )
         }
 
@@ -371,24 +385,32 @@ class SolitaireManager {
             for (i in 0 until 7) {
                 cardStacks[7 + i] = dupCards.copyOfRange(j, j + i + 1).toMutableList()
                 val lastCard = cardStacks[7 + i].last()
-                lastCard.frontVisible = true
-                lastCard.isLast = true
+                lastCard.frontVisible.value = true
+                lastCard.isLast.value = true
                 cardStacks[7 + i].forEachIndexed { index, card ->
-                    card.currentStackIndex = index
-                    card.currentStackId = 7 + i
+                    card.stackIndex = index
+                    card.stackId = 7 + i
+                    card.visible.value = true
+                    card.recalculateZIndex()
+                    card.calculateBaseOffset()
                 }
                 j += i + 1
             }
             cardStacks[6] = dupCards.copyOfRange(j, dupCards.size).toMutableList()
             cardStacks[6].forEachIndexed { index, card ->
-                card.currentStackIndex = index
-                card.currentStackId = 6
+                card.stackIndex = index
+                card.stackId = 6
+                card.visible.value = index == 0
+                card.recalculateZIndex()
+                card.calculateBaseOffset()
             }
             val stacks = Array(14) { listOf<Int>() }
             for (i in cardStacks.indices) {
-                stacks[i] = cardStacks[i].map { c -> if (c.frontVisible) c.id else -1 * c.id - 1 }
+                stacks[i] =
+                    cardStacks[i].map { c -> if (c.frontVisible.value) c.id else -1 * c.id - 1 }
             }
             couldGetFinished.value = couldGetFinished()
+            restStackEnabled.value = true
             timer.start()
             Logger.logEvent(FirebaseAnalytics.Event.LEVEL_START) {
                 param(FirebaseAnalytics.Param.LEVEL_NAME, GAME_NAME)
@@ -400,11 +422,13 @@ class SolitaireManager {
             BaseLayout.activeOverlapUI.value = false
             cardStacks.forEach { s -> s.clear() }
             cards.forEach {
-                it.frontVisible = false
-                it.isLast = false
-                it.currentStackId = 6
-                it.currentStackIndex = 0
-                it.offset = IntOffset.Zero
+                it.frontVisible.value = false
+                it.isLast.value = false
+                it.stackId = 6
+                it.stackIndex = 0
+                it.isMoving = false
+                it.recalculateZIndex()
+                it.calculateBaseOffset()
             }
         }
 
@@ -414,79 +438,98 @@ class SolitaireManager {
             loadPuzzle()
         }
 
-        fun resetRestStack() {
-            if (cardStacks[5].size == 0 || cardStacks[6].size != 0) return
+        fun resetRestStack(coroutineScope: CoroutineScope) {
+            if (restStackEnabled.value && cardStacks[6].size != 0) return
             cardStacks[6] = cardStacks[5].asReversed().map { card -> card }.toMutableList()
             cardStacks[5].clear()
             cardStacks[6].forEachIndexed { i, card ->
-                card.currentStackIndex = i
-                card.currentStackId = 6
-                card.frontVisible = false
-                card.isLast = false
+                card.stackIndex = i
+                card.stackId = 6
+                card.frontVisible.value = false
+                card.isLast.value = false
+                card.visible.value = false
+                card.isMoving = false
+                card.recalculateZIndex()
+                card.calculateBaseOffset()
+                coroutineScope.launch {
+                    card.animOffset.animateTo(card.baseOffset)
+                }
             }
+            cardStacks[6][0].visible.value = true
         }
 
-        fun turnFromRestStack(card: PlayingCard) {
+        fun turnFromRestStack(coroutineScope: CoroutineScope) {
             if (cardStacks[6].size == 0) return
-            if (cardStacks[6].last().id == card.id) {
-                card.currentStackIndex = cardStacks[5].size
-                card.currentStackId = 5
-                card.frontVisible = true
-                card.isLast = true
-                cardStacks[5].add(card)
-                cardStacks[6].removeAt(cardStacks[6].size - 1)
+            val card = cardStacks[6].last()
+            card.isMoving = true
+            card.visible.value = true
+            val index = cardStacks[5].size
+            card.stackIndex = index
+            card.stackId = 5
+            card.frontVisible.value = true
+            card.isLast.value = true
+            card.recalculateZIndex()
+            card.calculateBaseOffset()
+            cardStacks[5].add(card)
+            cardStacks[6].removeLast()
+            coroutineScope.launch {
+                card.animOffset.animateTo(card.baseOffset)
+                card.isMoving = false
+                card.recalculateZIndex()
             }
+            if (cardStacks[6].size == 0 && cardStacks[5].size <= 1) restStackEnabled.value = false
         }
 
         fun startMoveCard(card: PlayingCard) {
             if (movingCards.size != 0) return
-            if (!card.frontVisible) return
-            val stackId = card.currentStackId
+            if (!card.frontVisible.value) return
+            val stackId = card.stackId
             if (stackId <= 5) {
-                movingCards.add(cardStacks[stackId].last())
+                val c = cardStacks[stackId].last()
+                c.isMoving = true
+                c.recalculateZIndex()
+                movingCards.add(c)
                 return
             }
             val stack = cardStacks[stackId]
-            val index = card.currentStackIndex
+            val index = card.stackIndex
             for (i in index until stack.size) {
                 val c = stack[i]
+                c.isMoving = true
+                c.recalculateZIndex()
                 movingCards.add(c)
             }
             if (index != 0 && stackId >= 7) {
-                stack[index - 1].isLast = true
+                stack[index - 1].isLast.value = true
             }
         }
 
-        fun moveCards(offset: Offset) {
+        fun moveCards(offset: Offset, coroutineScope: CoroutineScope) {
             movingCards.forEach { card ->
                 card.offset = IntOffset(
                     card.offset.x + offset.x.roundToInt(), card.offset.y + offset.y.roundToInt()
                 )
+                val baseOffset = card.baseOffset
+                coroutineScope.launch {
+                    card.animOffset.animateTo(baseOffset + card.offset)
+                }
             }
         }
 
-        fun onReleaseMovingCards() {
+        fun onReleaseMovingCards(coroutineScope: CoroutineScope) {
             if (movingCards.size == 0) return
             val firstCard = movingCards[0]
-            val firstCardStackId = firstCard.currentStackId
-            val firstCardStackIndex = firstCard.currentStackIndex
+            val firstCardStackId = firstCard.stackId
+            val firstCardStackIndex = firstCard.stackIndex
             val oldStack = cardStacks[firstCardStackId]
-            val currentOffset = SolitaireLayout.calculateBaseOffsetByStackData(
-                firstCardStackId, firstCardStackIndex
-            ) + firstCard.offset
+            val offset = firstCard.baseOffset + firstCard.offset
 
-            val baseOffsetUpperLeft = SolitaireLayout.calculateBaseOffsetByStackData(0, 1)
-            val baseOffsetLowerRight = SolitaireLayout.calculateBaseOffsetByStackData(7, 1)
-            val heightBorder = baseOffsetLowerRight.y / 2f
-            val selectedStackByOffset = clamp(
-                ((currentOffset.x - baseOffsetUpperLeft.x) / SolitaireLayout.cardWidth).roundToInt(),
-                0,
-                6
-            )
+            val heightBorder = ((1 + 1.5f * distanceBetweenCards) * cardHeight) / 2f
+            val selectedStackByOffset = clamp(((offset.x - 0) / cardWidth).roundToInt(), 0, 6)
 
             var foundNewStack = false
 
-            if (movingCards.size == 1 && (currentOffset.y < heightBorder || firstCardStackId % 7 == selectedStackByOffset)) {
+            if (movingCards.size == 1 && (offset.y < heightBorder || firstCardStackId % 7 == selectedStackByOffset)) {
                 foundNewStack = moveCardToFoundation(firstCard)
             }
             if (!foundNewStack && firstCardStackId % 7 != selectedStackByOffset) {
@@ -501,29 +544,40 @@ class SolitaireManager {
                 stackId++
             }
             if (firstCardStackId >= 7 && !foundNewStack && firstCardStackIndex != 0) {
-                oldStack[firstCardStackIndex - 1].isLast = false
+                oldStack[firstCardStackIndex - 1].isLast.value = false
             }
 
             movingCards.forEach { card ->
                 card.offset = IntOffset.Zero
+                val baseOffset = card.baseOffset
+                coroutineScope.launch {
+                    card.animOffset.animateTo(baseOffset)
+                    card.isMoving = false
+                    card.recalculateZIndex()
+                }
             }
             movingCards.clear()
 
-            if (firstCardStackId >= 7 && oldStack.size >= 1) oldStack.last().frontVisible = true
+            if (firstCardStackId >= 7 && oldStack.size >= 1) oldStack.last().frontVisible.value =
+                true
 
             if (foundNewStack) checkFinished()
             else timer.addMillis(15000)
+
+            if (cardStacks[6].size == 0 && cardStacks[5].size <= 1) restStackEnabled.value = false
         }
 
         private fun moveCardToFoundation(card: PlayingCard): Boolean {
             val foundationStackId = floor(card.id / 13f).toInt()
             val foundation = cardStacks[foundationStackId]
             if (card.id % 13 == 0 || (foundation.size != 0 && foundation.last().id % 13 == card.id % 13 - 1)) {
-                cardStacks[card.currentStackId].removeLast()
+                cardStacks[card.stackId].removeLast()
                 foundation.add(card)
-                card.currentStackId = foundationStackId
-                card.currentStackIndex = foundation.size - 1
-                card.isLast = true
+                card.stackId = foundationStackId
+                val index = foundation.size - 1
+                card.stackIndex = index
+                card.isLast.value = true
+                card.calculateBaseOffset()
                 return true
             }
             return false
@@ -539,17 +593,18 @@ class SolitaireManager {
                 val lastCardNewStack = newStack.last()
                 if (lastCardNewStack.id % 13 != card.id % 13 + 1) return false
                 if (!((card.id in 13..38 && lastCardNewStack.id !in 13..38) || (card.id !in 13..38 && lastCardNewStack.id in 13..38))) return false
-                lastCardNewStack.isLast = false
+                lastCardNewStack.isLast.value = false
             }
             newStack.addAll(movingCards)
-            val lastIndex = card.currentStackIndex
-            val lastStack = cardStacks[card.currentStackId]
+            val lastIndex = card.stackIndex
+            val lastStack = cardStacks[card.stackId]
             while (lastStack.size > lastIndex) {
                 lastStack.removeAt(lastIndex)
             }
             movingCards.forEachIndexed { i, c ->
-                c.currentStackIndex = newStackSize + i
-                c.currentStackId = newStackId
+                c.stackIndex = newStackSize + i
+                c.stackId = newStackId
+                c.calculateBaseOffset()
             }
             return true
         }
@@ -570,13 +625,13 @@ class SolitaireManager {
 
         private fun isFinished(): Boolean {
             for (card in cards) {
-                if (!card.frontVisible || card.currentStackId >= 4) return false
+                if (!card.frontVisible.value || card.stackId >= 4) return false
             }
             return true
         }
 
         private fun couldGetFinished(): Boolean {
-            return !cards.any { !it.frontVisible && it.currentStackId >= 7 }
+            return !cards.any { !it.frontVisible.value && it.stackId >= 7 }
         }
 
         private fun onGameFinished() {

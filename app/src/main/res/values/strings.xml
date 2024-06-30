@@ -38,4 +38,10 @@
     <string name="auto_flag">Automatically place flags</string>
     <string name="safe_area">Start with safe area</string>
     <string name="time">Time:</string>
+    <string name="difficulty_easy">Easy</string>
+    <string name="difficulty_medium">Medium</string>
+    <string name="difficulty_hard">Hard</string>
+    <string name="difficulty_expert">Expert</string>
+    <string name="difficulty_master">Master</string>
+    <string name="difficulty_label">Difficulty</string>
 </resources>

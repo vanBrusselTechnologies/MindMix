@@ -1,5 +1,7 @@
 package com.vanbrusselgames.mindmix.games.sudoku
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -11,13 +13,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -27,11 +28,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.vanbrusselgames.mindmix.BaseUIHandler
 import com.vanbrusselgames.mindmix.PREF_KEY_SUDOKU__AUTO_EDIT_NOTES
 import com.vanbrusselgames.mindmix.PREF_KEY_SUDOKU__CHECK_CONFLICTING_CELLS
 import com.vanbrusselgames.mindmix.R
 import com.vanbrusselgames.mindmix.Settings
 import com.vanbrusselgames.mindmix.savePreferences
+import com.vanbrusselgames.mindmix.ui.tools.DifficultyDropdown
+import com.vanbrusselgames.mindmix.utils.constants.Difficulty
 
 @Composable
 fun SudokuSettings() {
@@ -53,9 +57,12 @@ fun SudokuSettings() {
             )
             Spacer(Modifier.height(20.dp))
 
-            val autoEditNotesTicked = remember { mutableStateOf(SudokuManager.autoEditNotes) }
+            DifficultyDropdownRow()
+
+            Spacer(Modifier.height(2.dp))
+
             Button(
-                { autoEditNotesTicked.value = !autoEditNotesTicked.value },
+                { SudokuManager.autoEditNotes.value = !SudokuManager.autoEditNotes.value },
                 Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(6.dp)
             ) {
@@ -63,47 +70,77 @@ fun SudokuSettings() {
                     Modifier.heightIn(max = 36.dp), verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(stringResource(R.string.auto_edit_notes))
-                    Spacer(Modifier.width(8.dp))
                     Spacer(Modifier.weight(1f))
-                    Checkbox(checked = autoEditNotesTicked.value, onCheckedChange = {
-                        autoEditNotesTicked.value = it
-                        SudokuManager.autoEditNotes = it
-                        savePreferences(ctx, PREF_KEY_SUDOKU__AUTO_EDIT_NOTES, value = it)
-                    }, colors = CheckboxDefaults.colors().copy(uncheckedBorderColor = MaterialTheme.colorScheme.onPrimary))
+                    Checkbox(
+                        checked = SudokuManager.autoEditNotes.value,
+                        onCheckedChange = {
+                            SudokuManager.autoEditNotes.value = it
+                            savePreferences(ctx, PREF_KEY_SUDOKU__AUTO_EDIT_NOTES, value = it)
+                        },
+                        colors = CheckboxDefaults.colors()
+                            .copy(uncheckedBorderColor = MaterialTheme.colorScheme.onPrimary)
+                    )
                 }
             }
 
             Spacer(Modifier.height(2.dp))
 
-            val checkConflictingCellsTicked =
-                remember { mutableStateOf(SudokuManager.checkConflictingCells) }
             Button(
-                { checkConflictingCellsTicked.value = !checkConflictingCellsTicked.value },
-                Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(6.dp)
+                {
+                    SudokuManager.checkConflictingCells.value =
+                        !SudokuManager.checkConflictingCells.value
+                }, Modifier.fillMaxWidth(), shape = RoundedCornerShape(6.dp)
             ) {
                 Row(
                     Modifier.heightIn(max = 36.dp), verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(stringResource(R.string.double_number_warning))
-                    Spacer(Modifier.width(8.dp))
                     Spacer(Modifier.weight(1f))
-                    Checkbox(checked = checkConflictingCellsTicked.value, onCheckedChange = {
-                        checkConflictingCellsTicked.value = it
-                        SudokuManager.checkConflictingCells = it
-                        savePreferences(ctx, PREF_KEY_SUDOKU__CHECK_CONFLICTING_CELLS, value = it)
+                    Checkbox(
+                        checked = SudokuManager.checkConflictingCells.value,
+                        onCheckedChange = { checked ->
+                            SudokuManager.checkConflictingCells.value = checked
+                            savePreferences(
+                                ctx, PREF_KEY_SUDOKU__CHECK_CONFLICTING_CELLS, value = checked
+                            )
 
-                        SudokuManager.cells.forEach { c ->
-                            if (SudokuManager.checkConflictingCells) {
-                                SudokuManager.checkConflictingCell(c.id)
-                            } else {
-                                c.isIncorrect = false
-                            }
-                        }
-                    }, colors = CheckboxDefaults.colors().copy(uncheckedBorderColor = MaterialTheme.colorScheme.onPrimary))
+                            if (checked) {
+                                SudokuManager.cells.forEach { SudokuManager.checkConflictingCell(it) }
+                            } else SudokuManager.cells.forEach { it.isIncorrect.value = false }
+                        },
+                        colors = CheckboxDefaults.colors()
+                            .copy(uncheckedBorderColor = MaterialTheme.colorScheme.onPrimary)
+                    )
                 }
             }
         }
+    }
+}
+
+@Composable
+fun DifficultyDropdownRow() {
+    val defaultButtonColors = ButtonDefaults.buttonColors()
+
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .background(defaultButtonColors.containerColor, RoundedCornerShape(6.dp)),
+        Arrangement.Center,
+        Alignment.CenterVertically
+    ) {
+        Text(
+            stringResource(R.string.difficulty_label),
+            Modifier.padding(20.dp),
+            defaultButtonColors.contentColor
+        )
+        Spacer(Modifier.weight(1f))
+
+
+        val modifier = Modifier
+            .padding(4.dp)
+            .width(IntrinsicSize.Min)
+        val callback = { diff: Difficulty -> SudokuManager.setDifficulty(diff) }
+        DifficultyDropdown(modifier, SudokuManager.difficulty, callback, enabledDifficulties)
     }
 }
 
@@ -111,6 +148,6 @@ fun SudokuSettings() {
 @Preview
 @Composable
 fun Prev_Settings_Screen() {
-    Settings.visible.value = true
+    BaseUIHandler.openSettings()
     SudokuSettings()
 }

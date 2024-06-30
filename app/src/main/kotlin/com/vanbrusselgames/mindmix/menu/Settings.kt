@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -35,14 +36,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vanbrusselgames.mindmix.AuthManager
+import com.vanbrusselgames.mindmix.BaseUIHandler
 import com.vanbrusselgames.mindmix.PREF_KEY_MENU__THEME
 import com.vanbrusselgames.mindmix.R
 import com.vanbrusselgames.mindmix.Settings
 import com.vanbrusselgames.mindmix.savePreferences
+import com.vanbrusselgames.mindmix.ui.theme.MindMixTheme
 import com.vanbrusselgames.mindmix.ui.theme.SelectedTheme
 
 private const val DATA_DELETION_URL =
@@ -65,47 +69,14 @@ fun MenuSettings() {
                 textAlign = TextAlign.Center
             )
             Spacer(Modifier.height(20.dp))
-
             ThemeDropdown()
-
             Spacer(Modifier.height(2.dp))
-
-            val signedIn = remember {
-                mutableStateOf(AuthManager.isAuthenticated && AuthManager.currentUser != null)
-            }
-            Button(
-                { AuthManager.signIn(signedIn) },
-                Modifier.fillMaxWidth(),
-                enabled = !signedIn.value,
-                RoundedCornerShape(6.dp)
-            ) {
-                Row(
-                    Modifier.heightIn(max = 36.dp), verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.games_controller),
-                        contentDescription = "Play Games Sign-In"
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Text(stringResource(if (signedIn.value) R.string.connected else R.string.signin))
-                }
-            }
+            SignInButton()
             Spacer(Modifier.height(2.dp))
-
-            val uriHandler = LocalUriHandler.current
-            Button(
-                {
-                    val userId = AuthManager.currentUser?.uid ?: ""
-                    uriHandler.openUri(DATA_DELETION_URL + userId)
-                }, Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(
-                    containerColor = colorScheme.error, contentColor = colorScheme.onError
-                ), shape = RoundedCornerShape(6.dp)
-            ) {
-                Text(stringResource(R.string.request_data_deletion))
-            }
+            DeleteDataButton()
             Spacer(Modifier.height(8.dp))
             Text(
-                "User ID: ${AuthManager.currentUser?.uid ?: ""}",
+                "User ID: ${AuthManager.userId.value}",
                 Modifier.fillMaxWidth(),
                 fontSize = 10.sp,
                 textAlign = TextAlign.Center
@@ -129,17 +100,15 @@ fun ThemeDropdown() {
     ) {
         Text(
             stringResource(R.string.theme),
-            Modifier.padding(16.dp),
+            Modifier.padding(24.dp),
             defaultButtonColors.contentColor
         )
-        Spacer(Modifier.width(12.dp))
         Spacer(Modifier.weight(1f))
         ExposedDropdownMenuBox(
             dropdownExpanded,
             onExpandedChange = { dropdownExpanded = !dropdownExpanded },
             Modifier
-                .padding(4.dp)
-                .width(IntrinsicSize.Min)
+                .padding(4.dp).widthIn(1.dp, Dp.Infinity)
         ) {
             val textFieldValue = stringResource(
                 when (MenuManager.theme.value) {
@@ -150,7 +119,7 @@ fun ThemeDropdown() {
             )
             TextField(value = textFieldValue,
                 {},
-                modifier = Modifier.menuAnchor(),
+                modifier = Modifier.menuAnchor().widthIn(1.dp, Dp.Infinity),
                 readOnly = true,
                 trailingIcon = {
                     ExposedDropdownMenuDefaults.TrailingIcon(dropdownExpanded)
@@ -184,10 +153,48 @@ fun ThemeDropdown() {
     }
 }
 
-@Preview(locale = "nl")
-@Preview
 @Composable
-fun Prev_Settings_Screen() {
-    Settings.visible.value = true
-    MenuSettings()
+fun SignInButton() {
+    val signedIn by AuthManager.signedIn
+    Button(
+        { AuthManager.signIn() },
+        Modifier.fillMaxWidth(),
+        enabled = !signedIn,
+        RoundedCornerShape(6.dp)
+    ) {
+        Row(
+            Modifier.heightIn(max = 36.dp), verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.games_controller),
+                contentDescription = "Play Games Sign-In"
+            )
+            Spacer(Modifier.width(8.dp))
+            Text(stringResource(if (signedIn) R.string.connected else R.string.signin))
+        }
+    }
+}
+
+@Composable
+fun DeleteDataButton() {
+    val uriHandler = LocalUriHandler.current
+    Button(
+        {
+            val userId by AuthManager.userId
+            uriHandler.openUri(DATA_DELETION_URL + userId)
+        }, Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(
+            containerColor = colorScheme.error, contentColor = colorScheme.onError
+        ), shape = RoundedCornerShape(6.dp)
+    ) {
+        Text(stringResource(R.string.request_data_deletion))
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun PrevSettings() {
+    MindMixTheme {
+        BaseUIHandler.openSettings()
+        MenuSettings()
+    }
 }

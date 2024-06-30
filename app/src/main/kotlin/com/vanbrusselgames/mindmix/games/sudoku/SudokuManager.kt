@@ -1,72 +1,134 @@
 package com.vanbrusselgames.mindmix.games.sudoku
 
+import androidx.compose.runtime.mutableStateOf
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.vanbrusselgames.mindmix.BaseLayout
 import com.vanbrusselgames.mindmix.Logger
 import com.vanbrusselgames.mindmix.R
 import com.vanbrusselgames.mindmix.games.GameFinished
+import com.vanbrusselgames.mindmix.utils.constants.Difficulty
+import com.vanbrusselgames.mindmix.utils.encode.Encode
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class SudokuManager {
     companion object Instance {
-        var inputMode: InputMode = InputMode.Normal
-        var loadedPuzzle: LoadedPuzzle? = null
+        const val SIZE = 9
+
+        var gameMode = PuzzleType.Classic
+
+        var currentPuzzle: LoadedPuzzle? = null
             set(p) {
                 field = p
                 if (p != null) onPuzzleLoaded(p)
             }
-        var cells: Array<SudokuPuzzleCell> = arrayOf()
-        var selectedCellIndex: Int = -1
 
-        var checkConflictingCells = false
-        var autoEditNotes = false
+        val cells = Array(SIZE * SIZE) { SudokuPuzzleCell(it, false, 0, SIZE) }
+
+        var checkConflictingCells = mutableStateOf(false)
+        var autoEditNotes = mutableStateOf(false)
+
         var finished = false
-        var difficulty: Difficulty = Difficulty.MEDIUM
+        val difficulty = mutableStateOf(Difficulty.MEDIUM)
+
+        fun setDifficulty(value: Difficulty) {
+            saveAndLoadProgress(difficulty.value, value)
+            difficulty.value = value
+        }
+
+        var savedProgress = Array(Difficulty.entries.size) {
+            SudokuProgress<List<Int>>(listOf(), mutableListOf(), listOf(), Difficulty.entries[it])
+        }
+
+        private fun saveAndLoadProgress(prevDifficulty: Difficulty, difficulty: Difficulty) {
+            if (currentPuzzle != null) setCurrentProgress(prevDifficulty)
+
+            val progress = savedProgress.find { it.difficulty == difficulty }!!
+            if (progress.clues.isEmpty()) return
+            currentPuzzle = LoadedPuzzle(SIZE, difficulty, progress.clues)
+            cells.forEachIndexed { i, cell ->
+                with(cell) {
+                    value.intValue = progress.input[i]
+                    for (j in 0 until SIZE) {
+                        val note = j + 1
+                        if (progress.inputNotes[i].contains(note) != cell.hasNote(note)) {
+                            cell.setNote(note)
+                        }
+                    }
+                    isClue.value = progress.clues[i] != 0
+                }
+            }
+            if (checkConflictingCells.value) {
+                cells.forEach { checkConflictingCell(it) }
+            } else cells.forEach { it.isIncorrect.value = false }
+        }
 
         private fun onPuzzleLoaded(p: LoadedPuzzle) {
             if (cells.size == p.size * p.size) {
                 cells.forEach {
-                    it.isClue = p.clues[it.id] != 0
-                    it.value = p.clues[it.id]
+                    it.reset()
+                    it.isClue.value = p.clues[it.id] != 0
+                    it.value.intValue = p.clues[it.id]
                 }
             } else {
-                cells = Array(p.size * p.size) {
-                    SudokuPuzzleCell(it, p.clues[it] != 0, p.clues[it], p.size)
-                }
+                cells.forEach { it.reset() }
             }
-            if (checkConflictingCells) {
-                cells.forEach { c -> checkConflictingCell(c.id) }
-            }
+            if (checkConflictingCells.value) cells.forEach { c -> checkConflictingCell(c) }
+            else cells.forEach { it.isIncorrect.value = false }
+
             SudokuLoader.puzzleLoaded.value = true
         }
 
-        fun saveToFile(): String {
-            val clues = cells.filter { c -> c.isClue }.map { c -> c.id }
-            val input = cells.map { c -> c.value }
-            val notes = cells.map { c ->
-                c.notes.mapIndexed { i, n -> if (n) i else -1 }.filter { n -> n != -1 }
+        private fun setCurrentProgress(difficulty: Difficulty = this.difficulty.value) {
+            val p = savedProgress.first { it.difficulty == difficulty }
+            p.input = cells.map { c -> c.value.intValue }
+            p.inputNotes = cells.map { c ->
+                c.notes.mapIndexed { i, n -> if (n) i + 1 else 0 }.toMutableList()
             }
-            return Json.encodeToString(SudokuData(clues, input, notes, finished))
+        }
+
+        fun saveToFile(): String {
+            if (finished) {
+                val index = savedProgress.indexOfFirst { it.difficulty == difficulty.value }
+                savedProgress[index] =
+                    SudokuProgress(listOf(), listOf(), listOf(), difficulty.value)
+            } else {
+                val p = savedProgress.first { it.difficulty == difficulty.value }
+                p.input = cells.map { c -> c.value.intValue }
+                p.inputNotes = cells.map { c ->
+                    c.notes.mapIndexed { i, n -> if (n) i + 1 else 0 }.toMutableList()
+                }
+            }
+
+            val progress = savedProgress.map {
+                SudokuProgress(
+                    Encode.base94(it.clues), Encode.base94(it.input), it.inputNotes.map { notes ->
+                        val booleans = notes.map { n -> n != 0 }
+                        Encode.base94(booleans)
+                    }, it.difficulty
+                )
+            }
+            return Json.encodeToString(
+                SudokuData(difficulty.value, progress, SudokuLoader.pages.toMap())
+            )
         }
 
         fun startPuzzle() {
             if (finished) reset()
-            if (loadedPuzzle != null) return
-            SudokuLoader.requestPuzzle(difficulty) { p ->
-                loadedPuzzle = p
+            if (currentPuzzle != null) return
+            SudokuLoader.requestPuzzle(difficulty.value) { p ->
+                currentPuzzle = p
             }
         }
 
         private fun reset() {
             finished = false
             BaseLayout.activeOverlapUI.value = false
-            SudokuLoader.removePuzzle(loadedPuzzle)
+            SudokuLoader.removePuzzle(currentPuzzle)
             cells.forEach {
                 it.reset()
             }
-            loadedPuzzle = null
-            selectedCellIndex = -1
+            currentPuzzle = null
         }
 
         fun startNewGame() {
@@ -77,12 +139,12 @@ class SudokuManager {
             }
         }
 
-        fun autoChangeNotes(index: Int) {
-            if (loadedPuzzle == null) return
-            if (index >= cells.size) return
-            if (cells[index].value == 0) return
+        fun autoChangeNotes(cell: SudokuPuzzleCell) {
+            if (currentPuzzle == null) return
+            val index = cell.id
+            val number: Int = cell.value.intValue
+            if (number == 0) return
             val indices: IntArray = SudokuPuzzle.peers(index, cells.size)
-            val number: Int = cells[index].value
             for (n: Int in indices) {
                 if (index == n) continue
                 if (!cells[n].hasNote(number)) continue
@@ -90,39 +152,43 @@ class SudokuManager {
             }
         }
 
-        fun checkConflictingCell(index: Int = 0, isSecondary: Boolean = false) {
-            if (loadedPuzzle == null) return
-            if (index >= cells.size || index < 0 || cells[index].isClue) return
+        fun checkConflictingCell(cell: SudokuPuzzleCell, isSecondary: Boolean = false) {
+            if (currentPuzzle == null) return
+            if (cell.isClue.value) return
+            val index = cell.id
             val indices: IntArray = SudokuPuzzle.peers(index, cells.size)
             var isConflicting = false
-            val v = cells[index].value
+            val v = cell.value.intValue
             for (n: Int in indices) {
                 if (index == n) continue
+                val cellN = cells[n]
                 when (true) {
                     (v == 0) -> {
-                        if (!isSecondary && cells[n].isIncorrect) {
-                            checkConflictingCell(n, true)
+                        if (!isSecondary && cellN.isIncorrect.value) {
+                            checkConflictingCell(cellN, true)
                         }
-                        if (cells[n].value == 0) continue
-                        if (!cells[index].hasNote(cells[n].value)) continue
-                        cells[index].isIncorrect = true
+                        if (cellN.value.intValue == 0) continue
+                        if (!cell.hasNote(cellN.value.intValue)) continue
+                        cell.isIncorrect.value = true
                         isConflicting = true
                     }
 
-                    (v == cells[n].value) -> {
-                        cells[index].isIncorrect = true
-                        if (!isSecondary) checkConflictingCell(n, true)
+                    (v == cellN.value.intValue) -> {
+                        cell.isIncorrect.value = true
+                        if (!isSecondary) checkConflictingCell(cellN, true)
                         isConflicting = true
                     }
 
-                    (!isSecondary && cells[n].isIncorrect || cells[n].value == 0 && cells[n].hasNote(v)) -> {
-                        checkConflictingCell(n, true)
+                    (!isSecondary && cellN.isIncorrect.value || cellN.value.intValue == 0 && cellN.hasNote(
+                        v
+                    )) -> {
+                        checkConflictingCell(cellN, true)
                     }
 
                     else -> {}
                 }
             }
-            if (!isConflicting) cells[index].isIncorrect = false
+            if (!isConflicting) cell.isIncorrect.value = false
         }
 
         fun checkFinished() {
@@ -138,8 +204,8 @@ class SudokuManager {
 
         private fun isFinished(): Boolean {
             try {
-                if (cells.any { c -> c.value == 0 }) return false
-                val input = cells.map { c -> c.value }.toIntArray()
+                if (cells.any { c -> c.value.intValue == 0 }) return false
+                val input = cells.map { c -> c.value.intValue }.toIntArray()
                 return SudokuPuzzle.getSolution(input).contentEquals(input)
             } catch (_: Exception) {
                 return false

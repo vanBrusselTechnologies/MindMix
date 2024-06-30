@@ -108,7 +108,7 @@ class AdManager(private val activity: MainActivity) {
             val statusMap = initializationStatus.adapterStatusMap
             for (adapterClass in statusMap.keys) {
                 val status = statusMap[adapterClass]
-                Logger.d(
+                Logger.i(
                     String.format(
                         "Adapter name: %s, Description: %s, Latency: %d",
                         adapterClass,
@@ -135,7 +135,7 @@ class AdManager(private val activity: MainActivity) {
                 }
 
                 override fun onAdLoaded(ad: RewardedAd) {
-                    Logger.d("Ad was loaded.")
+                    Logger.i("Ad was loaded.")
                     rewardedAd = ad
                     loading = false
                     notifyStateAdLoaded()
@@ -180,7 +180,7 @@ class AdManager(private val activity: MainActivity) {
                 // Handle the reward.
                 val rewardAmount = rewardItem.amount
                 val rewardType = rewardItem.type
-                Logger.d("User earned the reward: ${rewardAmount}x $rewardType")
+                Logger.i("User earned the reward: ${rewardAmount}x $rewardType")
                 onReward(rewardAmount)
                 loadAds()
             }
@@ -197,13 +197,13 @@ class AdManager(private val activity: MainActivity) {
         rewardedAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
             override fun onAdClicked() {
                 // Called when a click is recorded for an ad.
-                Logger.d("Ad was clicked.")
+                Logger.i("Ad was clicked.")
             }
 
             override fun onAdDismissedFullScreenContent() {
                 // Called when ad is dismissed.
                 // Set the ad reference to null so you don't show the ad a second time.
-                Logger.d("Ad dismissed fullscreen content.")
+                Logger.i("Ad dismissed fullscreen content.")
                 rewardedAd = null
                 loadAds()
             }
@@ -217,12 +217,12 @@ class AdManager(private val activity: MainActivity) {
 
             override fun onAdImpression() {
                 // Called when an impression is recorded for an ad.
-                Logger.d("Ad recorded an impression.")
+                Logger.i("Ad recorded an impression.")
             }
 
             override fun onAdShowedFullScreenContent() {
                 // Called when ad is shown.
-                Logger.d("Ad showed fullscreen content.")
+                Logger.i("Ad showed fullscreen content.")
             }
         }
     }

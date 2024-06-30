@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -36,12 +35,8 @@ class GameHelp {
             val description = stringResource(descriptionId)
 
             Box(Modifier.fillMaxSize(), Alignment.Center) {
-                Box(
-                    Modifier.fillMaxSize(0.95f), Alignment.Center
-                ) {
-                    Card(
-                        Modifier.alpha(0.9f), elevation = CardDefaults.cardElevation(20.dp)
-                    ) {
+                Box(Modifier.fillMaxSize(0.95f), Alignment.Center) {
+                    Card(Modifier.alpha(0.9f)) {
                         Box(Modifier.align(Alignment.CenterHorizontally)) {
                             IconButton(
                                 onClick = {

@@ -6,6 +6,7 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ParametersBuilder
 import com.google.firebase.analytics.logEvent
 import com.google.firebase.crashlytics.crashlytics
+import org.jetbrains.annotations.TestOnly
 
 class Logger(activity: MainActivity) {
     init {
@@ -20,32 +21,39 @@ class Logger(activity: MainActivity) {
             analytics.logEvent(eventName, block)
         }
 
-        fun d(msg: String) {
+        @TestOnly
+        fun d(msg: String){
             Log.d(TAG, msg)
         }
 
-        fun d(msg: String, tr: Throwable) {
+        fun i(msg: String) {
+            Log.i(TAG, msg)
+            Firebase.crashlytics.log(msg)
+        }
+
+        fun i(msg: String, tr: Throwable) {
             Log.d(TAG, msg, tr)
+            Firebase.crashlytics.log(msg)
         }
 
         fun e(msg: String) {
             Log.e(TAG, msg)
-            Firebase.crashlytics.log(msg)
+            Firebase.crashlytics.recordException(RuntimeException(msg))
         }
 
         fun e(msg: String, tr: Throwable) {
             Log.e(TAG, msg, tr)
-            Firebase.crashlytics.recordException(tr)
+            Firebase.crashlytics.recordException(RuntimeException(msg, tr))
         }
 
         fun w(msg: String) {
             Log.w(TAG, msg)
-            Firebase.crashlytics.log(msg)
+            Firebase.crashlytics.recordException(RuntimeException(msg))
         }
 
         fun w(msg: String, tr: Throwable) {
             Log.w(TAG, msg, tr)
-            Firebase.crashlytics.recordException(tr)
+            Firebase.crashlytics.recordException(RuntimeException(msg, tr))
         }
     }
 }

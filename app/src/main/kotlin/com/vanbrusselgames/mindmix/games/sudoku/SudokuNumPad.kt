@@ -13,9 +13,7 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -32,8 +30,15 @@ import com.vanbrusselgames.mindmix.games.GameFinished
 class SudokuNumPad {
 
     companion object {
+        private val inputMode = mutableStateOf(InputMode.Normal)
+
         @Composable
         fun Show(horizontal: Boolean) {
+            val modifier = Modifier
+                .fillMaxSize()
+                .aspectRatio(1f)
+                .padding(PaddingValues(2.dp))
+                .background(MaterialTheme.colorScheme.secondaryContainer)
             LazyVerticalGrid(
                 columns = GridCells.Fixed(if (horizontal) 2 else 5),
                 userScrollEnabled = false,
@@ -42,79 +47,65 @@ class SudokuNumPad {
                     .fillMaxSize()
             ) {
                 itemsIndexed(List(10) { 0 }) { index, _ ->
-                    SudokuNumPadCell(index, value = index + 1)
+                    if (index == 9) SudokuNumPadInputModeCell(modifier, index)
+                    else SudokuNumPadNumberCell(modifier, index)
                 }
             }
         }
 
         @Composable
-        private fun SudokuNumPadCell(index: Int, value: Int) {
-            val inputMode = remember { mutableStateOf(SudokuManager.inputMode) }
-            val padding = PaddingValues(
-                start = 2.dp,
-                end = 2.dp,
-                top = 2.dp,
-                bottom = 2.dp,
-            )
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .aspectRatio(1f)
-                    .padding(padding)
-                    .background(MaterialTheme.colorScheme.secondaryContainer)
-                    .clickable(enabled = !GameFinished.visible.value && !BaseLayout.activeOverlapUI.value) {
-                        if (value != 10) onClickNumPadCell(index)
-                        else changeInputMode(inputMode)
-                    }) {
-                if (value in 1..9) {
-                    AutoSizeText(
-                        text = AnnotatedString(value.toString()),
-                        color = MaterialTheme.colorScheme.onSecondaryContainer,
-                        textAlign = TextAlign.Center,
-                        fontWeight = FontWeight.ExtraBold,
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .scale(1.325f)
-                    )
-                }
-                if (value == 10) {
-                    val imagePainter = if (inputMode.value == InputMode.Normal) {
-                        painterResource(id = R.drawable.outline_stylus_24)
-                    } else painterResource(id = R.drawable.outline_edit_note_24)
-                    Icon(
-                        imagePainter, "",
-                        Modifier
-                            .fillMaxSize()
-                            .scale(0.9f)
-                    )
-                }
+        private fun SudokuNumPadNumberCell(modifier: Modifier, index: Int) {
+            Box(modifier.clickable(enabled = !GameFinished.visible.value && !BaseLayout.activeOverlapUI.value) {
+                onClickNumPadCell(index)
+            }) {
+                AutoSizeText(
+                    text = AnnotatedString((index + 1).toString()),
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.ExtraBold,
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .scale(1.325f)
+                )
+            }
+        }
+
+        @Composable
+        private fun SudokuNumPadInputModeCell(modifier: Modifier, index: Int) {
+            Box(modifier.clickable(enabled = !GameFinished.visible.value && !BaseLayout.activeOverlapUI.value) {
+                changeInputMode()
+            }) {
+                Icon(
+                    painterResource(id = if (inputMode.value == InputMode.Normal) R.drawable.outline_stylus_24 else R.drawable.outline_edit_note_24),
+                    "",
+                    Modifier
+                        .fillMaxSize()
+                        .scale(0.9f)
+                )
             }
         }
 
         private fun onClickNumPadCell(numPadCellIndex: Int) {
-            val gridCellIndex = SudokuManager.selectedCellIndex
-            if (gridCellIndex == -1) return
-            if (SudokuManager.inputMode == InputMode.Normal) {
-                SudokuManager.cells[gridCellIndex].value = numPadCellIndex + 1
+            val cell = SudokuManager.cells.find { it.isSelected.value }
+            if (cell == null) return
+            if (inputMode.value == InputMode.Normal) {
+                cell.value.intValue = numPadCellIndex + 1
                 SudokuManager.checkFinished()
                 if (SudokuManager.finished) {
-                    SudokuManager.selectedCellIndex = -1
-                    SudokuManager.cells.find { c -> c.isSelected }?.isSelected = false
-                } else if (SudokuManager.autoEditNotes) SudokuManager.autoChangeNotes(gridCellIndex)
+                    SudokuManager.cells.forEach { it.isSelected.value = false }
+                } else if (SudokuManager.autoEditNotes.value) SudokuManager.autoChangeNotes(cell)
             } else {
-                SudokuManager.cells[gridCellIndex].setNote(numPadCellIndex + 1)
-                SudokuManager.cells[gridCellIndex].value = 0
+                cell.setNote(numPadCellIndex + 1)
+                cell.value.intValue = 0
             }
-            if (SudokuManager.checkConflictingCells) {
-                SudokuManager.checkConflictingCell(gridCellIndex)
+            if (SudokuManager.checkConflictingCells.value) {
+                SudokuManager.checkConflictingCell(cell)
             }
         }
 
-        private fun changeInputMode(inputMode: MutableState<InputMode>) {
-            SudokuManager.inputMode =
-                if (SudokuManager.inputMode == InputMode.Normal) InputMode.Note
-                else InputMode.Normal
-            inputMode.value = SudokuManager.inputMode
+        private fun changeInputMode() {
+            inputMode.value = if (inputMode.value == InputMode.Normal) InputMode.Note
+            else InputMode.Normal
         }
     }
 }

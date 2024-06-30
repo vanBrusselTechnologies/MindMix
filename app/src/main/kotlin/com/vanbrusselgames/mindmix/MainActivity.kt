@@ -34,6 +34,8 @@ import androidx.navigation.navArgument
 import com.google.firebase.Firebase
 import com.google.firebase.appcheck.appCheck
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
+import com.google.firebase.functions.FirebaseFunctions
+import com.google.firebase.functions.functions
 import com.google.firebase.initialize
 import com.vanbrusselgames.mindmix.games.GameFinished
 import com.vanbrusselgames.mindmix.games.GameHelp
@@ -60,6 +62,7 @@ class MainActivity : ComponentActivity() {
 
         lateinit var snackbarHostState: SnackbarHostState
         lateinit var scope: CoroutineScope
+        lateinit var functions: FirebaseFunctions
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,7 +71,6 @@ class MainActivity : ComponentActivity() {
         Logger(this)
         networkMonitor = NetworkMonitor(this@MainActivity)
 
-        PixelHelper.setResources(resources)
         setFullScreen(actionBar, window)
         CoroutineScope(Dispatchers.IO).launch {
             Firebase.initialize(this@MainActivity)
@@ -76,8 +78,8 @@ class MainActivity : ComponentActivity() {
                 PlayIntegrityAppCheckProviderFactory.getInstance()
             )
             AuthManager.start(this@MainActivity)
-
-            GameLoader.init()
+            functions = Firebase.functions
+            GameLoader.init(this@MainActivity)
         }
 
         loadPreferences(applicationContext.dataStore)
@@ -93,7 +95,6 @@ class MainActivity : ComponentActivity() {
                 MindMixTheme(darkTheme) {
                     scope = rememberCoroutineScope()
                     snackbarHostState = remember { SnackbarHostState() }
-                    // A surface container using the 'background' color from the theme
                     Surface(
                         modifier = Modifier.fillMaxSize(),
                         color = MaterialTheme.colorScheme.background,

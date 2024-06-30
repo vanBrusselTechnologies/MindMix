@@ -1,10 +1,12 @@
 package com.vanbrusselgames.mindmix.games.solitaire
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.animateIntOffsetAsState
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.VectorConverter
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -18,20 +20,21 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.times
 import androidx.compose.ui.zIndex
@@ -39,60 +42,58 @@ import com.vanbrusselgames.mindmix.BaseLayout
 import com.vanbrusselgames.mindmix.PixelHelper
 import com.vanbrusselgames.mindmix.R
 import com.vanbrusselgames.mindmix.games.GameFinished
+import com.vanbrusselgames.mindmix.games.solitaire.PlayingCard.CardVisualType
+import com.vanbrusselgames.mindmix.games.solitaire.SolitaireLayout.Companion.cardHeight
+import com.vanbrusselgames.mindmix.games.solitaire.SolitaireLayout.Companion.cardWidth
+import com.vanbrusselgames.mindmix.games.solitaire.SolitaireLayout.Companion.distanceBetweenCards
 import kotlin.math.roundToInt
 
 data class PlayingCard(val type: CardType, val index: CardIndex, val drawableResId: Int) {
     val id = type.ordinal * 13 + index.ordinal
 
-    private val mutableFrontVisible = mutableStateOf(false)
-    var frontVisible = false
-        set(value) {
-            field = value
-            mutableFrontVisible.value = value
-        }
-
-    private val mutableCurrentStackId = mutableIntStateOf(6)
-    var currentStackId = 6
-        set(value) {
-            field = value
-            mutableCurrentStackId.intValue = value
-        }
-    var currentStackIndex = -1
-
-    private val mutableOffset = mutableStateOf(IntOffset.Zero)
+    var isMoving = false
+    var stackId = 6
+    var stackIndex = -1
+    var baseOffset = IntOffset.Zero
     var offset = IntOffset.Zero
-        set(value) {
-            field = value
-            mutableOffset.value = value
-        }
 
-    private val mutableIsLast = mutableStateOf(false)
-    var isLast = false
-        set(value) {
-            field = value
-            mutableIsLast.value = value
-        }
+    val animOffset = Animatable(baseOffset, IntOffset.VectorConverter)
 
-    private val icon = when (type) {
+    val zIndex = mutableFloatStateOf(0f)
+    val visible = mutableStateOf(true)
+    var frontVisible = mutableStateOf(false)
+    val isLast = mutableStateOf(false)
+
+    val icon = when (type) {
         CardType.CLOVERS -> R.drawable.clover
         CardType.DIAMONDS -> R.drawable.diamonds
         CardType.HEARTS -> R.drawable.hearts
         CardType.SPADES -> R.drawable.spades
     }
-
-    private val indexString = when (index) {
+    val indexString = when (index) {
         CardIndex.A -> "A"
         CardIndex.J -> "J"
         CardIndex.Q -> "Q"
         CardIndex.K -> "K"
         else -> (index.ordinal + 1).toString()
     }
-
-    private val indexColor = when (type) {
+    val indexColor = when (type) {
         CardType.CLOVERS -> Color.Black
         CardType.DIAMONDS -> Color.Red
         CardType.HEARTS -> Color.Red
         CardType.SPADES -> Color.Black
+    }
+
+    fun recalculateZIndex() {
+        zIndex.floatValue =
+            stackIndex * 0.01f + (if (isMoving && frontVisible.value) 10 else 0) + if (stackId == 6) 0 else if (stackId == 5) 1 else if (stackId < 5) 2 else 3
+    }
+
+    fun calculateBaseOffset() {
+        val x = (stackId % 7) * cardWidth
+        val y =
+            if (stackId < 7) 0f else (1 + (0.5f + stackIndex) * distanceBetweenCards) * cardHeight
+        baseOffset = IntOffset(x.roundToInt(), y.roundToInt())
     }
 
     enum class CardType {
@@ -106,130 +107,125 @@ data class PlayingCard(val type: CardType, val index: CardIndex, val drawableRes
     enum class CardVisualType {
         DETAILED, SIMPLE
     }
+}
 
-    @Composable
-    fun Composable(modifier: Modifier) {
-        val currentStackId by mutableCurrentStackId
-        val baseOffset =
-            SolitaireLayout.calculateBaseOffsetByStackData(currentStackId, currentStackIndex)
-        val offset by animateIntOffsetAsState(
-            targetValue = baseOffset + mutableOffset.value, label = "moveCardToStack"
-        )
-        val zIndex =
-            currentStackIndex * 0.01f + if (currentStackId == 6 || offset == baseOffset) 0 else if (currentStackId == 5) 10 else 20
-        val mod = modifier
-            .zIndex(zIndex)
-            .offset { offset }
-            .clickable(onClickLabel = "${type.name.replaceFirstChar { it.titlecase() }} $indexString") {
-                if (GameFinished.visible.value || BaseLayout.activeOverlapUI.value) return@clickable
-                if (currentStackId == 6) {
-                    SolitaireManager.turnFromRestStack(this)
-                } else {
-                    if (!frontVisible || zIndex >= 20f) return@clickable
-                    SolitaireManager.startMoveCard(this)
-                    SolitaireManager.onReleaseMovingCards()
-                }
+@Composable
+fun PlayingCard(model: PlayingCard, modifier: Modifier) {
+    val coroutineScope = rememberCoroutineScope()
+    val interactionSource = remember { MutableInteractionSource() }
+    val mod = modifier
+        .zIndex(model.zIndex.floatValue)
+        .offset { model.animOffset.value }
+        .clickable(
+            onClickLabel = "${model.type.name.replaceFirstChar { it.titlecase() }} $model.indexString",
+            interactionSource = interactionSource,
+            indication = null
+        ) {
+            if (GameFinished.visible.value || BaseLayout.activeOverlapUI.value) return@clickable
+            if (model.stackId == 6) {
+                SolitaireManager.turnFromRestStack(coroutineScope)
+            } else {
+                if (!model.frontVisible.value || model.animOffset.targetValue != model.baseOffset) return@clickable
+                SolitaireManager.startMoveCard(model)
+                SolitaireManager.onReleaseMovingCards(coroutineScope)
             }
-            .pointerInput(Unit) {
-                detectDragGestures(onDragStart = {
-                    if (SolitaireManager.finished || !frontVisible || BaseLayout.activeOverlapUI.value) return@detectDragGestures
-                    SolitaireManager.startMoveCard(this@PlayingCard)
-                }, onDragCancel = {
-                    SolitaireManager.onReleaseMovingCards()
-                }, onDragEnd = {
-                    SolitaireManager.onReleaseMovingCards()
-                }, onDrag = { change, offset ->
-                    change.consume()
-                    SolitaireManager.moveCards(offset)
-                })
-            }
-        when (SolitaireManager.cardVisualType.value) {
-            CardVisualType.DETAILED -> DetailedCard(mod)
-            CardVisualType.SIMPLE -> SimpleCard(mod)
         }
+        .pointerInput(Unit) {
+            detectDragGestures(onDragStart = {
+                if (SolitaireManager.finished || !model.frontVisible.value || BaseLayout.activeOverlapUI.value) return@detectDragGestures
+                SolitaireManager.startMoveCard(model)
+            }, onDragCancel = {
+                SolitaireManager.onReleaseMovingCards(coroutineScope)
+            }, onDragEnd = {
+                SolitaireManager.onReleaseMovingCards(coroutineScope)
+            }, onDrag = { change, offset ->
+                change.consume()
+                SolitaireManager.moveCards(offset, coroutineScope)
+            })
+        }
+    if (!model.visible.value) return Box(mod) {}
+    when (SolitaireManager.cardVisualType.value) {
+        CardVisualType.DETAILED -> DetailedCard(model, mod)
+        CardVisualType.SIMPLE -> SimpleCard(model, mod)
     }
+}
 
-    @Composable
-    private fun DetailedCard(modifier: Modifier) {
+@Composable
+private fun DetailedCard(model: PlayingCard, modifier: Modifier) {
+    Image(
+        painterResource(if (model.frontVisible.value) model.drawableResId else R.drawable.playingcards_detailed_back),
+        "Playing card",
+        modifier
+    )
+}
+
+@Composable
+private fun SimpleCard(model: PlayingCard, modifier: Modifier) {
+    Box(modifier, contentAlignment = Alignment.TopCenter) {
         Image(
-            painterResource(if (mutableFrontVisible.value) drawableResId else R.drawable.playingcards_detailed_back),
+            painterResource(if (model.frontVisible.value) R.drawable.playingcards_base else R.drawable.playingcards_detailed_back),
             "Playing card",
-            modifier
+            Modifier.fillMaxSize()
         )
-    }
-
-    @Composable
-    private fun SimpleCard(modifier: Modifier) {
-        Box(modifier, contentAlignment = Alignment.TopCenter) {
-            Image(
-                painterResource(if (mutableFrontVisible.value) R.drawable.playingcards_base else R.drawable.playingcards_detailed_back),
-                "Playing card",
-                Modifier.fillMaxSize()
-            )
-            if (!mutableFrontVisible.value) return@Box
-            val cardHeightInDpTarget = with(LocalDensity.current) {
-                if (mutableIsLast.value) SolitaireLayout.cardHeight.toDp()
-                else (SolitaireLayout.distanceBetweenCards * SolitaireLayout.cardHeight).toDp()
-            }
-            val cardHeightInDp = (animateFloatAsState(
-                targetValue = cardHeightInDpTarget.value, label = "selectedFactor"
-            )).value.dp
-            val cardWidthInDp = with(LocalDensity.current) {
-                SolitaireLayout.cardWidth.toDp()
-            }
-            Box(
-                modifier = Modifier
-                    .height(cardHeightInDp)
-                    .width(cardWidthInDp),
-                contentAlignment = Alignment.Center
+        if (!model.frontVisible.value) return@Box
+        val cardHeightInDpTarget = with(LocalDensity.current) {
+            (cardHeight * (if (model.isLast.value) 1f else distanceBetweenCards)).toDp()
+        }
+        val cardHeightInDp = (animateDpAsState(
+            targetValue = cardHeightInDpTarget, label = "selectedFactor"
+        )).value
+        val cardWidthInDp = with(LocalDensity.current) { cardWidth.toDp() }
+        Box(
+            Modifier
+                .height(cardHeightInDp)
+                .width(cardWidthInDp),
+            contentAlignment = Alignment.Center
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
+                BoxWithConstraints(
+                    Modifier
+                        .width(0.45f * cardWidthInDp)
+                        .heightIn(max = min(cardHeightInDp * 0.8f, cardWidthInDp * 0.45f))
                 ) {
-                    BoxWithConstraints(
-                        Modifier
-                            .width(0.45f * cardWidthInDp)
-                            .heightIn(max = min(cardHeightInDp * 0.8f, cardWidthInDp * 0.45f))
-                    ) {
-                        val c = constraints
-                        val fontSize = PixelHelper.pxToSp(
-                            minOf(
-                                (c.maxWidth * 1.7f / indexString.length).roundToInt(),
-                                (c.maxHeight * 0.95f).roundToInt()
-                            )
+                    val c = constraints
+                    val fontSize = PixelHelper.pxToSp(
+                        LocalContext.current.resources, minOf(
+                            (c.maxWidth * 1.7f / ((model.indexString.length - 1) * 1.1f + 1)).roundToInt(),
+                            (c.maxHeight * 0.95f).roundToInt()
                         )
-                        Text(
-                            indexString,
-                            fontSize = fontSize,
-                            color = indexColor,
-                            textAlign = TextAlign.End,
-                            modifier = Modifier.fillMaxSize(),
-                            style = LocalTextStyle.current.merge(
-                                TextStyle(
-                                    lineHeightStyle = LineHeightStyle(
-                                        alignment = LineHeightStyle.Alignment.Center,
-                                        trim = LineHeightStyle.Trim.Both
-                                    )
-                                ),
-                            )
-                        )
-                    }
-                    Spacer(Modifier.width(0.05f * cardWidthInDp))
-                    Box(
-                        Modifier
-                            .width(0.5f * cardWidthInDp)
-                            .heightIn(max = min(cardHeightInDp * 0.8f, cardWidthInDp * 0.4f)),
-                        contentAlignment = Alignment.CenterStart
-                    ) {
-                        Image(
-                            painter = painterResource(icon), "type ${type.ordinal}"
-                        )
-                    }
+                    )
+                    Text(
+                        model.indexString,
+                        fontSize = fontSize,
+                        color = model.indexColor,
+                        textAlign = TextAlign.End,
+                        modifier = Modifier.fillMaxSize(),
+                        style = LocalTextStyle.current.merge(
+                            TextStyle(
+                                lineHeightStyle = LineHeightStyle(
+                                    alignment = LineHeightStyle.Alignment.Center,
+                                    trim = LineHeightStyle.Trim.Both
+                                ), fontSize = fontSize
+                            ),
+                        ),
+                        maxLines = 1,
+                    )
+                }
+                Spacer(Modifier.width(0.05f * cardWidthInDp))
+                Box(
+                    Modifier
+                        .width(0.5f * cardWidthInDp)
+                        .heightIn(max = min(cardHeightInDp * 0.8f, cardWidthInDp * 0.4f)),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    Image(
+                        painter = painterResource(model.icon), "type ${model.type.ordinal}"
+                    )
                 }
             }
         }
     }
 }
-
-

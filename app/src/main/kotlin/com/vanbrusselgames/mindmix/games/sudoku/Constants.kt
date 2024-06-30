@@ -1,8 +1,6 @@
 package com.vanbrusselgames.mindmix.games.sudoku
 
-enum class Difficulty {
-    EASY, MEDIUM, HARD, EXPERT
-}
+import com.vanbrusselgames.mindmix.utils.constants.Difficulty
 
 enum class InputMode {
     Normal, Note
@@ -13,3 +11,7 @@ enum class PuzzleType {
 }
 
 const val GAME_NAME = "Sudoku"
+
+const val GAME_ID = 0
+
+val enabledDifficulties = listOf(Difficulty.EASY, Difficulty.MEDIUM, Difficulty.HARD, Difficulty.EXPERT, Difficulty.MASTER)

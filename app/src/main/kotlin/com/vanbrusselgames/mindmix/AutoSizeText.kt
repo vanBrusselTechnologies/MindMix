@@ -123,7 +123,7 @@ fun AutoSizeText(
             }
 
             // To see produced list values and the number of iterations, uncomment the next line
-            // Logger.d("counter = $counter, step = $step, [$max, $min] [${possibleFontSizes.first()}, ${possibleFontSizes.last()}]")
+            // Logger.i("counter = $counter, step = $step, [$max, $min] [${possibleFontSizes.first()}, ${possibleFontSizes.last()}]")
             // Example:
             // counter = 4, step = 1.0.sp, [27.636364.sp, 1.0.sp] [27.0.sp, 1.0.sp]
             // counter = 7, step = 1.0.sp, [70.181816.sp, 1.0.sp] [70.0.sp, 1.0.sp]

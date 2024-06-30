@@ -1,5 +1,6 @@
 package com.vanbrusselgames.mindmix
 
+
 import org.junit.Test
 import kotlin.system.measureTimeMillis
 
@@ -14,15 +15,16 @@ class ExampleUnitTest {
 
         val times = 1_000_000
 
-        println("\n\n\n\nStart Test!\n")
+        println("Start Test!\n")
         var t = 0
-
         val elapsed = measureTimeMillis {
             while (t < times) {
                 t++
             }
         }
+
         println("(average) elapsed Time: ${elapsed / times}")
-        println("\nEnd Test2!\n\n\n\n")
+        println("\nEnd Test!\n")
+
     }
 }

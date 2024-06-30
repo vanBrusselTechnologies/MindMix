@@ -1,6 +1,7 @@
 package com.vanbrusselgames.mindmix.menu
 
 import androidx.compose.runtime.mutableStateOf
+import com.vanbrusselgames.mindmix.Logger
 import com.vanbrusselgames.mindmix.SceneManager
 import com.vanbrusselgames.mindmix.ui.theme.SelectedTheme
 import kotlinx.serialization.encodeToString
@@ -10,21 +11,29 @@ class MenuManager {
     companion object Instance {
         val theme = mutableStateOf(SelectedTheme.System)
         val games = SceneManager.scenes.filter { e -> e.value != SceneManager.Scene.MENU }
-        const val GAME_COUNT = 3
         const val ADD_DUPLICATES = true
         var selectedGame = SceneManager.Scene.MINESWEEPER
+        var settingsGame = mutableStateOf(SceneManager.Scene.MENU)
         var coins = 0
-        //private var selectedGameModeIndices = intArrayOf(0, 0, 0)
+
+        val wheelModel = GameWheel(games.size)
+        /*private var selectedGameModeIndices = mapOf(
+            SceneManager.Scene.MINESWEEPER to 0,
+            SceneManager.Scene.SOLITAIRE to 0,
+            SceneManager.Scene.SUDOKU to 0,
+        )*/
 
         fun loadFromFile(data: MenuData) {
             selectedGame = data.selectedGame
+            wheelModel.selectedId = games.filter { g -> g.value == selectedGame }.keys.first()
+            wheelModel.rotationAngle = wheelModel.selectedId * wheelModel.angleStep
             coins = data.coins
-            //selectedGameModeIndices = data.selectedGameModeIndices.toIntArray()
+            //selectedGameModeIndices = data.selectedGameModeIndices
         }
 
         fun saveToFile(): String {
             return Json.encodeToString(
-                MenuData(selectedGame, coins/*, selectedGameModeIndices.toList()*/)
+                MenuData(selectedGame, coins/*, selectedGameModeIndices*/)
             )
         }
 
