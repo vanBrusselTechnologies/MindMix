@@ -102,10 +102,13 @@ class SudokuManager {
 
             val progress = savedProgress.map {
                 SudokuProgress(
-                    Encode.base94(it.clues), Encode.base94(it.input), it.inputNotes.map { notes ->
+                    Encode.base94Collection(it.clues),
+                    Encode.base94Collection(it.input),
+                    it.inputNotes.map { notes ->
                         val booleans = notes.map { n -> n != 0 }
-                        Encode.base94(booleans)
-                    }, it.difficulty
+                        Encode.base94Collection(booleans)
+                    },
+                    it.difficulty
                 )
             }
             return Json.encodeToString(

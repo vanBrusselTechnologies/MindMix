@@ -15,7 +15,9 @@ import com.vanbrusselgames.mindmix.games.sudoku.SudokuLoader
 import com.vanbrusselgames.mindmix.games.sudoku.SudokuManager
 import com.vanbrusselgames.mindmix.menu.MenuData
 import com.vanbrusselgames.mindmix.menu.MenuManager
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import java.io.File
@@ -86,20 +88,22 @@ class DataManager(ctx: Context) {
 
         fun save(withPublish: Boolean = true) {
             if (!loaded) return
-            val str: StringBuilder = StringBuilder()
-            for (entry in SceneManager.scenes) {
-                val dataString = when (entry.value) {
-                    SceneManager.Scene.SUDOKU -> SudokuManager.saveToFile()
-                    SceneManager.Scene.SOLITAIRE -> SolitaireManager.saveToFile()
-                    SceneManager.Scene.MINESWEEPER -> MinesweeperManager.saveToFile()
-                    SceneManager.Scene.MENU -> MenuManager.saveToFile()
+            CoroutineScope(Dispatchers.IO).launch {
+                val str: StringBuilder = StringBuilder()
+                for (entry in SceneManager.scenes) {
+                    val dataString = when (entry.value) {
+                        SceneManager.Scene.SUDOKU -> SudokuManager.saveToFile()
+                        SceneManager.Scene.SOLITAIRE -> SolitaireManager.saveToFile()
+                        SceneManager.Scene.MINESWEEPER -> MinesweeperManager.saveToFile()
+                        SceneManager.Scene.MENU -> MenuManager.saveToFile()
+                    }
+                    str.append("\n${entry.key}%$dataString")
                 }
-                str.append("\n${entry.key}%$dataString")
-            }
-            file.writeText(str.toString().trim(), fileDecoding)
-            if (withPublish) {
-                storagePath?.putStream(file.inputStream())
-                file.inputStream().close()
+                file.writeText(str.toString().trim(), fileDecoding)
+                if (withPublish) {
+                    storagePath?.putStream(file.inputStream())
+                    file.inputStream().close()
+                }
             }
         }
     }

@@ -4,15 +4,15 @@ import java.math.BigInteger
 
 class Encode {
     companion object {
-        fun <T> base94(input: Collection<T>): String {
+        fun <T> base94Collection(input: Collection<T>): String {
             var bigint = BigInteger.ZERO
             if (input.isEmpty()) return base94(bigint)
             val first = input.first()
             if (first is Int) {
                 bigint = BigInteger(input.ifEmpty { listOf(0) }.joinToString(""))
             } else if (first is Boolean) {
-                input as Collection<Boolean>
                 for ((index, value) in input.withIndex()) {
+                    value as Boolean
                     if (value) {
                         bigint = bigint.setBit(index)
                     }

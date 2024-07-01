@@ -170,7 +170,7 @@ class SudokuLoader {
                 }
                 puzzleLoaded.value = false
 
-                val puzzle = Encode.base94(p.clues)
+                val puzzle = Encode.base94Collection(p.clues)
 
                 val fileName = GameLoader.getFileName(
                     GAME_ID, SudokuManager.gameMode.ordinal, p.difficulty.name
@@ -201,7 +201,7 @@ class SudokuLoader {
         }
 
         private fun setProgress(progress: SudokuProgress<List<Int>>, override: Boolean) {
-            if(progress.clues.all { it == 0 }) return
+            if (progress.clues.all { it == 0 }) return
             val index =
                 SudokuManager.savedProgress.indexOfFirst { it.difficulty == progress.difficulty }
             if (index != -1) {
