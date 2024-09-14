@@ -21,7 +21,6 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import com.vanbrusselgames.mindmix.BaseLayout.Companion.activeOverlapUI
-import com.vanbrusselgames.mindmix.Logger
 import com.vanbrusselgames.mindmix.SceneManager
 import kotlinx.coroutines.launch
 import kotlin.math.round
@@ -83,7 +82,7 @@ fun GameWheel(model: GameWheel) {
                 enabled = !activeOverlapUI.value,
                 onDragStarted = {
                     val realAngle = (model.rotationAngle % 360 + 360) % 360
-                    val selectedItem = (realAngle / model.angleStep).roundToInt()
+                    val selectedItem = (realAngle / model.angleStep).toInt()
                     items[selectedItem].isSelected.value = false
                 },
                 onDragStopped = {

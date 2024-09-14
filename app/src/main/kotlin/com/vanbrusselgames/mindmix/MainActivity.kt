@@ -42,6 +42,8 @@ import com.vanbrusselgames.mindmix.games.GameHelp
 import com.vanbrusselgames.mindmix.games.GameLoader
 import com.vanbrusselgames.mindmix.games.GameMenu
 import com.vanbrusselgames.mindmix.games.GameTimer
+import com.vanbrusselgames.mindmix.games.game2048.Game2048
+import com.vanbrusselgames.mindmix.games.game2048.GameUI
 import com.vanbrusselgames.mindmix.games.minesweeper.MinesweeperLayout
 import com.vanbrusselgames.mindmix.games.solitaire.SolitaireLayout
 import com.vanbrusselgames.mindmix.games.sudoku.SudokuLayout
@@ -84,6 +86,8 @@ class MainActivity : ComponentActivity() {
 
         loadPreferences(applicationContext.dataStore)
         DataManager(this)
+
+        val game2048 = Game2048()
 
         setContentView(ComposeView(this).apply {
             setContent {
@@ -133,6 +137,9 @@ class MainActivity : ComponentActivity() {
                             ) {
                                 val mode = it.arguments?.getString("mode")
                                 MinesweeperLayout().Scene()
+                            }
+                            composable("game2048") {
+                                GameUI(game2048.viewModel)
                             }
                         }
                     }

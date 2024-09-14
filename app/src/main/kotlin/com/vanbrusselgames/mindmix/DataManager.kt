@@ -73,6 +73,9 @@ class DataManager(ctx: Context) {
                                 MenuManager.loadFromFile(data)
                             }
 
+                            SceneManager.Scene.GAME2048 -> {
+                            }
+
                             null -> {}
                         }
 
@@ -96,6 +99,7 @@ class DataManager(ctx: Context) {
                         SceneManager.Scene.SOLITAIRE -> SolitaireManager.saveToFile()
                         SceneManager.Scene.MINESWEEPER -> MinesweeperManager.saveToFile()
                         SceneManager.Scene.MENU -> MenuManager.saveToFile()
+                        SceneManager.Scene.GAME2048 -> null
                     }
                     str.append("\n${entry.key}%$dataString")
                 }

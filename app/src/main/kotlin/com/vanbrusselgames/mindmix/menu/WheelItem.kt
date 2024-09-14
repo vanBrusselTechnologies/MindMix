@@ -57,6 +57,7 @@ import com.vanbrusselgames.mindmix.BaseLayout.Companion.activeOverlapUI
 import com.vanbrusselgames.mindmix.BaseUIHandler
 import com.vanbrusselgames.mindmix.R
 import com.vanbrusselgames.mindmix.SceneManager
+import com.vanbrusselgames.mindmix.games.game2048.Game2048
 import com.vanbrusselgames.mindmix.ui.theme.Typography
 import com.vanbrusselgames.mindmix.utils.text.measureTextWidth
 import kotlin.math.cos
@@ -77,6 +78,7 @@ data class WheelItem(val game: SceneManager.Scene) {
         SceneManager.Scene.MINESWEEPER -> R.string.minesweeper_name
         SceneManager.Scene.SOLITAIRE -> R.string.solitaire_name
         SceneManager.Scene.SUDOKU -> R.string.sudoku_name
+        SceneManager.Scene.GAME2048 -> Game2048.NAME_RES_ID
     }
 
     val image = when (game) {
@@ -84,6 +86,7 @@ data class WheelItem(val game: SceneManager.Scene) {
         SceneManager.Scene.MINESWEEPER -> R.drawable.game_icon_minesweeper
         SceneManager.Scene.SOLITAIRE -> R.drawable.playingcards_detailed_clovers_a
         SceneManager.Scene.SUDOKU -> R.drawable.game_icon_sudoku
+        SceneManager.Scene.GAME2048 -> Game2048.IMAGE_RES_ID
     }
 
     //todo?

@@ -44,4 +44,5 @@
     <string name="difficulty_expert">Expert</string>
     <string name="difficulty_master">Master</string>
     <string name="difficulty_label">Difficulty</string>
+    <string name="game2048_name">2048</string>
 </resources>

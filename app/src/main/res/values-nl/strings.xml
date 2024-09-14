@@ -42,4 +42,5 @@
     <string name="difficulty_expert">Expert</string>
     <string name="difficulty_master">Meester</string>
     <string name="difficulty_label">Moelijkheidsgraad</string>
+    <string name="game2048_name">2048</string>
 </resources>

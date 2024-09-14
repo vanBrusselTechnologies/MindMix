@@ -1,8 +1,9 @@
 package com.vanbrusselgames.mindmix.menu
 
 import androidx.compose.runtime.mutableStateOf
-import com.vanbrusselgames.mindmix.Logger
 import com.vanbrusselgames.mindmix.SceneManager
+import com.vanbrusselgames.mindmix.SceneManager.Scene
+import com.vanbrusselgames.mindmix.games.game2048.Game2048
 import com.vanbrusselgames.mindmix.ui.theme.SelectedTheme
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -10,7 +11,9 @@ import kotlinx.serialization.json.Json
 class MenuManager {
     companion object Instance {
         val theme = mutableStateOf(SelectedTheme.System)
-        val games = SceneManager.scenes.filter { e -> e.value != SceneManager.Scene.MENU }
+        val games = mapOf(
+            0 to Scene.SUDOKU, 1 to Scene.SOLITAIRE, 2 to Scene.MINESWEEPER, Game2048.GAME_ID to Scene.GAME2048
+        )
         const val ADD_DUPLICATES = true
         var selectedGame = SceneManager.Scene.MINESWEEPER
         var settingsGame = mutableStateOf(SceneManager.Scene.MENU)

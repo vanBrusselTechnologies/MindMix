@@ -1,7 +1,6 @@
 package com.vanbrusselgames.mindmix.menu
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
@@ -44,6 +43,7 @@ class MenuLayout : BaseLayout() {
                 SceneManager.Scene.MINESWEEPER -> MinesweeperSettings()
                 SceneManager.Scene.SOLITAIRE -> SolitaireSettings()
                 SceneManager.Scene.SUDOKU -> SudokuSettings()
+                SceneManager.Scene.GAME2048 -> {}
             }
         }
     }
