@@ -65,6 +65,8 @@ class MainActivity : ComponentActivity() {
         lateinit var snackbarHostState: SnackbarHostState
         lateinit var scope: CoroutineScope
         lateinit var functions: FirebaseFunctions
+
+        val game2048 = Game2048()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,8 +88,6 @@ class MainActivity : ComponentActivity() {
 
         loadPreferences(applicationContext.dataStore)
         DataManager(this)
-
-        val game2048 = Game2048()
 
         setContentView(ComposeView(this).apply {
             setContent {
@@ -138,7 +138,7 @@ class MainActivity : ComponentActivity() {
                                 val mode = it.arguments?.getString("mode")
                                 MinesweeperLayout().Scene()
                             }
-                            composable("game2048") {
+                            composable(Game2048.NAV_ROUTE, Game2048.NAV_ARGUMENTS) {
                                 GameUI(game2048.viewModel)
                             }
                         }
