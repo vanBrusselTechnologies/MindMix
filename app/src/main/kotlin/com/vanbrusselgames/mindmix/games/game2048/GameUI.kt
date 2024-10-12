@@ -20,7 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -33,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlin.math.min
 
 const val threshold = 100
 
@@ -81,10 +82,10 @@ fun Grid2048(viewModel: GameViewModel) {
             }) {
         LazyHorizontalGrid(GridCells.Fixed(viewModel.sideSize), userScrollEnabled = false) {
             items(viewModel.cellList, key = { item -> item.id }) {
-                val value = remember { mutableIntStateOf(it.value) }
+                val value = remember { mutableLongStateOf(it.value) }
                 val background by animateColorAsState(it.background.value,
                     label = "cell_${it.id} background",
-                    finishedListener = { c -> value.intValue = it.value })
+                    finishedListener = { c -> value.longValue = it.value })
                 Box(
                     Modifier
                         .aspectRatio(1f)
@@ -96,13 +97,13 @@ fun Grid2048(viewModel: GameViewModel) {
                         .padding(2.dp)
                         .clip(RoundedCornerShape(5.dp))
                         .drawBehind {
-                            if (it.value != 0) drawRect(background)
+                            if (it.value != 0L) drawRect(background)
                         }, contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        if (it.value == 0) "" else value.intValue.toString(),
-                        fontSize = 50.sp,
-                        color = if (value.intValue < 256) Color.Black else Color(185, 185, 185),
+                        if (it.value == 0L) "" else value.longValue.toString(),
+                        fontSize = min(200f / viewModel.sideSize, (550f / viewModel.sideSize) / value.longValue.toString().length).sp,
+                        color = if (value.longValue < 256) Color.Black else Color(220, 220, 220),
                         fontWeight = FontWeight.ExtraBold,
                         style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum")
                     )

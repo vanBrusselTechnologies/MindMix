@@ -18,11 +18,13 @@ class GameViewModel : ViewModel() {
     val isStuck = mutableStateOf(false)
 
     init {
-        cellList.shuffle()
-        for (i in 0 until startNumbers) {
-            cellList[i].value = 2
+        if(cellList.any{it.value == 0L}) {
+            cellList.shuffle()
+            for (i in 0 until startNumbers) {
+                cellList[i].value = 2
+            }
+            cellList.sortBy { it.id }
         }
-        cellList.sortBy { it.id }
     }
 
     fun swipeUp() {
@@ -31,7 +33,7 @@ class GameViewModel : ViewModel() {
 
         val tempCellList = mutableListOf<GridCell2048>()
         getColumns().forEachIndexed { cId, column ->
-            val cells = column.filter { it.value != 0 }.toMutableList()
+            val cells = column.filter { it.value != 0L }.toMutableList()
             while (cells.size < sideSize) {
                 cells.add(GridCell2048(newId++, 0))
             }
@@ -51,7 +53,7 @@ class GameViewModel : ViewModel() {
 
         val tempCellList = mutableListOf<GridCell2048>()
         getColumns().forEachIndexed { cId, column ->
-            val cells = column.filter { it.value != 0 }.toMutableList()
+            val cells = column.filter { it.value != 0L }.toMutableList()
             while (cells.size < sideSize) {
                 cells.add(0, GridCell2048(newId++, 0))
             }
@@ -70,7 +72,7 @@ class GameViewModel : ViewModel() {
         combineEqualCells(rows)
 
         val newRows = getRows().mapIndexed { rId, row ->
-            val cells = row.filter { it.value != 0 }.toMutableList()
+            val cells = row.filter { it.value != 0L }.toMutableList()
             while (cells.size < sideSize) {
                 cells.add(GridCell2048(newId++, 0))
             }
@@ -93,7 +95,7 @@ class GameViewModel : ViewModel() {
         combineEqualCells(rows)
 
         val newRows = getRows().mapIndexed { rId, row ->
-            val cells = row.filter { it.value != 0 }.toMutableList()
+            val cells = row.filter { it.value != 0L }.toMutableList()
             while (cells.size < sideSize) {
                 cells.add(0, GridCell2048(newId++, 0))
             }
@@ -127,11 +129,11 @@ class GameViewModel : ViewModel() {
 
     private fun combineEqualCells(cells: List<List<GridCell2048>>) {
         for (r in cells) {
-            var v = 0
+            var v = 0L
             var cId = -1
             for (c in r) {
-                if (c.value == 0) continue
-                if (v == 0 || v != c.value) {
+                if (c.value == 0L) continue
+                if (v == 0L || v != c.value) {
                     v = c.value
                     cId = c.id
                     continue
@@ -146,7 +148,7 @@ class GameViewModel : ViewModel() {
     }
 
     private fun tryAddCell() {
-        val options = cellList.fastFilter { c -> c.value == 0 }
+        val options = cellList.fastFilter { c -> c.value == 0L }
         if (options.isEmpty()) {
             isStuck.value = !canMove()
             return
@@ -156,16 +158,16 @@ class GameViewModel : ViewModel() {
     }
 
     private fun canMove(): Boolean {
-        if (cellList.fastAny { c -> c.value == 0 }) return true
+        if (cellList.fastAny { c -> c.value == 0L }) return true
         getRows().fastForEach {
-            var value = 0
+            var value = 0L
             for (c in it) {
                 if (c.value == value) return true
                 value = c.value
             }
         }
         getColumns().fastForEach {
-            var value = 0
+            var value = 0L
             for (c in it) {
                 if (c.value == value) return true
                 value = c.value
