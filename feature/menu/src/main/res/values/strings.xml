@@ -1,0 +1,11 @@
+<resources>
+    <string name="signin">Sign In</string>
+    <string name="connected">Connected</string>
+    <string name="play">Play</string>
+    <string name="request_data_deletion">Request data deletion</string>
+    <string name="settings">Settings</string>
+    <string name="system">System</string>
+    <string name="dark_theme">Dark theme</string>
+    <string name="light_theme">Light theme</string>
+    <string name="theme">Theme</string>
+</resources>

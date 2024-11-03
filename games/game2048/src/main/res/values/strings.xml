@@ -1,0 +1,10 @@
+<resources>
+    <string name="game_2048_name">2048</string>
+    <string name="game_2048_desc">Swipe to move the tiles.\nTiles with the same number merge into one when they touch.\nAdd them up to reach 2048 (or even higher)!</string>
+    <string name="game_2048_size_3x3" translatable="false">3x3</string>
+    <string name="game_2048_size_4x4" translatable="false">4x4</string>
+    <string name="game_2048_size_5x5" translatable="false">5x5</string>
+    <string name="game_2048_size_6x6" translatable="false">6x6</string>
+    <string name="game_2048_size_7x7" translatable="false">7x7</string>
+    <string name="game_2048_size_label">Size</string>
+</resources>

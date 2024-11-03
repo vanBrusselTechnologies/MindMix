@@ -1,17 +1,19 @@
 package com.vanbrusselgames.mindmix
 
+import android.app.Activity
 import com.google.android.play.core.review.ReviewException
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.google.android.play.core.review.model.ReviewErrorCode
+import com.vanbrusselgames.mindmix.core.logging.Logger
 
 class ReviewManager {
     companion object {
-        private lateinit var activity: MainActivity
+        private lateinit var activity: Activity
         private lateinit var reviewManager: com.google.android.play.core.review.ReviewManager
         private var shown = false
 
         fun start(
-            activity: MainActivity
+            activity: Activity
         ) {
             this.activity = activity
             reviewManager = ReviewManagerFactory.create(activity)

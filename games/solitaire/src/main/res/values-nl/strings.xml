@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="solitaire_name">Solitaire</string>
+    <string name="solitaire_desc">Solitaire is een kaartspel voor 1 persoon wat je speelt met 1 pak kaarten zonder de jokers. Het doel is om alle kaarten vanuit een bepaalde startopstelling weg te spelen of te verplaatsen naar zogenaamde eindstapels. Wanneer alle 52 kaarten op volgorde naar de eindstapels gespeeld zijn, heb je het spel gewonnen.</string>
+    <string name="finish_game">Voltooi spel</string>
+    <string name="solitaire_success">Goed gedaan! Je hebt de solitaire opgelost!</string>
+    <string name="auto_edit_notes">Notities automatisch bijwerken</string>
+    <string name="double_number_warning">Waarschuwing bij dubbele getallen</string>
+    <string name="card_type">Kaart type</string>
+    <string name="card_type_simple">Simpel</string>
+    <string name="card_type_detailed">Gedetailleerd</string>
+    <string name="time">"Tijd: "</string>
+</resources>

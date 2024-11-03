@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="signin">Inloggen</string>
+    <string name="connected">Ingelogd</string>
+    <string name="play">Play</string>
+    <string name="request_data_deletion">Vraag gegevensverwijdering aan</string>
+    <string name="settings">Instellingen</string>
+    <string name="system">Systeem</string>
+    <string name="dark_theme">Donker thema</string>
+    <string name="light_theme">Licht thema</string>
+    <string name="theme">Thema</string>
+</resources>

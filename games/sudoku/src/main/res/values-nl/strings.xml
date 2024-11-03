@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sudoku_name">Sudoku</string>
+    <string name="sudoku_desc">Een sudoku puzzel bestaat uit 81 cellen die zijn verdeeld over negen kolommen, rijen en regio\'s.\n\nHet is de bedoeling dat de nummers 1 tot 9 op zo\'n manier in de lege cellen komen, dat in elke kolom, rij en 3x3 regio elk getal maar één keer voor komt.</string>
+    <string name="sudoku_success">Goed gedaan! Je hebt de sudoku opgelost!</string>
+    <string name="auto_edit_notes">Notities automatisch bijwerken</string>
+    <string name="double_number_warning">Waarschuwing bij dubbele getallen</string>
+    <string name="difficulty_label">Moelijkheidsgraad</string>
+</resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="minesweeper_name">Mijnenveger</string>
+    <string name="mines_left">Mijnen over:</string>
+    <string name="minesweeper_desc">Het spel bestaat uit een veld met gesloten vakjes, waarvan onder enkele vakjes een mijn verstopt zit. Het hoofddoel is zo snel mogelijk alle vakjes waar zich geen mijn bevindt te identificeren. In het begin klikt men een vakje in het veld aan, in de hoop dat er geen mijn onder zit. Als dit niet het geval is, zal er een nummer tussen 1 en 8 verschijnen, of een veld met meerdere nummers. Dit nummer geeft aan hoeveel mijnen er aan dit vlakje grenzen, dit kunnen vakjes zijn die aan naast elkaar staan, of schuin van elkaar staan. Hiervan uitgaande kan men alle mijnen ontwijken door de nummers op de verschillende aangeklikte vlakjes logisch te combineren.\n\nVelden waarvan men verwacht dat er een mijn achter zit, kan men markeren met een vlaggetje. De vlag-modus kan je (de)activeren door op de knop met schep/vlag symbool te klikken.</string>
+    <string name="minesweeper_failed">Helaas! Een van de bommen is ontploft!</string>
+    <string name="minesweeper_success">Goed gedaan! Je hebt alle bommen opgeruimd!</string>
+    <string name="auto_flag">Automatisch vlaggen plaatsen</string>
+    <string name="safe_area">Start met veilig gebied</string>
+</resources>

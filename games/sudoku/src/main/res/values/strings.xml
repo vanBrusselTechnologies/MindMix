@@ -1,0 +1,8 @@
+<resources>
+    <string name="sudoku_name">Sudoku</string>
+    <string name="sudoku_desc">A Sudoku puzzle consists of 81 cells which are divided into nine columns, rows and regions.\n\nThe task is now to place the numbers from 1 to 9 into the empty cells in such a way that in every row, column and 3x3 region each number appears only once.</string>
+    <string name="sudoku_success">Well done! You solved the sudoku!</string>
+    <string name="auto_edit_notes">Auto-edit candidates</string>
+    <string name="double_number_warning">Warning for double digits</string>
+    <string name="difficulty_label">Difficulty</string>
+</resources>

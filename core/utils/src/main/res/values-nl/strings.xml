@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="difficulty_easy">Gemakkelijk</string>
+    <string name="difficulty_medium">Gemiddeld</string>
+    <string name="difficulty_hard">Moeilijk</string>
+    <string name="difficulty_expert">Expert</string>
+    <string name="difficulty_master">Meester</string>
+</resources>

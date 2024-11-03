@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="core_designsystem_theme_system">Systeem</string>
+    <string name="core_designsystem_theme_dark">Donker thema</string>
+    <string name="core_designsystem_theme_light">Licht thema</string>
+</resources>

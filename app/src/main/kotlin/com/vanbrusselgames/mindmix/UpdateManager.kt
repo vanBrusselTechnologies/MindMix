@@ -4,8 +4,6 @@ import android.app.Activity
 import android.content.Context
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarResult
 import com.google.android.play.core.appupdate.AppUpdateInfo
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
@@ -14,6 +12,8 @@ import com.google.android.play.core.install.InstallStateUpdatedListener
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class UpdateManager {
@@ -34,16 +34,22 @@ class UpdateManager {
                     popupSnackbarForCompleteUpdate(activity)
                 } else if (appUpdateInfo.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) {
                     // If an in-app update is already running, resume the update.
-                    requestUpdate(activity, appUpdateInfo, activityResultLauncher, AppUpdateType.IMMEDIATE)
+                    requestUpdate(
+                        activity, appUpdateInfo, activityResultLauncher, AppUpdateType.IMMEDIATE
+                    )
                 } else if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE && appUpdateInfo.updatePriority() >= 4 /* high priority */ && appUpdateInfo.isUpdateTypeAllowed(
                         AppUpdateType.IMMEDIATE
                     )
                 ) {
-                    requestUpdate(activity, appUpdateInfo, activityResultLauncher, AppUpdateType.IMMEDIATE)
+                    requestUpdate(
+                        activity, appUpdateInfo, activityResultLauncher, AppUpdateType.IMMEDIATE
+                    )
                 } else if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE && /*(appUpdateInfo.clientVersionStalenessDays() ?: -1) >= DAYS_FOR_FLEXIBLE_UPDATE &&*/
                     appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)
                 ) {
-                    requestUpdate(activity, appUpdateInfo, activityResultLauncher, AppUpdateType.FLEXIBLE)
+                    requestUpdate(
+                        activity, appUpdateInfo, activityResultLauncher, AppUpdateType.FLEXIBLE
+                    )
                 }
             }
         }
@@ -83,22 +89,23 @@ class UpdateManager {
         }
 
         private fun popupSnackbarForCompleteUpdate(ctx: Context) {
-            MainActivity.scope.launch {
-                val result = MainActivity.snackbarHostState.showSnackbar(
-                    message = ctx.resources.getString(R.string.flexible_update_downloaded),
-                    actionLabel = "Restart",
-                    duration = SnackbarDuration.Indefinite,
-                    withDismissAction = false
-                )
-                when (result) {
-                    SnackbarResult.ActionPerformed -> {
-                        DataManager.save(false)
-                        appUpdateManager.completeUpdate()
-                        MainActivity.snackbarHostState.currentSnackbarData?.dismiss()
+            CoroutineScope(Dispatchers.Main).launch{
+                /*todo:
+                    val result = MainActivity.snackbarHostState.showSnackbar(
+                        message = ctx.resources.getString(R.string.flexible_update_downloaded),
+                        actionLabel = "Restart",
+                        duration = SnackbarDuration.Indefinite,
+                        withDismissAction = false
+                    )
+                    when (result) {
+                        SnackbarResult.ActionPerformed -> {
+                            DataManager.save(false)
+                            appUpdateManager.completeUpdate()
+                            MainActivity.snackbarHostState.currentSnackbarData?.dismiss()
+                        }
+                        SnackbarResult.Dismissed -> {}
                     }
-
-                    SnackbarResult.Dismissed -> {}
-                }
+                 */
             }
         }
     }
