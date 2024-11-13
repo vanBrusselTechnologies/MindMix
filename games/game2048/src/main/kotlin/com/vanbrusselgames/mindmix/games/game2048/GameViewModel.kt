@@ -1,6 +1,7 @@
 package com.vanbrusselgames.mindmix.games.game2048
 
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.util.fastAny
@@ -28,7 +29,7 @@ class GameViewModel : BaseGameViewModel() {
         private set
     private var cellCount: Int = sideSize * sideSize
     private val startNumbers = 3
-    val cellList = List(cellCount) { GridCell2048(it, 0) }.toMutableStateList()
+    val cellList = mutableStateListOf<GridCell2048>()
     private var newId = cellCount
 
     var isStuck = false
@@ -47,21 +48,34 @@ class GameViewModel : BaseGameViewModel() {
     fun getHighestTileValue() = cellList.map { it.value }.max()
 
     init {
-        if (cellList.any { it.value == 0L }) {
-            cellList.shuffle()
-            for (i in 0 until startNumbers) {
-                cellList[i].value = 2
-            }
-            cellList.sortBy { it.id }
+        // TODO: Load progress
+        if (cellList.isEmpty() || cellList.all { it.value == 0L }) {
+            startNewGame()
         }
     }
 
+    private fun reset() {
+        cellList.clear()
+
+        isStuck = false
+        delayedDialog = false
+        score.longValue = 0L
+    }
+
     override fun startNewGame() {
-        TODO("Not yet implemented")
+        reset()
+
+        cellList.addAll(List(cellCount) { GridCell2048(newId++, 0) }.toMutableStateList())
+        cellList.shuffle()
+        for (i in 0 until startNumbers) {
+            cellList[i].value = 2
+        }
+        cellList.sortBy { it.id }
     }
 
     fun setSize(value: GridSize2048) {
         saveAndLoadProgress(gridSize.value, value)
+        gridSize.value = value
     }
 
     private fun saveAndLoadProgress(prevSize: GridSize2048, size: GridSize2048) {
@@ -69,15 +83,14 @@ class GameViewModel : BaseGameViewModel() {
 
         //if (currentPuzzle != null) setCurrentProgress(prevDifficulty)
 
-        //val progress = savedProgress.find { it.difficulty == difficulty }!!
-        //if (progress.clues.isEmpty()) return
+        //val progress = savedProgress.find { it.size == size }!!
+        //if (progress.cellList.isEmpty()) return
         //currentPuzzle = LoadedPuzzle(SIZE, difficulty, progress.clues)
 
-        gridSize.value = size
+        if (prevSize === size) return
         sideSize = size.getSize()
         cellCount = sideSize * sideSize
 
-        if (prevSize === size) return
         cellList.clear()
         cellList.addAll(List(cellCount) { GridCell2048(newId++, 0) }.toMutableStateList())
 
@@ -267,10 +280,12 @@ class GameViewModel : BaseGameViewModel() {
     }
 
     private fun onGameFinished(navController: NavController, reachedTarget: Boolean) {
+        // TODO : Localize CORRECT title / text
         FinishedGame.titleResId = Game2048.NAME_RES_ID
         FinishedGame.textResId = R.string.game_2048_desc
         FinishedGame.score = score.longValue
         FinishedGame.highestTileValue = getHighestTileValue()
+        FinishedGame.isStuck = isStuck
         val bonusReward =
             1.5.pow((log2(getHighestTileValue().toDouble()) - log2(getTarget().toDouble())))
                 .fastRoundToInt()

@@ -49,9 +49,7 @@ import kotlin.math.floor
 fun GameUI(viewModel: GameViewModel, navController: NavController) {
     BaseScene(viewModel, navController) {
         if (!SudokuLoader.puzzleLoaded.value) GameLoadingScreen()
-        else SudokuSpecificLayout(viewModel, navController)/*GameFinished_Old.Screen(
-            viewModel,
-            onClickPlayAgain = { viewModel.startNewGame() })*/
+        else SudokuSpecificLayout(viewModel, navController)
     }
 }
 

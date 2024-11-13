@@ -1,7 +1,6 @@
 package com.vanbrusselgames.mindmix.games.solitaire
 
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.IntOffset
 import androidx.core.math.MathUtils.clamp
 import androidx.navigation.NavController
@@ -30,6 +29,8 @@ class GameViewModel : BaseGameViewModel(), ITimerVM {
     override val descResId = R.string.solitaire_desc
 
     override val timer = GameTimer()
+    private var fastestTime = -1L
+    private var moves = 0
 
     var distanceBetweenCards = 0.175f
     var cardHeight = 0f
@@ -395,6 +396,8 @@ class GameViewModel : BaseGameViewModel(), ITimerVM {
         couldGetFinished.value = couldGetFinished()
         timer.set(data.millis)
         timer.addMillis(data.penaltyMillis)
+        fastestTime = data.fastestMillis
+        moves = data.moves
 
         if (cardStacks[6].isEmpty() && cardStacks[5].size <= 1) restStackEnabled.value = false
     }
@@ -405,7 +408,14 @@ class GameViewModel : BaseGameViewModel(), ITimerVM {
             stacks[i] = cardStacks[i].map { c -> if (c.frontVisible.value) c.id else -1 * c.id - 1 }
         }
         return Json.encodeToString(
-            SolitaireData(stacks.asList(), finished, timer.currentMillis, timer.penaltyMillis)
+            SolitaireData(
+                stacks.asList(),
+                finished,
+                timer.currentMillis,
+                timer.addedMillis,
+                fastestTime,
+                moves
+            )
         )
     }
 
@@ -489,6 +499,7 @@ class GameViewModel : BaseGameViewModel(), ITimerVM {
             it.recalculateZIndex()
             it.calculateBaseOffset()
         }
+        moves = 0
     }
 
     override fun startNewGame() {
@@ -507,9 +518,9 @@ class GameViewModel : BaseGameViewModel(), ITimerVM {
             card.frontVisible.value = false
             card.isLast.value = false
             card.visible.value = false
-            card.isMoving = false
-            card.recalculateZIndex()
             card.calculateBaseOffset()
+            card.recalculateZIndex()
+            card.isMoving = false
             coroutineScope.launch {
                 card.animOffset.animateTo(card.baseOffset)
             }
@@ -527,14 +538,13 @@ class GameViewModel : BaseGameViewModel(), ITimerVM {
         card.stackId = 5
         card.frontVisible.value = true
         card.isLast.value = true
-        card.recalculateZIndex()
         card.calculateBaseOffset()
+        card.recalculateZIndex()
+        card.isMoving = false
         cardStacks[5].add(card)
         cardStacks[6].removeAt(cardStacks[6].lastIndex)
         coroutineScope.launch {
             card.animOffset.animateTo(card.baseOffset)
-            card.isMoving = false
-            card.recalculateZIndex()
         }
         if (cardStacks[6].isEmpty() && cardStacks[5].size <= 1) restStackEnabled.value = false
     }
@@ -563,14 +573,11 @@ class GameViewModel : BaseGameViewModel(), ITimerVM {
         }
     }
 
-    fun moveCards(offset: Offset, coroutineScope: CoroutineScope) {
+    fun moveCards(coroutineScope: CoroutineScope, intOffset: IntOffset) {
         movingCards.forEach { card ->
-            card.offset = IntOffset(
-                card.offset.x + offset.x.roundToInt(), card.offset.y + offset.y.roundToInt()
-            )
-            val baseOffset = card.baseOffset
+            card.offset += intOffset
             coroutineScope.launch {
-                card.animOffset.animateTo(baseOffset + card.offset)
+                card.animOffset.animateTo(card.baseOffset + card.offset)
             }
         }
     }
@@ -608,17 +615,18 @@ class GameViewModel : BaseGameViewModel(), ITimerVM {
 
         movingCards.forEach { card ->
             card.offset = IntOffset.Zero
-            val baseOffset = card.baseOffset
+            card.recalculateZIndex()
+            card.isMoving = false
             coroutineScope.launch {
-                card.animOffset.animateTo(baseOffset)
-                card.isMoving = false
-                card.recalculateZIndex()
+                card.animOffset.animateTo(card.baseOffset)
             }
         }
         movingCards.clear()
 
         if (firstCardStackId >= 7 && oldStack.isNotEmpty()) oldStack.last().frontVisible.value =
             true
+
+        moves++
 
         if (foundNewStack) checkFinished(navController)
         else timer.addMillis(15000)
@@ -693,12 +701,26 @@ class GameViewModel : BaseGameViewModel(), ITimerVM {
     }
 
     private fun onGameFinished(navController: NavController) {
-        FinishedGame.titleResId = Solitaire.NAME_RES_ID// TODO: "Congrats / Smart / Well done"
+        // TODO : Localize CORRECT title / text
+        FinishedGame.titleResId = Solitaire.NAME_RES_ID// "Congrats / Smart / Well done"
         FinishedGame.textResId = R.string.solitaire_success
+        // """You did great and solved puzzle in ${0} seconds!!
+        //     |That's Awesome!
+        //     |Share with your friends and challenge them to beat your time!""".trimMargin()
+
+        FinishedGame.moves = moves
         FinishedGame.usedMillis = timer.currentMillis
-        FinishedGame.penaltyMillis = timer.penaltyMillis
+        FinishedGame.penaltyMillis = timer.addedMillis
+        FinishedGame.lastRecordMillis = fastestTime
+
+        val totalUsedTime = timer.currentMillis + timer.addedMillis
+        val isNewRecord = fastestTime == -1L || fastestTime > totalUsedTime
+        if (isNewRecord) fastestTime = totalUsedTime
+        FinishedGame.isNewRecord = isNewRecord
+
         val minutes = max(1f, timer.currentMillis / 1000f / 60f)
-        FinishedGame.reward = max(1, floor(MAX_REWARD / minutes).toInt())
+        FinishedGame.reward =
+            max(1, floor(MAX_REWARD / minutes).toInt()) + if (isNewRecord) 2 else 0
 
         navController.navigateToGameFinished()
     }

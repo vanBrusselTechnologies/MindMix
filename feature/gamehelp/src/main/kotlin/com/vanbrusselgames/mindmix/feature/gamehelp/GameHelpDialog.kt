@@ -31,8 +31,9 @@ import com.vanbrusselgames.mindmix.core.designsystem.theme.MindMixTheme
 
 @Composable
 fun GameHelpDialog(navController: NavController, titleId: Int, descriptionId: Int) {
-    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+    val localConfig = LocalConfiguration.current
+    val screenWidth = localConfig.screenWidthDp.dp
+    val screenHeight = localConfig.screenHeightDp.dp
     Card(
         Modifier
             .sizeIn(maxWidth = screenWidth * 0.95f, maxHeight = screenHeight * 0.95f)

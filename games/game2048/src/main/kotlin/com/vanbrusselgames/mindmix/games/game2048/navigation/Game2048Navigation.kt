@@ -24,7 +24,6 @@ fun NavController.navigateTo2048(navOptions: NavOptions? = null) {
 fun NavGraphBuilder.game2048(
     navController: NavController, viewModel: GameViewModel
 ) {
-
     composable<Game2048Route> {
         GameUI(viewModel, navController)
     }

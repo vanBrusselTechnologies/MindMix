@@ -9,7 +9,7 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,9 +17,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,6 +38,7 @@ import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.min
+import androidx.compose.ui.unit.round
 import androidx.compose.ui.unit.times
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
@@ -119,13 +122,15 @@ data class PlayingCard(
 fun PlayingCard(model: PlayingCard, modifier: Modifier, navController: NavController) {
     val coroutineScope = rememberCoroutineScope()
     val interactionSource = remember { MutableInteractionSource() }
+    val onClickLabel =
+        remember { "${model.type.name.replaceFirstChar { it.titlecase() }} ${model.indexString}" }
     val mod = modifier
         .zIndex(model.zIndex.floatValue)
         .offset { model.animOffset.value }
         .clickable(
-            onClickLabel = "${model.type.name.replaceFirstChar { it.titlecase() }} $model.indexString",
-            interactionSource = interactionSource,
-            indication = null
+            interactionSource,
+            indication = null,
+            onClickLabel = onClickLabel,
         ) {
             if (SceneManager.dialogActiveState.value) return@clickable
             if (model.stackId == 6) {
@@ -146,7 +151,7 @@ fun PlayingCard(model: PlayingCard, modifier: Modifier, navController: NavContro
                 model.viewModel.onReleaseMovingCards(coroutineScope, navController)
             }, onDrag = { change, offset ->
                 change.consume()
-                model.viewModel.moveCards(offset, coroutineScope)
+                model.viewModel.moveCards(coroutineScope, offset.round())
             })
         }
     if (!model.visible.value) return Box(mod) {}
@@ -168,69 +173,74 @@ private fun DetailedCard(model: PlayingCard, modifier: Modifier) {
 @Composable
 private fun SimpleCard(model: PlayingCard, modifier: Modifier) {
     Box(modifier, contentAlignment = Alignment.TopCenter) {
-        Image(
-            painterResource(if (model.frontVisible.value) R.drawable.playingcards_base else R.drawable.playingcards_detailed_back),
-            "Playing card",
-            Modifier.fillMaxSize()
-        )
+        SimpleCardBackground(model.frontVisible)
         if (!model.frontVisible.value) return@Box
-        val cardHeightInDpTarget = with(LocalDensity.current) {
+        SimpleCardContent(model)
+    }
+}
+
+@Composable
+fun SimpleCardBackground(frontVisible: MutableState<Boolean>) {
+    Image(
+        painterResource(if (frontVisible.value) R.drawable.playingcards_base else R.drawable.playingcards_detailed_back),
+        "Playing card",
+        Modifier.fillMaxSize()
+    )
+}
+
+@Composable
+fun SimpleCardContent(model: PlayingCard) {
+    val localDensity = LocalDensity.current
+    val cardHeightInDpTarget = remember(model.isLast.value) {
+        with(localDensity) {
             (model.viewModel.cardHeight * (if (model.isLast.value) 1f else model.viewModel.distanceBetweenCards)).toDp()
         }
-        val cardHeightInDp = (animateDpAsState(
-            targetValue = cardHeightInDpTarget, label = "selectedFactor"
-        )).value
-        val cardWidthInDp = with(LocalDensity.current) { model.viewModel.cardWidth.toDp() }
-        Box(
-            Modifier
-                .height(cardHeightInDp)
-                .width(cardWidthInDp),
-            contentAlignment = Alignment.Center
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                BoxWithConstraints(
-                    Modifier
-                        .width(0.45f * cardWidthInDp)
-                        .heightIn(max = min(cardHeightInDp * 0.8f, cardWidthInDp * 0.45f))
-                ) {
-                    val c = this.constraints
-                    val res = LocalContext.current.resources
-                    val fontSize = remember {
-                        PixelHelper.pxToSp(
-                            res, minOf(
-                                (c.maxWidth * 1.7f / ((model.indexString.length - 1) * 1.1f + 1)).roundToInt(),
-                                (c.maxHeight * 0.95f).roundToInt()
-                            )
-                        )
-                    }
-                    Text(
-                        model.indexString,
-                        fontSize = fontSize,
-                        color = model.indexColor,
-                        textAlign = TextAlign.End,
-                        modifier = Modifier.fillMaxSize(),
-                        style = LocalTextStyle.current.merge(
-                            TextStyle(
-                                lineHeightStyle = LineHeightStyle(
-                                    alignment = LineHeightStyle.Alignment.Center,
-                                    trim = LineHeightStyle.Trim.Both
-                                ), fontSize = fontSize
-                            ),
-                        ),
-                        maxLines = 1,
-                    )
-                }
-                Spacer(Modifier.width(0.05f * cardWidthInDp))
-                Box(
-                    Modifier
-                        .width(0.5f * cardWidthInDp)
-                        .heightIn(max = min(cardHeightInDp * 0.8f, cardWidthInDp * 0.4f)),
-                    contentAlignment = Alignment.CenterStart
-                ) { Image(painterResource(model.icon), "type ${model.type.ordinal}") }
-            }
+    }
+    val cardHeightInDp = animateDpAsState(cardHeightInDpTarget, label = "selectedFactor").value
+    val cardWidthInDp = remember { with(localDensity) { model.viewModel.cardWidth.toDp() } }
+    Row(
+        Modifier
+            .height(cardHeightInDp)
+            .widthIn(max = cardWidthInDp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        val maxWidth = remember(cardWidthInDp) {
+            with(localDensity) { (cardWidthInDp * 0.45f).toPx() }
         }
+        val maxHeight = remember(cardHeightInDp, cardWidthInDp) {
+            with(localDensity) { min(cardHeightInDp * 0.8f, cardWidthInDp * 0.45f).toPx() }
+        }
+        val res = LocalContext.current.resources
+        val fontSize = remember(maxWidth, maxHeight) {
+            PixelHelper.pxToSp(
+                res, minOf(
+                    (maxWidth * 1.7f / ((model.indexString.length - 1) * 1.1f + 1)).roundToInt(),
+                    (maxHeight * 0.95f).roundToInt()
+                )
+            )
+        }
+        Text(
+            model.indexString,
+            Modifier.width(IntrinsicSize.Max),
+            model.indexColor,
+            fontSize,
+            textAlign = TextAlign.End,
+            style = LocalTextStyle.current.merge(
+                TextStyle(
+                    lineHeightStyle = LineHeightStyle(
+                        alignment = LineHeightStyle.Alignment.Center,
+                        trim = LineHeightStyle.Trim.Both
+                    ), fontSize = fontSize
+                ),
+            ),
+            maxLines = 1,
+        )
+        Spacer(Modifier.width(0.05f * cardWidthInDp))
+        Image(
+            painterResource(model.icon),
+            "type ${model.type.ordinal}",
+            Modifier.heightIn(max = min(cardHeightInDp * 0.8f, cardWidthInDp * 0.4f))
+        )
     }
 }

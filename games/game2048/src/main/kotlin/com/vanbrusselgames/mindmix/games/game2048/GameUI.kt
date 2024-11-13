@@ -4,8 +4,10 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -19,6 +21,7 @@ import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,18 +37,21 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.min
 import androidx.compose.ui.util.fastRoundToInt
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.vanbrusselgames.mindmix.core.common.BaseScene
+import com.vanbrusselgames.mindmix.core.designsystem.theme.MindMixTheme
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
 import kotlin.math.abs
-import kotlin.math.min
+import kotlin.math.max
 import kotlin.math.sqrt
 
 const val threshold = 100
@@ -60,10 +66,8 @@ fun GameUI(viewModel: GameViewModel, navController: NavController) {
             contentAlignment = Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Score:")
-                    Text(viewModel.score.longValue.toString())
-                }
+                Text(stringResource(R.string.game_2048_score_label))
+                Text(viewModel.score.longValue.toString())
                 Spacer(modifier = Modifier.size(16.dp))
                 Box(
                     Modifier
@@ -80,7 +84,7 @@ fun Grid2048(viewModel: GameViewModel, navController: NavController) {
     var offsetX by remember { mutableFloatStateOf(0f) }
     var offsetY by remember { mutableFloatStateOf(0f) }
 
-    Box(
+    BoxWithConstraints(
         Modifier
             .aspectRatio(1f)
             .pointerInput(Unit) {
@@ -113,8 +117,24 @@ fun Grid2048(viewModel: GameViewModel, navController: NavController) {
                     //Show effect what will happen when swipe will get finished -- Just effects
                 })
             }) {
+        val currentSpace = remember(this.maxWidth, this.maxHeight) {
+            min(
+                this.maxWidth, this.maxHeight
+            ) / viewModel.sideSize
+        }
+        val localDensity = LocalDensity.current
+        val fontSize = remember(currentSpace) { with(localDensity) { currentSpace.toSp() * 1.25f } }
+
+        val modifier = Modifier
+            .aspectRatio(1f)
+            .padding(1.5.dp)
+            .clip(RoundedCornerShape(5.dp))
         LazyHorizontalGrid(
             GridCells.Fixed(sqrt(viewModel.cellList.size.toFloat()).fastRoundToInt()),
+            Modifier.background(
+                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.375f),
+                RoundedCornerShape(5.dp)
+            ),
             userScrollEnabled = false
         ) {
             items(viewModel.cellList, key = { item -> item.id }) {
@@ -123,37 +143,41 @@ fun Grid2048(viewModel: GameViewModel, navController: NavController) {
                     label = "cell_${it.id} background",
                     finishedListener = { c -> value.longValue = it.value })
                 Box(
-                    Modifier
-                        .aspectRatio(1f)
+                    if (it.value == 0L) modifier else modifier
                         .animateItem(
                             fadeInSpec = tween(200, 100, FastOutSlowInEasing),
                             placementSpec = tween<IntOffset>(300, 0, FastOutSlowInEasing),
                             fadeOutSpec = tween(75, 25, LinearEasing)
                         )
-                        .padding(2.dp)
-                        .clip(RoundedCornerShape(5.dp))
                         .drawBehind { if (it.value != 0L) drawRect(background) }, Alignment.Center
                 ) {
-                    Text(
-                        if (it.value == 0L) "" else value.longValue.toString(),
-                        fontSize = min(
-                            200f / viewModel.sideSize,
-                            (550f / viewModel.sideSize) / value.longValue.toString().length
-                        ).sp,
-                        color = if (value.longValue < 256) Color.Black else Color(220, 220, 220),
-                        fontWeight = FontWeight.ExtraBold,
-                        style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum")
-                    )
+                    if (it.value != 0L) {
+                        val letters = remember(value.longValue) {
+                            max(1.5f, value.longValue.toString().length.toFloat())
+                        }
+                        Text(
+                            value.longValue.toString(),
+                            color = if (value.longValue < 256) Color.Black else Color(
+                                220, 220, 220
+                            ),
+                            fontSize = fontSize / letters,
+                            fontWeight = FontWeight.ExtraBold,
+                            style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum")
+                        )
+                    }
                 }
             }
         }
     }
 }
 
-@PreviewScreenSizes
+@PreviewLightDark
+//@PreviewScreenSizes
 @Composable
 private fun Preview() {
-    Surface {
-        GameUI(GameViewModel(), rememberNavController())
+    MindMixTheme {
+        Surface {
+            GameUI(GameViewModel(), rememberNavController())
+        }
     }
 }

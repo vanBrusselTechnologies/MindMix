@@ -6,6 +6,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -24,7 +25,6 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
 import kotlinx.coroutines.launch
-import kotlin.math.round
 import kotlin.math.roundToInt
 
 const val radius = 250f
@@ -46,52 +46,42 @@ fun GameWheel(viewModel: MenuScreenViewModel, navController: NavController, mode
         model.rotationAngle += it / 8f
         coroutineScope.launch {
             anim.animateTo(
-                model.rotationAngle, animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioLowBouncy,
-                    stiffness = Spring.StiffnessVeryLow
-                )
+                model.rotationAngle, spring(Spring.DampingRatioLowBouncy, Spring.StiffnessVeryLow)
             )
         }
     })
-
     val items = rememberWheelItems(
         viewModel, model.wheelItemCount, model.gameCount, model.selectedId, model.angleStep
     )
-
+    val interactionSource = remember { MutableInteractionSource() }
     val onDragEnd = {
+        val unsafeCurrentItem = (model.rotationAngle / model.angleStep).roundToInt()
+        model.rotationAngle = unsafeCurrentItem * model.angleStep
+        val gameCount = model.gameCount
+        val index = (unsafeCurrentItem.mod(gameCount) + gameCount).mod(gameCount)
+        viewModel.selectedGame = viewModel.games[index]!!
+
+        val steps = model.wheelItemCount
+        val selectedItem = (unsafeCurrentItem.mod(steps) + steps).mod(steps)
+        items[selectedItem].isSelected.value = true
+        model.selectedId = selectedItem
+
         coroutineScope.launch {
-            model.rotationAngle = round(model.rotationAngle / model.angleStep) * model.angleStep
-            val index =
-                (((model.rotationAngle / model.angleStep) % model.gameCount + model.gameCount) % model.gameCount).roundToInt()
-            viewModel.selectedGame = viewModel.games[index]!!
-
-            val realAngle = (model.rotationAngle % 360 + 360) % 360
-            val selectedItem = (realAngle / model.angleStep).roundToInt()
-            items[selectedItem].isSelected.value = true
-            model.selectedId = selectedItem
-
             anim.animateTo(
-                model.rotationAngle, spring(
-                    Spring.DampingRatioLowBouncy,
-                    Spring.StiffnessVeryLow
-                )
+                model.rotationAngle, spring(Spring.DampingRatioLowBouncy, Spring.StiffnessVeryLow)
             )
         }
     }
 
     Box(
-        contentAlignment = Alignment.BottomCenter,
-        modifier = Modifier
+        contentAlignment = Alignment.BottomCenter, modifier = Modifier
             .fillMaxSize()
             .draggable(draggableState,
                 Orientation.Horizontal,
                 enabled = !SceneManager.dialogActiveState.value,
-                onDragStarted = {
-                    items.forEach { it.isSelected.value = false }
-                },
-                onDragStopped = {
-                    onDragEnd()
-                })
+                interactionSource,
+                onDragStarted = { items.forEach { it.isSelected.value = false } },
+                onDragStopped = { onDragEnd() })
     ) {
         Box(contentAlignment = Alignment.Center,
             modifier = Modifier
@@ -117,7 +107,7 @@ fun rememberWheelItems(
     angleStep: Float
 ): List<WheelItem> {
     val localConfig = LocalConfiguration.current
-    return remember(localConfig) {
+    return remember {
         val screenHeight = localConfig.screenHeightDp
         val screenWidth = localConfig.screenWidthDp
         val minScreenSize = screenHeight.coerceAtMost(screenWidth) - 300f

@@ -29,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
@@ -160,7 +161,9 @@ fun MinesweeperGrid(viewModel: GameViewModel, navController: NavController) {
     }
 }
 
-private fun onSelectCell(viewModel: GameViewModel, cell: MinesweeperCell, navController: NavController) {
+private fun onSelectCell(
+    viewModel: GameViewModel, cell: MinesweeperCell, navController: NavController
+) {
     cell.pressed = true
     when (cell.state) {
         MinesweeperCell.State.Empty -> {
@@ -191,14 +194,15 @@ private fun onSelectCell(viewModel: GameViewModel, cell: MinesweeperCell, navCon
 
 @Composable
 fun MinesweeperCell(cell: MinesweeperCell) {
-    Box(
-        contentAlignment = Alignment.Center,
+    val cs = colorScheme
+    Box(contentAlignment = Alignment.Center,
         modifier = Modifier
             .size(cellSize)
             .padding(PaddingValues(0.75f.dp))
-            .background(if (cell.background.value == Color.Red) colorScheme.errorContainer else colorScheme.secondaryContainer)
-            .aspectRatio(1f)
-    ) {
+            .drawBehind {
+                drawRect(if (cell.background.value == Color.Red) cs.errorContainer else cs.secondaryContainer)
+            }
+            .aspectRatio(1f)) {
         val state by remember { cell.mutableCellState }
         when (state) {
             MinesweeperCell.State.Empty -> return@Box

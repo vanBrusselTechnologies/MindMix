@@ -44,8 +44,9 @@ fun GameMenuDialog(
     openSettings: () -> Unit,
     backToMenu: () -> Unit
 ) {
-    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+    val localConfig = LocalConfiguration.current
+    val screenWidth = localConfig.screenWidthDp.dp
+    val screenHeight = localConfig.screenHeightDp.dp
     Card(
         Modifier
             .sizeIn(maxWidth = screenWidth * 0.95f, maxHeight = screenHeight * 0.95f)

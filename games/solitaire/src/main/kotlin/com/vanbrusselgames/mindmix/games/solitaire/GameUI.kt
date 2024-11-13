@@ -2,7 +2,6 @@ package com.vanbrusselgames.mindmix.games.solitaire
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,11 +16,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -32,28 +34,18 @@ import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.vanbrusselgames.mindmix.core.common.BaseScene
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
-import kotlinx.coroutines.launch
 import kotlin.math.min
 
 @Composable
 fun GameUI(viewModel: GameViewModel, navController: NavController) {
     BaseScene(viewModel, navController) {
         SolitaireSpecificLayout(viewModel, navController)
-        /*GameFinished_Old.Screen(
-            viewModel,
-            onClickPlayAgain = { viewModel.startNewGame() }) {
-            Text(text = "${stringResource(R.string.time)}${viewModel.timer.formatTime(true)}")
-            //"""You did great and solved puzzle in ${0} seconds!!
-            //     |That's Awesome!
-            //     |Share with your friends and challenge them to beat your time!""".trimMargin()
-        }*/
         Box(
             Modifier
-                .fillMaxSize()
-                .blur(if (SceneManager.dialogActiveState.value) viewModel.blurStrength else 0.dp),
-            Alignment.BottomCenter
+                .align(Alignment.BottomCenter)
+                .blur(if (SceneManager.dialogActiveState.value) viewModel.blurStrength else 0.dp)
         ) {
-            viewModel.timer.Timer(viewModel)
+            viewModel.timer.Timer()
         }
     }
 }
@@ -64,67 +56,70 @@ fun SolitaireSpecificLayout(viewModel: GameViewModel, navController: NavControll
         Modifier
             .fillMaxSize()
             .blur(if (SceneManager.dialogActiveState.value) viewModel.blurStrength else 0.dp),
-        Alignment.Center
+        Alignment.TopCenter
     ) {
-        Box(Modifier.fillMaxSize(0.95f), contentAlignment = Alignment.TopCenter) {
-            BoxWithConstraints {
-                val maxHeight = this.constraints.maxHeight
-                val maxWidth = this.constraints.maxWidth
-                val maxCardHeight = maxHeight / 4.2375f
-                viewModel.cardHeight =
-                    if (maxWidth / maxHeight > GameViewModel.CARD_ASPECT_RATIO) maxCardHeight else maxWidth / 7f / GameViewModel.CARD_ASPECT_RATIO
-                viewModel.cardWidth = viewModel.cardHeight * GameViewModel.CARD_ASPECT_RATIO
-                viewModel.distanceBetweenCards =
-                    min(maxCardHeight / viewModel.cardHeight, 2f) * 0.175f
-                val cardHeightInDp = with(LocalDensity.current) { viewModel.cardHeight.toDp() }
-                val modifier = Modifier
-                    .width(cardHeightInDp * GameViewModel.CARD_ASPECT_RATIO)
-                    .height(cardHeightInDp)
-                    .aspectRatio(GameViewModel.CARD_ASPECT_RATIO)
+        val localConfig = LocalConfiguration.current
+        val localDensity = LocalDensity.current
+        val maxWidthDp = localConfig.screenWidthDp.dp * 0.95f
+        val maxHeightDp = localConfig.screenHeightDp.dp * 0.95f
+        val cardHeightInDp = remember(maxWidthDp, maxHeightDp) {
+            val maxCardHeightDp = maxHeightDp / 4.2375f
+            val cardHeightDp = if (maxWidthDp / maxHeightDp > GameViewModel.CARD_ASPECT_RATIO) {
+                maxCardHeightDp
+            } else maxWidthDp / 7f / GameViewModel.CARD_ASPECT_RATIO
 
-                Background(viewModel, modifier, cardHeightInDp)
+            viewModel.cardHeight = with(localDensity) { (cardHeightDp).toPx() }
+            viewModel.cardWidth = viewModel.cardHeight * GameViewModel.CARD_ASPECT_RATIO
+            viewModel.distanceBetweenCards = min(maxCardHeightDp / cardHeightDp, 2f) * 0.175f
 
-                val coroutineScope = rememberCoroutineScope()
-                viewModel.cards.forEach {
-                    coroutineScope.launch {
-                        it.calculateBaseOffset()
-                        it.animOffset.animateTo(it.baseOffset)
+            cardHeightDp
+        }
+        val modifier = Modifier
+            .width(cardHeightInDp * GameViewModel.CARD_ASPECT_RATIO)
+            .height(cardHeightInDp)
+            .aspectRatio(GameViewModel.CARD_ASPECT_RATIO)
+        Background(viewModel, modifier, cardHeightInDp)
+
+        Box(Modifier.width(cardHeightInDp * GameViewModel.CARD_ASPECT_RATIO * 7)) {
+            viewModel.cards.forEach {
+                LaunchedEffect(it.id) {
+                    it.calculateBaseOffset()
+                    it.recalculateZIndex()
+                    it.isMoving = false
+                    it.animOffset.animateTo(it.baseOffset)
+                }
+                PlayingCard(it, modifier, navController)
+            }
+        }
+
+        if (viewModel.couldGetFinished.value) {
+            Button(
+                onClick = {
+                    viewModel.cards.forEach {
+                        it.stackId = it.type.ordinal
+                        it.stackIndex = it.index.ordinal
                         it.isMoving = false
+                        it.isLast.value = true
+                        it.frontVisible.value = true
                         it.recalculateZIndex()
+                        it.calculateBaseOffset()
                     }
-                    PlayingCard(it, modifier, navController)
-                }
-
-                if (viewModel.couldGetFinished.value) {
-                    Button(
-                        onClick = {
-                            viewModel.cards.forEach {
-                                it.stackId = it.type.ordinal
-                                it.stackIndex = it.index.ordinal
-                                it.isMoving = false
-                                it.isLast.value = true
-                                it.frontVisible.value = true
-                                it.recalculateZIndex()
-                                it.calculateBaseOffset()
-                            }
-                            viewModel.checkFinished(navController)
-                        },
-                        Modifier
-                            .align(Alignment.BottomCenter)
-                            .zIndex(20f),
-                        enabled = !SceneManager.dialogActiveState.value,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.onPrimary,
-                            disabledContainerColor = MaterialTheme.colorScheme.primary,
-                            disabledContentColor = MaterialTheme.colorScheme.onPrimary,
-                        )
-                    ) {
-                        Icon(painterResource(R.drawable.baseline_flag_24), "Finish flag")
-                        Spacer(Modifier.width(2.dp))
-                        Text(stringResource(R.string.finish_game))
-                    }
-                }
+                    viewModel.checkFinished(navController)
+                },
+                Modifier
+                    .align(Alignment.BottomCenter)
+                    .zIndex(20f),
+                enabled = !SceneManager.dialogActiveState.value,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    disabledContainerColor = MaterialTheme.colorScheme.primary,
+                    disabledContentColor = MaterialTheme.colorScheme.onPrimary,
+                )
+            ) {
+                Icon(painterResource(R.drawable.baseline_flag_24), "Finish flag")
+                Spacer(Modifier.width(2.dp))
+                Text(stringResource(R.string.finish_game))
             }
         }
     }
@@ -141,40 +136,28 @@ fun Background(viewModel: GameViewModel, modifier: Modifier, cardHeight: Dp) {
 
 @Composable
 fun BackgroundTopRow(viewModel: GameViewModel, modifier: Modifier) {
-    val coroutineScope = rememberCoroutineScope()
     Row {
-        for (i in 0 until 7) {
-            when (i) {
-                4 -> Box(modifier)
-                5 -> Box(modifier)
-                6 -> if (!viewModel.restStackEnabled.value) Box(modifier) else Card(
-                    { viewModel.resetRestStack(coroutineScope) },
-                    modifier.alpha(0.75f),
-                    !SceneManager.dialogActiveState.value
-                ) {
-                    Box(Modifier.fillMaxSize()) {
-                        Icon(
-                            painterResource(id = R.drawable.outline_autorenew_24),
-                            "Stock",
-                            Modifier
-                                .align(Alignment.Center)
-                                .fillMaxSize()
-                        )
-                    }
-                }
+        Card(modifier.alpha(0.75f)) { FoundationBackground(R.drawable.clover, 0) }
+        Card(modifier.alpha(0.75f)) { FoundationBackground(R.drawable.diamonds, 1) }
+        Card(modifier.alpha(0.75f)) { FoundationBackground(R.drawable.hearts, 2) }
+        Card(modifier.alpha(0.75f)) { FoundationBackground(R.drawable.spades, 3) }
+        Box(modifier)
+        Box(modifier)
 
-                else -> Card(modifier.alpha(0.75f)) {
-                    val resourceId = when (i) {
-                        0 -> R.drawable.clover
-                        1 -> R.drawable.diamonds
-                        2 -> R.drawable.hearts
-                        3 -> R.drawable.spades
-                        else -> 0
-                    }
-                    FoundationBackground(resourceId, i)
-                }
+        if (viewModel.restStackEnabled.value) {
+            val coroutineScope = rememberCoroutineScope()
+            Card(
+                { viewModel.resetRestStack(coroutineScope) },
+                modifier.alpha(0.75f),
+                !SceneManager.dialogActiveState.value
+            ) {
+                Icon(
+                    painterResource(id = R.drawable.outline_autorenew_24),
+                    "Stock",
+                    Modifier.fillMaxSize()
+                )
             }
-        }
+        } else Box(modifier)
     }
 }
 
@@ -189,15 +172,7 @@ fun BackgroundLowerRow(viewModel: GameViewModel, modifier: Modifier, cardHeight:
 
 @Composable
 fun FoundationBackground(resourceId: Int, stackIndex: Int) {
-    Box(Modifier.fillMaxSize()) {
-        if (resourceId != 0) {
-            Image(
-                painterResource(id = resourceId),
-                "pile $stackIndex",
-                Modifier
-                    .fillMaxSize(0.9f)
-                    .align(Alignment.Center)
-            )
-        }
+    Box(Modifier.fillMaxSize(), Alignment.Center) {
+        Image(painterResource(resourceId), "pile $stackIndex", Modifier.fillMaxSize(0.9f))
     }
 }

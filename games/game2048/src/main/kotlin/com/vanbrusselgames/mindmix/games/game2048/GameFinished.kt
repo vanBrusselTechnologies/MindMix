@@ -1,10 +1,12 @@
 package com.vanbrusselgames.mindmix.games.game2048
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,8 +22,11 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.vanbrusselgames.mindmix.core.advertisement.AdManager
 import com.vanbrusselgames.mindmix.core.designsystem.theme.MindMixTheme
+import com.vanbrusselgames.mindmix.core.ui.DialogButton
 import com.vanbrusselgames.mindmix.feature.gamefinished.Buttons
 import com.vanbrusselgames.mindmix.feature.gamefinished.GameFinishedRewardRow
+import com.vanbrusselgames.mindmix.feature.gamefinished.StatRow
+import com.vanbrusselgames.mindmix.feature.gamefinished.Stats
 
 @Composable
 fun Game2048GameFinishedDialog(
@@ -37,15 +42,42 @@ fun Game2048GameFinishedDialog(
             fontWeight = FontWeight.ExtraBold
         )
         Spacer(Modifier.height(2.dp))
-        Text(stringResource(FinishedGame.textResId), textAlign = TextAlign.Center)
+        Text(
+            stringResource(FinishedGame.textResId),
+            Modifier.width(IntrinsicSize.Max),
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(Modifier.height(8.dp))
+        Stats {
+            StatRow(
+                fieldText = stringResource(R.string.game_2048_score_label),
+                valueText = FinishedGame.score.toString()
+            )
+            StatRow(
+                fieldText = stringResource(R.string.game_2048_stat_max_tile_label),
+                valueText = FinishedGame.highestTileValue.toString()
+            )
+        }
+
         if (FinishedGame.reward != 0 && adManager != null) {
             Spacer(Modifier.height(8.dp))
             GameFinishedRewardRow(FinishedGame.reward, adManager)
         }
         Spacer(Modifier.height(8.dp))
-        Buttons(
-            navController, Modifier.fillMaxWidth(), null, { viewModel.startNewGame() }, backToMenu
-        )
+        if (FinishedGame.isStuck) {
+            Buttons(
+                navController,
+                Modifier.fillMaxWidth(),
+                null,
+                { viewModel.startNewGame() },
+                backToMenu
+            )
+        } else {
+            DialogButton({ navController.popBackStack() }, Modifier.fillMaxWidth()) {
+                Text(stringResource(R.string.game_2048_continue_game))
+            }
+        }
     }
 }
 

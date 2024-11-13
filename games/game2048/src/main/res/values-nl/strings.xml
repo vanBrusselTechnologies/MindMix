@@ -3,4 +3,7 @@
     <string name="game_2048_name">2048</string>
     <string name="game_2048_desc">Swipe om de tegels te bewegen.\nTegels met hetzelfde nummer voegen samen wanneer ze elkaar raken.\nVoeg ze samen om 2048 te bereiken (of zelfs hoger)!</string>
     <string name="game_2048_size_label">Grootte</string>
+    <string name="game_2048_score_label">Score:</string>
+    <string name="game_2048_stat_max_tile_label">Hoogste tegel:</string>
+    <string name="game_2048_continue_game">Doorspelen</string>
 </resources>

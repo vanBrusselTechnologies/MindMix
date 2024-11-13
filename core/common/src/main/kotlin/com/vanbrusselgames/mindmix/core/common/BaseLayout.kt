@@ -1,6 +1,7 @@
 package com.vanbrusselgames.mindmix.core.common
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,7 +29,7 @@ import com.vanbrusselgames.mindmix.feature.settings.navigation.navigateToSetting
 fun BaseScene(
     viewModel: BaseScreenViewModel,
     navController: NavController,
-    sceneSpecific: @Composable () -> Unit?
+    sceneSpecific: @Composable BoxScope.() -> Unit?
 ) {
     Scaffold(Modifier.safeDrawingPadding(), { TopBar(viewModel, navController) }, snackbarHost = {
         //todo: SnackbarHost(hostState = MainActivity.snackbarHostState)

@@ -232,11 +232,12 @@ class GameViewModel : BaseGameViewModel() {
     }
 
     private fun onGameFinished(navController: NavController, success: Boolean) {
+        // TODO : Localize CORRECT title / text
         FinishedGame.titleResId = Minesweeper.NAME_RES_ID
-        // TODO: if (failed) "Failed" else "Congrats / Smart / Well done"
+        // if (failed) "Failed" else "Congrats / Smart / Well done"
         FinishedGame.textResId =
             if (!success) R.string.minesweeper_failed else R.string.minesweeper_success
-        // TODO: if (failed) "A mine exploded" else """You did great and solved puzzle in ${0} seconds!!
+        // if (failed) "A mine exploded" else """You did great and solved puzzle in ${0} seconds!!
         //     |That's Awesome!
         //     |Share with your friends and challenge them to beat your time!""".trimMargin()
         FinishedGame.reward = if (!success) 0 else 10

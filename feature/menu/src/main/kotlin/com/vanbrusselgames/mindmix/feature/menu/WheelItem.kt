@@ -14,7 +14,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -48,6 +47,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import androidx.compose.ui.util.lerp
@@ -107,21 +107,18 @@ fun WheelItem(
     val selectedFactor by animateFloatAsState(
         targetValue = if (model.isSelected.value) 1f else 0f, tween(
             durationMillis = (animDuration * 1.25f).toInt(), easing = easing
-        ), label = "selectedFactor"
+        ), label = "selectedFactorAnim"
     )
-    val offsetX = sin(angle * Math.PI / 180f) * model.radius
-    val offsetY = cos(angle * Math.PI / 180f) * model.radius
-
+    val offsetX = remember { sin(angle * Math.PI / 180f) * model.radius }
+    val offsetY = remember { cos(angle * Math.PI / 180f) * model.radius }
+    val interactionSource = remember { MutableInteractionSource() }
     Card(modifier
         .zIndex(if (model.isSelected.value) 1f else 0f)
         .offset(-offsetX.dp, -offsetY.dp)
-        .rotate(-model.angle)
+        .rotate(-angle)
         .offset { IntOffset(0.dp.roundToPx(), (model.offsetY.dp * selectedFactor).roundToPx()) }
         .clickable(
-            remember { MutableInteractionSource() },
-            null,
-            true,
-            "Play game: ${game.name.lowercase()}"
+            interactionSource, null, true, "Play game: ${game.name.lowercase()}"
         ) {
             if (!SceneManager.dialogActiveState.value) {
                 viewModel.selectedGame = game
@@ -137,36 +134,7 @@ fun WheelItem(
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 WheelItemTitle(name, selectedFactor)
-                AnimatedVisibility(
-                    model.isSelected.value, enter = slideInHorizontally(
-                        tween(durationMillis = animDuration, easing = easing)
-                    ) + expandIn(
-                        tween(durationMillis = animDuration, easing = easing)
-                    ) + fadeIn(
-                        tween(durationMillis = animDuration, easing = easing)
-                    ), exit = slideOutHorizontally(
-                        tween(durationMillis = animDuration, easing = easing)
-                    ) + shrinkOut(
-                        tween(durationMillis = animDuration, easing = easing)
-                    ) + fadeOut(
-                        tween(durationMillis = animDuration, easing = easing)
-                    )
-                ) {
-                    IconButton({
-                        viewModel.settingsGame = game
-                        navController.navigateToSettings()
-                    }) {
-                        Box(Modifier.fillMaxSize()) {
-                            Icon(
-                                Icons.Filled.Settings,
-                                "$name settings",
-                                Modifier
-                                    .align(Alignment.TopCenter)
-                                    .fillMaxSize(0.75f)
-                            )
-                        }
-                    }
-                }
+                WheelItemIconButton(viewModel, navController, model, name, game)
             }
             Spacer(modifier = Modifier.height(5.dp))
             WheelItemImage(model, name, selectedFactor)
@@ -175,9 +143,43 @@ fun WheelItem(
 }
 
 @Composable
+fun WheelItemIconButton(
+    viewModel: MenuScreenViewModel,
+    navController: NavController,
+    model: WheelItem,
+    name: String,
+    game: Scene
+) {
+    AnimatedVisibility(
+        model.isSelected.value, enter = slideInHorizontally(
+            tween(durationMillis = animDuration, easing = easing)
+        ) + expandIn(
+            tween(durationMillis = animDuration, easing = easing)
+        ) + fadeIn(
+            tween(durationMillis = animDuration, easing = easing)
+        ), exit = slideOutHorizontally(
+            tween(durationMillis = animDuration, easing = easing)
+        ) + shrinkOut(
+            tween(durationMillis = animDuration, easing = easing)
+        ) + fadeOut(
+            tween(durationMillis = animDuration, easing = easing)
+        ), label = "ShowSettings"
+    ) {
+        IconButton({
+            viewModel.settingsGame = game
+            navController.navigateToSettings()
+        }) {
+            Icon(Icons.Filled.Settings, "$name settings")
+        }
+    }
+}
+
+@Composable
 private fun WheelItemTitle(name: String, selectedFactor: Float) {
-    val widthBig = measureTextWidth(name, Typography.headlineLarge)
     val widthSmall = measureTextWidth(name, Typography.titleLarge)
+    val widthBig = measureTextWidth(name, Typography.headlineLarge)
+    val fontSizeSmall = remember { Typography.titleLarge.fontSize.value.sp }
+    val fontSizeBig = remember { Typography.headlineLarge.fontSize.value.sp }
 
     Text(
         name,
@@ -185,11 +187,7 @@ private fun WheelItemTitle(name: String, selectedFactor: Float) {
         modifier = Modifier.width(lerp(widthSmall.value, widthBig.value, selectedFactor).dp),
         maxLines = 1,
         style = Typography.headlineSmall,
-        fontSize = lerp(
-            Typography.titleLarge.fontSize.value,
-            Typography.headlineLarge.fontSize.value,
-            selectedFactor
-        ).sp
+        fontSize = lerp(fontSizeSmall, fontSizeBig, selectedFactor)
     )
 }
 
@@ -197,10 +195,10 @@ private fun WheelItemTitle(name: String, selectedFactor: Float) {
 private fun WheelItemImage(
     model: WheelItem, name: String, selectedFactor: Float
 ) {
-    val configuration = LocalConfiguration.current
+    val localConfig = LocalConfiguration.current
     val growthFactor = remember {
-        val screenHeight = configuration.screenHeightDp
-        val screenWidth = configuration.screenWidthDp
+        val screenHeight = localConfig.screenHeightDp
+        val screenWidth = localConfig.screenWidthDp
         val minScreenSize = screenHeight.coerceAtMost(screenWidth) - 300f
         100f.coerceAtMost(minScreenSize)
     }
@@ -208,9 +206,7 @@ private fun WheelItemImage(
     val painterResource = painterResource(model.image)
     val maxSize = remember { painterResource.intrinsicSize.maxDimension }
     val height = remember {
-        with(painterResource.intrinsicSize) {
-            height / (0.9f.coerceAtLeast(height / maxSize))
-        }
+        with(painterResource.intrinsicSize) { height / (0.9f.coerceAtLeast(height / maxSize)) }
     }
     val width = remember {
         with(painterResource.intrinsicSize) { width / (0.9f.coerceAtLeast(width / maxSize)) }

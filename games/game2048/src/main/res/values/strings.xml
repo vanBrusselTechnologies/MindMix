@@ -7,4 +7,7 @@
     <string name="game_2048_size_6x6" translatable="false">6x6</string>
     <string name="game_2048_size_7x7" translatable="false">7x7</string>
     <string name="game_2048_size_label">Size</string>
+    <string name="game_2048_score_label">Score:</string>
+    <string name="game_2048_stat_max_tile_label">Highest tile:</string>
+    <string name="game_2048_continue_game">Play on</string>
 </resources>

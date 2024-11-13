@@ -8,8 +8,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
 import kotlinx.coroutines.delay
-import kotlin.math.floor
-import kotlin.math.max
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 class GameTimer {
     private val running = mutableStateOf(false)
@@ -17,8 +17,9 @@ class GameTimer {
         private set
     private var startMillis = 0L
     private var pausedAt = 0L
+    var addedMillis = 0L
+        private set
     private var currentTime = mutableLongStateOf(0)
-    var penaltyMillis = 0L
 
     fun start() {
         startMillis = System.currentTimeMillis()
@@ -35,6 +36,8 @@ class GameTimer {
     fun pause() {
         if (pausedAt != 0L) return
         pausedAt = System.currentTimeMillis()
+        currentMillis = pausedAt - startMillis
+        currentTime.longValue = currentMillis + addedMillis
         running.value = false
     }
 
@@ -43,69 +46,50 @@ class GameTimer {
             startMillis += System.currentTimeMillis() - pausedAt
             pausedAt = 0L
             currentMillis = System.currentTimeMillis() - startMillis
-            currentTime.longValue = currentMillis
+            currentTime.longValue = currentMillis + addedMillis
         }
         running.value = true
     }
 
     fun stop() {
         pause()
-        currentMillis = pausedAt - startMillis
-        currentTime.longValue = currentMillis
     }
 
     fun addMillis(millis: Long) {
-        // todo: keep penalty seconds separated
-        //  penaltyMillis += millis
-
-        startMillis -= millis
-        currentMillis += millis
-        currentTime.longValue = currentMillis
+        addedMillis += millis
+        currentTime.longValue = currentMillis + addedMillis
     }
 
     @Composable
-    fun Timer(viewModel: BaseGameViewModel) {
+    fun Timer() {
         if (!SceneManager.dialogActiveState.value && SceneManager.currentScene != SceneManager.Scene.MENU) {
             resume()
         }
 
-        currentTime = remember { mutableLongStateOf(currentMillis) }
+        currentTime = remember { mutableLongStateOf(currentMillis + addedMillis) }
 
-        val seconds = max(currentTime.longValue / 1000f, 0f)
-        Text(
-            text = String.format(
-                "%02d:%02d:%02d",
-                floor(seconds / 3600f).toInt(),
-                (floor(seconds / 60f) % 60).toInt(),
-                (seconds % 60).toInt()
-            )
-        )
-        if (running.value) {
-            LaunchedEffect(currentTime.longValue) {
-                val diff = ((startMillis - System.currentTimeMillis()) % 1000 - 1000) % 1000 + 1000
-                delay(diff)
-                if (!running.value) return@LaunchedEffect
+        Text(formatDuration(currentTime.longValue, false))
+
+        LaunchedEffect(running.value) {
+            while (running.value) {
+                delay(1.seconds)
                 currentMillis = System.currentTimeMillis() - startMillis
-                currentTime.longValue = currentMillis
+                currentTime.longValue = currentMillis + addedMillis
             }
         }
     }
 
-    fun formatTime(includeMillis: Boolean): String {
-        if (includeMillis) {
-            return String.format(
-                "%01d:%02d:%02d.%03d",
-                floor(currentMillis / 3600000f).toInt(),
-                (floor(currentMillis / 60000f) % 60).toInt(),
-                (floor(currentMillis / 1000f) % 60).toInt(),
-                currentMillis % 1000
-            )
+    fun formatDuration(millis: Long, includeMillis: Boolean = false): String {
+        return millis.milliseconds.toComponents { m, s, n ->
+            val minutes = if (m < 10) "0$m" else m.toString()
+            val seconds = if (s < 10) "0$s" else s.toString()
+            if (includeMillis) {
+                val mil = n / 1000000
+                val millis = if (mil < 10) "00$mil" else if (mil < 100) "0$mil" else mil.toString()
+                "$minutes:$seconds.${millis}"
+            } else {
+                "$minutes:$seconds"
+            }
         }
-        return String.format(
-            "%01d:%02d:%02d",
-            floor(currentMillis / 3600000f).toInt(),
-            (floor(currentMillis / 60000f) % 60).toInt(),
-            (floor(currentMillis / 1000f) % 60).toInt()
-        )
     }
 }

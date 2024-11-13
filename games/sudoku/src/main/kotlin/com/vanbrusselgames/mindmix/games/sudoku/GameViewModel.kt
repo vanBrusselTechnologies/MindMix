@@ -246,9 +246,10 @@ class GameViewModel : BaseGameViewModel() {
     }
 
     private fun onGameFinished(navController: NavController) {
-        FinishedGame.titleResId = Sudoku.NAME_RES_ID// TODO: "Congrats / Smart / Well done"
+        // TODO : Localize CORRECT title / text
+        FinishedGame.titleResId = Sudoku.NAME_RES_ID// "Congrats / Smart / Well done"
         FinishedGame.textResId = R.string.sudoku_success
-        // TODO: """You did great and solved puzzle in ${0} seconds!!
+        // """You did great and solved puzzle in ${0} seconds!!
         //     |That's Awesome!
         //     |Share with your friends and challenge them to beat your time!""".trimMargin()
         FinishedGame.reward = rewardForDifficulty[difficulty.value]!!

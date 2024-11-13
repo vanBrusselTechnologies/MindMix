@@ -165,6 +165,7 @@ class MainActivity : ComponentActivity() {
                             settingsDialog(navController) {
                                 val settingsScene =
                                     if (SceneManager.currentScene == Scene.MENU) menu.viewModel.settingsGame else SceneManager.currentScene
+                                menu.viewModel.settingsGame = Scene.MENU
                                 when (settingsScene) {
                                     Scene.GAME2048 -> Game2048Settings(game2048.viewModel)
                                     Scene.MENU -> MenuSettings(menu.viewModel)
