@@ -25,7 +25,6 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -87,8 +86,9 @@ data class PlayingCard(
     }
 
     fun recalculateZIndex() {
-        zIndex.floatValue =
-            stackIndex * 0.01f + (if (isMoving && frontVisible.value) 10 else 0) + if (stackId == 6) 0 else if (stackId == 5) 1 else if (stackId < 5) 2 else 3
+        val stackBonus = if (stackId == 6) 0 else if (stackId == 5) 1 else if (stackId < 5) 2 else 3
+        val movingBonus = if (isMoving && frontVisible.value) 10 else 0
+        zIndex.floatValue = stackIndex * 0.01f + movingBonus + stackBonus
     }
 
     fun calculateBaseOffset() {
@@ -120,7 +120,6 @@ data class PlayingCard(
 
 @Composable
 fun PlayingCard(model: PlayingCard, modifier: Modifier, navController: NavController) {
-    val coroutineScope = rememberCoroutineScope()
     val interactionSource = remember { MutableInteractionSource() }
     val onClickLabel =
         remember { "${model.type.name.replaceFirstChar { it.titlecase() }} ${model.indexString}" }
@@ -134,11 +133,11 @@ fun PlayingCard(model: PlayingCard, modifier: Modifier, navController: NavContro
         ) {
             if (SceneManager.dialogActiveState.value) return@clickable
             if (model.stackId == 6) {
-                model.viewModel.turnFromRestStack(coroutineScope)
+                model.viewModel.turnFromRestStack()
             } else {
                 if (!model.frontVisible.value || model.animOffset.targetValue != model.baseOffset) return@clickable
                 model.viewModel.startMoveCard(model)
-                model.viewModel.onReleaseMovingCards(coroutineScope, navController)
+                model.viewModel.onReleaseMovingCards(navController)
             }
         }
         .pointerInput(Unit) {
@@ -146,12 +145,12 @@ fun PlayingCard(model: PlayingCard, modifier: Modifier, navController: NavContro
                 if (model.viewModel.finished || !model.frontVisible.value || SceneManager.dialogActiveState.value) return@detectDragGestures
                 model.viewModel.startMoveCard(model)
             }, onDragCancel = {
-                model.viewModel.onReleaseMovingCards(coroutineScope, navController)
+                model.viewModel.onReleaseMovingCards(navController)
             }, onDragEnd = {
-                model.viewModel.onReleaseMovingCards(coroutineScope, navController)
+                model.viewModel.onReleaseMovingCards(navController)
             }, onDrag = { change, offset ->
                 change.consume()
-                model.viewModel.moveCards(coroutineScope, offset.round())
+                model.viewModel.moveCards(offset.round())
             })
         }
     if (!model.visible.value) return Box(mod) {}

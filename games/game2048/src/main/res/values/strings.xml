@@ -9,5 +9,10 @@
     <string name="game_2048_size_label">Size</string>
     <string name="game_2048_score_label">Score:</string>
     <string name="game_2048_stat_max_tile_label">Highest tile:</string>
-    <string name="game_2048_continue_game">Play on</string>
+    <string name="game_2048_continue_game">Keep playing</string>
+    <string name="game_2048_game_over_title">Game over!</string>
+    <string name="game_2048_reach_target_title">Target Reached!</string>
+    <string name="game_2048_success">You’ve reached the target tile %1$s. Well Played!</string>
+    <string name="game_2048_game_over_text">You’re stuck and didn’t reach the target tile %1$s. Give it another try!</string>
+    <string name="game_2048_reach_target_text">You’ve got the target tile %1$s with a score of %2$s. How far can you go?</string>
 </resources>

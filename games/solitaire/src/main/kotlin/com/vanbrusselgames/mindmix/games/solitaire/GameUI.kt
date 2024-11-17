@@ -18,7 +18,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -83,9 +82,9 @@ fun SolitaireSpecificLayout(viewModel: GameViewModel, navController: NavControll
         Box(Modifier.width(cardHeightInDp * GameViewModel.CARD_ASPECT_RATIO * 7)) {
             viewModel.cards.forEach {
                 LaunchedEffect(it.id) {
+                    it.isMoving = false
                     it.calculateBaseOffset()
                     it.recalculateZIndex()
-                    it.isMoving = false
                     it.animOffset.animateTo(it.baseOffset)
                 }
                 PlayingCard(it, modifier, navController)
@@ -94,18 +93,7 @@ fun SolitaireSpecificLayout(viewModel: GameViewModel, navController: NavControll
 
         if (viewModel.couldGetFinished.value) {
             Button(
-                onClick = {
-                    viewModel.cards.forEach {
-                        it.stackId = it.type.ordinal
-                        it.stackIndex = it.index.ordinal
-                        it.isMoving = false
-                        it.isLast.value = true
-                        it.frontVisible.value = true
-                        it.recalculateZIndex()
-                        it.calculateBaseOffset()
-                    }
-                    viewModel.checkFinished(navController)
-                },
+                onClick = { viewModel.onClickFinishGame(navController) },
                 Modifier
                     .align(Alignment.BottomCenter)
                     .zIndex(20f),
@@ -145,9 +133,8 @@ fun BackgroundTopRow(viewModel: GameViewModel, modifier: Modifier) {
         Box(modifier)
 
         if (viewModel.restStackEnabled.value) {
-            val coroutineScope = rememberCoroutineScope()
             Card(
-                { viewModel.resetRestStack(coroutineScope) },
+                { viewModel.resetRestStack() },
                 modifier.alpha(0.75f),
                 !SceneManager.dialogActiveState.value
             ) {

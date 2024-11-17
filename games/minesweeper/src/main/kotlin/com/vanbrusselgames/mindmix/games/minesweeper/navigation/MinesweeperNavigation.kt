@@ -24,8 +24,8 @@ fun NavController.navigateToMinesweeper(navOptions: NavOptions? = null) {
 fun NavGraphBuilder.minesweeper(
     navController: NavController, viewModel: GameViewModel
 ) {
-    viewModel.loadPuzzle()
     composable<MinesweeperRoute> {
+        viewModel.loadPuzzle()
         //it.arguments?.getString("mode")
         GameUI(viewModel, navController)
     }

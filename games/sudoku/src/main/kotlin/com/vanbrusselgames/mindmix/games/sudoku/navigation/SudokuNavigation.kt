@@ -24,8 +24,8 @@ fun NavController.navigateToSudoku(navOptions: NavOptions? = null) {
 fun NavGraphBuilder.sudoku(
     navController: NavController, viewModel: GameViewModel
 ) {
-    viewModel.startPuzzle()
     composable<SudokuRoute> {
+        viewModel.startPuzzle()
         //it.arguments?.getString("mode")
         GameUI(viewModel, navController)
     }

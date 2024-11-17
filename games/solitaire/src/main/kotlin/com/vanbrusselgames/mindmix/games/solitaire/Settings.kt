@@ -41,7 +41,7 @@ fun SolitaireSettings(viewModel: GameViewModel) {
     ) {
         LocalContext.current
         Text(
-            text = stringResource(Solitaire.NAME_RES_ID),
+            text = stringResource(viewModel.nameResId),
             Modifier.fillMaxWidth(),
             fontSize = 36.sp,
             fontWeight = FontWeight.ExtraBold,

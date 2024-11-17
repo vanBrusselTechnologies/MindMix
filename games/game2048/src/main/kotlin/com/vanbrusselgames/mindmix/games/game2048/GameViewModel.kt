@@ -281,16 +281,20 @@ class GameViewModel : BaseGameViewModel() {
 
     private fun onGameFinished(navController: NavController, reachedTarget: Boolean) {
         // TODO : Localize CORRECT title / text
-        FinishedGame.titleResId = Game2048.NAME_RES_ID
-        FinishedGame.textResId = R.string.game_2048_desc
+        FinishedGame.titleResId =
+            if (!isStuck && reachedTarget) R.string.game_2048_reach_target_title else if (isStuck && !reachedTarget) R.string.game_2048_game_over_title else Game2048.NAME_RES_ID
+        FinishedGame.textResId =
+            if (!isStuck && reachedTarget) R.string.game_2048_reach_target_text else if (isStuck && !reachedTarget) R.string.game_2048_game_over_text else R.string.game_2048_success
         FinishedGame.score = score.longValue
         FinishedGame.highestTileValue = getHighestTileValue()
+        FinishedGame.targetTile = getTarget()
         FinishedGame.isStuck = isStuck
-        val bonusReward =
-            1.5.pow((log2(getHighestTileValue().toDouble()) - log2(getTarget().toDouble())))
-                .fastRoundToInt()
-        FinishedGame.reward =
-            if (reachedTarget && !isStuck) 10 else if (reachedTarget) 10 + bonusReward else 0
+        FinishedGame.reward = if (reachedTarget && isStuck) 10 + getBonusReward() else 0
         navController.navigateToGameFinished()
+    }
+
+    private fun getBonusReward(): Int {
+        return 1.5.pow((log2(getHighestTileValue().toDouble()) - log2(getTarget().toDouble())))
+            .fastRoundToInt()
     }
 }

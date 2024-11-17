@@ -117,7 +117,7 @@ fun Grid2048(viewModel: GameViewModel, navController: NavController) {
                     //Show effect what will happen when swipe will get finished -- Just effects
                 })
             }) {
-        val currentSpace = remember(this.maxWidth, this.maxHeight) {
+        val currentSpace = remember(this.maxWidth, this.maxHeight, viewModel.sideSize) {
             min(
                 this.maxWidth, this.maxHeight
             ) / viewModel.sideSize

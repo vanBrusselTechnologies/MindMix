@@ -6,4 +6,9 @@
     <string name="game_2048_score_label">Score:</string>
     <string name="game_2048_stat_max_tile_label">Hoogste tegel:</string>
     <string name="game_2048_continue_game">Doorspelen</string>
+    <string name="game_2048_game_over_title">Game over!</string>
+    <string name="game_2048_reach_target_title">Doel bereikt!</string>
+    <string name="game_2048_success">Je hebt de doeltegel %1$s bereikt. Goed gespeeld!</string>
+    <string name="game_2048_game_over_text">Je bent vastgelopen zonder de doeltegel %1$s te halen. Probeer het nog eens!</string>
+    <string name="game_2048_reach_target_text">De doeltegel %1$s is binnen met een score van %2$s. Hoever kun je komen?</string>
 </resources>

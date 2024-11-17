@@ -43,9 +43,17 @@ fun Game2048GameFinishedDialog(
         )
         Spacer(Modifier.height(2.dp))
         Text(
-            stringResource(FinishedGame.textResId),
-            Modifier.width(IntrinsicSize.Max),
-            textAlign = TextAlign.Center
+            when (FinishedGame.textResId) {
+                R.string.game_2048_reach_target_text -> reachedTargetText(
+                    FinishedGame.targetTile, FinishedGame.score
+                )
+
+                R.string.game_2048_game_over_text -> gameOverText(FinishedGame.targetTile)
+                R.string.game_2048_success -> successText(FinishedGame.targetTile)
+                else -> {
+                    stringResource(FinishedGame.textResId)
+                }
+            }, Modifier.width(IntrinsicSize.Max), textAlign = TextAlign.Center
         )
 
         Spacer(Modifier.height(8.dp))
@@ -79,6 +87,21 @@ fun Game2048GameFinishedDialog(
             }
         }
     }
+}
+
+@Composable
+private fun reachedTargetText(targetTile: Long, score: Long): String {
+    return stringResource(R.string.game_2048_reach_target_text, targetTile, score)
+}
+
+@Composable
+private fun gameOverText(targetTile: Long): String {
+    return stringResource(R.string.game_2048_game_over_text, targetTile)
+}
+
+@Composable
+private fun successText(targetTile: Long): String {
+    return stringResource(R.string.game_2048_success, targetTile)
 }
 
 @PreviewLightDark

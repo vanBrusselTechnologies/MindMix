@@ -11,6 +11,8 @@ import com.vanbrusselgames.mindmix.core.common.ITimerVM
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.feature.gamefinished.navigation.navigateToGameFinished
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -24,6 +26,8 @@ class GameViewModel : BaseGameViewModel(), ITimerVM {
         private const val CARD_PIXEL_WIDTH = 566f
         const val CARD_ASPECT_RATIO = CARD_PIXEL_WIDTH / CARD_PIXEL_HEIGHT
     }
+
+    private lateinit var coroutineScope: CoroutineScope
 
     override val nameResId = Solitaire.NAME_RES_ID
     override val descResId = R.string.solitaire_desc
@@ -361,6 +365,10 @@ class GameViewModel : BaseGameViewModel(), ITimerVM {
 
     val cardVisualType = mutableStateOf(PlayingCard.CardVisualType.SIMPLE)
 
+    fun setCoroutineScope(scope: CoroutineScope) {
+        coroutineScope = scope
+    }
+
     fun loadFromFile(data: SolitaireData) {
         if (data.finished) {
             startNewGame()
@@ -388,8 +396,9 @@ class GameViewModel : BaseGameViewModel(), ITimerVM {
                 c.frontVisible.value = frontVisible
                 if (i < 7 || (frontVisible && j + 1 == data.cardStacks[i].size)) c.isLast.value =
                     true
-                c.recalculateZIndex()
+                c.isMoving = false
                 c.calculateBaseOffset()
+                c.recalculateZIndex()
                 cardStacks[i].add(c)
             }
         }
@@ -447,7 +456,7 @@ class GameViewModel : BaseGameViewModel(), ITimerVM {
     }
 
     fun loadPuzzle() {
-        if (finished) reset()
+        if (finished) return startNewGame()
         else timer.resume()
         if (!cardStacks.all { cs -> cs.isEmpty() }) return
         val dupCards = cards.copyOf()
@@ -462,8 +471,9 @@ class GameViewModel : BaseGameViewModel(), ITimerVM {
                 card.stackIndex = index
                 card.stackId = 7 + i
                 card.visible.value = true
-                card.recalculateZIndex()
+                card.isMoving = false
                 card.calculateBaseOffset()
+                card.recalculateZIndex()
             }
             j += i + 1
         }
@@ -472,8 +482,9 @@ class GameViewModel : BaseGameViewModel(), ITimerVM {
             card.stackIndex = index
             card.stackId = 6
             card.visible.value = index == 0
-            card.recalculateZIndex()
+            card.isMoving = false
             card.calculateBaseOffset()
+            card.recalculateZIndex()
         }
         val stacks = Array(14) { listOf<Int>() }
         for (i in cardStacks.indices) {
@@ -481,9 +492,12 @@ class GameViewModel : BaseGameViewModel(), ITimerVM {
         }
         couldGetFinished.value = couldGetFinished()
         restStackEnabled.value = true
-        timer.start()
         Logger.logEvent(FirebaseAnalytics.Event.LEVEL_START) {
             param(FirebaseAnalytics.Param.LEVEL_NAME, Solitaire.GAME_NAME)
+        }
+        coroutineScope.launch {
+            cards.map { async { it.animOffset.animateTo(it.baseOffset) } }.awaitAll()
+            timer.start()
         }
     }
 
@@ -496,56 +510,54 @@ class GameViewModel : BaseGameViewModel(), ITimerVM {
             it.stackId = 6
             it.stackIndex = 0
             it.isMoving = false
-            it.recalculateZIndex()
             it.calculateBaseOffset()
+            it.recalculateZIndex()
         }
         moves = 0
+        timer.reset()
     }
 
     override fun startNewGame() {
         reset()
-        timer.start()
         loadPuzzle()
     }
 
-    fun resetRestStack(coroutineScope: CoroutineScope) {
+    fun resetRestStack() {
         if (restStackEnabled.value && cardStacks[6].isNotEmpty()) return
         cardStacks[6] = cardStacks[5].asReversed().map { card -> card }.toMutableList()
         cardStacks[5].clear()
         cardStacks[6].forEachIndexed { i, card ->
-            card.stackIndex = i
-            card.stackId = 6
-            card.frontVisible.value = false
-            card.isLast.value = false
-            card.visible.value = false
-            card.calculateBaseOffset()
-            card.recalculateZIndex()
-            card.isMoving = false
             coroutineScope.launch {
+                card.stackIndex = i
+                card.stackId = 6
+                card.frontVisible.value = false
+                card.isLast.value = false
+                card.visible.value = i == 0
+                card.isMoving = false
+                card.calculateBaseOffset()
+                card.recalculateZIndex()
                 card.animOffset.animateTo(card.baseOffset)
             }
         }
-        cardStacks[6][0].visible.value = true
     }
 
-    fun turnFromRestStack(coroutineScope: CoroutineScope) {
+    fun turnFromRestStack() {
         if (cardStacks[6].isEmpty()) return
         val card = cardStacks[6].last()
-        card.isMoving = true
-        card.visible.value = true
         val index = cardStacks[5].size
         card.stackIndex = index
         card.stackId = 5
+        card.visible.value = true
         card.frontVisible.value = true
         card.isLast.value = true
-        card.calculateBaseOffset()
-        card.recalculateZIndex()
         card.isMoving = false
-        cardStacks[5].add(card)
-        cardStacks[6].removeAt(cardStacks[6].lastIndex)
         coroutineScope.launch {
+            card.calculateBaseOffset()
+            card.recalculateZIndex()
             card.animOffset.animateTo(card.baseOffset)
         }
+        cardStacks[5].add(card)
+        cardStacks[6].removeAt(cardStacks[6].lastIndex)
         if (cardStacks[6].isEmpty() && cardStacks[5].size <= 1) restStackEnabled.value = false
     }
 
@@ -573,16 +585,16 @@ class GameViewModel : BaseGameViewModel(), ITimerVM {
         }
     }
 
-    fun moveCards(coroutineScope: CoroutineScope, intOffset: IntOffset) {
+    fun moveCards(intOffset: IntOffset) {
         movingCards.forEach { card ->
-            card.offset += intOffset
             coroutineScope.launch {
+                card.offset += intOffset
                 card.animOffset.animateTo(card.baseOffset + card.offset)
             }
         }
     }
 
-    fun onReleaseMovingCards(coroutineScope: CoroutineScope, navController: NavController) {
+    fun onReleaseMovingCards(navController: NavController) {
         if (movingCards.isEmpty()) return
         val firstCard = movingCards[0]
         val firstCardStackId = firstCard.stackId
@@ -615,10 +627,10 @@ class GameViewModel : BaseGameViewModel(), ITimerVM {
 
         movingCards.forEach { card ->
             card.offset = IntOffset.Zero
-            card.recalculateZIndex()
             card.isMoving = false
             coroutineScope.launch {
                 card.animOffset.animateTo(card.baseOffset)
+                card.recalculateZIndex()
             }
         }
         movingCards.clear()
@@ -676,6 +688,22 @@ class GameViewModel : BaseGameViewModel(), ITimerVM {
         return true
     }
 
+    fun onClickFinishGame(navController: NavController) {
+        cards.forEach {
+            coroutineScope.launch {
+                it.stackId = it.type.ordinal
+                it.stackIndex = it.index.ordinal
+                it.isMoving = false
+                it.isLast.value = true
+                it.frontVisible.value = true
+                it.calculateBaseOffset()
+                it.recalculateZIndex()
+                it.animOffset.animateTo(it.baseOffset)
+            }
+        }
+        checkFinished(navController)
+    }
+
     fun checkFinished(navController: NavController) {
         finished = isFinished()
         if (finished) {
@@ -701,7 +729,6 @@ class GameViewModel : BaseGameViewModel(), ITimerVM {
     }
 
     private fun onGameFinished(navController: NavController) {
-        // TODO : Localize CORRECT title / text
         FinishedGame.titleResId = Solitaire.NAME_RES_ID// "Congrats / Smart / Well done"
         FinishedGame.textResId = R.string.solitaire_success
         // """You did great and solved puzzle in ${0} seconds!!

@@ -10,6 +10,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
@@ -88,7 +89,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val networkMonitor = NetworkMonitor(this@MainActivity)
+        val networkMonitor = NetworkMonitor(this)
         CoroutineScope(Dispatchers.IO).launch {
             Firebase.initialize(this@MainActivity)
             Firebase.appCheck.installAppCheckProviderFactory(
@@ -97,7 +98,9 @@ class MainActivity : ComponentActivity() {
             AuthManager.start(this@MainActivity)
             GameLoader.init(this@MainActivity, networkMonitor)
         }
-        val adManager = AdManager(this@MainActivity, networkMonitor)
+        val adManager = AdManager(this, networkMonitor)
+        val snackbarHostState = SnackbarHostState()
+        val updateManager = UpdateManager(this, snackbarHostState)
 
         loadPreferences(applicationContext.dataStore)
         DataManager(this)
@@ -109,6 +112,7 @@ class MainActivity : ComponentActivity() {
                     SelectedTheme.Dark -> true
                     SelectedTheme.Light -> false
                 }
+                SnackbarHostState()
                 //todo: val snackbarHostState = remember { SnackbarHostState() }
                 navController = rememberNavController()
                 navController.enableOnBackPressed(false)
@@ -134,28 +138,23 @@ class MainActivity : ComponentActivity() {
                                 { currentViewModel().nameResId },
                                 { (currentViewModel() as BaseGameViewModel).startNewGame() },
                                 { navController.navigateToSettings() }) { navController.navigateToMenu() }
-                            gameHelpDialog(
-                                navController,
+                            gameHelpDialog(navController,
                                 { currentViewModel().nameResId }) { (currentViewModel() as BaseGameViewModel).descResId }
                             gameFinishedDialog {
                                 when (SceneManager.currentScene) {
-                                    Scene.GAME2048 -> Game2048GameFinishedDialog(
-                                        navController,
+                                    Scene.GAME2048 -> Game2048GameFinishedDialog(navController,
                                         game2048.viewModel,
                                         { adManager }) { navController.navigateToMenu() }
 
-                                    Scene.MINESWEEPER -> MinesweeperGameFinishedDialog(
-                                        navController,
+                                    Scene.MINESWEEPER -> MinesweeperGameFinishedDialog(navController,
                                         minesweeper.viewModel,
                                         { adManager }) { navController.navigateToMenu() }
 
-                                    Scene.SOLITAIRE -> SolitaireGameFinishedDialog(
-                                        navController,
+                                    Scene.SOLITAIRE -> SolitaireGameFinishedDialog(navController,
                                         solitaire.viewModel,
                                         { adManager }) { navController.navigateToMenu() }
 
-                                    Scene.SUDOKU -> SudokuGameFinishedDialog(
-                                        navController,
+                                    Scene.SUDOKU -> SudokuGameFinishedDialog(navController,
                                         sudoku.viewModel,
                                         { adManager }) { navController.navigateToMenu() }
 
@@ -181,12 +180,11 @@ class MainActivity : ComponentActivity() {
             }
         })
 
-        UpdateManager.start(this@MainActivity,
-            registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result: ActivityResult ->
-                if (result.resultCode != RESULT_OK) {
-                    Logger.w("Update flow failed! Result code: " + result.resultCode)
-                }
-            })
+        updateManager.checkForUpdates(registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result: ActivityResult ->
+            if (result.resultCode != RESULT_OK) {
+                Logger.w("Update flow failed! Result code: " + result.resultCode)
+            }
+        })
 
         CoroutineScope(Dispatchers.Main).launch {
             ReviewManager.start(this@MainActivity)
