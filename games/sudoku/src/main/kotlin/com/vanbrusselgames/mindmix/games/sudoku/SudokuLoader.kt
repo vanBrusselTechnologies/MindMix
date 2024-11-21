@@ -108,51 +108,51 @@ class SudokuLoader {
                 "per_page" to perPage
             )
             return Firebase.functions.getHttpsCallable("puzzles").call(data).continueWith { task ->
-                    val encodedPuzzles = (task.result?.data as List<*>).filterIsInstance<String>()
-                    val puzzles = encodedPuzzles.map { p ->
-                        val clues = Decode.base94toIntList(
-                            p.trim(), size
-                        )
-                        LoadedPuzzle(IntMath.sqrt(size, RoundingMode.FLOOR), difficulty, clues)
-                    }.shuffled()
-
-                    Logger.i("Successfully loaded ${puzzles.size} puzzles")
-                    loadedPuzzles[difficulty]!!.addAll(puzzles)
-
-                    var overrideProgress = false
-                    val p = puzzles.first()
-                    if (requestingCallback != null && requestingDifficulty == difficulty) {
-                        overrideProgress = true
-                        requestingCallback?.let { it(p) }
-                        requestingCallback = null
-                    }
-
-
-                    setProgress(
-                        viewModel, SudokuProgress(
-                            p.clues, p.clues, List(p.clues.size) { listOf() }, difficulty
-                        ), overrideProgress
+                val encodedPuzzles = (task.result?.getData() as List<*>).filterIsInstance<String>()
+                val puzzles = encodedPuzzles.map { p ->
+                    val clues = Decode.base94toIntList(
+                        p.trim(), size
                     )
+                    LoadedPuzzle(IntMath.sqrt(size, RoundingMode.FLOOR), difficulty, clues)
+                }.shuffled()
 
-                    val fileName =
-                        GameLoader.getFileName(Sudoku.GAME_ID, gameMode.ordinal, difficulty.name)
-                    GameLoader.appendToFile(fileName, encodedPuzzles)
+                Logger.i("Successfully loaded ${puzzles.size} puzzles")
+                loadedPuzzles[difficulty]!!.addAll(puzzles)
 
-                    requesting = false
-                }.addOnCompleteListener { task ->
-                    requesting = false
-                    if (!task.isSuccessful) {
-                        val e = task.exception
-                        if (e is FirebaseFunctionsException) {
-                            val code = e.code
-                            val details = e.details
-                            Logger.w("$code, $details")
-                        }
-                        Logger.w(
-                            "Failed to load puzzles", e!!
-                        )
-                    }
+                var overrideProgress = false
+                val p = puzzles.first()
+                if (requestingCallback != null && requestingDifficulty == difficulty) {
+                    overrideProgress = true
+                    requestingCallback?.let { it(p) }
+                    requestingCallback = null
                 }
+
+
+                setProgress(
+                    viewModel, SudokuProgress(
+                        p.clues, p.clues, List(p.clues.size) { listOf() }, difficulty
+                    ), overrideProgress
+                )
+
+                val fileName =
+                    GameLoader.getFileName(Sudoku.GAME_ID, gameMode.ordinal, difficulty.name)
+                GameLoader.appendToFile(fileName, encodedPuzzles)
+
+                requesting = false
+            }.addOnCompleteListener { task ->
+                requesting = false
+                if (!task.isSuccessful) {
+                    val e = task.exception
+                    if (e is FirebaseFunctionsException) {
+                        val code = e.code
+                        val details = e.details
+                        Logger.w("$code, $details")
+                    }
+                    Logger.w(
+                        "Failed to load puzzles", e!!
+                    )
+                }
+            }
         }
 
         fun requestPuzzle(

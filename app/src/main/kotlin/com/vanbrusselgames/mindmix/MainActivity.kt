@@ -41,6 +41,7 @@ import com.vanbrusselgames.mindmix.feature.gamehelp.navigation.gameHelpDialog
 import com.vanbrusselgames.mindmix.feature.gamemenu.navigation.gameMenuDialog
 import com.vanbrusselgames.mindmix.feature.gamemenu.navigation.navigateToGameMenu
 import com.vanbrusselgames.mindmix.feature.menu.MenuSettings
+import com.vanbrusselgames.mindmix.feature.menu.navigation.MenuRoute
 import com.vanbrusselgames.mindmix.feature.menu.navigation.menu
 import com.vanbrusselgames.mindmix.feature.menu.navigation.navigateToMenu
 import com.vanbrusselgames.mindmix.feature.settings.navigation.navigateToSettings
@@ -115,11 +116,10 @@ class MainActivity : ComponentActivity() {
                         contentColor = MaterialTheme.colorScheme.onBackground
                     ) {
                         NavHost(navController = navController,
-                            startDestination = "main",
+                            startDestination = MenuRoute,
                             Modifier.fillMaxSize(),
                             enterTransition = { fadeIn() },
                             exitTransition = { fadeOut() }) {
-                            composable("main") { navController.navigateToMenu() }
                             menu(navController, menu.viewModel, snackbarHostState)
                             solitaire(navController, solitaire.viewModel, snackbarHostState)
                             sudoku(navController, sudoku.viewModel, snackbarHostState)
@@ -129,7 +129,8 @@ class MainActivity : ComponentActivity() {
                                 { currentViewModel().nameResId },
                                 { (currentViewModel() as BaseGameViewModel).startNewGame() },
                                 { navController.navigateToSettings() }) { navController.navigateToMenu() }
-                            gameHelpDialog(navController,
+                            gameHelpDialog(
+                                navController,
                                 { currentViewModel().nameResId }) { (currentViewModel() as BaseGameViewModel).descResId }
                             gameFinishedDialog {
                                 when (SceneManager.currentScene) {

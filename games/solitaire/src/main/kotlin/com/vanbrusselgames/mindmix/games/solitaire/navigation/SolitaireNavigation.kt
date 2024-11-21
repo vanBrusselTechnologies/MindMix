@@ -7,6 +7,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
 import com.vanbrusselgames.mindmix.games.solitaire.GameUI
 import com.vanbrusselgames.mindmix.games.solitaire.SolitaireViewModel
@@ -19,8 +20,9 @@ object SolitaireRoute {
 }
 
 fun NavController.navigateToSolitaire(navOptions: NavOptions? = null) {
+    Logger.d("Navigate to: Solitaire")
     SceneManager.currentScene = SceneManager.Scene.SOLITAIRE
-    navigate(route = SolitaireRoute, navOptions)
+    navigate(SolitaireRoute, navOptions)
 }
 
 fun NavGraphBuilder.solitaire(

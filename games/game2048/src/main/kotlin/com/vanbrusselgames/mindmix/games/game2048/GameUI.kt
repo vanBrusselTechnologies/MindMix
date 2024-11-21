@@ -27,15 +27,14 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
@@ -51,7 +50,6 @@ import androidx.navigation.compose.rememberNavController
 import com.vanbrusselgames.mindmix.core.common.BaseScene
 import com.vanbrusselgames.mindmix.core.designsystem.theme.MindMixTheme
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
-import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.sqrt
 
@@ -59,9 +57,7 @@ const val threshold = 100
 
 @Composable
 fun GameUI(
-    viewModel: Game2048ViewModel,
-    navController: NavController,
-    snackbarHostState: SnackbarHostState
+    viewModel: Game2048ViewModel, navController: NavController, snackbarHostState: SnackbarHostState
 ) {
     BaseScene(viewModel, navController, snackbarHostState) {
         Box(
@@ -86,46 +82,25 @@ fun GameUI(
 
 @Composable
 fun Grid2048(viewModel: Game2048ViewModel, navController: NavController) {
-    var offsetX by remember { mutableFloatStateOf(0f) }
-    var offsetY by remember { mutableFloatStateOf(0f) }
-
+    var totalDragOffset = remember { Offset.Zero }
     BoxWithConstraints(
         Modifier
             .aspectRatio(1f)
             .pointerInput(Unit) {
                 detectDragGestures(onDragStart = {
-                    offsetX = 0f
-                    offsetY = 0f
+                    totalDragOffset = Offset.Zero
                 }, onDragEnd = {
-                    if (SceneManager.dialogActiveState.value) return@detectDragGestures
-                    if (viewModel.isStuck || viewModel.delayedDialog) return@detectDragGestures
-                    if (abs(offsetX) < threshold && abs(offsetY) < threshold) return@detectDragGestures
-                    if (abs(offsetX) > abs(offsetY)) {
-                        if (offsetX > 0) {
-                            viewModel.swipeRight(navController)
-                        } else {
-                            viewModel.swipeLeft(navController)
-                        }
-                    } else {
-                        if (offsetY > 0) {
-                            viewModel.swipeDown(navController)
-                        } else {
-                            viewModel.swipeUp(navController)
-                        }
-                    }
+                    viewModel.handleDragGestures(navController, totalDragOffset)
                 }, onDrag = { change, dragAmount ->
                     if (SceneManager.dialogActiveState.value) return@detectDragGestures
                     if (viewModel.isStuck || viewModel.delayedDialog) return@detectDragGestures
                     change.consume()
-                    offsetX += dragAmount.x
-                    offsetY += dragAmount.y
+                    totalDragOffset += dragAmount
                     //Show effect what will happen when swipe will get finished -- Just effects
                 })
             }) {
         val currentSpace = remember(this.maxWidth, this.maxHeight, viewModel.sideSize) {
-            min(
-                this.maxWidth, this.maxHeight
-            ) / viewModel.sideSize
+            min(this.maxWidth, this.maxHeight) / viewModel.sideSize
         }
         val localDensity = LocalDensity.current
         val fontSize = remember(currentSpace) { with(localDensity) { currentSpace.toSp() * 1.25f } }

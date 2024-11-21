@@ -6,6 +6,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
+import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
 import com.vanbrusselgames.mindmix.feature.menu.MenuScreenViewModel
 import com.vanbrusselgames.mindmix.feature.menu.SceneUI
@@ -18,8 +19,9 @@ object MenuRoute {
 }
 
 fun NavController.navigateToMenu(navOptions: NavOptions? = null) {
+    Logger.d("Navigate to: Menu")
     SceneManager.currentScene = SceneManager.Scene.MENU
-    navigate(route = MenuRoute) {
+    navigate(MenuRoute) {
         navOptions
         popUpTo(MenuRoute) { inclusive = true }
     }

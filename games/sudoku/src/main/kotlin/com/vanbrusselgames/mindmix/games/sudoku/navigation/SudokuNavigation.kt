@@ -6,6 +6,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
 import com.vanbrusselgames.mindmix.games.sudoku.GameUI
 import com.vanbrusselgames.mindmix.games.sudoku.SudokuViewModel
@@ -18,8 +19,9 @@ object SudokuRoute {
 }
 
 fun NavController.navigateToSudoku(navOptions: NavOptions? = null) {
+    Logger.d("Navigate to: Sudoku")
     SceneManager.currentScene = SceneManager.Scene.SUDOKU
-    navigate(route = SudokuRoute, navOptions)
+    navigate(SudokuRoute, navOptions)
 }
 
 fun NavGraphBuilder.sudoku(

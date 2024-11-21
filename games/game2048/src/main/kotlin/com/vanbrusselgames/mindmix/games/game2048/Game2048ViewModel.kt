@@ -4,19 +4,27 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastFilter
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastRoundToInt
 import androidx.datastore.preferences.core.Preferences
 import androidx.navigation.NavController
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.vanbrusselgames.mindmix.core.common.BaseGameViewModel
+import com.vanbrusselgames.mindmix.core.logging.Logger
+import com.vanbrusselgames.mindmix.core.navigation.SceneManager
 import com.vanbrusselgames.mindmix.feature.gamefinished.navigation.navigateToGameFinished
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import kotlin.collections.chunked
+import kotlin.collections.indexOfFirst
+import kotlin.math.abs
 import kotlin.math.log2
 import kotlin.math.pow
 import kotlin.random.Random
@@ -38,6 +46,10 @@ class Game2048ViewModel : BaseGameViewModel() {
 
     var score = mutableLongStateOf(0L)
 
+    var savedProgress = Array(GridSize2048.entries.size) {
+        Game2048Progress(listOf(), -1, -1, -1, GridSize2048.entries[it], false)
+    }
+
     fun getTarget(): Long = when (gridSize.value) {
         GridSize2048.THREE -> 256
         GridSize2048.FOUR -> 2048
@@ -48,15 +60,75 @@ class Game2048ViewModel : BaseGameViewModel() {
 
     fun getHighestTileValue() = cellList.map { it.value }.max()
 
-    init {
-        // TODO: Load progress
-        if (cellList.isEmpty() || cellList.all { it.value == 0L }) {
-            startNewGame()
+    fun setSize(value: GridSize2048) {
+        saveAndLoadProgress(gridSize.value, value)
+        gridSize.value = value
+    }
+
+    private fun saveAndLoadProgress(prevSize: GridSize2048, size: GridSize2048) {
+        if (prevSize === size) return
+        saveCurrentProgress(prevSize)
+
+        setProgress(size)
+    }
+
+    private fun saveCurrentProgress(size: GridSize2048 = this.gridSize.value) {
+        val p = savedProgress.first { it.size == size }
+        p.cellValues = cellList.map { c -> c.value }
+        p.currentScore = score.longValue
+        p.isStuck = isStuck
+    }
+
+    private fun saveProgress(progress: Game2048Progress) {
+        val p = savedProgress.first { it.size == progress.size }
+        p.cellValues = progress.cellValues
+        p.currentScore = progress.currentScore
+        p.isStuck = progress.isStuck
+        p.moves = progress.moves
+        p.bestScore = progress.bestScore
+    }
+
+    private fun setProgress(size: GridSize2048) {
+        reset()
+        gridSize.value = size
+        sideSize = size.getSize()
+        cellCount = sideSize * sideSize
+        val progress = savedProgress.find { it.size == size }!!
+        if (progress.cellValues.isEmpty() || progress.cellValues.all { it == 0L }) return startNewGame()
+
+        cellList.addAll(List(cellCount) {
+            GridCell2048(newId++, progress.cellValues[it])
+        }.toMutableStateList())
+        score.longValue = progress.currentScore
+        isStuck = progress.isStuck
+        //moves = progress.moves
+    }
+
+    fun loadFromFile(data: Game2048Data) {
+        gridSize.value = data.size
+        for (progress in data.progress) {
+            if (progress.cellValues.all { it == 0L }) continue
+            saveProgress(progress)
         }
+        setProgress(data.size)
+    }
+
+    fun saveToFile(): String {
+        if (isStuck) {
+            val index = savedProgress.indexOfFirst { it.size == gridSize.value }
+            savedProgress[index] = Game2048Progress(
+                listOf(), -1, -1, savedProgress[index].bestScore, gridSize.value, false
+            )
+        } else {
+            val p = savedProgress.first { it.size == gridSize.value }
+            p.cellValues = cellList.map { it.value }
+            //p.moves = moves
+            p.currentScore = score.longValue
+        }
+        return Json.encodeToString(Game2048Data(gridSize.value, savedProgress.asList()))
     }
 
     override fun onLoadPreferences(preferences: Preferences) {
-
     }
 
     private fun reset() {
@@ -67,8 +139,21 @@ class Game2048ViewModel : BaseGameViewModel() {
         score.longValue = 0L
     }
 
+    /**
+     * Loads a puzzle for the game.
+     * If no playable puzzle is currently loaded it will start a new game by initializing a fresh puzzle.
+     * If a puzzle is already loaded, it will continue with the current state.
+     */
+    fun loadPuzzle() {
+        if (isStuck || cellList.all { it.value == 0L }) startNewGame()
+        // otherwise game is already loaded using LoadFromFile()
+    }
+
     override fun startNewGame() {
         reset()
+        Logger.logEvent(FirebaseAnalytics.Event.LEVEL_START) {
+            param(FirebaseAnalytics.Param.LEVEL_NAME, Game2048.GAME_NAME)
+        }
 
         cellList.addAll(List(cellCount) { GridCell2048(newId++, 0) }.toMutableStateList())
         cellList.shuffle()
@@ -78,33 +163,16 @@ class Game2048ViewModel : BaseGameViewModel() {
         cellList.sortBy { it.id }
     }
 
-    fun setSize(value: GridSize2048) {
-        saveAndLoadProgress(gridSize.value, value)
-        gridSize.value = value
-    }
-
-    private fun saveAndLoadProgress(prevSize: GridSize2048, size: GridSize2048) {
-        // todo: Load Actual progress for size, instead of creating new puzzle.
-
-        //if (currentPuzzle != null) setCurrentProgress(prevDifficulty)
-
-        //val progress = savedProgress.find { it.size == size }!!
-        //if (progress.cellList.isEmpty()) return
-        //currentPuzzle = LoadedPuzzle(SIZE, difficulty, progress.clues)
-
-        if (prevSize === size) return
-        sideSize = size.getSize()
-        cellCount = sideSize * sideSize
-
-        cellList.clear()
-        cellList.addAll(List(cellCount) { GridCell2048(newId++, 0) }.toMutableStateList())
-
-        cellList.shuffle()
-        for (i in 0 until startNumbers) {
-            cellList[i].value = 2
+    fun handleDragGestures(navController: NavController, totalDragOffset: Offset) {
+        if (isStuck || delayedDialog || SceneManager.dialogActiveState.value) return
+        val x = totalDragOffset.x
+        val y = totalDragOffset.y
+        if (abs(x) < threshold && abs(y) < threshold) return
+        if (abs(x) > abs(y)) { // Horizontal
+            if (x > 0) swipeRight(navController) else swipeLeft(navController)
+        } else { // Vertical
+            if (y > 0) swipeDown(navController) else swipeUp(navController)
         }
-        cellList.sortBy { it.id }
-        score.longValue = 0L
     }
 
     fun swipeUp(navController: NavController) {
@@ -114,7 +182,8 @@ class Game2048ViewModel : BaseGameViewModel() {
 
         val tempCellList = mutableListOf<GridCell2048>()
         getColumns().forEachIndexed { cId, column ->
-            val cells = column.filter { it.value != 0L }.toMutableList()
+            val cells = column.sortedBy { if (it.value == 0L) 1 else 0 }.toMutableList()
+            //.filter { it.value != 0L }.toMutableList()
             while (cells.size < sideSize) {
                 cells.add(GridCell2048(newId++, 0))
             }
@@ -133,7 +202,8 @@ class Game2048ViewModel : BaseGameViewModel() {
 
         val tempCellList = mutableListOf<GridCell2048>()
         getColumns().forEachIndexed { cId, column ->
-            val cells = column.filter { it.value != 0L }.toMutableList()
+            val cells = column.sortedBy { if (it.value == 0L) 0 else 1 }.toMutableList()
+            //.filter { it.value != 0L }.toMutableList()
             while (cells.size < sideSize) {
                 cells.add(0, GridCell2048(newId++, 0))
             }
@@ -151,7 +221,8 @@ class Game2048ViewModel : BaseGameViewModel() {
         combineEqualCells(navController, rows)
 
         val newRows = getRows().mapIndexed { rId, row ->
-            val cells = row.filter { it.value != 0L }.toMutableList()
+            val cells = row.sortedBy { if (it.value == 0L) 1 else 0 }.toMutableList()
+            //.filter { it.value != 0L }.toMutableList()
             while (cells.size < sideSize) {
                 cells.add(GridCell2048(newId++, 0))
             }
@@ -176,7 +247,8 @@ class Game2048ViewModel : BaseGameViewModel() {
         combineEqualCells(navController, rows)
 
         val newRows = getRows().mapIndexed { rId, row ->
-            val cells = row.filter { it.value != 0L }.toMutableList()
+            val cells = row.sortedBy { if (it.value == 0L) 0 else 1 }.toMutableList()
+            //.filter { it.value != 0L }.toMutableList()
             while (cells.size < sideSize) {
                 cells.add(0, GridCell2048(newId++, 0))
             }
@@ -209,7 +281,9 @@ class Game2048ViewModel : BaseGameViewModel() {
         return rows
     }
 
-    private fun combineEqualCells(navController: NavController, cells: List<List<GridCell2048>>) {
+    private fun combineEqualCells(
+        navController: NavController, cells: List<List<GridCell2048>>
+    ) {
         var reachedTarget = false
         var points = 0L
         for (r in cells) {
@@ -247,7 +321,8 @@ class Game2048ViewModel : BaseGameViewModel() {
             return
         }
         val cell = options.random()
-        cell.value = if (Random.nextFloat() < 0.9) 2 else 4
+        cellList[cellList.indexOf(cell)] =
+            GridCell2048(newId++, if (Random.nextFloat() < 0.9) 2 else 4)
         checkStuck(navController)
     }
 

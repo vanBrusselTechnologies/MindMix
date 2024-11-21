@@ -8,14 +8,17 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.dialog
 import com.vanbrusselgames.mindmix.core.designsystem.theme.setFullScreen
+import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.feature.gamemenu.GameMenuDialog
 import kotlinx.serialization.Serializable
 
 @Serializable
 object GameMenuRoute
 
-fun NavController.navigateToGameMenu(navOptions: NavOptions? = null) =
-    navigate(route = GameMenuRoute, navOptions)
+fun NavController.navigateToGameMenu(navOptions: NavOptions? = null) {
+    Logger.d("Navigate to: GameMenu")
+    navigate(GameMenuRoute, navOptions)
+}
 
 fun NavGraphBuilder.gameMenuDialog(
     navController: NavController,

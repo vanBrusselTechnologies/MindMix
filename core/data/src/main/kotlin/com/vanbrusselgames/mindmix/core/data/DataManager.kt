@@ -61,7 +61,7 @@ class DataManager(
                     val safeCode = line.substring(0, i).toInt()
                     val json = line.substring(i + 1)
                     val saveScene = SceneManager.scenes[safeCode]
-                    if (saveScene == null) continue;
+                    if (saveScene == null) continue
                     dataMap[saveScene] = json
                     loadDataForScene(jsonParser, saveScene, json)
                 } catch (e: Exception) {

@@ -9,18 +9,20 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.dialog
 import com.vanbrusselgames.mindmix.core.designsystem.theme.setFullScreen
+import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.feature.settings.SettingsDialog
 import kotlinx.serialization.Serializable
 
 @Serializable
 object SettingsRoute
 
-fun NavController.navigateToSettings(navOptions: NavOptions? = null) =
-    navigate(route = SettingsRoute, navOptions)
+fun NavController.navigateToSettings(navOptions: NavOptions? = null) {
+    Logger.d("Navigate to: Settings")
+    navigate(SettingsRoute, navOptions)
+}
 
 fun NavGraphBuilder.settingsDialog(
-    navController: NavController,
-    content: @Composable () -> Unit
+    navController: NavController, content: @Composable () -> Unit
 ) {
     dialog<SettingsRoute>(dialogProperties = DialogProperties(true, false, false)) {
         val window = (LocalView.current.parent as? DialogWindowProvider)?.window

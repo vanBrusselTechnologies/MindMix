@@ -8,14 +8,17 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.dialog
 import com.vanbrusselgames.mindmix.core.designsystem.theme.setFullScreen
+import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.feature.gamehelp.GameHelpDialog
 import kotlinx.serialization.Serializable
 
 @Serializable
 object GameHelpRoute
 
-fun NavController.navigateToGameHelp(navOptions: NavOptions? = null) =
-    navigate(route = GameHelpRoute, navOptions)
+fun NavController.navigateToGameHelp(navOptions: NavOptions? = null) {
+    Logger.d("Navigate to: GameHelp")
+    navigate(GameHelpRoute, navOptions)
+}
 
 fun NavGraphBuilder.gameHelpDialog(
     navController: NavController, nameResId: () -> Int, descResId: () -> Int

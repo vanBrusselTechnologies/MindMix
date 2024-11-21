@@ -67,6 +67,7 @@ class SudokuViewModel : BaseGameViewModel() {
     }
 
     private fun saveAndLoadProgress(prevDifficulty: Difficulty, difficulty: Difficulty) {
+        if (prevDifficulty == difficulty) return
         if (currentPuzzle != null) setCurrentProgress(prevDifficulty)
 
         val progress = savedProgress.find { it.difficulty == difficulty }!!

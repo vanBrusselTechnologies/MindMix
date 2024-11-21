@@ -11,7 +11,19 @@ data class GridCell2048(val id: Int, private var _value: Long) {
     private val color11 = Color.Red
     private val color22 = Color.Blue
     private val color33 = Color.Black
-    val background = mutableStateOf<Color>(color0)
+    val background = mutableStateOf<Color>(Color.Transparent)
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is GridCell2048) return false
+
+        if (id == other.id) return true
+        return false
+    }
+
+    override fun hashCode(): Int {
+        return id
+    }
 
     init {
         updateBackground()

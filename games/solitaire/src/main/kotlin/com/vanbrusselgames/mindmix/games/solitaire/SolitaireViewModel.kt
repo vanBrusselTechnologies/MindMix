@@ -700,12 +700,12 @@ class SolitaireViewModel : BaseGameViewModel(), ITimerVM {
 
     fun onClickFinishGame(navController: NavController) {
         cards.forEach {
+            it.stackId = it.type.ordinal
+            it.stackIndex = it.index.ordinal
+            it.isMoving = false
+            it.isLast.value = true
+            it.frontVisible.value = true
             coroutineScope.launch {
-                it.stackId = it.type.ordinal
-                it.stackIndex = it.index.ordinal
-                it.isMoving = false
-                it.isLast.value = true
-                it.frontVisible.value = true
                 it.calculateBaseOffset()
                 it.recalculateZIndex()
                 it.animOffset.animateTo(it.baseOffset)

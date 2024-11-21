@@ -7,10 +7,10 @@ androidxEspresso = "3.6.1"
 androidxJunit = "1.2.1"
 appUpdate = "2.1.0"
 appUpdateKtx = "2.1.0"
-composeBom = "2024.10.01"
+composeBom = "2024.11.00"
 constraintlayout = "2.2.0"
 datastorePreferences = "1.1.1"
-firebaseBom = "33.5.1"
+firebaseBom = "33.6.0"
 firebaseCrashlyticsGradle = "3.0.2"
 firebaseCrashlyticsPlugin = "3.0.2"
 firebasePerfPlugin = "1.4.2"
@@ -22,7 +22,7 @@ kotlin = "2.0.20"
 kotlinxSerializationJson = "1.7.3"
 ksp = "2.0.20-1.0.25"
 lifecycleRuntimeKtx = "2.8.7"
-navigationCompose = "2.8.3"
+navigationCompose = "2.8.4"
 playServicesAds = "23.5.0"
 playServicesAuth = "21.2.0"
 playServicesGamesV2 = "20.1.2"
@@ -30,6 +30,7 @@ review = "2.0.2"
 reviewKtx = "2.0.2"
 appcompat = "1.7.0"
 material = "1.12.0"
+playServicesMeasurementApi = "22.1.2"
 
 
 [libraries]
@@ -71,6 +72,7 @@ review = { module = "com.google.android.play:review", version.ref = "review" }
 review-ktx = { module = "com.google.android.play:review-ktx", version.ref = "reviewKtx" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+play-services-measurement-api = { group = "com.google.android.gms", name = "play-services-measurement-api", version.ref = "playServicesMeasurementApi" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }

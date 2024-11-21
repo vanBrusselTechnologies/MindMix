@@ -5,6 +5,7 @@ import com.vanbrusselgames.mindmix.core.navigation.SceneManager.Scene
 import com.vanbrusselgames.mindmix.feature.menu.Menu
 import com.vanbrusselgames.mindmix.feature.menu.MenuData
 import com.vanbrusselgames.mindmix.games.game2048.Game2048
+import com.vanbrusselgames.mindmix.games.game2048.Game2048Data
 import com.vanbrusselgames.mindmix.games.minesweeper.Minesweeper
 import com.vanbrusselgames.mindmix.games.minesweeper.MinesweeperData
 import com.vanbrusselgames.mindmix.games.solitaire.Solitaire
@@ -44,9 +45,8 @@ val loadDataForScene: (jsonParser: Json, Scene, String) -> Unit = { jsonParser, 
         }
 
         Scene.GAME2048 -> {
-            //TODO
-            //    val data = jsonParser.decodeFromString<Game2048Data>(json)
-            //    game2048.viewModel.loadFromFile(data)
+            val data = jsonParser.decodeFromString<Game2048Data>(json)
+            game2048.viewModel.loadFromFile(data)
         }
     }
 }
@@ -62,9 +62,7 @@ val onLoadPreferences: (preferences: Preferences) -> Unit = { preferences ->
 val gameLoad: suspend (loadFromFile: Boolean) -> Unit = { loadFromFile ->
     try {
         SudokuLoader.requestPuzzles(
-            sudoku.viewModel,
-            PuzzleType.Classic,
-            loadFromFile
+            sudoku.viewModel, PuzzleType.Classic, loadFromFile
         )
     } catch (_: Exception) {
     }

@@ -6,6 +6,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
 import com.vanbrusselgames.mindmix.games.minesweeper.GameUI
 import com.vanbrusselgames.mindmix.games.minesweeper.MinesweeperViewModel
@@ -18,8 +19,9 @@ object MinesweeperRoute {
 }
 
 fun NavController.navigateToMinesweeper(navOptions: NavOptions? = null) {
+    Logger.d("Navigate to: Minesweeper")
     SceneManager.currentScene = SceneManager.Scene.MINESWEEPER
-    navigate(route = MinesweeperRoute, navOptions)
+    navigate(MinesweeperRoute, navOptions)
 }
 
 fun NavGraphBuilder.minesweeper(

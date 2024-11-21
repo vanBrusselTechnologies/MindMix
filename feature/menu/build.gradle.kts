@@ -56,4 +56,5 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.kotlinx.serialization.json)
     implementation(project(":core:data"))
+    implementation(project(":core:logging"))
 }
