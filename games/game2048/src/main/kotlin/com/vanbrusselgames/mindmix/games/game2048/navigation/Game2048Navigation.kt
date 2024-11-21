@@ -1,5 +1,6 @@
 package com.vanbrusselgames.mindmix.games.game2048.navigation
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -7,7 +8,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
 import com.vanbrusselgames.mindmix.games.game2048.GameUI
-import com.vanbrusselgames.mindmix.games.game2048.GameViewModel
+import com.vanbrusselgames.mindmix.games.game2048.Game2048ViewModel
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -22,9 +23,11 @@ fun NavController.navigateTo2048(navOptions: NavOptions? = null) {
 }
 
 fun NavGraphBuilder.game2048(
-    navController: NavController, viewModel: GameViewModel
+    navController: NavController,
+    viewModel: Game2048ViewModel,
+    snackbarHostState: SnackbarHostState
 ) {
     composable<Game2048Route> {
-        GameUI(viewModel, navController)
+        GameUI(viewModel, navController, snackbarHostState)
     }
 }

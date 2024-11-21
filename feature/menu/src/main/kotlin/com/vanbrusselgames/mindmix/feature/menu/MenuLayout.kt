@@ -10,6 +10,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,8 +33,8 @@ import com.vanbrusselgames.mindmix.core.designsystem.theme.MindMixTheme
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
 
 @Composable
-fun SceneUI(viewModel: MenuScreenViewModel, navController: NavController) {
-    BaseScene(viewModel, navController) {
+fun SceneUI(viewModel: MenuScreenViewModel, navController: NavController, snackbarHostState: SnackbarHostState) {
+    BaseScene(viewModel, navController, snackbarHostState) {
         SetLayoutGameWheel(viewModel, navController)
     }
 }

@@ -28,9 +28,10 @@ import com.vanbrusselgames.mindmix.feature.gamefinished.GameFinishedRewardRow
 @Composable
 fun MinesweeperGameFinishedDialog(
     navController: NavController,
-    viewModel: GameViewModel,
+    viewModel: MinesweeperViewModel,
     adManager: (() -> AdManager)?,
-    backToMenu: () -> Unit
+    backToMenu: () -> Unit,
+    forceSave: () -> Unit
 ) {
     Column(
         Modifier
@@ -47,7 +48,7 @@ fun MinesweeperGameFinishedDialog(
         Text(stringResource(FinishedGame.textResId), textAlign = TextAlign.Center)
         if (FinishedGame.reward != 0 && adManager != null) {
             Spacer(Modifier.height(8.dp))
-            GameFinishedRewardRow(FinishedGame.reward, adManager)
+            GameFinishedRewardRow(FinishedGame.reward, adManager, forceSave)
         }
         Spacer(Modifier.height(8.dp))
         Buttons(
@@ -61,7 +62,7 @@ fun MinesweeperGameFinishedDialog(
 fun Prev_GameFinished() {
     MindMixTheme {
         Surface {
-            MinesweeperGameFinishedDialog(rememberNavController(), GameViewModel(), null) {}
+            MinesweeperGameFinishedDialog(rememberNavController(), MinesweeperViewModel(), null, {}) {}
         }
     }
 }

@@ -1,6 +1,6 @@
 package com.vanbrusselgames.mindmix.games.sudoku
 
-class Sudoku(val viewModel: GameViewModel = GameViewModel()) {
+class Sudoku(val viewModel: SudokuViewModel = SudokuViewModel()) {
     companion object {
         const val GAME_ID: Int = 0
         const val GAME_NAME = "Sudoku"

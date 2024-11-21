@@ -1,5 +1,6 @@
 package com.vanbrusselgames.mindmix.games.sudoku
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -28,18 +29,22 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.vanbrusselgames.mindmix.core.data.savePreferences
 import com.vanbrusselgames.mindmix.core.ui.EnumDropdown
 import com.vanbrusselgames.mindmix.core.utils.constants.Difficulty
+import com.vanbrusselgames.mindmix.games.sudoku.data.PREF_KEY_AUTO_EDIT_NOTES
+import com.vanbrusselgames.mindmix.games.sudoku.data.PREF_KEY_CHECK_CONFLICTING_CELLS
 
 @Composable
-fun SudokuSettings(viewModel: GameViewModel) {
+fun SudokuSettings(
+    ctx: Context, viewModel: SudokuViewModel
+) {
     Column(
         Modifier
             .padding(24.dp)
             .width(IntrinsicSize.Max),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val ctx = LocalContext.current
         Text(
             text = stringResource(Sudoku.NAME_RES_ID),
             Modifier.fillMaxWidth(),
@@ -51,9 +56,11 @@ fun SudokuSettings(viewModel: GameViewModel) {
         DifficultyDropdownRow(viewModel)
         Spacer(Modifier.height(2.dp))
         Button(
-            { viewModel.autoEditNotes.value = !viewModel.autoEditNotes.value },
-            Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(6.dp)
+            {
+                val enabled = !viewModel.autoEditNotes.value
+                viewModel.autoEditNotes.value = enabled
+                savePreferences(ctx, PREF_KEY_AUTO_EDIT_NOTES, enabled)
+            }, Modifier.fillMaxWidth(), shape = RoundedCornerShape(6.dp)
         ) {
             Row(Modifier.heightIn(max = 36.dp), verticalAlignment = Alignment.CenterVertically) {
                 Text(stringResource(R.string.auto_edit_notes))
@@ -62,7 +69,7 @@ fun SudokuSettings(viewModel: GameViewModel) {
                     checked = viewModel.autoEditNotes.value,
                     onCheckedChange = {
                         viewModel.autoEditNotes.value = it
-                        //todo: savePreferences(ctx, PREF_KEY_SUDOKU__AUTO_EDIT_NOTES, value = it)
+                        savePreferences(ctx, PREF_KEY_AUTO_EDIT_NOTES, it)
                     },
                     colors = CheckboxDefaults.colors()
                         .copy(uncheckedBorderColor = MaterialTheme.colorScheme.onPrimary)
@@ -71,9 +78,14 @@ fun SudokuSettings(viewModel: GameViewModel) {
         }
         Spacer(Modifier.height(2.dp))
         Button(
-            { viewModel.checkConflictingCells.value = !viewModel.checkConflictingCells.value },
-            Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(6.dp)
+            {
+                val enabled = !viewModel.checkConflictingCells.value
+                viewModel.checkConflictingCells.value = enabled
+                savePreferences(ctx, PREF_KEY_CHECK_CONFLICTING_CELLS, enabled)
+                if (enabled) {
+                    viewModel.cells.forEach { viewModel.checkConflictingCell(it) }
+                } else viewModel.cells.forEach { it.isIncorrect.value = false }
+            }, Modifier.fillMaxWidth(), shape = RoundedCornerShape(6.dp)
         ) {
             Row(Modifier.heightIn(max = 36.dp), verticalAlignment = Alignment.CenterVertically) {
                 Text(stringResource(R.string.double_number_warning))
@@ -82,7 +94,7 @@ fun SudokuSettings(viewModel: GameViewModel) {
                     checked = viewModel.checkConflictingCells.value,
                     onCheckedChange = { checked ->
                         viewModel.checkConflictingCells.value = checked
-                        //todo: savePreferences(ctx, PREF_KEY_SUDOKU__CHECK_CONFLICTING_CELLS, value = checked)
+                        savePreferences(ctx, PREF_KEY_CHECK_CONFLICTING_CELLS, checked)
 
                         if (checked) {
                             viewModel.cells.forEach { viewModel.checkConflictingCell(it) }
@@ -97,7 +109,7 @@ fun SudokuSettings(viewModel: GameViewModel) {
 }
 
 @Composable
-fun DifficultyDropdownRow(viewModel: GameViewModel) {
+fun DifficultyDropdownRow(viewModel: SudokuViewModel) {
     val defaultButtonColors = ButtonDefaults.buttonColors()
     Row(
         Modifier
@@ -124,5 +136,5 @@ fun DifficultyDropdownRow(viewModel: GameViewModel) {
 @Preview
 @Composable
 fun Prev_Settings() {
-    SudokuSettings(GameViewModel())
+    SudokuSettings(LocalContext.current, SudokuViewModel())
 }

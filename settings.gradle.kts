@@ -17,6 +17,7 @@ include(":app")
 
 include(":core:advertisement")
 //include(":core:analytics")
+include(":core:authentication")
 include(":core:common")
 include(":core:data")
 //include(":core:data-test")

@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -46,15 +47,17 @@ import com.vanbrusselgames.mindmix.core.utils.PixelHelper
 import kotlin.math.floor
 
 @Composable
-fun GameUI(viewModel: GameViewModel, navController: NavController) {
-    BaseScene(viewModel, navController) {
+fun GameUI(
+    viewModel: SudokuViewModel, navController: NavController, snackbarHostState: SnackbarHostState
+) {
+    BaseScene(viewModel, navController, snackbarHostState) {
         if (!SudokuLoader.puzzleLoaded.value) GameLoadingScreen()
         else SudokuSpecificLayout(viewModel, navController)
     }
 }
 
 @Composable
-fun SudokuSpecificLayout(viewModel: GameViewModel, navController: NavController) {
+fun SudokuSpecificLayout(viewModel: SudokuViewModel, navController: NavController) {
     BoxWithConstraints(
         Modifier
             .fillMaxSize()
@@ -88,7 +91,7 @@ fun SudokuSpecificLayout(viewModel: GameViewModel, navController: NavController)
 }
 
 @Composable
-fun SceneContent(viewModel: GameViewModel, navController: NavController, horizontal: Boolean) {
+fun SceneContent(viewModel: SudokuViewModel, navController: NavController, horizontal: Boolean) {
     SudokuGrid(viewModel)
     Spacer(
         Modifier
@@ -100,7 +103,7 @@ fun SceneContent(viewModel: GameViewModel, navController: NavController, horizon
 
 //#region Grid
 @Composable
-fun SudokuGrid(viewModel: GameViewModel) {
+fun SudokuGrid(viewModel: SudokuViewModel) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
@@ -120,7 +123,7 @@ fun SudokuGrid(viewModel: GameViewModel) {
 }
 
 @Composable
-fun SudokuCell(viewModel: GameViewModel, cell: SudokuPuzzleCell) {
+fun SudokuCell(viewModel: SudokuViewModel, cell: SudokuPuzzleCell) {
     val index = cell.id
     val column = index % 3
     val row = (floor(index / 9f) % 3f).toInt()

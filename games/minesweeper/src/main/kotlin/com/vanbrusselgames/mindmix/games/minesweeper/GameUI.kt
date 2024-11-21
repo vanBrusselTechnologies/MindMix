@@ -21,6 +21,7 @@ import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -48,7 +49,7 @@ import androidx.navigation.NavController
 import com.vanbrusselgames.mindmix.core.common.BaseScene
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
 import com.vanbrusselgames.mindmix.core.utils.PixelHelper.Companion.pxToSp
-import com.vanbrusselgames.mindmix.games.minesweeper.GameViewModel.InputMode
+import com.vanbrusselgames.mindmix.games.minesweeper.MinesweeperViewModel.InputMode
 import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
@@ -57,14 +58,18 @@ import kotlin.math.roundToInt
 private var cellSize: Dp = 0.dp
 
 @Composable
-fun GameUI(viewModel: GameViewModel, navController: NavController) {
-    BaseScene(viewModel, navController) {
+fun GameUI(
+    viewModel: MinesweeperViewModel,
+    navController: NavController,
+    snackbarHostState: SnackbarHostState
+) {
+    BaseScene(viewModel, navController, snackbarHostState) {
         MinesweeperSpecificLayout(viewModel, navController)
     }
 }
 
 @Composable
-fun MinesweeperSpecificLayout(viewModel: GameViewModel, navController: NavController) {
+fun MinesweeperSpecificLayout(viewModel: MinesweeperViewModel, navController: NavController) {
     BoxWithConstraints(
         Modifier
             .fillMaxSize()
@@ -114,7 +119,7 @@ fun MinesweeperSpecificLayout(viewModel: GameViewModel, navController: NavContro
 
 //#region Grid
 @Composable
-fun MinesweeperGrid(viewModel: GameViewModel, navController: NavController) {
+fun MinesweeperGrid(viewModel: MinesweeperViewModel, navController: NavController) {
     Box(
         if (viewModel.sizeX < viewModel.sizeY) {
             Modifier.fillMaxWidth(0.95f)
@@ -162,7 +167,7 @@ fun MinesweeperGrid(viewModel: GameViewModel, navController: NavController) {
 }
 
 private fun onSelectCell(
-    viewModel: GameViewModel, cell: MinesweeperCell, navController: NavController
+    viewModel: MinesweeperViewModel, cell: MinesweeperCell, navController: NavController
 ) {
     cell.pressed = true
     when (cell.state) {
@@ -176,7 +181,7 @@ private fun onSelectCell(
                 if (cell.mineCount == 0) {
                     viewModel.findOtherSafeCells(cell)
                 }
-                if (viewModel.autoFlag) viewModel.autoFlag()
+                if (viewModel.autoFlag.value) viewModel.autoFlag()
                 viewModel.checkFinished(navController)
             }
         }
@@ -261,7 +266,7 @@ fun MinesweeperMineCell() {
 
 //#region Tools
 @Composable
-fun Tools(viewModel: GameViewModel, isHorizontal: Boolean) {
+fun Tools(viewModel: MinesweeperViewModel, isHorizontal: Boolean) {
     if (isHorizontal) {
         Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
             ToolsContent(viewModel, Modifier.weight(1f), Modifier.weight(2f))
@@ -275,7 +280,7 @@ fun Tools(viewModel: GameViewModel, isHorizontal: Boolean) {
 
 @Composable
 private fun ToolsContent(
-    viewModel: GameViewModel, modifierWeight1f: Modifier, modifierWeight2f: Modifier
+    viewModel: MinesweeperViewModel, modifierWeight1f: Modifier, modifierWeight2f: Modifier
 ) {
     val colors = ButtonColors(
         colorScheme.secondaryContainer,

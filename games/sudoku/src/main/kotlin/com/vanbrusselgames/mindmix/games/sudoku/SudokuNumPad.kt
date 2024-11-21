@@ -27,7 +27,7 @@ import com.vanbrusselgames.mindmix.core.navigation.SceneManager
 import com.vanbrusselgames.mindmix.core.ui.AutoSizeText
 
 @Composable
-fun SudokuNumPad(viewModel: GameViewModel, navController: NavController, horizontal: Boolean) {
+fun SudokuNumPad(viewModel: SudokuViewModel, navController: NavController, horizontal: Boolean) {
     val modifier = Modifier
         .fillMaxSize()
         .aspectRatio(1f)
@@ -49,7 +49,7 @@ fun SudokuNumPad(viewModel: GameViewModel, navController: NavController, horizon
 
 @Composable
 private fun SudokuNumPadNumberCell(
-    viewModel: GameViewModel, modifier: Modifier, index: Int, navController: NavController
+    viewModel: SudokuViewModel, modifier: Modifier, index: Int, navController: NavController
 ) {
     Box(modifier.clickable(enabled = !SceneManager.dialogActiveState.value) {
         viewModel.onClickNumPadCell(index, navController)
@@ -68,7 +68,7 @@ private fun SudokuNumPadNumberCell(
 }
 
 @Composable
-private fun SudokuNumPadInputModeCell(viewModel: GameViewModel, modifier: Modifier) {
+private fun SudokuNumPadInputModeCell(viewModel: SudokuViewModel, modifier: Modifier) {
     Box(modifier.clickable(enabled = !SceneManager.dialogActiveState.value) {
         viewModel.changeInputMode()
     }) {

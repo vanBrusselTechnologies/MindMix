@@ -8,6 +8,7 @@ import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastFilter
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastRoundToInt
+import androidx.datastore.preferences.core.Preferences
 import androidx.navigation.NavController
 import com.vanbrusselgames.mindmix.core.common.BaseGameViewModel
 import com.vanbrusselgames.mindmix.feature.gamefinished.navigation.navigateToGameFinished
@@ -20,7 +21,7 @@ import kotlin.math.log2
 import kotlin.math.pow
 import kotlin.random.Random
 
-class GameViewModel : BaseGameViewModel() {
+class Game2048ViewModel : BaseGameViewModel() {
     override val nameResId = Game2048.NAME_RES_ID
     override val descResId = R.string.game_2048_desc
 
@@ -52,6 +53,10 @@ class GameViewModel : BaseGameViewModel() {
         if (cellList.isEmpty() || cellList.all { it.value == 0L }) {
             startNewGame()
         }
+    }
+
+    override fun onLoadPreferences(preferences: Preferences) {
+
     }
 
     private fun reset() {

@@ -14,6 +14,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,8 +37,12 @@ import com.vanbrusselgames.mindmix.core.navigation.SceneManager
 import kotlin.math.min
 
 @Composable
-fun GameUI(viewModel: GameViewModel, navController: NavController) {
-    BaseScene(viewModel, navController) {
+fun GameUI(
+    viewModel: SolitaireViewModel,
+    navController: NavController,
+    snackbarHostState: SnackbarHostState
+) {
+    BaseScene(viewModel, navController, snackbarHostState) {
         SolitaireSpecificLayout(viewModel, navController)
         Box(
             Modifier
@@ -50,7 +55,7 @@ fun GameUI(viewModel: GameViewModel, navController: NavController) {
 }
 
 @Composable
-fun SolitaireSpecificLayout(viewModel: GameViewModel, navController: NavController) {
+fun SolitaireSpecificLayout(viewModel: SolitaireViewModel, navController: NavController) {
     Box(
         Modifier
             .fillMaxSize()
@@ -63,23 +68,24 @@ fun SolitaireSpecificLayout(viewModel: GameViewModel, navController: NavControll
         val maxHeightDp = localConfig.screenHeightDp.dp * 0.95f
         val cardHeightInDp = remember(maxWidthDp, maxHeightDp) {
             val maxCardHeightDp = maxHeightDp / 4.2375f
-            val cardHeightDp = if (maxWidthDp / maxHeightDp > GameViewModel.CARD_ASPECT_RATIO) {
-                maxCardHeightDp
-            } else maxWidthDp / 7f / GameViewModel.CARD_ASPECT_RATIO
+            val cardHeightDp =
+                if (maxWidthDp / maxHeightDp > SolitaireViewModel.CARD_ASPECT_RATIO) {
+                    maxCardHeightDp
+                } else maxWidthDp / 7f / SolitaireViewModel.CARD_ASPECT_RATIO
 
             viewModel.cardHeight = with(localDensity) { (cardHeightDp).toPx() }
-            viewModel.cardWidth = viewModel.cardHeight * GameViewModel.CARD_ASPECT_RATIO
+            viewModel.cardWidth = viewModel.cardHeight * SolitaireViewModel.CARD_ASPECT_RATIO
             viewModel.distanceBetweenCards = min(maxCardHeightDp / cardHeightDp, 2f) * 0.175f
 
             cardHeightDp
         }
         val modifier = Modifier
-            .width(cardHeightInDp * GameViewModel.CARD_ASPECT_RATIO)
+            .width(cardHeightInDp * SolitaireViewModel.CARD_ASPECT_RATIO)
             .height(cardHeightInDp)
-            .aspectRatio(GameViewModel.CARD_ASPECT_RATIO)
+            .aspectRatio(SolitaireViewModel.CARD_ASPECT_RATIO)
         Background(viewModel, modifier, cardHeightInDp)
 
-        Box(Modifier.width(cardHeightInDp * GameViewModel.CARD_ASPECT_RATIO * 7)) {
+        Box(Modifier.width(cardHeightInDp * SolitaireViewModel.CARD_ASPECT_RATIO * 7)) {
             viewModel.cards.forEach {
                 LaunchedEffect(it.id) {
                     it.isMoving = false
@@ -114,7 +120,7 @@ fun SolitaireSpecificLayout(viewModel: GameViewModel, navController: NavControll
 }
 
 @Composable
-fun Background(viewModel: GameViewModel, modifier: Modifier, cardHeight: Dp) {
+fun Background(viewModel: SolitaireViewModel, modifier: Modifier, cardHeight: Dp) {
     Column {
         BackgroundTopRow(viewModel, modifier)
         Spacer(Modifier.height(0.5f * viewModel.distanceBetweenCards * cardHeight))
@@ -123,7 +129,7 @@ fun Background(viewModel: GameViewModel, modifier: Modifier, cardHeight: Dp) {
 }
 
 @Composable
-fun BackgroundTopRow(viewModel: GameViewModel, modifier: Modifier) {
+fun BackgroundTopRow(viewModel: SolitaireViewModel, modifier: Modifier) {
     Row {
         Card(modifier.alpha(0.75f)) { FoundationBackground(R.drawable.clover, 0) }
         Card(modifier.alpha(0.75f)) { FoundationBackground(R.drawable.diamonds, 1) }
@@ -149,7 +155,7 @@ fun BackgroundTopRow(viewModel: GameViewModel, modifier: Modifier) {
 }
 
 @Composable
-fun BackgroundLowerRow(viewModel: GameViewModel, modifier: Modifier, cardHeight: Dp) {
+fun BackgroundLowerRow(viewModel: SolitaireViewModel, modifier: Modifier, cardHeight: Dp) {
     Row(Modifier.height(18 * viewModel.distanceBetweenCards * cardHeight)) {
         for (i in 0 until 7) {
             Card(modifier.alpha(0.5f)) {}

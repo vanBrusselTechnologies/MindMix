@@ -1,6 +1,6 @@
 package com.vanbrusselgames.mindmix.games.minesweeper
 
-data class Minesweeper(val viewModel: GameViewModel = GameViewModel()) {
+data class Minesweeper(val viewModel: MinesweeperViewModel = MinesweeperViewModel()) {
     companion object {
         const val GAME_ID: Int = 2
         const val GAME_NAME = "Minesweeper"

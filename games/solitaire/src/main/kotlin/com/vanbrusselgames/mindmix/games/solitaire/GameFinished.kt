@@ -34,9 +34,10 @@ import kotlin.time.Duration.Companion.milliseconds
 @Composable
 fun SolitaireGameFinishedDialog(
     navController: NavController,
-    viewModel: GameViewModel,
+    viewModel: SolitaireViewModel,
     adManager: (() -> AdManager)?,
-    backToMenu: () -> Unit
+    backToMenu: () -> Unit,
+    forceSave: () -> Unit
 ) {
     Column(
         Modifier
@@ -93,7 +94,7 @@ fun SolitaireGameFinishedDialog(
 
         if (FinishedGame.reward != 0 && adManager != null) {
             Spacer(Modifier.height(8.dp))
-            GameFinishedRewardRow(FinishedGame.reward, adManager)
+            GameFinishedRewardRow(FinishedGame.reward, adManager, forceSave)
         }
         Spacer(Modifier.height(8.dp))
         Buttons(
@@ -120,7 +121,7 @@ fun Prev_GameFinished() {
             FinishedGame.usedMillis = 10000000
             FinishedGame.lastRecordMillis = 9999999
             FinishedGame.isNewRecord = false
-            SolitaireGameFinishedDialog(rememberNavController(), GameViewModel(), null) {}
+            SolitaireGameFinishedDialog(rememberNavController(), SolitaireViewModel(), null, {}) {}
         }
     }
 }

@@ -32,8 +32,8 @@ android {
         applicationId = "com.vanBrusselGames.MindMix"
         minSdk = 23
         targetSdk = 35
-        versionCode = 99
-        versionName = "1.1.3"
+        versionCode = 102
+        versionName = "1.2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -76,6 +76,7 @@ android {
 
 dependencies {
     implementation(project(":core:advertisement"))
+    implementation(project(":core:authentication"))
     implementation(project(":core:common"))
     implementation(project(":core:data"))
     implementation(project(":core:designsystem"))
@@ -103,6 +104,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.appcheck.playintegrity)

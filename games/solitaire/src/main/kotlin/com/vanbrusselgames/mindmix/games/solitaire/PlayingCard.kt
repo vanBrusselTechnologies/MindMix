@@ -48,7 +48,7 @@ import com.vanbrusselgames.mindmix.games.solitaire.PlayingCard.CardVisualType
 import kotlin.math.roundToInt
 
 data class PlayingCard(
-    val viewModel: GameViewModel, val type: CardType, val index: CardIndex, val drawableResId: Int
+    val viewModel: SolitaireViewModel, val type: CardType, val index: CardIndex, val drawableResId: Int
 ) {
     val id = type.ordinal * 13 + index.ordinal
 

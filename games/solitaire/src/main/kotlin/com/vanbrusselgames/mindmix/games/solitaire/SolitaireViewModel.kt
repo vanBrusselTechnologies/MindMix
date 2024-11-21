@@ -3,6 +3,7 @@ package com.vanbrusselgames.mindmix.games.solitaire
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.unit.IntOffset
 import androidx.core.math.MathUtils.clamp
+import androidx.datastore.preferences.core.Preferences
 import androidx.navigation.NavController
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.vanbrusselgames.mindmix.core.common.BaseGameViewModel
@@ -10,6 +11,8 @@ import com.vanbrusselgames.mindmix.core.common.GameTimer
 import com.vanbrusselgames.mindmix.core.common.ITimerVM
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.feature.gamefinished.navigation.navigateToGameFinished
+import com.vanbrusselgames.mindmix.games.solitaire.PlayingCard.CardVisualType
+import com.vanbrusselgames.mindmix.games.solitaire.data.PREF_KEY_CARD_TYPE
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -20,7 +23,7 @@ import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.roundToInt
 
-class GameViewModel : BaseGameViewModel(), ITimerVM {
+class SolitaireViewModel : BaseGameViewModel(), ITimerVM {
     companion object {
         private const val CARD_PIXEL_HEIGHT = 819f
         private const val CARD_PIXEL_WIDTH = 566f
@@ -409,6 +412,13 @@ class GameViewModel : BaseGameViewModel(), ITimerVM {
         moves = data.moves
 
         if (cardStacks[6].isEmpty() && cardStacks[5].size <= 1) restStackEnabled.value = false
+    }
+
+    override fun onLoadPreferences(preferences: Preferences) {
+        if (preferences[PREF_KEY_CARD_TYPE] != null) {
+            cardVisualType.value =
+                CardVisualType.entries.first { it.ordinal == preferences[PREF_KEY_CARD_TYPE] }
+        }
     }
 
     fun saveToFile(): String {

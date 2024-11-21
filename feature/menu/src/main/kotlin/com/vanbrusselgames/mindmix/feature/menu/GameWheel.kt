@@ -27,7 +27,7 @@ import com.vanbrusselgames.mindmix.core.navigation.SceneManager
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
-const val radius = 250f
+const val radius = 275f
 
 data class GameWheel(val viewModel: MenuScreenViewModel, val gameCount: Int) {
     val withDupsFactor = if (MenuScreenViewModel.ADD_DUPLICATES) 2 else 1
@@ -86,7 +86,7 @@ fun GameWheel(viewModel: MenuScreenViewModel, navController: NavController, mode
         Box(contentAlignment = Alignment.Center,
             modifier = Modifier
                 .height(350.dp)
-                .offset(0.dp, 250.dp)
+                .offset(0.dp, 275.dp)
                 .graphicsLayer {
                     transformOrigin = TransformOrigin.Center
                     rotationZ = anim.value

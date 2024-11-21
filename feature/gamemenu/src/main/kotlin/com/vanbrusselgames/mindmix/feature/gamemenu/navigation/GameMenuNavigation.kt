@@ -25,6 +25,10 @@ fun NavGraphBuilder.gameMenuDialog(
     backToMenu: () -> Unit
 ) {
     dialog<GameMenuRoute>(dialogProperties = DialogProperties(true, false, false)) {
+        if(gameNameId() == -1) {
+            navController.popBackStack()
+            return@dialog
+        }
         val window = (LocalView.current.parent as? DialogWindowProvider)?.window
         if (window != null) setFullScreen(null, window)
         GameMenuDialog(navController, gameNameId(), startNewGame, openSettings, backToMenu)

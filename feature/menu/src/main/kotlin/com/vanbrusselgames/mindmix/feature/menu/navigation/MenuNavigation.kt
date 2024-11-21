@@ -1,5 +1,6 @@
 package com.vanbrusselgames.mindmix.feature.menu.navigation
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -25,9 +26,11 @@ fun NavController.navigateToMenu(navOptions: NavOptions? = null) {
 }
 
 fun NavGraphBuilder.menu(
-    navController: NavController, viewModel: MenuScreenViewModel
+    navController: NavController,
+    viewModel: MenuScreenViewModel,
+    snackbarHostState: SnackbarHostState
 ) {
     composable<MenuRoute> {
-        SceneUI(viewModel, navController)
+        SceneUI(viewModel, navController, snackbarHostState)
     }
 }

@@ -3,7 +3,7 @@ package com.vanbrusselgames.mindmix.games.minesweeper
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 
-data class MinesweeperCell(val viewModel: GameViewModel, val id: Int) {
+data class MinesweeperCell(val viewModel: MinesweeperViewModel, val id: Int) {
     var isMine = false
     var pressed = false
 

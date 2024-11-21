@@ -22,6 +22,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -57,8 +58,12 @@ import kotlin.math.sqrt
 const val threshold = 100
 
 @Composable
-fun GameUI(viewModel: GameViewModel, navController: NavController) {
-    BaseScene(viewModel, navController) {
+fun GameUI(
+    viewModel: Game2048ViewModel,
+    navController: NavController,
+    snackbarHostState: SnackbarHostState
+) {
+    BaseScene(viewModel, navController, snackbarHostState) {
         Box(
             Modifier
                 .fillMaxSize()
@@ -80,7 +85,7 @@ fun GameUI(viewModel: GameViewModel, navController: NavController) {
 }
 
 @Composable
-fun Grid2048(viewModel: GameViewModel, navController: NavController) {
+fun Grid2048(viewModel: Game2048ViewModel, navController: NavController) {
     var offsetX by remember { mutableFloatStateOf(0f) }
     var offsetY by remember { mutableFloatStateOf(0f) }
 
@@ -177,7 +182,7 @@ fun Grid2048(viewModel: GameViewModel, navController: NavController) {
 private fun Preview() {
     MindMixTheme {
         Surface {
-            GameUI(GameViewModel(), rememberNavController())
+            GameUI(Game2048ViewModel(), rememberNavController(), SnackbarHostState())
         }
     }
 }

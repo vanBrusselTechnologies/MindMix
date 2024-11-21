@@ -4,19 +4,23 @@ import androidx.collection.MutableIntList
 import androidx.collection.mutableIntListOf
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
+import androidx.datastore.preferences.core.Preferences
 import androidx.navigation.NavController
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.vanbrusselgames.mindmix.core.common.BaseGameViewModel
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.feature.gamefinished.navigation.navigateToGameFinished
+import com.vanbrusselgames.mindmix.games.minesweeper.data.PREF_KEY_AUTO_FLAG
+import com.vanbrusselgames.mindmix.games.minesweeper.data.PREF_KEY_SAFE_START
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.math.min
 import kotlin.math.pow
 import kotlin.random.Random
 
-class GameViewModel : BaseGameViewModel() {
+class MinesweeperViewModel : BaseGameViewModel() {
     override val nameResId = Minesweeper.NAME_RES_ID
     override val descResId = R.string.minesweeper_desc
 
@@ -26,8 +30,8 @@ class GameViewModel : BaseGameViewModel() {
 
     var finished = false
 
-    var safeStart = false
-    var autoFlag = false
+    var safeStart = mutableStateOf(false)
+    var autoFlag = mutableStateOf(false)
 
     val mines = BooleanArray(sizeX * sizeY) { false }
 
@@ -61,8 +65,17 @@ class GameViewModel : BaseGameViewModel() {
             c.getCellMineCount()
             c.state = stateEntries[data.input[i]]
         }
-        if (autoFlag) autoFlag()
+        if (autoFlag.value) autoFlag()
         calculateMinesLeft()
+    }
+
+    override fun onLoadPreferences(preferences: Preferences) {
+        if (preferences[PREF_KEY_AUTO_FLAG] != null) {
+            autoFlag.value = preferences[PREF_KEY_AUTO_FLAG]!!
+        }
+        if (preferences[PREF_KEY_SAFE_START] != null) {
+            safeStart.value = preferences[PREF_KEY_SAFE_START]!!
+        }
     }
 
     fun saveToFile(): String {
@@ -98,14 +111,14 @@ class GameViewModel : BaseGameViewModel() {
         }
         minesLeft.intValue = mineCount
 
-        if (safeStart) {
+        if (safeStart.value) {
             while (true) {
                 val randomIndex: Int = Random.nextInt(cellCount)
                 val c = cells[randomIndex]
                 if (c.isMine || c.mineCount != 0) continue
                 c.state = MinesweeperCell.State.Number
                 findOtherSafeCells(c)
-                if (autoFlag) autoFlag()
+                if (autoFlag.value) autoFlag()
                 break
             }
         }

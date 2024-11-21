@@ -1,5 +1,6 @@
 package com.vanbrusselgames.mindmix.games.minesweeper.navigation
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -7,7 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
 import com.vanbrusselgames.mindmix.games.minesweeper.GameUI
-import com.vanbrusselgames.mindmix.games.minesweeper.GameViewModel
+import com.vanbrusselgames.mindmix.games.minesweeper.MinesweeperViewModel
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -22,11 +23,13 @@ fun NavController.navigateToMinesweeper(navOptions: NavOptions? = null) {
 }
 
 fun NavGraphBuilder.minesweeper(
-    navController: NavController, viewModel: GameViewModel
+    navController: NavController,
+    viewModel: MinesweeperViewModel,
+    snackbarHostState: SnackbarHostState
 ) {
     composable<MinesweeperRoute> {
         viewModel.loadPuzzle()
         //it.arguments?.getString("mode")
-        GameUI(viewModel, navController)
+        GameUI(viewModel, navController, snackbarHostState)
     }
 }

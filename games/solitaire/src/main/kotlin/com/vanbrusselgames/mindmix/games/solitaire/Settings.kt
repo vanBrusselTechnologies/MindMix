@@ -1,5 +1,6 @@
 package com.vanbrusselgames.mindmix.games.solitaire
 
+import android.content.Context
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -26,20 +27,21 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.vanbrusselgames.mindmix.core.data.savePreferences
 import com.vanbrusselgames.mindmix.core.designsystem.theme.MindMixTheme
 import com.vanbrusselgames.mindmix.core.ui.EnumDropdown
 import com.vanbrusselgames.mindmix.games.solitaire.PlayingCard.CardVisualType
+import com.vanbrusselgames.mindmix.games.solitaire.data.PREF_KEY_CARD_TYPE
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SolitaireSettings(viewModel: GameViewModel) {
+fun SolitaireSettings(ctx: Context, viewModel: SolitaireViewModel) {
     Column(
         Modifier
             .padding(24.dp)
             .width(IntrinsicSize.Max),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        LocalContext.current
         Text(
             text = stringResource(viewModel.nameResId),
             Modifier.fillMaxWidth(),
@@ -48,12 +50,12 @@ fun SolitaireSettings(viewModel: GameViewModel) {
             textAlign = TextAlign.Center
         )
         Spacer(Modifier.height(20.dp))
-        CardTypeDropdownRow(viewModel)
+        CardTypeDropdownRow(ctx, viewModel)
     }
 }
 
 @Composable
-fun CardTypeDropdownRow(viewModel: GameViewModel) {
+fun CardTypeDropdownRow(ctx: Context, viewModel: SolitaireViewModel) {
     val defaultButtonColors = ButtonDefaults.buttonColors()
     Row(
         Modifier
@@ -71,7 +73,10 @@ fun CardTypeDropdownRow(viewModel: GameViewModel) {
         val modifier = Modifier
             .padding(4.dp)
             .width(IntrinsicSize.Min)
-        val callback = { cardType: CardVisualType -> viewModel.cardVisualType.value = cardType }
+        val callback = { cardType: CardVisualType ->
+            viewModel.cardVisualType.value = cardType
+            savePreferences(ctx, PREF_KEY_CARD_TYPE, cardType.ordinal)
+        }
         EnumDropdown(modifier, viewModel.cardVisualType, callback, CardVisualType.entries.toList())
     }
 }
@@ -84,7 +89,7 @@ fun CardTypeDropdownRow(viewModel: GameViewModel) {
 fun Prev_Settings() {
     MindMixTheme {
         Surface {
-            SolitaireSettings(GameViewModel())
+            SolitaireSettings(LocalContext.current, SolitaireViewModel())
         }
     }
 }

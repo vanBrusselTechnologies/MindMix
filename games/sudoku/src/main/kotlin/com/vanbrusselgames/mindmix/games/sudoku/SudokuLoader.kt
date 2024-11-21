@@ -40,7 +40,7 @@ class SudokuLoader {
         private var requestingDifficulty: Difficulty? = null
 
         suspend fun requestPuzzles(
-            viewModel: GameViewModel, gameMode: PuzzleType, loadFromFile: Boolean = false
+            viewModel: SudokuViewModel, gameMode: PuzzleType, loadFromFile: Boolean = false
         ) {
             try {
                 Logger.i("Start loading Sudoku Puzzles")
@@ -58,18 +58,16 @@ class SudokuLoader {
         }
 
         private fun loadFromFile(
-            viewModel: GameViewModel, gameMode: PuzzleType, difficulty: Difficulty
+            viewModel: SudokuViewModel, gameMode: PuzzleType, difficulty: Difficulty
         ) {
             val fileName = GameLoader.getFileName(Sudoku.GAME_ID, gameMode.ordinal, difficulty.name)
             val content = GameLoader.readFile(fileName)
             if (content.isEmpty()) return
-            val size = GameViewModel.SIZE * GameViewModel.SIZE
+            val size = SudokuViewModel.SIZE * SudokuViewModel.SIZE
             val puzzles = content.map { p ->
-                val clues =
-                    Decode.base94toIntList(
-                        p.trim(),
-                        size
-                    )
+                val clues = Decode.base94toIntList(
+                    p.trim(), size
+                )
                 LoadedPuzzle(IntMath.sqrt(size, RoundingMode.FLOOR), difficulty, clues)
             }.shuffled()
             Logger.i("Successfully loaded ${puzzles.size} puzzles from file")
@@ -92,7 +90,7 @@ class SudokuLoader {
         }
 
         private fun requestPuzzles(
-            viewModel: GameViewModel,
+            viewModel: SudokuViewModel,
             gameMode: PuzzleType,
             difficulty: Difficulty,
             page: Int,
@@ -101,7 +99,7 @@ class SudokuLoader {
             if (requesting) return Tasks.forResult(Unit)
             requesting = true
             Logger.i("Requesting Sudoku puzzles")
-            val size = GameViewModel.SIZE * GameViewModel.SIZE
+            val size = SudokuViewModel.SIZE * SudokuViewModel.SIZE
             val data = hashMapOf(
                 "gameId" to Sudoku.GAME_ID,
                 "gameModeId" to gameMode.ordinal,
@@ -109,15 +107,12 @@ class SudokuLoader {
                 "page" to page,
                 "per_page" to perPage
             )
-            return Firebase.functions.getHttpsCallable("puzzles").call(data)
-                .continueWith { task ->
+            return Firebase.functions.getHttpsCallable("puzzles").call(data).continueWith { task ->
                     val encodedPuzzles = (task.result?.data as List<*>).filterIsInstance<String>()
                     val puzzles = encodedPuzzles.map { p ->
-                        val clues =
-                            Decode.base94toIntList(
-                                p.trim(),
-                                size
-                            )
+                        val clues = Decode.base94toIntList(
+                            p.trim(), size
+                        )
                         LoadedPuzzle(IntMath.sqrt(size, RoundingMode.FLOOR), difficulty, clues)
                     }.shuffled()
 
@@ -154,15 +149,14 @@ class SudokuLoader {
                             Logger.w("$code, $details")
                         }
                         Logger.w(
-                            "Failed to load puzzles",
-                            e!!
+                            "Failed to load puzzles", e!!
                         )
                     }
                 }
         }
 
         fun requestPuzzle(
-            viewModel: GameViewModel, diff: Difficulty, callback: (LoadedPuzzle) -> Unit
+            viewModel: SudokuViewModel, diff: Difficulty, callback: (LoadedPuzzle) -> Unit
         ) {
             try {
                 val p = loadedPuzzles[diff]!!.first()
@@ -178,7 +172,7 @@ class SudokuLoader {
             }
         }
 
-        fun removePuzzle(viewModel: GameViewModel, p: LoadedPuzzle?) {
+        fun removePuzzle(viewModel: SudokuViewModel, p: LoadedPuzzle?) {
             if (p == null) return
             val index = loadedPuzzles[p.difficulty]!!.indexOfFirst {
                 it.clues.joinToString("") == p.clues.joinToString("")
@@ -192,10 +186,9 @@ class SudokuLoader {
                 }
                 puzzleLoaded.value = false
 
-                val puzzle =
-                    Encode.base94Collection(
-                        p.clues
-                    )
+                val puzzle = Encode.base94Collection(
+                    p.clues
+                )
 
                 val fileName = GameLoader.getFileName(
                     Sudoku.GAME_ID, viewModel.gameMode.ordinal, p.difficulty.name
@@ -204,30 +197,28 @@ class SudokuLoader {
             }
         }
 
-        fun loadFromFile(viewModel: GameViewModel, data: SudokuData) {
+        fun loadFromFile(viewModel: SudokuViewModel, data: SudokuData) {
             viewModel.setDifficulty(data.difficulty)
             for (kvp in data.page) pages[kvp.key] = kvp.value
             val progressList = data.progress
-            val size = GameViewModel.SIZE * GameViewModel.SIZE
+            val size = SudokuViewModel.SIZE * SudokuViewModel.SIZE
+
+            viewModel.stringProgress = progressList
             val savedProgress = progressList.map { progress ->
+
+                viewModel.hasUpdate[progress.difficulty] = false
+
                 SudokuProgress(
                     Decode.base94toIntList(
-                        progress.clues,
-                        size
-                    ),
-                    Decode.base94toIntList(
-                        progress.input,
-                        size
-                    ),
-                    progress.inputNotes.map { notes ->
-                        val decodedNotes =
-                            Decode.base94toBooleanList(
-                                notes,
-                                GameViewModel.SIZE
-                            )
-                        List(GameViewModel.SIZE) { i -> if (decodedNotes[i]) i + 1 else 0 }
-                    },
-                    progress.difficulty
+                        progress.clues, size
+                    ), Decode.base94toIntList(
+                        progress.input, size
+                    ), progress.inputNotes.map { notes ->
+                        val decodedNotes = Decode.base94toBooleanList(
+                            notes, SudokuViewModel.SIZE
+                        )
+                        List(SudokuViewModel.SIZE) { i -> if (decodedNotes[i]) i + 1 else 0 }
+                    }, progress.difficulty
                 )
             }
             for (progress in savedProgress) {
@@ -236,7 +227,7 @@ class SudokuLoader {
         }
 
         private fun setProgress(
-            viewModel: GameViewModel, progress: SudokuProgress<List<Int>>, override: Boolean
+            viewModel: SudokuViewModel, progress: SudokuProgress<List<Int>>, override: Boolean
         ) {
             if (progress.clues.all { it == 0 }) return
             val index =
@@ -245,8 +236,7 @@ class SudokuLoader {
                 if (!override && viewModel.savedProgress[index].clues.isNotEmpty()) return
                 viewModel.savedProgress[index] = progress
                 if (progress.clues.isEmpty()) return
-                val size =
-                    IntMath.sqrt(progress.input.size, RoundingMode.FLOOR)
+                val size = IntMath.sqrt(progress.input.size, RoundingMode.FLOOR)
                 val p = LoadedPuzzle(size, progress.difficulty, progress.clues)
 
                 val duplicateIndex = loadedPuzzles[p.difficulty]!!.indexOfFirst {

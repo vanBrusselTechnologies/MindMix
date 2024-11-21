@@ -1,6 +1,7 @@
 package com.vanbrusselgames.mindmix.games.sudoku
 
 import androidx.compose.runtime.mutableStateOf
+import androidx.datastore.preferences.core.Preferences
 import androidx.navigation.NavController
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.vanbrusselgames.mindmix.core.common.BaseGameViewModel
@@ -8,10 +9,12 @@ import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.utils.constants.Difficulty
 import com.vanbrusselgames.mindmix.core.utils.encode.Encode
 import com.vanbrusselgames.mindmix.feature.gamefinished.navigation.navigateToGameFinished
+import com.vanbrusselgames.mindmix.games.sudoku.data.PREF_KEY_AUTO_EDIT_NOTES
+import com.vanbrusselgames.mindmix.games.sudoku.data.PREF_KEY_CHECK_CONFLICTING_CELLS
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-class GameViewModel : BaseGameViewModel() {
+class SudokuViewModel : BaseGameViewModel() {
     override val nameResId = Sudoku.NAME_RES_ID
     override val descResId = R.string.sudoku_desc
 
@@ -44,6 +47,23 @@ class GameViewModel : BaseGameViewModel() {
 
     var savedProgress = Array(Difficulty.entries.size) {
         SudokuProgress<List<Int>>(listOf(), mutableListOf(), listOf(), Difficulty.entries[it])
+    }
+
+    var stringProgress = enabledDifficulties.map { SudokuProgress("", "", listOf(), it) }
+    val hasUpdate = enabledDifficulties.map { it to true }.toMap().toMutableMap()
+
+    override fun onLoadPreferences(preferences: Preferences) {
+        if (preferences[PREF_KEY_CHECK_CONFLICTING_CELLS] != null) {
+            val enabled = preferences[PREF_KEY_CHECK_CONFLICTING_CELLS]!!
+            checkConflictingCells.value = enabled
+
+            if (enabled) {
+                cells.forEach { checkConflictingCell(it) }
+            } else cells.forEach { it.isIncorrect.value = false }
+        }
+        if (preferences[PREF_KEY_AUTO_EDIT_NOTES] != null) {
+            autoEditNotes.value = preferences[PREF_KEY_AUTO_EDIT_NOTES]!!
+        }
     }
 
     private fun saveAndLoadProgress(prevDifficulty: Difficulty, difficulty: Difficulty) {
@@ -93,6 +113,10 @@ class GameViewModel : BaseGameViewModel() {
         }
     }
 
+    fun loadFromFile(data: SudokuData) {
+        SudokuLoader.loadFromFile(this, data)
+    }
+
     fun saveToFile(): String {
         //todo: Improve Saving
         if (finished) {
@@ -105,19 +129,22 @@ class GameViewModel : BaseGameViewModel() {
                 c.notes.mapIndexed { i, n -> if (n) i + 1 else 0 }.toMutableList()
             }
         }
-//todo: Only on changes!!
         val progress = savedProgress.map {
-            SudokuProgress(
-                Encode.base94Collection(it.clues),
-                Encode.base94Collection(it.input),
-                it.inputNotes.map { notes ->
-                    val booleans = notes.map { n -> n != 0 }
-                    Encode.base94Collection(
-                        booleans
-                    )
-                },
-                it.difficulty
-            )
+            val hasUpdate = hasUpdate[it.difficulty]
+            if (hasUpdate != null && !hasUpdate) stringProgress[it.difficulty.ordinal] else {
+                this.hasUpdate[it.difficulty] = false
+                SudokuProgress(
+                    Encode.base94Collection(it.clues),
+                    Encode.base94Collection(it.input),
+                    it.inputNotes.map { notes ->
+                        val booleans = notes.map { n -> n != 0 }
+                        Encode.base94Collection(
+                            booleans
+                        )
+                    },
+                    it.difficulty
+                )
+            }
         }
         return Json.encodeToString(
             SudokuData(difficulty.value, progress, SudokuLoader.pages.toMap())
@@ -153,6 +180,9 @@ class GameViewModel : BaseGameViewModel() {
         if (finished) return
         val cell = cells.find { it.isSelected.value }
         if (cell == null) return
+
+        hasUpdate[difficulty.value] = true
+
         if (inputMode.value == InputMode.Normal) {
             cell.value.intValue = numPadCellIndex + 1
             checkFinished(navController)

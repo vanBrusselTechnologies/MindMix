@@ -31,9 +31,10 @@ import com.vanbrusselgames.mindmix.feature.gamefinished.Stats
 @Composable
 fun Game2048GameFinishedDialog(
     navController: NavController,
-    viewModel: GameViewModel,
+    viewModel: Game2048ViewModel,
     adManager: (() -> AdManager)?,
-    backToMenu: () -> Unit
+    backToMenu: () -> Unit,
+    forceSave: () -> Unit
 ) {
     Column(Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
@@ -70,7 +71,7 @@ fun Game2048GameFinishedDialog(
 
         if (FinishedGame.reward != 0 && adManager != null) {
             Spacer(Modifier.height(8.dp))
-            GameFinishedRewardRow(FinishedGame.reward, adManager)
+            GameFinishedRewardRow(FinishedGame.reward, adManager, forceSave)
         }
         Spacer(Modifier.height(8.dp))
         if (FinishedGame.isStuck) {
@@ -109,7 +110,7 @@ private fun successText(targetTile: Long): String {
 fun Prev_GameFinished() {
     MindMixTheme {
         Surface {
-            Game2048GameFinishedDialog(rememberNavController(), GameViewModel(), null) {}
+            Game2048GameFinishedDialog(rememberNavController(), Game2048ViewModel(), null, {}) {}
         }
     }
 }

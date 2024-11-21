@@ -27,7 +27,7 @@ import com.vanbrusselgames.mindmix.core.designsystem.theme.MindMixTheme
 import com.vanbrusselgames.mindmix.core.ui.EnumDropdown
 
 @Composable
-fun Game2048Settings(viewModel: GameViewModel) {
+fun Game2048Settings(viewModel: Game2048ViewModel) {
     Column(
         Modifier
             .padding(24.dp)
@@ -47,7 +47,7 @@ fun Game2048Settings(viewModel: GameViewModel) {
 }
 
 @Composable
-fun SizeDropdownRow(viewModel: GameViewModel) {
+fun SizeDropdownRow(viewModel: Game2048ViewModel) {
     val defaultButtonColors = ButtonDefaults.buttonColors()
     Row(
         Modifier
@@ -75,7 +75,7 @@ fun SizeDropdownRow(viewModel: GameViewModel) {
 fun Prev_Settings() {
     MindMixTheme {
         Surface {
-            Game2048Settings(GameViewModel())
+            Game2048Settings(Game2048ViewModel())
         }
     }
 }

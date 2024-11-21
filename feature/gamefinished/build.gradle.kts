@@ -37,7 +37,7 @@ android {
 
 dependencies {
     implementation(project(":core:advertisement"))
-    implementation(project(":core:data"))
+    implementation(project(":core:common"))
     implementation(project(":core:designsystem"))
     implementation(project(":core:logging"))
     implementation(project(":core:ui"))

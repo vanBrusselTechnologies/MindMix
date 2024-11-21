@@ -15,34 +15,29 @@ class GameLoader {
 
         private lateinit var ctx: Context
 
-        suspend fun init(ctx: Context, networkMonitor: NetworkMonitor) {
+        suspend fun init(
+            ctx: Context, networkMonitor: NetworkMonitor, loader: suspend (loadFromFile: Boolean) -> Unit
+        ) {
             this.ctx = ctx
             if (!initialized) {
                 initialized = true
-                startLoading(true)
+                startLoading(true, loader)
             }
             networkMonitor.registerNetworkCallback(object : ConnectivityManager.NetworkCallback() {
                 override fun onAvailable(network: Network) {
                     CoroutineScope(Dispatchers.IO).launch {
-                        startLoading(false)
+                        startLoading(false, loader)
                     }
                 }
             })
         }
 
-        private suspend fun startLoading(loadFromFile: Boolean) {
+        private suspend fun startLoading(
+            loadFromFile: Boolean, loader: suspend (loadFromFile: Boolean) -> Unit
+        ) {
             coroutineScope {
                 launch(coroutineContext) {
-                    /*todo:
-                        try {
-                            SudokuLoader.requestPuzzles(
-                                MainActivity.sudoku.viewModel,
-                                PuzzleType.Classic,
-                                loadFromFile
-                            )
-                        } catch (_: Exception) {
-                        }
-                     */
+                    loader(loadFromFile)
                 }
             }
         }

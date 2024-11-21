@@ -1,6 +1,6 @@
 package com.vanbrusselgames.mindmix.games.game2048
 
-class Game2048(val viewModel: GameViewModel = GameViewModel()) {
+class Game2048(val viewModel: Game2048ViewModel = Game2048ViewModel()) {
     companion object {
         const val GAME_ID: Int = 3
         const val GAME_NAME = "2048"

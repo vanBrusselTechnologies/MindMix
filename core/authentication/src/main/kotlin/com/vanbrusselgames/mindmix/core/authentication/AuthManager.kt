@@ -1,4 +1,4 @@
-package com.vanbrusselgames.mindmix.core.data
+package com.vanbrusselgames.mindmix.core.authentication
 
 import android.app.Activity
 import android.widget.Toast
@@ -15,34 +15,41 @@ import com.google.firebase.auth.PlayGamesAuthProvider
 import com.google.firebase.auth.auth
 import com.google.firebase.crashlytics.crashlytics
 import com.vanbrusselgames.mindmix.core.logging.Logger
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-class AuthManager private constructor(private val activity: Activity) {
+class AuthManager(private val activity: Activity) {
     private var currentUser: FirebaseUser? = Firebase.auth.currentUser
     private val gamesSignInClient: GamesSignInClient
     private var isAuthenticated = false
+    val signedIn = mutableStateOf(false)
+    val userId = mutableStateOf("")
 
     init {
         PlayGamesSdk.initialize(activity)
         gamesSignInClient = PlayGames.getGamesSignInClient(activity)
-        gamesSignInClient.isAuthenticated.addOnCompleteListener { isAuthenticatedTask: Task<AuthenticationResult> ->
-            val isAuthenticated =
-                isAuthenticatedTask.isSuccessful && isAuthenticatedTask.result.isAuthenticated
-            this.isAuthenticated = isAuthenticated
+        CoroutineScope(Dispatchers.IO).launch {
+            gamesSignInClient.isAuthenticated.addOnCompleteListener { isAuthenticatedTask: Task<AuthenticationResult> ->
+                val isAuthenticated =
+                    isAuthenticatedTask.isSuccessful && isAuthenticatedTask.result.isAuthenticated
+                this@AuthManager.isAuthenticated = isAuthenticated
 
-            signedIn.value = isAuthenticated && currentUser != null
+                signedIn.value = isAuthenticated && currentUser != null
 
-            currentUser?.uid?.let {
-                userId.value = it
-                Firebase.crashlytics.setUserId(it)
-            }
+                currentUser?.uid?.let {
+                    userId.value = it
+                    Firebase.crashlytics.setUserId(it)
+                }
 
-            if (isAuthenticated) {
-                gamesSignInClient.requestServerSideAccess(
-                    getString(activity, R.string.default_web_client_id), false
-                ).addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        val serverAuthToken = task.result
-                        firebaseAuthWithPlayGames(activity, serverAuthToken)
+                if (isAuthenticated) {
+                    gamesSignInClient.requestServerSideAccess(
+                        getString(activity, R.string.default_web_client_id), false
+                    ).addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            val serverAuthToken = task.result
+                            firebaseAuthWithPlayGames(activity, serverAuthToken)
+                        }
                     }
                 }
             }
@@ -96,20 +103,5 @@ class AuthManager private constructor(private val activity: Activity) {
                     }
                 }
             }
-    }
-
-    companion object {
-        private lateinit var Instance: AuthManager
-        val signedIn = mutableStateOf(false)
-        val userId = mutableStateOf("")
-
-        fun start(activity: Activity) {
-            Instance = AuthManager(activity)
-        }
-
-        fun signIn() {
-            if (::Instance.isInitialized) Instance.signIn()
-            else Logger.e("AuthManager is not initialized. Could not sign in.")
-        }
     }
 }

@@ -31,6 +31,7 @@ import androidx.navigation.NavController
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.vanbrusselgames.mindmix.core.advertisement.AdDoublerButton
 import com.vanbrusselgames.mindmix.core.advertisement.AdManager
+import com.vanbrusselgames.mindmix.core.common.coins
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.ui.DialogButton
 
@@ -49,7 +50,7 @@ fun GameFinishedDialog(content: @Composable () -> Unit) {
 }
 
 @Composable
-fun GameFinishedRewardRow(reward: Int, adManager: () -> AdManager) {
+fun GameFinishedRewardRow(reward: Int, adManager: () -> AdManager, forceSave: () -> Unit) {
     Row(
         Modifier.heightIn(max = 48.dp),
         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -65,8 +66,8 @@ fun GameFinishedRewardRow(reward: Int, adManager: () -> AdManager) {
             AdDoublerButton(adManager = adManager()) { adReward ->
                 adShown = true
                 bonus = adReward
-                //todo: MainActivity.menu.viewModel.coins += reward * bonus
-                // DataManager.save()
+                coins += reward * bonus
+                forceSave()
                 logEarnedCurrencyReward(reward * bonus)
             }
         }

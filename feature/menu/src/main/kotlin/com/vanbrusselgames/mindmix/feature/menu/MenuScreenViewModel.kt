@@ -1,10 +1,13 @@
 package com.vanbrusselgames.mindmix.feature.menu
 
 import androidx.compose.runtime.mutableStateOf
+import androidx.datastore.preferences.core.Preferences
 import androidx.navigation.NavController
 import com.vanbrusselgames.mindmix.core.common.BaseScreenViewModel
+import com.vanbrusselgames.mindmix.core.common.coins
 import com.vanbrusselgames.mindmix.core.designsystem.theme.SelectedTheme
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager.Scene
+import com.vanbrusselgames.mindmix.feature.menu.data.PREF_KEY_THEME
 import com.vanbrusselgames.mindmix.games.game2048.Game2048
 import com.vanbrusselgames.mindmix.games.game2048.navigation.navigateTo2048
 import com.vanbrusselgames.mindmix.games.minesweeper.Minesweeper
@@ -34,7 +37,6 @@ class MenuScreenViewModel : BaseScreenViewModel() {
     )
     var selectedGame = Scene.MINESWEEPER
     var settingsGame = Scene.MENU
-    var coins = 0
 
     val wheelModel = GameWheel(this, games.size)
 
@@ -43,6 +45,12 @@ class MenuScreenViewModel : BaseScreenViewModel() {
             Scene.SOLITAIRE to 0,
             Scene.SUDOKU to 0,
         )*/
+
+    override fun onLoadPreferences(preferences: Preferences) {
+        if (preferences[PREF_KEY_THEME] != null) {
+            theme.value = SelectedTheme.entries.first { it.ordinal == preferences[PREF_KEY_THEME] }
+        }
+    }
 
     fun loadFromFile(data: MenuData) {
         selectedGame = data.selectedGame
@@ -53,9 +61,8 @@ class MenuScreenViewModel : BaseScreenViewModel() {
     }
 
     fun saveToFile(): String {
-        return Json.encodeToString(
-            MenuData(selectedGame, coins/*, selectedGameModeIndices*/)
-        )
+        // TODO: Move currency to own file
+        return Json.encodeToString(MenuData(selectedGame, coins/*, selectedGameModeIndices*/))
     }
 
     //fun getSelectedGameModeIndex(gameIndex: Int = -1): Int {
@@ -68,8 +75,8 @@ class MenuScreenViewModel : BaseScreenViewModel() {
     //    selectedGameModeIndices[selectedGameIndex] = gameModeIndex
     //}
 
-    fun navigateToSelectedGame(navController: NavController){
-        when(selectedGame){
+    fun navigateToSelectedGame(navController: NavController) {
+        when (selectedGame) {
             Scene.GAME2048 -> navController.navigateTo2048()
             Scene.MENU -> {}
             Scene.MINESWEEPER -> navController.navigateToMinesweeper()

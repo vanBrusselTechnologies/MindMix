@@ -1,5 +1,6 @@
 package com.vanbrusselgames.mindmix.games.solitaire.navigation
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -8,7 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
 import com.vanbrusselgames.mindmix.games.solitaire.GameUI
-import com.vanbrusselgames.mindmix.games.solitaire.GameViewModel
+import com.vanbrusselgames.mindmix.games.solitaire.SolitaireViewModel
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -23,13 +24,15 @@ fun NavController.navigateToSolitaire(navOptions: NavOptions? = null) {
 }
 
 fun NavGraphBuilder.solitaire(
-    navController: NavController, viewModel: GameViewModel
+    navController: NavController,
+    viewModel: SolitaireViewModel,
+    snackbarHostState: SnackbarHostState
 ) {
     composable<SolitaireRoute> {
         val coroutineScope = rememberCoroutineScope()
         viewModel.setCoroutineScope(coroutineScope)
         viewModel.loadPuzzle()
         //it.arguments?.getString("mode")
-        GameUI(viewModel, navController)
+        GameUI(viewModel, navController, snackbarHostState)
     }
 }

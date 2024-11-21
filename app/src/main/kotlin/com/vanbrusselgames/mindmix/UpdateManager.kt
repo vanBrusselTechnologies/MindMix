@@ -19,7 +19,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class UpdateManager(val ctx: Context, val snackbarHostState: SnackbarHostState) {
+class UpdateManager(
+    val ctx: Context, val snackbarHostState: SnackbarHostState, val dataManager: DataManager
+) {
     //private const val DAYS_FOR_FLEXIBLE_UPDATE = 3
     private lateinit var appUpdateManager: AppUpdateManager
 
@@ -100,7 +102,7 @@ class UpdateManager(val ctx: Context, val snackbarHostState: SnackbarHostState) 
             )
             when (result) {
                 SnackbarResult.ActionPerformed -> {
-                    DataManager.save(false)
+                    dataManager.save(false)
                     appUpdateManager.completeUpdate()
                     snackbarHostState.currentSnackbarData?.dismiss()
                 }

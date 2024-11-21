@@ -1,6 +1,6 @@
 package com.vanbrusselgames.mindmix.games.solitaire
 
-class Solitaire(val viewModel: GameViewModel = GameViewModel()) {
+class Solitaire(val viewModel: SolitaireViewModel = SolitaireViewModel()) {
     companion object {
         const val GAME_ID: Int = 1
         const val GAME_NAME = "Solitaire"

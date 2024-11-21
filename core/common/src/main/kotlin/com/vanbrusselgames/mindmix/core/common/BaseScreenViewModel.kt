@@ -2,6 +2,7 @@ package com.vanbrusselgames.mindmix.core.common
 
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
+import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.ViewModel
 
 abstract class BaseScreenViewModel : ViewModel() {
@@ -15,4 +16,7 @@ abstract class BaseScreenViewModel : ViewModel() {
     val topRowHeight = (topRowButtonSize + 2f * padding)
 
     open fun onOpenDialog() {}
+
+    abstract fun onLoadPreferences(preferences: Preferences)
+    //abstract fun onLoadData()
 }

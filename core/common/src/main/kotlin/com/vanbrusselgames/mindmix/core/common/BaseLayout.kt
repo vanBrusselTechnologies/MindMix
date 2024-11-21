@@ -15,6 +15,8 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,10 +31,11 @@ import com.vanbrusselgames.mindmix.feature.settings.navigation.navigateToSetting
 fun BaseScene(
     viewModel: BaseScreenViewModel,
     navController: NavController,
-    sceneSpecific: @Composable BoxScope.() -> Unit?
+    snackbarHostState: SnackbarHostState,
+    sceneSpecific: @Composable BoxScope.() -> Unit
 ) {
     Scaffold(Modifier.safeDrawingPadding(), { TopBar(viewModel, navController) }, snackbarHost = {
-        //todo: SnackbarHost(hostState = MainActivity.snackbarHostState)
+        SnackbarHost(hostState = snackbarHostState)
     }) {
         Box(
             Modifier
