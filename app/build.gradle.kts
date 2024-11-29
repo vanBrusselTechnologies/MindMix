@@ -1,3 +1,4 @@
+
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -32,7 +33,7 @@ android {
         applicationId = "com.vanBrusselGames.MindMix"
         minSdk = 23
         targetSdk = 35
-        versionCode = 102
+        versionCode = 104
         versionName = "1.2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -95,6 +96,7 @@ dependencies {
 
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
     implementation(platform(libs.androidx.compose.bom))
@@ -112,6 +114,7 @@ dependencies {
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.performance)
 
+    implementation(libs.play.integrity)
     implementation(libs.play.services.ads)
     implementation(libs.play.services.auth)
     implementation(libs.play.services.games.v2)

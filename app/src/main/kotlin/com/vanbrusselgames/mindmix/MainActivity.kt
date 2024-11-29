@@ -14,9 +14,9 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.Firebase
 import com.google.firebase.appcheck.appCheck
@@ -84,6 +84,8 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashscreen = installSplashScreen()
+        var keepSplashScreen = true
         super.onCreate(savedInstanceState)
 
         Firebase.initialize(this)
@@ -92,13 +94,27 @@ class MainActivity : ComponentActivity() {
         val networkMonitor = NetworkMonitor(this)
         val authManager = AuthManager(this)
         val adManager = AdManager(this, networkMonitor)
-        dataManager =
-            DataManager(this, { authManager.userId.value }, loadDataForScene, saveSceneData)
-        loadPreferences(applicationContext.dataStore, onLoadPreferences)
+
+        val updateManager =
+            UpdateManager(this@MainActivity, snackbarHostState) { dataManager.save(false) }
+        updateManager.checkForUpdates(registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result: ActivityResult ->
+            if (result.resultCode != RESULT_OK) {
+                Logger.w("Update flow failed! Result code: " + result.resultCode)
+            }
+        })
+
         CoroutineScope(Dispatchers.IO).launch {
-            GameLoader.init(this@MainActivity, networkMonitor, gameLoad)
+            dataManager = DataManager(
+                this@MainActivity, { authManager.userId.value }, loadDataForScene, saveSceneData
+            )
+            loadPreferences(applicationContext.dataStore, onLoadPreferences)
+            launch {
+                GameLoader.init(this@MainActivity, networkMonitor, gameLoad)
+            }
+            ReviewManager.start(this@MainActivity)
+            keepSplashScreen = false
         }
-        val updateManager = UpdateManager(this, snackbarHostState, dataManager)
+        splashscreen.setKeepOnScreenCondition { keepSplashScreen }
         setContentView(ComposeView(this).apply {
             setContent {
                 val darkTheme = when (menu.viewModel.theme.value) {
@@ -115,7 +131,7 @@ class MainActivity : ComponentActivity() {
                         color = MaterialTheme.colorScheme.background,
                         contentColor = MaterialTheme.colorScheme.onBackground
                     ) {
-                        NavHost(navController = navController,
+                        NavHost(navController,
                             startDestination = MenuRoute,
                             Modifier.fillMaxSize(),
                             enterTransition = { fadeIn() },
@@ -129,8 +145,7 @@ class MainActivity : ComponentActivity() {
                                 { currentViewModel().nameResId },
                                 { (currentViewModel() as BaseGameViewModel).startNewGame() },
                                 { navController.navigateToSettings() }) { navController.navigateToMenu() }
-                            gameHelpDialog(
-                                navController,
+                            gameHelpDialog(navController,
                                 { currentViewModel().nameResId }) { (currentViewModel() as BaseGameViewModel).descResId }
                             gameFinishedDialog {
                                 when (SceneManager.currentScene) {
@@ -183,16 +198,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
         })
-
-        updateManager.checkForUpdates(registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result: ActivityResult ->
-            if (result.resultCode != RESULT_OK) {
-                Logger.w("Update flow failed! Result code: " + result.resultCode)
-            }
-        })
-
-        CoroutineScope(Dispatchers.Main).launch {
-            ReviewManager.start(this@MainActivity)
-        }
     }
 
     override fun onPause() {

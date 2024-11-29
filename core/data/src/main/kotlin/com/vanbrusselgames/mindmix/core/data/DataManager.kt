@@ -12,7 +12,6 @@ import com.vanbrusselgames.mindmix.core.navigation.SceneManager.Scene
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import java.io.File
 
@@ -95,10 +94,9 @@ class DataManager(
     init {
         file = File(ctx.filesDir, FILE_NAME)
         file.createNewFile()
-        runBlocking(Dispatchers.IO) {
+        CoroutineScope(Dispatchers.IO).launch {
             if (!loaded) load(loadDataForScene)
             autoSave()
-            true
         }
     }
 

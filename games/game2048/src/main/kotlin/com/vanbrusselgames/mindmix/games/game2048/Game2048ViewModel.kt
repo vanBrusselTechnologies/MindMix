@@ -70,9 +70,10 @@ class Game2048ViewModel : BaseGameViewModel() {
         saveCurrentProgress(prevSize)
 
         setProgress(size)
+        loadPuzzle()
     }
 
-    private fun saveCurrentProgress(size: GridSize2048 = this.gridSize.value) {
+    private fun saveCurrentProgress(size: GridSize2048 = gridSize.value) {
         val p = savedProgress.first { it.size == size }
         p.cellValues = cellList.map { c -> c.value }
         p.currentScore = score.longValue
@@ -120,10 +121,7 @@ class Game2048ViewModel : BaseGameViewModel() {
                 listOf(), -1, -1, savedProgress[index].bestScore, gridSize.value, false
             )
         } else {
-            val p = savedProgress.first { it.size == gridSize.value }
-            p.cellValues = cellList.map { it.value }
-            //p.moves = moves
-            p.currentScore = score.longValue
+            saveCurrentProgress()
         }
         return Json.encodeToString(Game2048Data(gridSize.value, savedProgress.asList()))
     }
@@ -338,14 +336,16 @@ class Game2048ViewModel : BaseGameViewModel() {
 
     private fun canMove(): Boolean {
         if (cellList.fastAny { c -> c.value == 0L }) return true
-        getRows().fastForEach {
+        val rows = getRows()
+        rows.fastForEach {
             var value = 0L
             for (c in it) {
                 if (c.value == value) return true
                 value = c.value
             }
         }
-        getColumns().fastForEach {
+        val columns = getColumns()
+        columns.fastForEach {
             var value = 0L
             for (c in it) {
                 if (c.value == value) return true
@@ -360,7 +360,7 @@ class Game2048ViewModel : BaseGameViewModel() {
     }
 
     private fun onGameFinished(navController: NavController, reachedTarget: Boolean) {
-        // TODO : Localize CORRECT title / text
+        saveCurrentProgress()
         FinishedGame.titleResId =
             if (!isStuck && reachedTarget) R.string.game_2048_reach_target_title else if (isStuck && !reachedTarget) R.string.game_2048_game_over_title else Game2048.NAME_RES_ID
         FinishedGame.textResId =

@@ -245,7 +245,6 @@ class MinesweeperViewModel : BaseGameViewModel() {
     }
 
     private fun onGameFinished(navController: NavController, success: Boolean) {
-        // TODO : Localize CORRECT title / text
         FinishedGame.titleResId = Minesweeper.NAME_RES_ID
         // if (failed) "Failed" else "Congrats / Smart / Well done"
         FinishedGame.textResId =

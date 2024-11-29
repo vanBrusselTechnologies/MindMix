@@ -107,14 +107,14 @@ fun Grid2048(viewModel: Game2048ViewModel, navController: NavController) {
 
         val modifier = Modifier
             .aspectRatio(1f)
-            .padding(1.5.dp)
+            .padding(2.dp)
             .clip(RoundedCornerShape(5.dp))
         LazyHorizontalGrid(
             GridCells.Fixed(sqrt(viewModel.cellList.size.toFloat()).fastRoundToInt()),
             Modifier.background(
-                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.375f),
+                MaterialTheme.colorScheme.secondaryContainer,
                 RoundedCornerShape(5.dp)
-            ),
+            ).padding(3.dp),
             userScrollEnabled = false
         ) {
             items(viewModel.cellList, key = { item -> item.id }) {

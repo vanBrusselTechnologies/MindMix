@@ -9,4 +9,10 @@
     <string name="card_type_simple">Simple</string>
     <string name="card_type_detailed">Detailed</string>
     <string name="time">Time:</string>
+    <string name="game_solitaire_label_last_best">Last best time:</string>
+    <string name="game_solitaire_label_fastest_time">Fastest time:</string>
+    <string name="game_solitaire_new_record">New best!</string>
+    <string name="game_soltaire_label_moves">Moves:</string>
+    <string name="game_solitaire_label_current_time">Current time:</string>
+    <string name="game_soltaire_label_penalty_time">Penalty time:</string>
 </resources>

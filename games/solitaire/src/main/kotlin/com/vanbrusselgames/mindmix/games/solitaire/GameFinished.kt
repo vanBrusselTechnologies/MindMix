@@ -58,25 +58,28 @@ fun SolitaireGameFinishedDialog(
         )
         Spacer(Modifier.height(8.dp))
         Stats {
-            // TODO: Localization
-            StatRow(fieldText = "Moves:", valueText = FinishedGame.moves.toString())
             StatRow(
-                fieldText = "Current Time:", valueText = formatDuration(FinishedGame.usedMillis)
+                fieldText = stringResource(R.string.game_soltaire_label_moves),
+                valueText = FinishedGame.moves.toString()
+            )
+            StatRow(
+                fieldText = stringResource(R.string.game_solitaire_label_current_time),
+                valueText = formatDuration(FinishedGame.usedMillis)
             )
             if (FinishedGame.penaltyMillis > 0) {
                 StatRow(
-                    fieldText = "Penalty Time:",
+                    fieldText = stringResource(R.string.game_soltaire_label_penalty_time),
                     valueText = formatDuration(FinishedGame.penaltyMillis)
                 )
             }
             if (FinishedGame.isNewRecord) {
                 Box {
                     StatRow(
-                        fieldText = "Fastest Time:",
+                        fieldText = stringResource(R.string.game_solitaire_label_fastest_time),
                         valueText = formatDuration(FinishedGame.usedMillis + FinishedGame.penaltyMillis)
                     )
                     Text(
-                        "New Best!",
+                        stringResource(R.string.game_solitaire_new_record),
                         Modifier
                             .rotate(-16.25f)
                             .align(Alignment.CenterEnd),
@@ -87,7 +90,7 @@ fun SolitaireGameFinishedDialog(
                 }
             }
             if (FinishedGame.lastRecordMillis != -1L) StatRow(
-                fieldText = if (FinishedGame.isNewRecord) "Last Best Time:" else "Fastest Time:",
+                fieldText = stringResource(if (FinishedGame.isNewRecord) R.string.game_solitaire_label_last_best else R.string.game_solitaire_label_fastest_time),
                 valueText = formatDuration(FinishedGame.lastRecordMillis)
             )
         }

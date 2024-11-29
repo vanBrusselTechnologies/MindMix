@@ -14,20 +14,17 @@ import com.google.android.play.core.install.InstallStateUpdatedListener
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
-import com.vanbrusselgames.mindmix.core.data.DataManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class UpdateManager(
-    val ctx: Context, val snackbarHostState: SnackbarHostState, val dataManager: DataManager
+    val ctx: Context, val snackbarHostState: SnackbarHostState, val saveData: () -> Unit
 ) {
     //private const val DAYS_FOR_FLEXIBLE_UPDATE = 3
-    private lateinit var appUpdateManager: AppUpdateManager
+    private val appUpdateManager: AppUpdateManager = AppUpdateManagerFactory.create(ctx)
 
     fun checkForUpdates(activityResultLauncher: ActivityResultLauncher<IntentSenderRequest>) {
-        if (this::appUpdateManager.isInitialized) return
-        appUpdateManager = AppUpdateManagerFactory.create(ctx)
         val appUpdateInfoTask = appUpdateManager.appUpdateInfo
         appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
             if (appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED) {
@@ -102,7 +99,7 @@ class UpdateManager(
             )
             when (result) {
                 SnackbarResult.ActionPerformed -> {
-                    dataManager.save(false)
+                    saveData()
                     appUpdateManager.completeUpdate()
                     snackbarHostState.currentSnackbarData?.dismiss()
                 }

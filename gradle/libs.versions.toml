@@ -3,6 +3,7 @@
 androidGradlePlugin = "8.6.1"
 androidxActivity = "1.9.3"
 androidxCore = "1.15.0"
+androidxCoreSplashscreen = "1.0.1"
 androidxEspresso = "3.6.1"
 androidxJunit = "1.2.1"
 appUpdate = "2.1.0"
@@ -23,6 +24,7 @@ kotlinxSerializationJson = "1.7.3"
 ksp = "2.0.20-1.0.25"
 lifecycleRuntimeKtx = "2.8.7"
 navigationCompose = "2.8.4"
+playIntegrity = "1.4.0"
 playServicesAds = "23.5.0"
 playServicesAuth = "21.2.0"
 playServicesGamesV2 = "20.1.2"
@@ -31,7 +33,6 @@ reviewKtx = "2.0.2"
 appcompat = "1.7.0"
 material = "1.12.0"
 playServicesMeasurementApi = "22.1.2"
-
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidxActivity" }
@@ -42,6 +43,7 @@ androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidxCore" }
+androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "androidxCoreSplashscreen" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
@@ -65,6 +67,7 @@ google-services = { module = "com.google.gms:google-services", version.ref = "go
 gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
 junit = { module = "junit:junit", version.ref = "junitVersion" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+play-integrity = { module = "com.google.android.play:integrity", version.ref = "playIntegrity" }
 play-services-ads = { module = "com.google.android.gms:play-services-ads", version.ref = "playServicesAds" }
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 play-services-games-v2 = { module = "com.google.android.gms:play-services-games-v2", version.ref = "playServicesGamesV2" }

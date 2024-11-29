@@ -366,7 +366,7 @@ class SolitaireViewModel : BaseGameViewModel(), ITimerVM {
     val couldGetFinished = mutableStateOf(false)
     val restStackEnabled = mutableStateOf(true)
 
-    val cardVisualType = mutableStateOf(PlayingCard.CardVisualType.SIMPLE)
+    val cardVisualType = mutableStateOf(CardVisualType.SIMPLE)
 
     fun setCoroutineScope(scope: CoroutineScope) {
         coroutineScope = scope
@@ -755,7 +755,7 @@ class SolitaireViewModel : BaseGameViewModel(), ITimerVM {
         if (isNewRecord) fastestTime = totalUsedTime
         FinishedGame.isNewRecord = isNewRecord
 
-        val minutes = max(1f, timer.currentMillis / 1000f / 60f)
+        val minutes = max(1f, totalUsedTime / 1000f / 60f)
         FinishedGame.reward =
             max(1, floor(MAX_REWARD / minutes).toInt()) + if (isNewRecord) 2 else 0
 

@@ -50,7 +50,7 @@ class SudokuViewModel : BaseGameViewModel() {
     }
 
     var stringProgress = enabledDifficulties.map { SudokuProgress("", "", listOf(), it) }
-    val hasUpdate = enabledDifficulties.map { it to true }.toMap().toMutableMap()
+    val hasUpdate = enabledDifficulties.map { it to false }.toMap().toMutableMap()
 
     override fun onLoadPreferences(preferences: Preferences) {
         if (preferences[PREF_KEY_CHECK_CONFLICTING_CELLS] != null) {
@@ -119,7 +119,6 @@ class SudokuViewModel : BaseGameViewModel() {
     }
 
     fun saveToFile(): String {
-        //todo: Improve Saving
         if (finished) {
             val index = savedProgress.indexOfFirst { it.difficulty == difficulty.value }
             savedProgress[index] = SudokuProgress(listOf(), listOf(), listOf(), difficulty.value)
@@ -277,7 +276,6 @@ class SudokuViewModel : BaseGameViewModel() {
     }
 
     private fun onGameFinished(navController: NavController) {
-        // TODO : Localize CORRECT title / text
         FinishedGame.titleResId = Sudoku.NAME_RES_ID// "Congrats / Smart / Well done"
         FinishedGame.textResId = R.string.sudoku_success
         // """You did great and solved puzzle in ${0} seconds!!

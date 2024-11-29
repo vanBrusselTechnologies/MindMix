@@ -61,7 +61,6 @@ class MenuScreenViewModel : BaseScreenViewModel() {
     }
 
     fun saveToFile(): String {
-        // TODO: Move currency to own file
         return Json.encodeToString(MenuData(selectedGame, coins/*, selectedGameModeIndices*/))
     }
 
