@@ -202,7 +202,7 @@ class SudokuLoader {
             for (kvp in data.page) pages[kvp.key] = kvp.value
             val progressList = data.progress
             val size = SudokuViewModel.SIZE * SudokuViewModel.SIZE
-
+            if (progressList.isEmpty()) return
             viewModel.stringProgress = progressList
             val savedProgress = progressList.map { progress ->
 

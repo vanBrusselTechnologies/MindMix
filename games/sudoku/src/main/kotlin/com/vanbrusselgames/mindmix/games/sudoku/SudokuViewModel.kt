@@ -146,6 +146,7 @@ class SudokuViewModel : BaseGameViewModel() {
                 )
             }
         }
+        stringProgress = progress
         return Json.encodeToString(
             SudokuData(difficulty.value, progress, SudokuLoader.pages.toMap())
         )
