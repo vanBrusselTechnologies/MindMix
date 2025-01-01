@@ -47,7 +47,7 @@ class Game2048ViewModel : BaseGameViewModel() {
     var score = mutableLongStateOf(0L)
 
     var savedProgress = Array(GridSize2048.entries.size) {
-        Game2048Progress(listOf(), -1, -1, -1, GridSize2048.entries[it], false)
+        Game2048Progress(size = GridSize2048.entries[it])
     }
 
     fun getTarget(): Long = when (gridSize.value) {
@@ -144,7 +144,7 @@ class Game2048ViewModel : BaseGameViewModel() {
      */
     fun loadPuzzle() {
         if (isStuck || cellList.all { it.value == 0L }) startNewGame()
-        // otherwise game is already loaded using LoadFromFile()
+        // else: game is already loaded using loadFromFile()
     }
 
     override fun startNewGame() {

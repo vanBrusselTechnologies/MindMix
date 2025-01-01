@@ -21,7 +21,7 @@ class GameTimer {
         private set
     private var currentTime = mutableLongStateOf(0)
 
-    fun reset(){
+    fun reset() {
         addedMillis = 0
         pausedAt = 0
         currentTime.longValue = 0
@@ -29,6 +29,7 @@ class GameTimer {
     }
 
     fun start() {
+        reset()
         startMillis = System.currentTimeMillis()
         currentMillis = 0L
         running.value = true
@@ -55,6 +56,7 @@ class GameTimer {
             currentMillis = System.currentTimeMillis() - startMillis
             currentTime.longValue = currentMillis + addedMillis
         }
+        if (startMillis == 0L) reset()
         running.value = true
     }
 

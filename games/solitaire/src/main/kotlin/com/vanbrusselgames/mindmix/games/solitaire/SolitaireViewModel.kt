@@ -11,6 +11,8 @@ import com.vanbrusselgames.mindmix.core.common.GameTimer
 import com.vanbrusselgames.mindmix.core.common.ITimerVM
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.feature.gamefinished.navigation.navigateToGameFinished
+import com.vanbrusselgames.mindmix.games.solitaire.PlayingCard.CardIndex
+import com.vanbrusselgames.mindmix.games.solitaire.PlayingCard.CardType
 import com.vanbrusselgames.mindmix.games.solitaire.PlayingCard.CardVisualType
 import com.vanbrusselgames.mindmix.games.solitaire.data.PREF_KEY_CARD_TYPE
 import kotlinx.coroutines.CoroutineScope
@@ -45,316 +47,160 @@ class SolitaireViewModel : BaseGameViewModel(), ITimerVM {
 
     val cards = arrayOf(
         PlayingCard(
-            this,
-            PlayingCard.CardType.CLOVERS,
-            PlayingCard.CardIndex.A,
-            R.drawable.playingcards_detailed_clovers_a
+            this, CardType.CLOVERS, CardIndex.A, R.drawable.playingcards_detailed_clovers_a
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.CLOVERS,
-            PlayingCard.CardIndex.TWO,
-            R.drawable.playingcards_detailed_clovers_2
+            this, CardType.CLOVERS, CardIndex.TWO, R.drawable.playingcards_detailed_clovers_2
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.CLOVERS,
-            PlayingCard.CardIndex.THREE,
-            R.drawable.playingcards_detailed_clovers_3
+            this, CardType.CLOVERS, CardIndex.THREE, R.drawable.playingcards_detailed_clovers_3
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.CLOVERS,
-            PlayingCard.CardIndex.FOUR,
-            R.drawable.playingcards_detailed_clovers_4
+            this, CardType.CLOVERS, CardIndex.FOUR, R.drawable.playingcards_detailed_clovers_4
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.CLOVERS,
-            PlayingCard.CardIndex.FIVE,
-            R.drawable.playingcards_detailed_clovers_5
+            this, CardType.CLOVERS, CardIndex.FIVE, R.drawable.playingcards_detailed_clovers_5
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.CLOVERS,
-            PlayingCard.CardIndex.SIX,
-            R.drawable.playingcards_detailed_clovers_6
+            this, CardType.CLOVERS, CardIndex.SIX, R.drawable.playingcards_detailed_clovers_6
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.CLOVERS,
-            PlayingCard.CardIndex.SEVEN,
-            R.drawable.playingcards_detailed_clovers_7
+            this, CardType.CLOVERS, CardIndex.SEVEN, R.drawable.playingcards_detailed_clovers_7
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.CLOVERS,
-            PlayingCard.CardIndex.EIGHT,
-            R.drawable.playingcards_detailed_clovers_8
+            this, CardType.CLOVERS, CardIndex.EIGHT, R.drawable.playingcards_detailed_clovers_8
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.CLOVERS,
-            PlayingCard.CardIndex.NINE,
-            R.drawable.playingcards_detailed_clovers_9
+            this, CardType.CLOVERS, CardIndex.NINE, R.drawable.playingcards_detailed_clovers_9
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.CLOVERS,
-            PlayingCard.CardIndex.TEN,
-            R.drawable.playingcards_detailed_clovers_10
+            this, CardType.CLOVERS, CardIndex.TEN, R.drawable.playingcards_detailed_clovers_10
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.CLOVERS,
-            PlayingCard.CardIndex.J,
-            R.drawable.playingcards_detailed_clovers_j
+            this, CardType.CLOVERS, CardIndex.J, R.drawable.playingcards_detailed_clovers_j
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.CLOVERS,
-            PlayingCard.CardIndex.Q,
-            R.drawable.playingcards_detailed_clovers_q
+            this, CardType.CLOVERS, CardIndex.Q, R.drawable.playingcards_detailed_clovers_q
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.CLOVERS,
-            PlayingCard.CardIndex.K,
-            R.drawable.playingcards_detailed_clovers_k
+            this, CardType.CLOVERS, CardIndex.K, R.drawable.playingcards_detailed_clovers_k
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.DIAMONDS,
-            PlayingCard.CardIndex.A,
-            R.drawable.playingcards_detailed_diamonds_a
+            this, CardType.DIAMONDS, CardIndex.A, R.drawable.playingcards_detailed_diamonds_a
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.DIAMONDS,
-            PlayingCard.CardIndex.TWO,
-            R.drawable.playingcards_detailed_diamonds_2
+            this, CardType.DIAMONDS, CardIndex.TWO, R.drawable.playingcards_detailed_diamonds_2
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.DIAMONDS,
-            PlayingCard.CardIndex.THREE,
-            R.drawable.playingcards_detailed_diamonds_3
+            this, CardType.DIAMONDS, CardIndex.THREE, R.drawable.playingcards_detailed_diamonds_3
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.DIAMONDS,
-            PlayingCard.CardIndex.FOUR,
-            R.drawable.playingcards_detailed_diamonds_4
+            this, CardType.DIAMONDS, CardIndex.FOUR, R.drawable.playingcards_detailed_diamonds_4
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.DIAMONDS,
-            PlayingCard.CardIndex.FIVE,
-            R.drawable.playingcards_detailed_diamonds_5
+            this, CardType.DIAMONDS, CardIndex.FIVE, R.drawable.playingcards_detailed_diamonds_5
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.DIAMONDS,
-            PlayingCard.CardIndex.SIX,
-            R.drawable.playingcards_detailed_diamonds_6
+            this, CardType.DIAMONDS, CardIndex.SIX, R.drawable.playingcards_detailed_diamonds_6
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.DIAMONDS,
-            PlayingCard.CardIndex.SEVEN,
-            R.drawable.playingcards_detailed_diamonds_7
+            this, CardType.DIAMONDS, CardIndex.SEVEN, R.drawable.playingcards_detailed_diamonds_7
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.DIAMONDS,
-            PlayingCard.CardIndex.EIGHT,
-            R.drawable.playingcards_detailed_diamonds_8
+            this, CardType.DIAMONDS, CardIndex.EIGHT, R.drawable.playingcards_detailed_diamonds_8
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.DIAMONDS,
-            PlayingCard.CardIndex.NINE,
-            R.drawable.playingcards_detailed_diamonds_9
+            this, CardType.DIAMONDS, CardIndex.NINE, R.drawable.playingcards_detailed_diamonds_9
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.DIAMONDS,
-            PlayingCard.CardIndex.TEN,
-            R.drawable.playingcards_detailed_diamonds_10
+            this, CardType.DIAMONDS, CardIndex.TEN, R.drawable.playingcards_detailed_diamonds_10
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.DIAMONDS,
-            PlayingCard.CardIndex.J,
-            R.drawable.playingcards_detailed_diamonds_j
+            this, CardType.DIAMONDS, CardIndex.J, R.drawable.playingcards_detailed_diamonds_j
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.DIAMONDS,
-            PlayingCard.CardIndex.Q,
-            R.drawable.playingcards_detailed_diamonds_q
+            this, CardType.DIAMONDS, CardIndex.Q, R.drawable.playingcards_detailed_diamonds_q
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.DIAMONDS,
-            PlayingCard.CardIndex.K,
-            R.drawable.playingcards_detailed_diamonds_k
+            this, CardType.DIAMONDS, CardIndex.K, R.drawable.playingcards_detailed_diamonds_k
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.HEARTS,
-            PlayingCard.CardIndex.A,
-            R.drawable.playingcards_detailed_hearts_a
+            this, CardType.HEARTS, CardIndex.A, R.drawable.playingcards_detailed_hearts_a
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.HEARTS,
-            PlayingCard.CardIndex.TWO,
-            R.drawable.playingcards_detailed_hearts_2
+            this, CardType.HEARTS, CardIndex.TWO, R.drawable.playingcards_detailed_hearts_2
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.HEARTS,
-            PlayingCard.CardIndex.THREE,
-            R.drawable.playingcards_detailed_hearts_3
+            this, CardType.HEARTS, CardIndex.THREE, R.drawable.playingcards_detailed_hearts_3
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.HEARTS,
-            PlayingCard.CardIndex.FOUR,
-            R.drawable.playingcards_detailed_hearts_4
+            this, CardType.HEARTS, CardIndex.FOUR, R.drawable.playingcards_detailed_hearts_4
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.HEARTS,
-            PlayingCard.CardIndex.FIVE,
-            R.drawable.playingcards_detailed_hearts_5
+            this, CardType.HEARTS, CardIndex.FIVE, R.drawable.playingcards_detailed_hearts_5
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.HEARTS,
-            PlayingCard.CardIndex.SIX,
-            R.drawable.playingcards_detailed_hearts_6
+            this, CardType.HEARTS, CardIndex.SIX, R.drawable.playingcards_detailed_hearts_6
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.HEARTS,
-            PlayingCard.CardIndex.SEVEN,
-            R.drawable.playingcards_detailed_hearts_7
+            this, CardType.HEARTS, CardIndex.SEVEN, R.drawable.playingcards_detailed_hearts_7
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.HEARTS,
-            PlayingCard.CardIndex.EIGHT,
-            R.drawable.playingcards_detailed_hearts_8
+            this, CardType.HEARTS, CardIndex.EIGHT, R.drawable.playingcards_detailed_hearts_8
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.HEARTS,
-            PlayingCard.CardIndex.NINE,
-            R.drawable.playingcards_detailed_hearts_9
+            this, CardType.HEARTS, CardIndex.NINE, R.drawable.playingcards_detailed_hearts_9
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.HEARTS,
-            PlayingCard.CardIndex.TEN,
-            R.drawable.playingcards_detailed_hearts_10
+            this, CardType.HEARTS, CardIndex.TEN, R.drawable.playingcards_detailed_hearts_10
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.HEARTS,
-            PlayingCard.CardIndex.J,
-            R.drawable.playingcards_detailed_hearts_j
+            this, CardType.HEARTS, CardIndex.J, R.drawable.playingcards_detailed_hearts_j
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.HEARTS,
-            PlayingCard.CardIndex.Q,
-            R.drawable.playingcards_detailed_hearts_q
+            this, CardType.HEARTS, CardIndex.Q, R.drawable.playingcards_detailed_hearts_q
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.HEARTS,
-            PlayingCard.CardIndex.K,
-            R.drawable.playingcards_detailed_hearts_k
+            this, CardType.HEARTS, CardIndex.K, R.drawable.playingcards_detailed_hearts_k
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.SPADES,
-            PlayingCard.CardIndex.A,
-            R.drawable.playingcards_detailed_spades_a
+            this, CardType.SPADES, CardIndex.A, R.drawable.playingcards_detailed_spades_a
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.SPADES,
-            PlayingCard.CardIndex.TWO,
-            R.drawable.playingcards_detailed_spades_2
+            this, CardType.SPADES, CardIndex.TWO, R.drawable.playingcards_detailed_spades_2
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.SPADES,
-            PlayingCard.CardIndex.THREE,
-            R.drawable.playingcards_detailed_spades_3
+            this, CardType.SPADES, CardIndex.THREE, R.drawable.playingcards_detailed_spades_3
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.SPADES,
-            PlayingCard.CardIndex.FOUR,
-            R.drawable.playingcards_detailed_spades_4
+            this, CardType.SPADES, CardIndex.FOUR, R.drawable.playingcards_detailed_spades_4
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.SPADES,
-            PlayingCard.CardIndex.FIVE,
-            R.drawable.playingcards_detailed_spades_5
+            this, CardType.SPADES, CardIndex.FIVE, R.drawable.playingcards_detailed_spades_5
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.SPADES,
-            PlayingCard.CardIndex.SIX,
-            R.drawable.playingcards_detailed_spades_6
+            this, CardType.SPADES, CardIndex.SIX, R.drawable.playingcards_detailed_spades_6
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.SPADES,
-            PlayingCard.CardIndex.SEVEN,
-            R.drawable.playingcards_detailed_spades_7
+            this, CardType.SPADES, CardIndex.SEVEN, R.drawable.playingcards_detailed_spades_7
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.SPADES,
-            PlayingCard.CardIndex.EIGHT,
-            R.drawable.playingcards_detailed_spades_8
+            this, CardType.SPADES, CardIndex.EIGHT, R.drawable.playingcards_detailed_spades_8
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.SPADES,
-            PlayingCard.CardIndex.NINE,
-            R.drawable.playingcards_detailed_spades_9
+            this, CardType.SPADES, CardIndex.NINE, R.drawable.playingcards_detailed_spades_9
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.SPADES,
-            PlayingCard.CardIndex.TEN,
-            R.drawable.playingcards_detailed_spades_10
+            this, CardType.SPADES, CardIndex.TEN, R.drawable.playingcards_detailed_spades_10
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.SPADES,
-            PlayingCard.CardIndex.J,
-            R.drawable.playingcards_detailed_spades_j
+            this, CardType.SPADES, CardIndex.J, R.drawable.playingcards_detailed_spades_j
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.SPADES,
-            PlayingCard.CardIndex.Q,
-            R.drawable.playingcards_detailed_spades_q
+            this, CardType.SPADES, CardIndex.Q, R.drawable.playingcards_detailed_spades_q
         ),
         PlayingCard(
-            this,
-            PlayingCard.CardType.SPADES,
-            PlayingCard.CardIndex.K,
-            R.drawable.playingcards_detailed_spades_k
+            this, CardType.SPADES, CardIndex.K, R.drawable.playingcards_detailed_spades_k
         ),
     )
 
@@ -373,14 +219,13 @@ class SolitaireViewModel : BaseGameViewModel(), ITimerVM {
     }
 
     fun loadFromFile(data: SolitaireData) {
-        if (data.finished) {
-            startNewGame()
-            return
-        }
+        fastestTime = data.fastestMillis
+
+        if (data.finished) return reset()
 
         if (!checkValid(data.cardStacks)) {
-            Logger.e("Saved Solitaire puzzle is not valid, loading new puzzle")
-            startNewGame()
+            Logger.e("Saved Solitaire puzzle is not valid, resetting puzzle.")
+            reset()
             return
         }
 
@@ -408,7 +253,6 @@ class SolitaireViewModel : BaseGameViewModel(), ITimerVM {
         couldGetFinished.value = couldGetFinished()
         timer.set(data.millis)
         timer.addMillis(data.penaltyMillis)
-        fastestTime = data.fastestMillis
         moves = data.moves
 
         if (cardStacks[6].isEmpty() && cardStacks[5].size <= 1) restStackEnabled.value = false
@@ -728,10 +572,7 @@ class SolitaireViewModel : BaseGameViewModel(), ITimerVM {
     }
 
     private fun isFinished(): Boolean {
-        for (card in cards) {
-            if (!card.frontVisible.value || card.stackId >= 4) return false
-        }
-        return true
+        return cards.none { !it.frontVisible.value || it.stackId >= 4 }
     }
 
     private fun couldGetFinished(): Boolean {

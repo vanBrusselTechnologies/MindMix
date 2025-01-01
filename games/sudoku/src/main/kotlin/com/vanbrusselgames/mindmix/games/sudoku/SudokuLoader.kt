@@ -205,20 +205,15 @@ class SudokuLoader {
             if (progressList.isEmpty()) return
             viewModel.stringProgress = progressList
             val savedProgress = progressList.map { progress ->
-
                 viewModel.hasUpdate[progress.difficulty] = false
-
                 SudokuProgress(
-                    Decode.base94toIntList(
-                        progress.clues, size
-                    ), Decode.base94toIntList(
-                        progress.input, size
-                    ), progress.inputNotes.map { notes ->
-                        val decodedNotes = Decode.base94toBooleanList(
-                            notes, SudokuViewModel.SIZE
-                        )
+                    Decode.base94toIntList(progress.clues, size),
+                    Decode.base94toIntList(progress.input, size),
+                    progress.inputNotes.map { notes ->
+                        val decodedNotes = Decode.base94toBooleanList(notes, SudokuViewModel.SIZE)
                         List(SudokuViewModel.SIZE) { i -> if (decodedNotes[i]) i + 1 else 0 }
-                    }, progress.difficulty
+                    },
+                    progress.difficulty
                 )
             }
             for (progress in savedProgress) {
