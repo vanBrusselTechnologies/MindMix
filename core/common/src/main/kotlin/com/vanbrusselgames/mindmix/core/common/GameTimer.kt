@@ -71,8 +71,8 @@ class GameTimer {
 
     @Composable
     fun Timer() {
-        if (!SceneManager.dialogActiveState.value && SceneManager.currentScene != SceneManager.Scene.MENU) {
-            resume()
+        remember(SceneManager.dialogActiveState.value, SceneManager.currentScene) {
+            if (!SceneManager.dialogActiveState.value && SceneManager.currentScene != SceneManager.Scene.MENU) resume();0
         }
 
         currentTime = remember { mutableLongStateOf(currentMillis + addedMillis) }

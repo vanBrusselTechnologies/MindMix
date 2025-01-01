@@ -33,8 +33,8 @@ android {
         applicationId = "com.vanBrusselGames.MindMix"
         minSdk = 23
         targetSdk = 35
-        versionCode = 106
-        versionName = "1.2.2"
+        versionCode = 107
+        versionName = "1.2.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
