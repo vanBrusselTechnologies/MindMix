@@ -1,4 +1,5 @@
-
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -11,6 +12,7 @@ plugins {
     alias(libs.plugins.firebase.perf)
     alias(libs.plugins.gms)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.hilt)
 }
 
 val keystorePropertiesFile: File = rootProject.file("keystore.properties")
@@ -27,12 +29,12 @@ android {
         }
     }
     namespace = "com.vanbrusselgames.mindmix"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.vanBrusselGames.MindMix"
         minSdk = 23
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 107
         versionName = "1.2.3"
 
@@ -43,30 +45,31 @@ android {
     }
 
     buildTypes {
-        getByName("release") {
+        release {
             isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
             signingConfig = signingConfigs.getByName("release")
         }
-        getByName("debug") {
+        debug {
             applicationIdSuffix = ".debug"
             signingConfig = signingConfigs.named("debug").get()
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
-    kotlinOptions {
-        jvmTarget = "17"
+    tasks.withType<KotlinJvmCompile>().configureEach {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_21)
+            freeCompilerArgs = listOf("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
+        }
     }
     buildFeatures {
         compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.15"
     }
     packaging {
         resources {

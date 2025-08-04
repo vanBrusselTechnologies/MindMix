@@ -1,41 +1,40 @@
 [versions]
-# AGP and tools should be updated together
-androidGradlePlugin = "8.6.1"
-androidxActivity = "1.9.3"
-androidxCore = "1.15.0"
+androidxActivity = "1.10.1"
+androidxCore = "1.16.0"
 androidxCoreSplashscreen = "1.0.1"
-androidxEspresso = "3.6.1"
-androidxJunit = "1.2.1"
+androidxEspresso = "3.7.0"
+androidxJunit = "1.3.0"
 appUpdate = "2.1.0"
 appUpdateKtx = "2.1.0"
-composeBom = "2024.12.01"
-constraintlayout = "2.2.0"
-datastorePreferences = "1.1.1"
-firebaseBom = "33.7.0"
-firebaseCrashlyticsGradle = "3.0.2"
-firebaseCrashlyticsPlugin = "3.0.2"
-firebasePerfPlugin = "1.4.2"
-gmsPlugin = "4.4.2"
-googleServices = "4.4.2"
-gradle = "8.2.2"
+composeBom = "2025.07.00"
+constraintlayout = "2.2.1"
+datastorePreferences = "1.1.7"
+firebaseBom = "34.0.0"
+firebaseCrashlytics = "3.0.5"
+firebasePerfPlugin = "2.0.0"
+googleServices = "4.4.3"
+gradle = "8.12.0"
+hilt = "2.57"
+hiltNavigation = "1.2.0"
 junitVersion = "4.13.2"
-kotlin = "2.0.20"
-kotlinxSerializationJson = "1.7.3"
-ksp = "2.0.20-1.0.25"
-lifecycleRuntimeKtx = "2.8.7"
-navigationCompose = "2.8.5"
+kotlin = "2.2.0"
+kotlinxSerializationJson = "1.9.0"
+ksp = "2.2.0-2.0.2"
+lifecycleRuntimeKtx = "2.9.2"
+navigationCompose = "2.9.3"
 playIntegrity = "1.4.0"
-playServicesAds = "23.6.0"
-playServicesAuth = "21.3.0"
-playServicesGamesV2 = "20.1.2"
+playServicesAds = "24.5.0"
+playServicesAuth = "21.4.0"
+playServicesGamesV2 = "21.0.0"
 review = "2.0.2"
 reviewKtx = "2.0.2"
-appcompat = "1.7.0"
+appcompat = "1.7.1"
 material = "1.12.0"
-playServicesMeasurementApi = "22.1.2"
+playServicesMeasurementApi = "23.0.0"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidxActivity" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
 androidx-compose-material3 = { module = "androidx.compose.material3:material3" }
 androidx-compose-ui = { module = "androidx.compose.ui:ui" }
@@ -46,6 +45,7 @@ androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx
 androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "androidxCoreSplashscreen" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
+androidx-hilt-navigation = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigation" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-test-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "androidxEspresso" }
 androidx-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
@@ -59,31 +59,34 @@ firebase-authentication = { module = "com.google.firebase:firebase-auth" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-config = { module = "com.google.firebase:firebase-config" }
 firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
-firebase-crashlytics-gradle = { module = "com.google.firebase:firebase-crashlytics-gradle", version.ref = "firebaseCrashlyticsGradle" }
+firebase-crashlytics-gradle = { module = "com.google.firebase:firebase-crashlytics-gradle", version.ref = "firebaseCrashlytics" }
 firebase-functions = { module = "com.google.firebase:firebase-functions" }
 firebase-performance = { module = "com.google.firebase:firebase-perf" }
 firebase-storage = { module = "com.google.firebase:firebase-storage" }
 google-services = { module = "com.google.gms:google-services", version.ref = "googleServices" }
 gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
+hilt = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
 junit = { module = "junit:junit", version.ref = "junitVersion" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 play-integrity = { module = "com.google.android.play:integrity", version.ref = "playIntegrity" }
 play-services-ads = { module = "com.google.android.gms:play-services-ads", version.ref = "playServicesAds" }
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 play-services-games-v2 = { module = "com.google.android.gms:play-services-games-v2", version.ref = "playServicesGamesV2" }
+play-services-measurement-api = { group = "com.google.android.gms", name = "play-services-measurement-api", version.ref = "playServicesMeasurementApi" }
 review = { module = "com.google.android.play:review", version.ref = "review" }
 review-ktx = { module = "com.google.android.play:review-ktx", version.ref = "reviewKtx" }
-androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
-play-services-measurement-api = { group = "com.google.android.gms", name = "play-services-measurement-api", version.ref = "playServicesMeasurementApi" }
 
 [plugins]
-android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
+android-application = { id = "com.android.application", version.ref = "gradle" }
+android-library = { id = "com.android.library", version.ref = "gradle" }
 compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlyticsPlugin" }
+# Used in app/build.gradle.kts
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlytics" }
 firebase-perf = { id = "com.google.firebase.firebase-perf", version.ref = "firebasePerfPlugin" }
-gms = { id = "com.google.gms.google-services", version.ref = "gmsPlugin" }
+gms = { id = "com.google.gms.google-services", version.ref = "googleServices" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
