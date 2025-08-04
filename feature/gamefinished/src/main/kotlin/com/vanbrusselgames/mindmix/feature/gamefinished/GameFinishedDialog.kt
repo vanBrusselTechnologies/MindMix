@@ -13,6 +13,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -29,8 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.vanbrusselgames.mindmix.core.advertisement.AdDoublerButton
-import com.vanbrusselgames.mindmix.core.advertisement.AdManager
+import com.vanbrusselgames.mindmix.core.ui.AdDoublerButton
 import com.vanbrusselgames.mindmix.core.common.coins
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.ui.DialogButton
@@ -50,7 +50,7 @@ fun GameFinishedDialog(content: @Composable () -> Unit) {
 }
 
 @Composable
-fun GameFinishedRewardRow(reward: Int, adManager: () -> AdManager, forceSave: () -> Unit) {
+fun GameFinishedRewardRow(reward: Int, checkAdLoaded: (adLoaded: MutableState<Boolean>) -> Unit, showAd: (adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit) -> Unit, forceSave: () -> Unit) {
     Row(
         Modifier.heightIn(max = 48.dp),
         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -63,7 +63,7 @@ fun GameFinishedRewardRow(reward: Int, adManager: () -> AdManager, forceSave: ()
         Text(text = (reward * (1 + bonus)).toString(), fontSize = 28.sp)
         if (!adShown) {
             Spacer(Modifier.width(16.dp))
-            AdDoublerButton(adManager = adManager()) { adReward ->
+            AdDoublerButton(Modifier, checkAdLoaded, showAd) { adReward ->
                 adShown = true
                 bonus = adReward
                 coins += reward * bonus

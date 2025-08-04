@@ -12,7 +12,7 @@ import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,10 +26,7 @@ import com.vanbrusselgames.mindmix.core.utils.constants.StringEnum
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <T : StringEnum> EnumDropdown(
-    modifier: Modifier = Modifier,
-    state: MutableState<T>,
-    setStateCallback: (T) -> Unit,
-    options: List<T>
+    modifier: Modifier = Modifier, state: State<T>, setStateCallback: (T) -> Unit, options: List<T>
 ) {
     var dropdownExpanded by remember { mutableStateOf(false) }
     ExposedDropdownMenuBox(
@@ -38,7 +35,8 @@ fun <T : StringEnum> EnumDropdown(
         Modifier.padding(4.dp)
     ) {
         state.value.getStringResource()
-        TextField(stringResource(state.value.getStringResource()),
+        TextField(
+            stringResource(state.value.getStringResource()),
             {},
             Modifier
                 .menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
@@ -52,7 +50,8 @@ fun <T : StringEnum> EnumDropdown(
             modifier.height(IntrinsicSize.Min)
         ) {
             for (option in options) {
-                DropdownMenuItem(text = { Text(stringResource(option.getStringResource())) },
+                DropdownMenuItem(
+                    text = { Text(stringResource(option.getStringResource())) },
                     onClick = {
                         setStateCallback(option)
                         dropdownExpanded = false

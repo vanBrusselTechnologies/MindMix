@@ -2,21 +2,13 @@ package com.vanbrusselgames.mindmix.core.navigation
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.navigation.NavController
+import com.vanbrusselgames.mindmix.core.logging.Logger
+import com.vanbrusselgames.mindmix.core.model.Scene
+import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 
 class SceneManager {
-    enum class Scene {
-        GAME2048, MENU, MINESWEEPER, SOLITAIRE, SUDOKU
-    }
-
     companion object {
-        val scenes = mapOf(
-            0 to Scene.SUDOKU,
-            1 to Scene.SOLITAIRE,
-            2 to Scene.MINESWEEPER,
-            3 to Scene.MENU,
-            4 to Scene.GAME2048
-        )
-        var currentScene = Scene.MENU
+        var currentScene: Scene = SceneRegistry.Menu
         val dialogActiveState = mutableStateOf(false)
     }
 
@@ -24,4 +16,12 @@ class SceneManager {
         NavController.OnDestinationChangedListener { navController, destination, bundle ->
             dialogActiveState.value = destination.navigatorName === "dialog"
         }
+}
+
+fun NavController.navigateToMenu() {
+    Logger.d("Navigate to: Menu")
+    SceneManager.currentScene = SceneRegistry.Menu
+    navigate(AppRoutes.Menu) {
+        popUpTo(AppRoutes.Menu) { inclusive = true }
+    }
 }

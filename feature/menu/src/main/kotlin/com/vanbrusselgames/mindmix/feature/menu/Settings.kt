@@ -43,7 +43,7 @@ private const val DATA_DELETION_URL =
     "https://docs.google.com/forms/d/e/1FAIpQLSf-_Yo6db7aYUt3qcEBq-rxCgjVCN1uVcWeeZ_oXQyZH8DIyQ/viewform?usp=pp_url&entry.2052602114="
 
 @Composable
-fun MenuSettings(ctx: Context, viewModel: MenuScreenViewModel, authManager: AuthManager?) {
+fun MenuSettings(ctx: Context, viewModel: MenuScreenViewModel, authManager: AuthManager?, onClickSignIn: () -> Unit) {
     Column(
         Modifier
             .padding(24.dp)
@@ -61,8 +61,8 @@ fun MenuSettings(ctx: Context, viewModel: MenuScreenViewModel, authManager: Auth
         ThemeDropdownRow(ctx, viewModel)
         Spacer(Modifier.height(4.dp))
         if (authManager != null) {
-            SignInButton(authManager)
-            DeleteDataButton(authManager)
+            SignInButton(authManager, onClickSignIn)
+            DeleteDataButton { authManager.userId.value }
             Spacer(Modifier.height(8.dp))
             Text(
                 "User ID: ${authManager.userId.value}",
@@ -102,10 +102,10 @@ fun ThemeDropdownRow(ctx: Context, viewModel: MenuScreenViewModel) {
 }
 
 @Composable
-fun SignInButton(authManager: AuthManager) {
+fun SignInButton(authManager: AuthManager, onClickSignIn: () -> Unit) {
     val signedIn by authManager.signedIn
     Button(
-        { authManager.signIn() },
+        onClickSignIn,
         Modifier.fillMaxWidth(),
         enabled = !signedIn,
         RoundedCornerShape(6.dp)
@@ -119,10 +119,10 @@ fun SignInButton(authManager: AuthManager) {
 }
 
 @Composable
-fun DeleteDataButton(authManager: AuthManager) {
+fun DeleteDataButton(getUserId: () -> String) {
     val uriHandler = LocalUriHandler.current
     Button(
-        { uriHandler.openUri("$DATA_DELETION_URL${authManager.userId.value}") },
+        { uriHandler.openUri("$DATA_DELETION_URL${getUserId()}") },
         Modifier.fillMaxWidth(),
         colors = ButtonDefaults.buttonColors(colorScheme.error, colorScheme.onError),
         shape = RoundedCornerShape(6.dp)
@@ -132,5 +132,5 @@ fun DeleteDataButton(authManager: AuthManager) {
 @PreviewLightDark
 @Composable
 private fun PrevSettings() {
-    MindMixTheme { Surface { MenuSettings(LocalContext.current, MenuScreenViewModel(), null) } }
+    MindMixTheme { Surface { MenuSettings(LocalContext.current, MenuScreenViewModel(), null, {}) } }
 }

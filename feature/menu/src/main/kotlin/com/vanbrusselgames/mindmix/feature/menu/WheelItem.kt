@@ -55,21 +55,23 @@ import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.vanbrusselgames.mindmix.core.designsystem.theme.Typography
-import com.vanbrusselgames.mindmix.core.navigation.SceneManager
-import com.vanbrusselgames.mindmix.core.navigation.SceneManager.Scene
+import com.vanbrusselgames.mindmix.core.model.GameScene
+import com.vanbrusselgames.mindmix.core.model.Scene
+import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.core.ui.measureTextWidth
 import com.vanbrusselgames.mindmix.feature.settings.navigation.navigateToSettings
 import com.vanbrusselgames.mindmix.games.game2048.Game2048
 import com.vanbrusselgames.mindmix.games.minesweeper.Minesweeper
 import com.vanbrusselgames.mindmix.games.solitaire.Solitaire
-import com.vanbrusselgames.mindmix.games.sudoku.Sudoku
+import com.vanbrusselgames.mindmix.games.sudoku.model.Sudoku
+import com.vanbrusselgames.mindmix.games.sudoku.navigation.navigateToSudokuSettings
 import kotlin.math.cos
 import kotlin.math.sin
 
 const val animDuration = 150
 val easing = LinearEasing
 
-data class WheelItem(val game: Scene) {
+data class WheelItem(val game: GameScene) {
     var isSelected = mutableStateOf(false)
     var growthFactor = 0f
     var offsetY = 0f
@@ -77,19 +79,19 @@ data class WheelItem(val game: Scene) {
     var radius = 0f
 
     val title = when (game) {
-        Scene.MENU -> Menu.NAME_RES_ID
-        Scene.MINESWEEPER -> Minesweeper.NAME_RES_ID
-        Scene.SOLITAIRE -> Solitaire.NAME_RES_ID
-        Scene.SUDOKU -> Sudoku.NAME_RES_ID
-        Scene.GAME2048 -> Game2048.NAME_RES_ID
+        SceneRegistry.Minesweeper -> Minesweeper.NAME_RES_ID
+        SceneRegistry.Solitaire -> Solitaire.NAME_RES_ID
+        SceneRegistry.Sudoku -> Sudoku.NAME_RES_ID
+        SceneRegistry.Game2048 -> Game2048.NAME_RES_ID
+        else -> -1
     }
 
     val image = when (game) {
-        Scene.MENU -> Menu.IMAGE_RES_ID
-        Scene.MINESWEEPER -> Minesweeper.IMAGE_RES_ID
-        Scene.SOLITAIRE -> Solitaire.IMAGE_RES_ID
-        Scene.SUDOKU -> Sudoku.IMAGE_RES_ID
-        Scene.GAME2048 -> Game2048.IMAGE_RES_ID
+        SceneRegistry.Minesweeper -> Minesweeper.IMAGE_RES_ID
+        SceneRegistry.Solitaire -> Solitaire.IMAGE_RES_ID
+        SceneRegistry.Sudoku -> Sudoku.IMAGE_RES_ID
+        SceneRegistry.Game2048 -> Game2048.IMAGE_RES_ID
+        else -> -1
     }
 }
 
@@ -112,19 +114,18 @@ fun WheelItem(
     val offsetX = remember { sin(angle * Math.PI / 180f) * model.radius }
     val offsetY = remember { cos(angle * Math.PI / 180f) * model.radius }
     val interactionSource = remember { MutableInteractionSource() }
-    Card(modifier
-        .zIndex(if (model.isSelected.value) 1f else 0f)
-        .offset(-offsetX.dp, -offsetY.dp)
-        .rotate(-angle)
-        .offset { IntOffset(0.dp.roundToPx(), (model.offsetY.dp * selectedFactor).roundToPx()) }
-        .clickable(
-            interactionSource, null, true, "Play game: ${game.name.lowercase()}"
-        ) {
-            if (!SceneManager.dialogActiveState.value) {
+    Card(
+        modifier
+            .zIndex(if (model.isSelected.value) 1f else 0f)
+            .offset(-offsetX.dp, -offsetY.dp)
+            .rotate(-angle)
+            .offset { IntOffset(0.dp.roundToPx(), (model.offsetY.dp * selectedFactor).roundToPx()) }
+            .clickable(
+                interactionSource, null, true, "Play game: ${game.name.lowercase()}"
+            ) {
                 viewModel.selectedGame = game
                 viewModel.navigateToSelectedGame(navController)
-            }
-        }) {
+            }) {
         Column(
             Modifier
                 .padding(10.dp)
@@ -167,7 +168,7 @@ fun WheelItemIconButton(
     ) {
         IconButton({
             viewModel.settingsGame = game
-            navController.navigateToSettings()
+            if (game == SceneRegistry.Sudoku) navController.navigateToSudokuSettings() else navController.navigateToSettings()
         }) {
             Icon(Icons.Filled.Settings, "$name settings")
         }
@@ -228,7 +229,7 @@ private fun WheelItemImage(
 @Composable
 private fun Prev_WheelItem() {
     Column {
-        val item = WheelItem(Scene.SUDOKU)
+        val item = WheelItem(SceneRegistry.Sudoku)
         item.isSelected.value = true
         WheelItem(MenuScreenViewModel(), rememberNavController(), item)
     }

@@ -14,23 +14,29 @@ import com.google.android.play.core.install.InstallStateUpdatedListener
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class UpdateManager(
-    val ctx: Context, val snackbarHostState: SnackbarHostState, val saveData: () -> Unit
-) {
+@Singleton
+class UpdateManager @Inject constructor(@ApplicationContext private val ctx: Context) {
     //private const val DAYS_FOR_FLEXIBLE_UPDATE = 3
     private val appUpdateManager: AppUpdateManager = AppUpdateManagerFactory.create(ctx)
 
-    fun checkForUpdates(activityResultLauncher: ActivityResultLauncher<IntentSenderRequest>) {
+    fun checkForUpdates(
+        activityResultLauncher: ActivityResultLauncher<IntentSenderRequest>,
+        snackbarHostState: SnackbarHostState,
+        saveData: () -> Unit
+    ) {
         val appUpdateInfoTask = appUpdateManager.appUpdateInfo
         appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
             if (appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED) {
                 // If the update is downloaded but not installed,
                 // notify the user to complete the update.
-                popupSnackbarForCompleteUpdate(ctx)
+                popupSnackbarForCompleteUpdate(snackbarHostState, saveData)
                 return@addOnSuccessListener
             }
             when (appUpdateInfo.updateAvailability()) {
@@ -39,7 +45,11 @@ class UpdateManager(
                 UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS -> {
                     // If an in-app update is already running, resume the update.
                     requestUpdate(
-                        ctx, appUpdateInfo, activityResultLauncher, AppUpdateType.IMMEDIATE
+                        appUpdateInfo,
+                        activityResultLauncher,
+                        AppUpdateType.IMMEDIATE,
+                        snackbarHostState,
+                        saveData
                     )
                 }
 
@@ -49,17 +59,24 @@ class UpdateManager(
                                 AppUpdateType.IMMEDIATE
                             )
                         ) AppUpdateType.IMMEDIATE else AppUpdateType.FLEXIBLE
-                    requestUpdate(ctx, appUpdateInfo, activityResultLauncher, appUpdateType)
+                    requestUpdate(
+                        appUpdateInfo,
+                        activityResultLauncher,
+                        appUpdateType,
+                        snackbarHostState,
+                        saveData
+                    )
                 }
             }
         }
     }
 
     private fun requestUpdate(
-        ctx: Context,
         appUpdateInfo: AppUpdateInfo,
         activityResultLauncher: ActivityResultLauncher<IntentSenderRequest>,
-        appUpdateType: Int
+        appUpdateType: Int,
+        snackbarHostState: SnackbarHostState,
+        saveData: () -> Unit
     ) {
         if (appUpdateType == AppUpdateType.FLEXIBLE) {
             // Create a listener to track request state updates.
@@ -73,7 +90,7 @@ class UpdateManager(
                 if (state.installStatus() == InstallStatus.DOWNLOADED) {
                     // If the update is downloaded but not installed,
                     // notify the user to complete the update.
-                    popupSnackbarForCompleteUpdate(ctx)
+                    popupSnackbarForCompleteUpdate(snackbarHostState, saveData)
                 }
                 //else if (state.installStatus() == InstallStatus.INSTALLED) {
                 //    appUpdateManager.unregisterListener(listener)
@@ -89,7 +106,9 @@ class UpdateManager(
         )
     }
 
-    private fun popupSnackbarForCompleteUpdate(ctx: Context) {
+    private fun popupSnackbarForCompleteUpdate(
+        snackbarHostState: SnackbarHostState, saveData: () -> Unit
+    ) {
         CoroutineScope(Dispatchers.Main).launch {
             val result = snackbarHostState.showSnackbar(
                 message = ctx.resources.getString(R.string.flexible_update_downloaded),

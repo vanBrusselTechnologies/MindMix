@@ -3,32 +3,30 @@ package com.vanbrusselgames.mindmix.core.utils.encode
 import java.math.BigInteger
 
 object Encode {
-    fun <T> base94Collection(input: Collection<T>): String {
-        var bigint = BigInteger.ZERO
-        if (input.isEmpty()) return base94(bigint)
-        val first = input.first()
-        if (first is Int) {
-            bigint = BigInteger(input.ifEmpty { listOf(0) }.joinToString(""))
-        } else if (first is Boolean) {
-            for ((index, value) in input.withIndex()) {
-                value as Boolean
-                if (value) {
-                    bigint = bigint.setBit(index)
-                }
-            }
+    fun base94(input: BigInteger): String {
+        if (input == BigInteger.ZERO) return "!"
+        val encoding = BigInteger.valueOf(94)
+        var num = input
+        val sb = StringBuilder()
+        while (num != BigInteger.ZERO) {
+            val remainder = num.mod(encoding)
+            sb.append((remainder.toInt() + 33).toChar())
+            num = num.divide(encoding)
         }
-        return base94(bigint)
+        return sb.reverse().toString()
     }
 
-    fun base94(input: BigInteger): String {
-        val encoding = BigInteger("94")
-        var workingInput = input
-        val output = StringBuilder()
-        while (workingInput !== BigInteger.ZERO) {
-            val rest = workingInput % encoding
-            output.append((rest.toInt() + 33).toChar())
-            workingInput = (workingInput - rest) / encoding
-        }
-        return output.toString().reversed().trim()
+    /** Collection should only contain values inside range 0-9 */
+    fun base94IntCollection(input: Collection<Int>): String {
+        if (input.isEmpty()) return base94(BigInteger.ZERO)
+        return base94(BigInteger(input.ifEmpty { listOf(0) }.joinToString("")))
+    }
+
+    fun base94BooleanCollection(input: Collection<Boolean>): String {
+        if (input.isEmpty()) return base94(BigInteger.ZERO)
+        val bigint =
+            BigInteger.valueOf(input.fold(0) { acc, bit -> (acc shl 1) or if (bit) 1 else 0 }
+                .toLong())
+        return base94(bigint)
     }
 }

@@ -15,8 +15,6 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,19 +22,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
 import com.vanbrusselgames.mindmix.feature.gamehelp.navigation.navigateToGameHelp
-import com.vanbrusselgames.mindmix.feature.gamemenu.navigation.navigateToGameMenu
-import com.vanbrusselgames.mindmix.feature.settings.navigation.navigateToSettings
 
 @Composable
 fun BaseScene(
-    viewModel: BaseScreenViewModel,
+    viewModel: IBaseScreenViewModel,
     navController: NavController,
-    snackbarHostState: SnackbarHostState,
+    openGameMenu: () -> Unit,
+    openSettings: () -> Unit,
     sceneSpecific: @Composable BoxScope.() -> Unit
 ) {
-    Scaffold(Modifier.safeDrawingPadding(), { TopBar(viewModel, navController) }, snackbarHost = {
-        SnackbarHost(hostState = snackbarHostState)
-    }) {
+    Scaffold(
+        Modifier.safeDrawingPadding(),
+        { TopBar(viewModel, navController, openGameMenu, openSettings) }) {
         Box(
             Modifier
                 .fillMaxSize()
@@ -46,7 +43,12 @@ fun BaseScene(
 }
 
 @Composable
-private fun TopBar(viewModel: BaseScreenViewModel, navController: NavController) {
+private fun TopBar(
+    viewModel: IBaseScreenViewModel,
+    navController: NavController,
+    openGameMenu: () -> Unit,
+    openSettings: () -> Unit
+) {
     Box(
         Modifier
             .height(viewModel.topRowHeight)
@@ -56,7 +58,7 @@ private fun TopBar(viewModel: BaseScreenViewModel, navController: NavController)
             if (!viewModel.isMenu) {
                 IconButton(
                     onClick = {
-                        navController.navigateToGameMenu()
+                        openGameMenu()//navController.navigateToGameMenu()
                         viewModel.onOpenDialog()
                     },
                     modifier = Modifier
@@ -97,7 +99,7 @@ private fun TopBar(viewModel: BaseScreenViewModel, navController: NavController)
                  */
                 IconButton(
                     onClick = {
-                        navController.navigateToSettings()
+                        openSettings()//navController.navigateToSettings()
                         viewModel.onOpenDialog()
                     },
                     modifier = Modifier

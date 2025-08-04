@@ -1,3 +1,3 @@
 package com.vanbrusselgames.mindmix.core.common
 
-var coins = 0;
+var coins = 0

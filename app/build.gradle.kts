@@ -84,7 +84,9 @@ dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:data"))
     implementation(project(":core:designsystem"))
+    implementation(project(":core:games"))
     implementation(project(":core:logging"))
+    implementation(project(":core:model"))
     implementation(project(":core:navigation"))
     implementation(project(":core:utils"))
     implementation(project(":feature:gamefinished"))
@@ -108,8 +110,12 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.hilt.navigation)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
+
+    implementation(libs.hilt)
+    ksp(libs.hilt.compiler)
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.appcheck.playintegrity)

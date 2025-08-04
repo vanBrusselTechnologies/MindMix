@@ -2,21 +2,17 @@ package com.vanbrusselgames.mindmix.core.common
 
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
-import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.ViewModel
 
-abstract class BaseScreenViewModel : ViewModel() {
-    abstract val isMenu: Boolean
-    abstract val nameResId: Int
+abstract class BaseScreenViewModel : ViewModel(), IBaseScreenViewModel {
+    abstract override val isMenu: Boolean
+    abstract override val nameResId: Int
 
-    val blurStrength = 10.dp
+    override val blurStrength = 10.dp
 
-    val topRowButtonSize = 48.dp
-    val padding = topRowButtonSize / 100f
-    val topRowHeight = (topRowButtonSize + 2f * padding)
+    override val topRowButtonSize = 48.dp
+    override val padding = topRowButtonSize / 100f
+    override val topRowHeight = (topRowButtonSize + 2f * padding)
 
-    open fun onOpenDialog() {}
-
-    abstract fun onLoadPreferences(preferences: Preferences)
-    //abstract fun onLoadData()
+    override fun onOpenDialog() {}
 }

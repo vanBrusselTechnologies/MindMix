@@ -27,7 +27,11 @@ fun NavGraphBuilder.gameMenuDialog(
     openSettings: () -> Unit,
     backToMenu: () -> Unit
 ) {
-    dialog<GameMenuRoute>(dialogProperties = DialogProperties(true, false, false)) {
+    dialog<GameMenuRoute>(dialogProperties = DialogProperties(
+        dismissOnBackPress = true,
+        dismissOnClickOutside = false,
+        usePlatformDefaultWidth = false
+    )) {
         if(gameNameId() == -1) {
             navController.popBackStack()
             return@dialog

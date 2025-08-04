@@ -1,9 +1,9 @@
 package com.vanbrusselgames.mindmix.core.common
 
-abstract class BaseGameViewModel : BaseScreenViewModel() {
-    abstract val descResId: Int
+abstract class BaseGameViewModel : BaseScreenViewModel(), IBaseGameViewModel {
+    abstract override val descResId: Int
 
     override val isMenu = false
 
-    abstract fun startNewGame()
+    abstract override fun startNewGame()
 }

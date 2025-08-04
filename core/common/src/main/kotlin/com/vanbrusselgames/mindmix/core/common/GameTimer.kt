@@ -6,6 +6,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
@@ -70,14 +72,14 @@ class GameTimer {
     }
 
     @Composable
-    fun Timer() {
+    fun Timer(modifier: Modifier = Modifier) {
         remember(SceneManager.dialogActiveState.value, SceneManager.currentScene) {
-            if (!SceneManager.dialogActiveState.value && SceneManager.currentScene != SceneManager.Scene.MENU) resume();0
+            if (!SceneManager.dialogActiveState.value && SceneManager.currentScene != SceneRegistry.Menu) resume();0
         }
 
         currentTime = remember { mutableLongStateOf(currentMillis + addedMillis) }
 
-        Text(formatDuration(currentTime.longValue, false))
+        Text(formatDuration(currentTime.longValue, false), modifier)
 
         LaunchedEffect(running.value) {
             while (running.value) {

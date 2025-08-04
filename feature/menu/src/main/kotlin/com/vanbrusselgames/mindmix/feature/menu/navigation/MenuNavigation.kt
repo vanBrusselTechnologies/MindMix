@@ -1,38 +1,21 @@
 package com.vanbrusselgames.mindmix.feature.menu.navigation
 
-import androidx.compose.material3.SnackbarHostState
-import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import com.vanbrusselgames.mindmix.core.logging.Logger
-import com.vanbrusselgames.mindmix.core.navigation.SceneManager
+import com.vanbrusselgames.mindmix.core.common.BaseScreenViewModel
+import com.vanbrusselgames.mindmix.core.navigation.AppRoutes
 import com.vanbrusselgames.mindmix.feature.menu.MenuScreenViewModel
 import com.vanbrusselgames.mindmix.feature.menu.SceneUI
-import kotlinx.serialization.Serializable
-
-@Serializable
-object MenuRoute {
-    const val NAV_ROUTE = "menu"
-    val NAV_ARGUMENTS = emptyList<NamedNavArgument>()
-}
-
-fun NavController.navigateToMenu(navOptions: NavOptions? = null) {
-    Logger.d("Navigate to: Menu")
-    SceneManager.currentScene = SceneManager.Scene.MENU
-    navigate(MenuRoute) {
-        navOptions
-        popUpTo(MenuRoute) { inclusive = true }
-    }
-}
 
 fun NavGraphBuilder.menu(
     navController: NavController,
     viewModel: MenuScreenViewModel,
-    snackbarHostState: SnackbarHostState
+    setCurrentViewModel: (BaseScreenViewModel?) -> Unit
 ) {
-    composable<MenuRoute> {
-        SceneUI(viewModel, navController, snackbarHostState)
+    composable<AppRoutes.Menu> {
+        val vm = viewModel
+        setCurrentViewModel(vm)
+        SceneUI(vm, navController)
     }
 }

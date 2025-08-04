@@ -4,100 +4,48 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.storage
 import com.vanbrusselgames.mindmix.core.logging.Logger
-import com.vanbrusselgames.mindmix.core.navigation.SceneManager
-import com.vanbrusselgames.mindmix.core.navigation.SceneManager.Scene
+import com.vanbrusselgames.mindmix.core.model.Scene
+import com.vanbrusselgames.mindmix.core.model.SceneRegistry
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 import java.io.File
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class DataManager(
-    ctx: Context,
-    val userId: () -> String,
-    loadDataForScene: (jsonParser: Json, Scene, String) -> Unit,
-    val saveSceneData: (dataManager: DataManager) -> Unit
-) {
-    companion object {
-        private const val FILE_NAME = "save.vbg"
-        private val fileDecoding = Charsets.UTF_8
-        private lateinit var file: File
-        private var loaded = false
-        private val storage = Firebase.storage
-        private var isAutoSaving = false
-        private val jsonParser = Json { ignoreUnknownKeys = true }
+@Singleton
+class DataManager @Inject constructor(@ApplicationContext ctx: Context) {
+    private val fileName = "save.vbg"
+    private val fileDecoding = Charsets.UTF_8
+    private val file: File = File(ctx.filesDir, fileName)
+    private var loaded = false
+    private var isAutoSaving = false
+    private var hasUpdate = false
 
-        private val dataMap = mutableMapOf(
-            Scene.SUDOKU to "",
-            Scene.SOLITAIRE to "",
-            Scene.MINESWEEPER to "",
-            Scene.MENU to "",
-            Scene.GAME2048 to ""
-        )
-    }
+    private val dataMap =
+        SceneRegistry.allScenes.map { it.sceneId }.associateWith { "" }.toMutableMap()
 
     private val storagePath: StorageReference?
-        get() = userId().let {
+        get() = Firebase.auth.currentUser?.uid.let {
             return when (it) {
+                null -> null
                 "" -> null
-                else -> storage.reference.child("Users/${it}/$FILE_NAME")
+                else -> Firebase.storage.reference.child("Users/${it}/$fileName")
             }
         }
-
-
-    private fun load(loadDataForScene: (jsonParser: Json, Scene, String) -> Unit) {
-        try {
-            //TODO: Download online file from firebase
-            val content = file.readLines(fileDecoding)
-            for (line in content) {
-                try {
-                    if (line.isEmpty()) continue
-                    val i = line.indexOf('%')
-                    if (i == -1) continue
-                    val safeCode = line.substring(0, i).toInt()
-                    val json = line.substring(i + 1)
-                    val saveScene = SceneManager.scenes[safeCode]
-                    if (saveScene == null) continue
-                    dataMap[saveScene] = json
-                    loadDataForScene(jsonParser, saveScene, json)
-                } catch (e: Exception) {
-                    Logger.e("Error reading line of save file", e)
-                }
-            }
-        } catch (e: Exception) {
-            Logger.e("Error loading save file", e)
-        }
-        loaded = true
-    }
-
-    fun saveScene(scene: Scene, data: String) {
-        dataMap[scene] = data
-    }
-
-    fun save(withPublish: Boolean = true) {
-        if (!loaded) return
-        CoroutineScope(Dispatchers.IO).launch {
-            val str: StringBuilder = StringBuilder()
-            saveSceneData(this@DataManager)
-            for (entry in SceneManager.scenes) str.append("\n${entry.key}%${dataMap[entry.value]}")
-            file.writeText(str.toString().trim(), fileDecoding)
-            if (withPublish) {
-                storagePath?.putStream(file.inputStream())
-                file.inputStream().close()
-            }
-        }
-    }
 
     init {
-        file = File(ctx.filesDir, FILE_NAME)
         file.createNewFile()
-        CoroutineScope(Dispatchers.IO).launch {
-            if (!loaded) load(loadDataForScene)
-            autoSave()
-        }
+    }
+
+    fun initialLoad() {
+        if (!loaded) load()
+        autoSave()
     }
 
     var autoSaveCount = 0
@@ -111,5 +59,55 @@ class DataManager(
                 save(autoSaveCount++ % 12 == 0)
             }
         })
+    }
+
+    private fun load() {
+        try {
+            //TODO: Download online file from firebase
+            val content = file.readLines(fileDecoding)
+            for (line in content) {
+                try {
+                    if (line.isEmpty()) continue
+                    val i = line.indexOf('%')
+                    if (i == -1) continue
+                    val safeCode = line.substring(0, i).toInt()
+                    val json = line.substring(i + 1)
+                    if (dataMap.containsKey(safeCode) && dataMap[safeCode] != "") continue
+                    dataMap[safeCode] = json
+                } catch (e: Exception) {
+                    Logger.e("Error reading line of save file", e)
+                }
+            }
+        } catch (e: Exception) {
+            Logger.e("Error loading save file", e)
+        }
+        loaded = true
+    }
+
+    fun saveScene(game: Scene, data: String) {
+        dataMap[game.sceneId] = data
+        hasUpdate = true
+    }
+
+    fun save(withPublish: Boolean = true) {
+        if (!loaded || !hasUpdate) return
+        CoroutineScope(Dispatchers.IO).launch {
+            val sb = StringBuilder()
+            dataMap.forEach {
+                if (it.value.trim().isNotEmpty()) sb.append("\n${it.key}%${it.value}")
+            }
+            if (sb.isEmpty()) return@launch
+            file.writeText(sb.toString().trim(), fileDecoding)
+            sb.clear()
+            hasUpdate = false
+            if (withPublish) {
+                storagePath?.putStream(file.inputStream())
+                file.inputStream().close()
+            }
+        }
+    }
+
+    fun getSavedDataForScene(scene: Scene): String {
+        return dataMap[scene.sceneId]!!
     }
 }

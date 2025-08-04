@@ -23,6 +23,7 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
@@ -78,7 +79,7 @@ fun GameWheel(viewModel: MenuScreenViewModel, navController: NavController, mode
             .fillMaxSize()
             .draggable(draggableState,
                 Orientation.Horizontal,
-                enabled = !SceneManager.dialogActiveState.value,
+                true,
                 interactionSource,
                 onDragStarted = { items.forEach { it.isSelected.value = false } },
                 onDragStopped = { onDragEnd() })
@@ -130,6 +131,6 @@ fun rememberWheelItems(
 @Composable
 private fun PrevWheel() {
     val viewModel = MenuScreenViewModel()
-    viewModel.selectedGame = SceneManager.Scene.SUDOKU
+    viewModel.selectedGame = SceneRegistry.Sudoku
     GameWheel(viewModel, rememberNavController(), GameWheel(viewModel, 3))
 }

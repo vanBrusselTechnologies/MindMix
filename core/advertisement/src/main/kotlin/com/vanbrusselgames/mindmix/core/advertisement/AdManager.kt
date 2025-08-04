@@ -1,6 +1,7 @@
 package com.vanbrusselgames.mindmix.core.advertisement
 
 import android.app.Activity
+import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.os.Handler
@@ -18,50 +19,54 @@ import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.UserMessagingPlatform
 import com.vanbrusselgames.mindmix.core.common.NetworkMonitor
 import com.vanbrusselgames.mindmix.core.logging.Logger
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class AdManager(private val activity: Activity, networkMonitor: NetworkMonitor) {
-    companion object {
-        private lateinit var consentInformation: ConsentInformation
-        private var loadingConsentInformation = false
+@Singleton
+class AdManager @Inject constructor(
+    @ApplicationContext private val ctx: Context,
+    private val networkMonitor: NetworkMonitor
+) {
+    private lateinit var consentInformation: ConsentInformation
+    private var loadingConsentInformation = false
 
-        // Use an atomic boolean to initialize the Google Mobile Ads SDK and load ads once.
-        private val isMobileAdsInitializeCalled = AtomicBoolean(false)
+    // Use an atomic boolean to initialize the Google Mobile Ads SDK and load ads once.
+    private val isMobileAdsInitializeCalled = AtomicBoolean(false)
 
-        private var rewardedAd: RewardedAd? = null
+    private var rewardedAd: RewardedAd? = null
 
-        private var loading = false
-        private val adLoadedStates: MutableList<MutableState<Boolean>> = mutableListOf()
+    private var loading = false
+    private val adLoadedStates: MutableList<MutableState<Boolean>> = mutableListOf()
 
-        private val mainHandler = Handler(Looper.getMainLooper())
+    private val mainHandler = Handler(Looper.getMainLooper())
 
-        private var internetConnected = true
+    private var internetConnected = true
 
-        private val networkCallback = object : ConnectivityManager.NetworkCallback() {
-            override fun onAvailable(network: Network) {
-                internetConnected = true
-            }
-
-            override fun onLost(network: Network) {
-                internetConnected = false
-            }
+    private val networkCallback = object : ConnectivityManager.NetworkCallback() {
+        override fun onAvailable(network: Network) {
+            internetConnected = true
         }
 
-        private var initialized = false
-
-        private var sdkInitialized = false
+        override fun onLost(network: Network) {
+            internetConnected = false
+        }
     }
 
+    private var initialized = false
 
-    init {
+    private var sdkInitialized = false
+
+    fun initialize(activity: Activity) {
         if (!initialized) {
             CoroutineScope(Dispatchers.Main).launch {
                 initialized = true
                 networkMonitor.registerNetworkCallback(networkCallback)
-                requestConsent()
+                requestConsent(activity)
                 // Check if you can initialize the Google Mobile Ads SDK in parallel
                 // while checking for new consent information. Consent obtained in
                 // the previous session can be used to request ads.
@@ -71,11 +76,11 @@ class AdManager(private val activity: Activity, networkMonitor: NetworkMonitor) 
         }
     }
 
-    private fun requestConsent() {
+    private fun requestConsent(activity: Activity) {
         if (loadingConsentInformation) return
         loadingConsentInformation = true
         val params: ConsentRequestParameters = ConsentRequestParameters.Builder().build()
-        consentInformation = UserMessagingPlatform.getConsentInformation(activity)
+        consentInformation = UserMessagingPlatform.getConsentInformation(ctx)
         consentInformation.requestConsentInfoUpdate(activity, params, {
             UserMessagingPlatform.loadAndShowConsentFormIfRequired(activity) { loadAndShowError ->
                 if (loadAndShowError != null) {
@@ -105,7 +110,7 @@ class AdManager(private val activity: Activity, networkMonitor: NetworkMonitor) 
 
     private fun initializeMobileAdsSdk() {
         if (isMobileAdsInitializeCalled.getAndSet(true)) return
-        MobileAds.initialize(activity) { initializationStatus ->
+        MobileAds.initialize(ctx) { initializationStatus ->
             sdkInitialized = true
             val statusMap = initializationStatus.adapterStatusMap
             for (adapterClass in statusMap.keys) {
@@ -121,7 +126,8 @@ class AdManager(private val activity: Activity, networkMonitor: NetworkMonitor) 
         if (loading) return
         val adRequest = AdRequest.Builder().build()
         loading = true
-        RewardedAd.load(activity,
+        RewardedAd.load(
+            ctx,
             "ca-app-pub-7048585956228368/6355537748",
             adRequest,
             object : RewardedAdLoadCallback() {
@@ -145,7 +151,7 @@ class AdManager(private val activity: Activity, networkMonitor: NetworkMonitor) 
         adLoadedStates.clear()
     }
 
-    fun checkAdLoaded(adLoadedState: MutableState<Boolean>? = null) {
+    fun checkAdLoaded(activity: Activity, adLoadedState: MutableState<Boolean>? = null) {
         if (adLoadedState != null) {
             if (rewardedAd != null) {
                 adLoadedState.value = true
@@ -156,7 +162,7 @@ class AdManager(private val activity: Activity, networkMonitor: NetworkMonitor) 
         if (consentInformation.canRequestAds()) {
             if (!sdkInitialized) initializeMobileAdsSdk()
             if (rewardedAd == null) loadAds()
-        } else requestConsent()
+        } else requestConsent(activity)
 
         if (adLoadedStates.isEmpty()) return
 
@@ -164,13 +170,13 @@ class AdManager(private val activity: Activity, networkMonitor: NetworkMonitor) 
             override fun run() {
                 if (rewardedAd != null) return
                 if (!internetConnected) return
-                checkAdLoaded()
+                checkAdLoaded(activity)
             }
         }, 5000)
     }
 
     fun showAd(
-        adLoadedState: MutableState<Boolean>? = null, onReward: (Int) -> Unit
+        activity: Activity, adLoadedState: MutableState<Boolean>? = null, onReward: (Int) -> Unit
     ) {
         addAdCallbacks()
 
@@ -186,7 +192,7 @@ class AdManager(private val activity: Activity, networkMonitor: NetworkMonitor) 
         } ?: run {
             if (adLoadedState != null) adLoadedState.value = false
             Logger.w("The rewarded ad is not ready yet.")
-            checkAdLoaded(adLoadedState)
+            checkAdLoaded(activity, adLoadedState)
         }
     }
 

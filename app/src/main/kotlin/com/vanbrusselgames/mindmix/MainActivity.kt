@@ -5,16 +5,25 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
@@ -26,62 +35,82 @@ import com.vanbrusselgames.mindmix.core.advertisement.AdManager
 import com.vanbrusselgames.mindmix.core.authentication.AuthManager
 import com.vanbrusselgames.mindmix.core.common.BaseGameViewModel
 import com.vanbrusselgames.mindmix.core.common.BaseScreenViewModel
-import com.vanbrusselgames.mindmix.core.common.GameLoader
-import com.vanbrusselgames.mindmix.core.common.NetworkMonitor
 import com.vanbrusselgames.mindmix.core.data.DataManager
-import com.vanbrusselgames.mindmix.core.data.dataStore
-import com.vanbrusselgames.mindmix.core.data.loadPreferences
 import com.vanbrusselgames.mindmix.core.designsystem.theme.MindMixTheme
 import com.vanbrusselgames.mindmix.core.designsystem.theme.SelectedTheme
+import com.vanbrusselgames.mindmix.core.games.GameLoader
 import com.vanbrusselgames.mindmix.core.logging.Logger
+import com.vanbrusselgames.mindmix.core.model.GameScene
+import com.vanbrusselgames.mindmix.core.model.SceneRegistry
+import com.vanbrusselgames.mindmix.core.model.StaticScene
+import com.vanbrusselgames.mindmix.core.navigation.AppRoutes
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
-import com.vanbrusselgames.mindmix.core.navigation.SceneManager.Scene
+import com.vanbrusselgames.mindmix.core.navigation.navigateToMenu
 import com.vanbrusselgames.mindmix.feature.gamefinished.navigation.gameFinishedDialog
 import com.vanbrusselgames.mindmix.feature.gamehelp.navigation.gameHelpDialog
 import com.vanbrusselgames.mindmix.feature.gamemenu.navigation.gameMenuDialog
 import com.vanbrusselgames.mindmix.feature.gamemenu.navigation.navigateToGameMenu
+import com.vanbrusselgames.mindmix.feature.menu.MenuScreenViewModel
 import com.vanbrusselgames.mindmix.feature.menu.MenuSettings
-import com.vanbrusselgames.mindmix.feature.menu.navigation.MenuRoute
 import com.vanbrusselgames.mindmix.feature.menu.navigation.menu
-import com.vanbrusselgames.mindmix.feature.menu.navigation.navigateToMenu
 import com.vanbrusselgames.mindmix.feature.settings.navigation.navigateToSettings
 import com.vanbrusselgames.mindmix.feature.settings.navigation.settingsDialog
 import com.vanbrusselgames.mindmix.games.game2048.Game2048GameFinishedDialog
 import com.vanbrusselgames.mindmix.games.game2048.Game2048Settings
+import com.vanbrusselgames.mindmix.games.game2048.Game2048ViewModel
 import com.vanbrusselgames.mindmix.games.game2048.navigation.game2048
 import com.vanbrusselgames.mindmix.games.minesweeper.MinesweeperGameFinishedDialog
 import com.vanbrusselgames.mindmix.games.minesweeper.MinesweeperSettings
+import com.vanbrusselgames.mindmix.games.minesweeper.MinesweeperViewModel
 import com.vanbrusselgames.mindmix.games.minesweeper.navigation.minesweeper
 import com.vanbrusselgames.mindmix.games.solitaire.SolitaireGameFinishedDialog
-import com.vanbrusselgames.mindmix.games.solitaire.SolitaireSettings
-import com.vanbrusselgames.mindmix.games.solitaire.navigation.solitaire
-import com.vanbrusselgames.mindmix.games.sudoku.SudokuGameFinishedDialog
-import com.vanbrusselgames.mindmix.games.sudoku.SudokuSettings
+import com.vanbrusselgames.mindmix.games.solitaire.SolitaireViewModel
+import com.vanbrusselgames.mindmix.games.sudoku.navigation.navigateToSudokuGameMenu
+import com.vanbrusselgames.mindmix.games.sudoku.navigation.navigateToSudokuSettings
 import com.vanbrusselgames.mindmix.games.sudoku.navigation.sudoku
-import kotlinx.coroutines.CoroutineScope
+import com.vanbrusselgames.mindmix.games.sudoku.ui.dialogs.SudokuGameFinishedDialog
+import com.vanbrusselgames.mindmix.games.sudoku.viewmodel.SudokuViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @Inject
+    lateinit var adManager: AdManager
+
+    @Inject
+    lateinit var authManager: AuthManager
+
+    @Inject
     lateinit var dataManager: DataManager
 
-    fun getViewModelByScene(scene: Scene): BaseScreenViewModel {
-        return when (scene) {
-            Scene.SUDOKU -> sudoku.viewModel
-            Scene.GAME2048 -> game2048.viewModel
-            Scene.MENU -> menu.viewModel
-            Scene.MINESWEEPER -> minesweeper.viewModel
-            Scene.SOLITAIRE -> solitaire.viewModel
-        }
+    @Inject
+    lateinit var gameLoader: GameLoader
+
+    @Inject
+    lateinit var reviewManager: ReviewManager
+
+    @Inject
+    lateinit var updateManager: UpdateManager
+
+    val game2048ViewModel by viewModels<Game2048ViewModel>()
+    val menuScreenViewModel by viewModels<MenuScreenViewModel>()
+    val minesweeperViewModel by viewModels<MinesweeperViewModel>()
+    //val solitaireViewModel by viewModels<SolitaireViewModel>()
+
+    private val _currentViewModel = mutableStateOf<BaseScreenViewModel?>(null)
+    val currentViewModel: State<BaseScreenViewModel?> = _currentViewModel
+
+    fun setCurrentViewModel(viewModel: BaseScreenViewModel?) {
+        _currentViewModel.value = viewModel
     }
 
     val snackbarHostState = SnackbarHostState()
 
     lateinit var navController: NavHostController
-
-    fun currentViewModel(): BaseScreenViewModel {
-        return getViewModelByScene(SceneManager.currentScene)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashscreen = installSplashScreen()
@@ -91,33 +120,26 @@ class MainActivity : ComponentActivity() {
         Firebase.initialize(this)
         Firebase.appCheck.installAppCheckProviderFactory(PlayIntegrityAppCheckProviderFactory.getInstance())
 
-        val networkMonitor = NetworkMonitor(this)
-        val authManager = AuthManager(this)
-        val adManager = AdManager(this, networkMonitor)
+        authManager.initialAuthCheck(this)
+        adManager.initialize(this)
 
-        val updateManager =
-            UpdateManager(this@MainActivity, snackbarHostState) { dataManager.save(false) }
         updateManager.checkForUpdates(registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result: ActivityResult ->
-            if (result.resultCode != RESULT_OK) {
-                Logger.w("Update flow failed! Result code: " + result.resultCode)
-            }
-        })
+            if (result.resultCode != RESULT_OK) Logger.w("Update flow failed! Result code: " + result.resultCode)
+        }, snackbarHostState) { dataManager.save(false) }
 
-        CoroutineScope(Dispatchers.IO).launch {
-            dataManager = DataManager(
-                this@MainActivity, { authManager.userId.value }, loadDataForScene, saveSceneData
-            )
-            loadPreferences(applicationContext.dataStore, onLoadPreferences)
-            launch {
-                GameLoader.init(this@MainActivity, networkMonitor, gameLoad)
+        lifecycleScope.launch(Dispatchers.IO) {
+            dataManager.initialLoad()
+
+            withContext(Dispatchers.Main) {
+                Logger.d("Finished initial load!")
+                keepSplashScreen = false
             }
-            ReviewManager.start(this@MainActivity)
-            keepSplashScreen = false
         }
         splashscreen.setKeepOnScreenCondition { keepSplashScreen }
         setContentView(ComposeView(this).apply {
             setContent {
-                val darkTheme = when (menu.viewModel.theme.value) {
+                Logger.d("setContent")
+                val darkTheme = when (menuScreenViewModel.theme.value) {
                     SelectedTheme.System -> isSystemInDarkTheme()
                     SelectedTheme.Dark -> true
                     SelectedTheme.Light -> false
@@ -131,65 +153,130 @@ class MainActivity : ComponentActivity() {
                         color = MaterialTheme.colorScheme.background,
                         contentColor = MaterialTheme.colorScheme.onBackground
                     ) {
-                        NavHost(navController,
-                            startDestination = MenuRoute,
-                            Modifier.fillMaxSize(),
-                            enterTransition = { fadeIn() },
-                            exitTransition = { fadeOut() }) {
-                            menu(navController, menu.viewModel, snackbarHostState)
-                            solitaire(navController, solitaire.viewModel, snackbarHostState)
-                            sudoku(navController, sudoku.viewModel, snackbarHostState)
-                            minesweeper(navController, minesweeper.viewModel, snackbarHostState)
-                            game2048(navController, game2048.viewModel, snackbarHostState)
-                            gameMenuDialog(navController,
-                                { currentViewModel().nameResId },
-                                { (currentViewModel() as BaseGameViewModel).startNewGame() },
-                                { navController.navigateToSettings() }) { navController.navigateToMenu() }
-                            gameHelpDialog(navController,
-                                { currentViewModel().nameResId }) { (currentViewModel() as BaseGameViewModel).descResId }
-                            gameFinishedDialog {
-                                when (SceneManager.currentScene) {
-                                    Scene.GAME2048 -> Game2048GameFinishedDialog(navController,
-                                        game2048.viewModel,
-                                        { adManager },
-                                        { navController.navigateToMenu() }) { dataManager.save() }
+                        Scaffold(Modifier.safeDrawingPadding(), snackbarHost = {
+                            SnackbarHost(hostState = snackbarHostState)
+                        }) {
+                            NavHost(
+                                navController,
+                                startDestination = AppRoutes.Menu,
+                                Modifier
+                                    .fillMaxSize()
+                                    .padding(it),
+                                enterTransition = { fadeIn() },
+                                exitTransition = { fadeOut() }) {
 
-                                    Scene.MINESWEEPER -> MinesweeperGameFinishedDialog(navController,
-                                        minesweeper.viewModel,
-                                        { adManager },
-                                        { navController.navigateToMenu() }) { dataManager.save() }
+                                menu(navController, menuScreenViewModel, ::setCurrentViewModel)
+                                //solitaire(navController, solitaireViewModel, ::setCurrentViewModel)
+                                sudoku(navController, ::setCurrentViewModel)
+                                minesweeper(
+                                    navController, minesweeperViewModel, ::setCurrentViewModel
+                                )
+                                game2048(navController, game2048ViewModel, ::setCurrentViewModel)
+                                gameMenuDialog(
+                                    navController,
+                                    { currentViewModel.value!!.nameResId },
+                                    { (currentViewModel.value as BaseGameViewModel).startNewGame() },
+                                    { if (SceneManager.currentScene == SceneRegistry.Sudoku) navController.navigateToSudokuSettings() else navController.navigateToSettings() }) { navController.navigateToMenu() }
+                                gameHelpDialog(
+                                    navController,
+                                    { currentViewModel.value!!.nameResId }) { (currentViewModel.value as BaseGameViewModel).descResId }
+                                gameFinishedDialog {
+                                    when (SceneManager.currentScene) {
+                                        SceneRegistry.Game2048 -> Game2048GameFinishedDialog(
+                                            navController,
+                                            currentViewModel.value as Game2048ViewModel,
+                                            { adLoaded: MutableState<Boolean> ->
+                                                adManager.checkAdLoaded(
+                                                    this@MainActivity, adLoaded
+                                                )
+                                            },
+                                            { adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit ->
+                                                adManager.showAd(
+                                                    this@MainActivity, adLoaded, onAdWatched
+                                                )
+                                            },
+                                            { navController.navigateToMenu() }) {
+                                            dataManager.save(true)
+                                        }
 
-                                    Scene.SOLITAIRE -> SolitaireGameFinishedDialog(navController,
-                                        solitaire.viewModel,
-                                        { adManager },
-                                        { navController.navigateToMenu() }) { dataManager.save() }
+                                        SceneRegistry.Minesweeper -> MinesweeperGameFinishedDialog(
+                                            navController,
+                                            currentViewModel.value as MinesweeperViewModel,
+                                            { adLoaded: MutableState<Boolean> ->
+                                                adManager.checkAdLoaded(
+                                                    this@MainActivity, adLoaded
+                                                )
+                                            },
+                                            { adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit ->
+                                                adManager.showAd(
+                                                    this@MainActivity, adLoaded, onAdWatched
+                                                )
+                                            },
+                                            { navController.navigateToMenu() }) {
+                                            dataManager.save(true)
+                                        }
 
-                                    Scene.SUDOKU -> SudokuGameFinishedDialog(navController,
-                                        sudoku.viewModel,
-                                        { adManager },
-                                        { navController.navigateToMenu() }) { dataManager.save() }
+                                        SceneRegistry.Solitaire -> SolitaireGameFinishedDialog(
+                                            navController,
+                                            currentViewModel.value as SolitaireViewModel,
+                                            { adLoaded: MutableState<Boolean> ->
+                                                adManager.checkAdLoaded(
+                                                    this@MainActivity, adLoaded
+                                                )
+                                            },
+                                            { adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit ->
+                                                adManager.showAd(
+                                                    this@MainActivity, adLoaded, onAdWatched
+                                                )
+                                            },
+                                            { navController.navigateToMenu() }) {
+                                            dataManager.save(true)
+                                        }
 
-                                    Scene.MENU -> {}
+                                        SceneRegistry.Sudoku -> SudokuGameFinishedDialog(
+                                            navController,
+                                            currentViewModel.value as SudokuViewModel,
+                                            { adLoaded: MutableState<Boolean> ->
+                                                adManager.checkAdLoaded(
+                                                    this@MainActivity, adLoaded
+                                                )
+                                            },
+                                            { adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit ->
+                                                adManager.showAd(
+                                                    this@MainActivity, adLoaded, onAdWatched
+                                                )
+                                            },
+                                            { navController.navigateToMenu() }) {
+                                            dataManager.save(true)
+                                        }
+
+                                        SceneRegistry.Menu -> {}
+                                        is GameScene -> {}
+                                        is StaticScene -> {}
+                                    }
                                 }
-                            }
-                            settingsDialog(navController) {
-                                val settingsScene =
-                                    if (SceneManager.currentScene == Scene.MENU) menu.viewModel.settingsGame else SceneManager.currentScene
-                                menu.viewModel.settingsGame = Scene.MENU
-                                when (settingsScene) {
-                                    Scene.GAME2048 -> Game2048Settings(game2048.viewModel)
+                                settingsDialog(navController) {
+                                    val settingsScene =
+                                        if (SceneManager.currentScene == SceneRegistry.Menu) menuScreenViewModel.settingsGame else SceneManager.currentScene
+                                    menuScreenViewModel.settingsGame = SceneRegistry.Menu
+                                    when (settingsScene) {
+                                        SceneRegistry.Game2048 -> Game2048Settings(game2048ViewModel)
 
-                                    Scene.MENU -> MenuSettings(context, menu.viewModel, authManager)
+                                        SceneRegistry.Menu -> MenuSettings(
+                                            context, menuScreenViewModel, authManager
+                                        ) { authManager.signIn(this@MainActivity) }
 
-                                    Scene.MINESWEEPER -> MinesweeperSettings(
-                                        context, minesweeper.viewModel
-                                    )
+                                        SceneRegistry.Minesweeper -> MinesweeperSettings(
+                                            context, minesweeperViewModel
+                                        )
 
-                                    Scene.SOLITAIRE -> SolitaireSettings(
-                                        context, solitaire.viewModel
-                                    )
+                                        //SceneRegistry.Solitaire -> SolitaireSettings(
+                                        //    context, solitaireViewModel
+                                        //)
 
-                                    Scene.SUDOKU -> SudokuSettings(context, sudoku.viewModel)
+                                        is GameScene -> {}
+                                        is StaticScene -> {}
+                                    }
                                 }
                             }
                         }
@@ -211,14 +298,14 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun onLoseFocus() {
-        dataManager.save()
+        dataManager.save(true)
         openGameMenu()
     }
 
     private fun openGameMenu() {
-        if (!SceneManager.dialogActiveState.value && SceneManager.currentScene != Scene.MENU) {
-            navController.navigateToGameMenu()
-            currentViewModel().onOpenDialog()
+        if (!SceneManager.dialogActiveState.value && currentViewModel.value !is MenuScreenViewModel) {
+            if (SceneManager.currentScene == SceneRegistry.Sudoku) navController.navigateToSudokuGameMenu() else navController.navigateToGameMenu()
+            currentViewModel.value!!.onOpenDialog()
         }
     }
 }

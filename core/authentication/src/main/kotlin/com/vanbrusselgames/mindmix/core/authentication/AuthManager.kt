@@ -1,6 +1,7 @@
 package com.vanbrusselgames.mindmix.core.authentication
 
 import android.app.Activity
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.ContextCompat.getString
@@ -10,46 +11,57 @@ import com.google.android.gms.games.PlayGames
 import com.google.android.gms.games.PlayGamesSdk
 import com.google.android.gms.tasks.Task
 import com.google.firebase.Firebase
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.PlayGamesAuthProvider
 import com.google.firebase.auth.auth
 import com.google.firebase.crashlytics.crashlytics
 import com.vanbrusselgames.mindmix.core.logging.Logger
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class AuthManager(private val activity: Activity) {
-    private var currentUser: FirebaseUser? = Firebase.auth.currentUser
-    private val gamesSignInClient: GamesSignInClient
+@Singleton
+class AuthManager @Inject constructor(@ApplicationContext private val ctx: Context) {
     private var isAuthenticated = false
     val signedIn = mutableStateOf(false)
     val userId = mutableStateOf("")
 
     init {
-        PlayGamesSdk.initialize(activity)
-        gamesSignInClient = PlayGames.getGamesSignInClient(activity)
+        PlayGamesSdk.initialize(ctx)
+
+        Firebase.auth.currentUser?.uid?.let {
+            userId.value = it
+            Firebase.crashlytics.setUserId(it)
+        }
+    }
+
+    // This method shows how to get the client when you have an activity
+    private fun getGamesSignInClient(activity: Activity): GamesSignInClient {
+        return PlayGames.getGamesSignInClient(activity)
+    }
+
+    // Call this from your Activity/ViewModel when it's ready
+    fun initialAuthCheck(activity: Activity) {
         CoroutineScope(Dispatchers.IO).launch {
-            gamesSignInClient.isAuthenticated.addOnCompleteListener { isAuthenticatedTask: Task<AuthenticationResult> ->
+            getGamesSignInClient(activity).isAuthenticated.addOnCompleteListener { isAuthenticatedTask: Task<AuthenticationResult> ->
                 val isAuthenticated =
                     isAuthenticatedTask.isSuccessful && isAuthenticatedTask.result.isAuthenticated
                 this@AuthManager.isAuthenticated = isAuthenticated
 
-                signedIn.value = isAuthenticated && currentUser != null
+                // Update signedIn state based on both Firebase and Play Games
+                signedIn.value = isAuthenticated && Firebase.auth.currentUser != null
 
-                currentUser?.uid?.let {
-                    userId.value = it
-                    Firebase.crashlytics.setUserId(it)
-                }
-
-                if (isAuthenticated) {
-                    gamesSignInClient.requestServerSideAccess(
-                        getString(activity, R.string.default_web_client_id), false
-                    ).addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            val serverAuthToken = task.result
-                            firebaseAuthWithPlayGames(activity, serverAuthToken)
-                        }
+                if (isAuthenticated && Firebase.auth.currentUser == null) {
+                    // Authenticated with Play Games but not Firebase, try to link
+                    Logger.d("Authenticated with Play Games, attempting Firebase link.")
+                    requestAndLinkFirebase(activity)
+                } else if (isAuthenticated && Firebase.auth.currentUser != null) {
+                    Logger.d("Already authenticated with Play Games and Firebase.")
+                    Firebase.auth.currentUser?.uid?.let {
+                        userId.value = it
+                        Firebase.crashlytics.setUserId(it)
                     }
                 }
             }
@@ -57,22 +69,17 @@ class AuthManager(private val activity: Activity) {
     }
 
     private fun firebaseAuthWithPlayGames(activity: Activity, serverAuthCode: String) {
-        val auth = Firebase.auth
         val credential = PlayGamesAuthProvider.getCredential(serverAuthCode)
-        auth.signInWithCredential(credential).addOnCompleteListener(activity) { task ->
+        Firebase.auth.signInWithCredential(credential).addOnCompleteListener(activity) { task ->
             if (task.isSuccessful) {
                 Logger.i("signInWithCredential:success")
-                currentUser = auth.currentUser
-                signedIn.value = isAuthenticated && currentUser != null
-                currentUser?.uid?.let {
-                    userId.value = it
+                signedIn.value = isAuthenticated && Firebase.auth.currentUser != null
+                Firebase.auth.currentUser?.uid?.let {
                     Firebase.crashlytics.setUserId(it)
                 }
             } else {
                 // If sign in fails, display a message to the user.
-                Logger.w(
-                    "signInWithCredential:failure", task.exception!!
-                )
+                Logger.w("signInWithCredential:failure", task.exception!!)
                 //todo: localize error
                 Toast.makeText(
                     activity,
@@ -83,18 +90,34 @@ class AuthManager(private val activity: Activity) {
         }
     }
 
-    fun signIn() {
-        gamesSignInClient.signIn()
-            .addOnCompleteListener { isAuthenticatedTask: Task<AuthenticationResult> ->
+    private fun requestAndLinkFirebase(activity: Activity) {
+        getGamesSignInClient(activity).requestServerSideAccess(
+            getString(ctx, R.string.default_web_client_id), false
+        ).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val serverAuthToken = task.result
+                firebaseAuthWithPlayGames(activity, serverAuthToken)
+            } else {
+                Logger.w("requestServerSideAccess:failure", task.exception)
+                Toast.makeText(activity, "Failed to get server auth code.", Toast.LENGTH_SHORT)
+                    .show()
+                signedIn.value = false // Indicate failure
+            }
+        }
+    }
+
+    fun signIn(activity: Activity) {
+        with(getGamesSignInClient(activity)) {
+            signIn().addOnCompleteListener { isAuthenticatedTask: Task<AuthenticationResult> ->
                 val isAuthenticated =
                     isAuthenticatedTask.isSuccessful && isAuthenticatedTask.result.isAuthenticated
-                this.isAuthenticated = isAuthenticated
+                this@AuthManager.isAuthenticated = isAuthenticated
 
-                signedIn.value = isAuthenticated && currentUser != null
+                signedIn.value = isAuthenticated && Firebase.auth.currentUser != null
 
                 if (isAuthenticated) {
-                    gamesSignInClient.requestServerSideAccess(
-                        getString(activity, R.string.default_web_client_id), false
+                    requestServerSideAccess(
+                        getString(ctx, R.string.default_web_client_id), false
                     ).addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             val serverAuthToken = task.result
@@ -103,5 +126,6 @@ class AuthManager(private val activity: Activity) {
                     }
                 }
             }
+        }
     }
 }

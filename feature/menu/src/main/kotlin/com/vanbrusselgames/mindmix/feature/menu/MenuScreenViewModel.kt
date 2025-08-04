@@ -6,19 +6,17 @@ import androidx.navigation.NavController
 import com.vanbrusselgames.mindmix.core.common.BaseScreenViewModel
 import com.vanbrusselgames.mindmix.core.common.coins
 import com.vanbrusselgames.mindmix.core.designsystem.theme.SelectedTheme
-import com.vanbrusselgames.mindmix.core.navigation.SceneManager.Scene
+import com.vanbrusselgames.mindmix.core.model.GameScene
+import com.vanbrusselgames.mindmix.core.model.Scene
+import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.feature.menu.data.PREF_KEY_THEME
-import com.vanbrusselgames.mindmix.games.game2048.Game2048
 import com.vanbrusselgames.mindmix.games.game2048.navigation.navigateTo2048
-import com.vanbrusselgames.mindmix.games.minesweeper.Minesweeper
 import com.vanbrusselgames.mindmix.games.minesweeper.navigation.navigateToMinesweeper
-import com.vanbrusselgames.mindmix.games.solitaire.Solitaire
 import com.vanbrusselgames.mindmix.games.solitaire.navigation.navigateToSolitaire
-import com.vanbrusselgames.mindmix.games.sudoku.Sudoku
 import com.vanbrusselgames.mindmix.games.sudoku.navigation.navigateToSudoku
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
+//@HiltViewModel -- only when using Hilt @Inject
 class MenuScreenViewModel : BaseScreenViewModel() {
     override val nameResId: Int = Menu.NAME_RES_ID
 
@@ -30,30 +28,31 @@ class MenuScreenViewModel : BaseScreenViewModel() {
 
     val theme = mutableStateOf(SelectedTheme.System)
     val games = mapOf(
-        Sudoku.GAME_ID to Scene.SUDOKU,
-        Solitaire.GAME_ID to Scene.SOLITAIRE,
-        Minesweeper.GAME_ID to Scene.MINESWEEPER,
-        Game2048.GAME_ID to Scene.GAME2048
+        SceneRegistry.Sudoku.gameId to SceneRegistry.Sudoku,
+        SceneRegistry.Solitaire.gameId to SceneRegistry.Solitaire,
+        SceneRegistry.Minesweeper.gameId to SceneRegistry.Minesweeper,
+        SceneRegistry.Game2048.gameId to SceneRegistry.Game2048
     )
-    var selectedGame = Scene.MINESWEEPER
-    var settingsGame = Scene.MENU
+    var selectedGame: GameScene = SceneRegistry.Minesweeper
+    var settingsGame: Scene = SceneRegistry.Menu
 
     val wheelModel = GameWheel(this, games.size)
 
     /*private var selectedGameModeIndices = mapOf(
-            Scene.MINESWEEPER to 0,
-            Scene.SOLITAIRE to 0,
-            Scene.SUDOKU to 0,
+            SceneRegistry.Minesweeper to 0,
+            SceneRegistry.Solitaire to 0,
+            SceneRegistry.Sudoku to 0,
         )*/
 
-    override fun onLoadPreferences(preferences: Preferences) {
+    fun onLoadPreferences(preferences: Preferences) {
         if (preferences[PREF_KEY_THEME] != null) {
             theme.value = SelectedTheme.entries.first { it.ordinal == preferences[PREF_KEY_THEME] }
         }
     }
 
     fun loadFromFile(data: MenuData) {
-        selectedGame = data.selectedGame
+        selectedGame =
+            SceneRegistry.allScenes.first { it.sceneId == data.selectedGame } as GameScene
         wheelModel.selectedId = games.filter { g -> g.value == selectedGame }.keys.first()
         wheelModel.rotationAngle = wheelModel.selectedId * wheelModel.angleStep
         coins = data.coins
@@ -61,7 +60,7 @@ class MenuScreenViewModel : BaseScreenViewModel() {
     }
 
     fun saveToFile(): String {
-        return Json.encodeToString(MenuData(selectedGame, coins/*, selectedGameModeIndices*/))
+        return Json.encodeToString(MenuData(selectedGame.sceneId, coins/*, selectedGameModeIndices*/))
     }
 
     //fun getSelectedGameModeIndex(gameIndex: Int = -1): Int {
@@ -76,11 +75,10 @@ class MenuScreenViewModel : BaseScreenViewModel() {
 
     fun navigateToSelectedGame(navController: NavController) {
         when (selectedGame) {
-            Scene.GAME2048 -> navController.navigateTo2048()
-            Scene.MENU -> {}
-            Scene.MINESWEEPER -> navController.navigateToMinesweeper()
-            Scene.SOLITAIRE -> navController.navigateToSolitaire()
-            Scene.SUDOKU -> navController.navigateToSudoku()
+            SceneRegistry.Game2048 -> navController.navigateTo2048()
+            SceneRegistry.Minesweeper -> navController.navigateToMinesweeper()
+            SceneRegistry.Solitaire -> navController.navigateToSolitaire()
+            SceneRegistry.Sudoku -> navController.navigateToSudoku()
         }
     }
 }
