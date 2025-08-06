@@ -1,4 +1,4 @@
-package com.vanbrusselgames.mindmix.core.data.preferences.sudoku
+package com.vanbrusselgames.mindmix.games.sudoku.data.preferences
 
 import androidx.datastore.preferences.core.Preferences
 

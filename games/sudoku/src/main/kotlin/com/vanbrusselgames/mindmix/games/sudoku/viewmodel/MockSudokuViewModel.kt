@@ -32,10 +32,6 @@ class MockSudokuViewModel : BaseGameViewModel(), ISudokuViewModel {
     private var finished = false
 
     override fun startNewGame() {
-        startPuzzle()
-    }
-
-    override fun startPuzzle() {
     }
 
     override fun setSelectedCell(cellId: Int) {

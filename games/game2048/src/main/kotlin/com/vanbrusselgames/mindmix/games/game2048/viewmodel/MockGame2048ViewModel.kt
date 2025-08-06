@@ -1,56 +1,56 @@
-package com.vanbrusselgames.mindmix.games.game2048
+package com.vanbrusselgames.mindmix.games.game2048.viewmodel
 
 import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.toMutableStateList
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastFilter
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastRoundToInt
-import androidx.datastore.preferences.core.Preferences
 import androidx.navigation.NavController
-import com.google.firebase.analytics.FirebaseAnalytics
 import com.vanbrusselgames.mindmix.core.common.BaseGameViewModel
-import com.vanbrusselgames.mindmix.core.logging.Logger
-import com.vanbrusselgames.mindmix.core.navigation.SceneManager
 import com.vanbrusselgames.mindmix.feature.gamefinished.navigation.navigateToGameFinished
+import com.vanbrusselgames.mindmix.games.game2048.R
+import com.vanbrusselgames.mindmix.games.game2048.model.FinishedGame
+import com.vanbrusselgames.mindmix.games.game2048.model.Game2048
+import com.vanbrusselgames.mindmix.games.game2048.model.GridCell2048
+import com.vanbrusselgames.mindmix.games.game2048.model.GridSize2048
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import kotlin.collections.chunked
-import kotlin.collections.indexOfFirst
+import javax.inject.Inject
 import kotlin.math.abs
 import kotlin.math.log2
 import kotlin.math.pow
 import kotlin.random.Random
 
-class Game2048ViewModel : BaseGameViewModel() {
-    override val nameResId = Game2048.NAME_RES_ID
+@HiltViewModel
+class MockGame2048ViewModel @Inject constructor() : BaseGameViewModel(), IGame2048ViewModel {
+    override val nameResId = Game2048.Companion.NAME_RES_ID
     override val descResId = R.string.game_2048_desc
 
-    val gridSize = mutableStateOf(GridSize2048.FOUR)
-    var sideSize = gridSize.value.getSize()
-        private set
-    private var cellCount: Int = sideSize * sideSize
-    private val startNumbers = 3
-    val cellList = mutableStateListOf<GridCell2048>()
+    override val gridSize = mutableStateOf(GridSize2048.FOUR)
+    override val cellList =
+        SnapshotStateList(gridSize.value.getMaxCellCount()) { GridCell2048(it, 0) }
+    override val score = mutableLongStateOf(0L)
+    override val preferencesLoaded = MutableStateFlow(false).asStateFlow()
+    override val puzzleLoaded = MutableStateFlow(false).asStateFlow()
+
+    override var finished = false
+
+    val threshold = 100
+
+    private var cellCount = gridSize.value.getMaxCellCount()
+    private var sideSize = gridSize.value.getSize()
     private var newId = cellCount
+    private var isStuck = false
 
-    var isStuck = false
-    var delayedDialog = false
-
-    var score = mutableLongStateOf(0L)
-
-    var savedProgress = Array(GridSize2048.entries.size) {
-        Game2048Progress(size = GridSize2048.entries[it])
-    }
-
-    fun getTarget(): Long = when (gridSize.value) {
+    private fun getTarget(): Long = when (gridSize.value) {
         GridSize2048.THREE -> 256
         GridSize2048.FOUR -> 2048
         GridSize2048.FIVE -> 8192
@@ -58,111 +58,12 @@ class Game2048ViewModel : BaseGameViewModel() {
         GridSize2048.SEVEN -> 131072
     }
 
-    fun getHighestTileValue() = cellList.map { it.value }.max()
+    private fun getHighestTileValue() = cellList.maxOf { it.value }
 
-    fun setSize(value: GridSize2048) {
-        saveAndLoadProgress(gridSize.value, value)
-        gridSize.value = value
-    }
+    override fun startNewGame() {}
 
-    private fun saveAndLoadProgress(prevSize: GridSize2048, size: GridSize2048) {
-        if (prevSize === size) return
-        saveCurrentProgress(prevSize)
-
-        setProgress(size)
-        loadPuzzle()
-    }
-
-    private fun saveCurrentProgress(size: GridSize2048 = gridSize.value) {
-        val p = savedProgress.first { it.size == size }
-        p.cellValues = cellList.map { c -> c.value }
-        p.currentScore = score.longValue
-        p.isStuck = isStuck
-    }
-
-    private fun saveProgress(progress: Game2048Progress) {
-        val p = savedProgress.first { it.size == progress.size }
-        p.cellValues = progress.cellValues
-        p.currentScore = progress.currentScore
-        p.isStuck = progress.isStuck
-        p.moves = progress.moves
-        p.bestScore = progress.bestScore
-    }
-
-    private fun setProgress(size: GridSize2048) {
-        reset()
-        gridSize.value = size
-        sideSize = size.getSize()
-        cellCount = sideSize * sideSize
-        val progress = savedProgress.find { it.size == size }!!
-        if (progress.cellValues.isEmpty() || progress.cellValues.all { it == 0L }) return startNewGame()
-
-        cellList.addAll(List(cellCount) {
-            GridCell2048(newId++, progress.cellValues[it])
-        }.toMutableStateList())
-        score.longValue = progress.currentScore
-        isStuck = progress.isStuck
-        //moves = progress.moves
-    }
-
-    fun loadFromFile(data: Game2048Data) {
-        gridSize.value = data.size
-        for (progress in data.progress) {
-            if (progress.cellValues.all { it == 0L }) continue
-            saveProgress(progress)
-        }
-        setProgress(data.size)
-    }
-
-    fun saveToFile(): String {
-        if (isStuck) {
-            val index = savedProgress.indexOfFirst { it.size == gridSize.value }
-            savedProgress[index] = Game2048Progress(
-                listOf(), -1, -1, savedProgress[index].bestScore, gridSize.value, false
-            )
-        } else {
-            saveCurrentProgress()
-        }
-        return Json.encodeToString(Game2048Data(gridSize.value, savedProgress.asList()))
-    }
-
-    override fun onLoadPreferences(preferences: Preferences) {
-    }
-
-    private fun reset() {
-        cellList.clear()
-
-        isStuck = false
-        delayedDialog = false
-        score.longValue = 0L
-    }
-
-    /**
-     * Loads a puzzle for the game.
-     * If no playable puzzle is currently loaded it will start a new game by initializing a fresh puzzle.
-     * If a puzzle is already loaded, it will continue with the current state.
-     */
-    fun loadPuzzle() {
-        if (isStuck || cellList.all { it.value == 0L }) startNewGame()
-        // else: game is already loaded using loadFromFile()
-    }
-
-    override fun startNewGame() {
-        reset()
-        Logger.logEvent(FirebaseAnalytics.Event.LEVEL_START) {
-            param(FirebaseAnalytics.Param.LEVEL_NAME, Game2048.GAME_NAME)
-        }
-
-        cellList.addAll(List(cellCount) { GridCell2048(newId++, 0) }.toMutableStateList())
-        cellList.shuffle()
-        for (i in 0 until startNumbers) {
-            cellList[i].value = 2
-        }
-        cellList.sortBy { it.id }
-    }
-
-    fun handleDragGestures(navController: NavController, totalDragOffset: Offset) {
-        if (isStuck || delayedDialog || SceneManager.dialogActiveState.value) return
+    override fun handleDragGestures(navController: NavController, totalDragOffset: Offset) {
+        if (finished) return
         val x = totalDragOffset.x
         val y = totalDragOffset.y
         if (abs(x) < threshold && abs(y) < threshold) return
@@ -173,7 +74,7 @@ class Game2048ViewModel : BaseGameViewModel() {
         }
     }
 
-    fun swipeUp(navController: NavController) {
+    private fun swipeUp(navController: NavController) {
         val lastValues = cellList.map { it.value }
         val columns = getColumns()
         combineEqualCells(navController, columns)
@@ -193,7 +94,7 @@ class Game2048ViewModel : BaseGameViewModel() {
         tryAddCell(navController)
     }
 
-    fun swipeDown(navController: NavController) {
+    private fun swipeDown(navController: NavController) {
         val lastValues = cellList.map { it.value }
         val columns = getColumns().map { it.reversed() }
         combineEqualCells(navController, columns)
@@ -213,7 +114,7 @@ class Game2048ViewModel : BaseGameViewModel() {
         tryAddCell(navController)
     }
 
-    fun swipeLeft(navController: NavController) {
+    private fun swipeLeft(navController: NavController) {
         val lastValues = cellList.map { it.value }
         val rows = getRows()
         combineEqualCells(navController, rows)
@@ -239,7 +140,7 @@ class Game2048ViewModel : BaseGameViewModel() {
         tryAddCell(navController)
     }
 
-    fun swipeRight(navController: NavController) {
+    private fun swipeRight(navController: NavController) {
         val lastValues = cellList.map { it.value }
         val rows = getRows().map { it.reversed() }
         combineEqualCells(navController, rows)
@@ -279,9 +180,7 @@ class Game2048ViewModel : BaseGameViewModel() {
         return rows
     }
 
-    private fun combineEqualCells(
-        navController: NavController, cells: List<List<GridCell2048>>
-    ) {
+    private fun combineEqualCells(navController: NavController, cells: List<List<GridCell2048>>) {
         var reachedTarget = false
         var points = 0L
         for (r in cells) {
@@ -305,37 +204,35 @@ class Game2048ViewModel : BaseGameViewModel() {
         }
         addScore(points)
         if (reachedTarget) CoroutineScope(Dispatchers.Main).launch {
-            delayedDialog = true
+            finished = true
             delay(500)
             onGameFinished(navController, true)
-            delayedDialog = false
         }
     }
 
     private fun tryAddCell(navController: NavController) {
-        val options = cellList.fastFilter { c -> c.value == 0L }
+        val options = cellList.fastFilter { it.value == 0L }
         if (options.isEmpty()) {
             checkStuck(navController)
             return
         }
         val cell = options.random()
         cellList[cellList.indexOf(cell)] =
-            GridCell2048(newId++, if (Random.nextFloat() < 0.9) 2 else 4)
+            GridCell2048(newId++, if (Random.Default.nextFloat() < 0.9) 2 else 4)
         checkStuck(navController)
     }
 
     private fun checkStuck(navController: NavController) {
         isStuck = !canMove()
         if (isStuck) CoroutineScope(Dispatchers.Main).launch {
-            delayedDialog = true
+            finished = true
             delay(1000)
             onGameFinished(navController, getHighestTileValue() >= getTarget())
-            delayedDialog = false
         }
     }
 
     private fun canMove(): Boolean {
-        if (cellList.fastAny { c -> c.value == 0L }) return true
+        if (cellList.fastAny { it.value == 0L }) return true
         val rows = getRows()
         rows.fastForEach {
             var value = 0L
@@ -360,9 +257,8 @@ class Game2048ViewModel : BaseGameViewModel() {
     }
 
     private fun onGameFinished(navController: NavController, reachedTarget: Boolean) {
-        saveCurrentProgress()
         FinishedGame.titleResId =
-            if (!isStuck && reachedTarget) R.string.game_2048_reach_target_title else if (isStuck && !reachedTarget) R.string.game_2048_game_over_title else Game2048.NAME_RES_ID
+            if (!isStuck && reachedTarget) R.string.game_2048_reach_target_title else if (isStuck && !reachedTarget) R.string.game_2048_game_over_title else Game2048.Companion.NAME_RES_ID
         FinishedGame.textResId =
             if (!isStuck && reachedTarget) R.string.game_2048_reach_target_text else if (isStuck && !reachedTarget) R.string.game_2048_game_over_text else R.string.game_2048_success
         FinishedGame.score = score.longValue
@@ -376,5 +272,11 @@ class Game2048ViewModel : BaseGameViewModel() {
     private fun getBonusReward(): Int {
         return 1.5.pow((log2(getHighestTileValue().toDouble()) - log2(getTarget().toDouble())))
             .fastRoundToInt()
+    }
+
+    override fun setSize(value: GridSize2048) {
+        gridSize.value = value
+        sideSize = value.getSize()
+        cellCount = value.getMaxCellCount()
     }
 }

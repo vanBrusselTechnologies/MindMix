@@ -60,7 +60,8 @@ import com.vanbrusselgames.mindmix.core.model.Scene
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.core.ui.measureTextWidth
 import com.vanbrusselgames.mindmix.feature.settings.navigation.navigateToSettings
-import com.vanbrusselgames.mindmix.games.game2048.Game2048
+import com.vanbrusselgames.mindmix.games.game2048.model.Game2048
+import com.vanbrusselgames.mindmix.games.game2048.navigation.navigateToGame2048Settings
 import com.vanbrusselgames.mindmix.games.minesweeper.Minesweeper
 import com.vanbrusselgames.mindmix.games.solitaire.Solitaire
 import com.vanbrusselgames.mindmix.games.sudoku.model.Sudoku
@@ -168,7 +169,11 @@ fun WheelItemIconButton(
     ) {
         IconButton({
             viewModel.settingsGame = game
-            if (game == SceneRegistry.Sudoku) navController.navigateToSudokuSettings() else navController.navigateToSettings()
+            when (game) {
+                SceneRegistry.Game2048 -> navController.navigateToGame2048Settings()
+                SceneRegistry.Sudoku -> navController.navigateToSudokuSettings()
+                else -> navController.navigateToSettings()
+            }
         }) {
             Icon(Icons.Filled.Settings, "$name settings")
         }

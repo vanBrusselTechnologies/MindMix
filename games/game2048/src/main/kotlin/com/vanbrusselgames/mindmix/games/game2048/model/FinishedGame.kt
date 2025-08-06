@@ -1,4 +1,4 @@
-package com.vanbrusselgames.mindmix.games.game2048
+package com.vanbrusselgames.mindmix.games.game2048.model
 
 object FinishedGame {
     var titleResId: Int = 0

@@ -1,7 +1,6 @@
 package com.vanbrusselgames.mindmix.games.sudoku.navigation
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -66,9 +65,6 @@ fun NavGraphBuilder.sudoku(
             setCurrentViewModel(vm)
             // val route = navBackStackEntry.toRoute<SudokuGameRoute>()
             // route.mode
-            LaunchedEffect(Unit) {
-
-            }
             GameUI(vm, navController)
             BackHandler { navController.navigateToSudokuGameMenu() }
         }

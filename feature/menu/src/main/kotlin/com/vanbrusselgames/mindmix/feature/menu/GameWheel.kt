@@ -35,7 +35,7 @@ data class GameWheel(val viewModel: MenuScreenViewModel, val gameCount: Int) {
     val wheelItemCount = gameCount * withDupsFactor
     val angleStep = 360f / wheelItemCount
 
-    var selectedId = viewModel.games.filter { g -> g.value == viewModel.selectedGame }.keys.first()
+    var selectedId = viewModel.games.filter { it.value == viewModel.selectedGame }.keys.first()
     var rotationAngle = selectedId * angleStep
 }
 

@@ -211,7 +211,7 @@ fun SudokuRegularCellText(cell: SudokuPuzzleCell, isClue: Boolean) {
 
 @Composable
 fun SudokuNoteCellText(cell: SudokuPuzzleCell) {
-    if (cell.notes.none { n -> n }) return
+    if (cell.notes.none { it }) return
     val str = StringBuilder()
     var i = 0
     while (i < 9) {

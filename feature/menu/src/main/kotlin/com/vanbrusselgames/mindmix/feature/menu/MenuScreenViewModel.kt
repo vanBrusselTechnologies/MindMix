@@ -10,7 +10,7 @@ import com.vanbrusselgames.mindmix.core.model.GameScene
 import com.vanbrusselgames.mindmix.core.model.Scene
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.feature.menu.data.PREF_KEY_THEME
-import com.vanbrusselgames.mindmix.games.game2048.navigation.navigateTo2048
+import com.vanbrusselgames.mindmix.games.game2048.navigation.navigateToGame2048
 import com.vanbrusselgames.mindmix.games.minesweeper.navigation.navigateToMinesweeper
 import com.vanbrusselgames.mindmix.games.solitaire.navigation.navigateToSolitaire
 import com.vanbrusselgames.mindmix.games.sudoku.navigation.navigateToSudoku
@@ -53,7 +53,7 @@ class MenuScreenViewModel : BaseScreenViewModel() {
     fun loadFromFile(data: MenuData) {
         selectedGame =
             SceneRegistry.allScenes.first { it.sceneId == data.selectedGame } as GameScene
-        wheelModel.selectedId = games.filter { g -> g.value == selectedGame }.keys.first()
+        wheelModel.selectedId = games.filter { it.value == selectedGame }.keys.first()
         wheelModel.rotationAngle = wheelModel.selectedId * wheelModel.angleStep
         coins = data.coins
         //selectedGameModeIndices = data.selectedGameModeIndices
@@ -75,7 +75,7 @@ class MenuScreenViewModel : BaseScreenViewModel() {
 
     fun navigateToSelectedGame(navController: NavController) {
         when (selectedGame) {
-            SceneRegistry.Game2048 -> navController.navigateTo2048()
+            SceneRegistry.Game2048 -> navController.navigateToGame2048()
             SceneRegistry.Minesweeper -> navController.navigateToMinesweeper()
             SceneRegistry.Solitaire -> navController.navigateToSolitaire()
             SceneRegistry.Sudoku -> navController.navigateToSudoku()

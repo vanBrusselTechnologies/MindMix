@@ -5,14 +5,14 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.vanbrusselgames.mindmix.core.common.BaseGameViewModel
-import com.vanbrusselgames.mindmix.core.data.preferences.sudoku.SudokuPreferences
-import com.vanbrusselgames.mindmix.core.data.preferences.sudoku.SudokuPreferencesRepository
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.core.utils.constants.Difficulty
 import com.vanbrusselgames.mindmix.feature.gamefinished.navigation.navigateToGameFinished
 import com.vanbrusselgames.mindmix.games.sudoku.R
 import com.vanbrusselgames.mindmix.games.sudoku.data.SudokuRepository
+import com.vanbrusselgames.mindmix.games.sudoku.data.preferences.SudokuPreferences
+import com.vanbrusselgames.mindmix.games.sudoku.data.preferences.SudokuPreferencesRepository
 import com.vanbrusselgames.mindmix.games.sudoku.helpers.SudokuPuzzle
 import com.vanbrusselgames.mindmix.games.sudoku.model.FinishedGame
 import com.vanbrusselgames.mindmix.games.sudoku.model.InputMode
@@ -57,9 +57,8 @@ class SudokuViewModel @Inject constructor(
     override val inputMode = mutableStateOf(InputMode.Normal)
 
     private val _preferencesLoaded = MutableStateFlow(false)
-    override val preferencesLoaded =
-        _preferencesLoaded.onStart { loadPreferences() }
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), false)
+    override val preferencesLoaded = _preferencesLoaded.onStart { loadPreferences() }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), false)
 
     private val _puzzleLoaded = MutableStateFlow(false)
     override val puzzleLoaded = _puzzleLoaded.onStart { loadData() }
@@ -79,7 +78,6 @@ class SudokuViewModel @Inject constructor(
         autoEditNotes.value = preferences.autoEditNotes
         difficulty.value = Difficulty.entries[preferences.difficulty]
         _preferencesLoaded.value = true
-        Logger.d("SudokuViewModel preferences: Applied!")
     }
 
     private suspend fun loadData() {
@@ -90,8 +88,7 @@ class SudokuViewModel @Inject constructor(
             if (savedProgress != null) onPuzzleLoaded(savedProgress)
             else onPuzzleLoaded(
                 sudokuRepository.requestNewPuzzleFlow(difficulty.value, gameMode)
-                    .flowOn(Dispatchers.IO)
-                    .firstOrNull()
+                    .flowOn(Dispatchers.IO).firstOrNull()
             )
         }
     }
@@ -99,54 +96,51 @@ class SudokuViewModel @Inject constructor(
     override fun startNewGame() {
         Logger.d("[sudoku] startNewGame")
         reset()
+        sudokuRepository.removeProgressForDifficulty(difficulty.value)
         startPuzzle()
         Logger.logEvent(FirebaseAnalytics.Event.LEVEL_START) {
             param(FirebaseAnalytics.Param.LEVEL_NAME, SceneRegistry.Sudoku.name)
         }
     }
 
-    override fun startPuzzle() {
+    private fun startPuzzle() {
         Logger.d("[sudoku] startPuzzle")
         if (finished) reset()
         if (_puzzleLoaded.value) return
         viewModelScope.launch(Dispatchers.IO) {
-            Logger.d("[sudoku] startPuzzle - Launch")
             onPuzzleLoaded(
                 sudokuRepository.getPuzzleProgress(difficulty.value)
                     ?: sudokuRepository.requestNewPuzzleFlow(difficulty.value, gameMode)
                         .firstOrNull()
             )
-            Logger.d("[sudoku] startPuzzle - Launch --done")
         }
     }
 
-    private suspend fun onPuzzleLoaded(p: SudokuProgress?) {
-        withContext(Dispatchers.Default) {
-            Logger.d("[sudoku] onPuzzleLoaded")
-            if (p == null || cells.size != p.input.size) {
-                _puzzleLoaded.value = false
-                return@withContext
-            }
-            Logger.d(
-                "Puzzle Loaded: ${p.difficulty}:\n" + "${p.clues.joinToString("")}\n" + p.input.joinToString(
-                    ""
-                )
-            )
-            cells.forEach {
-                it.reset()
-                it.isClue.value = p.clues[it.id] != 0
-                it.value.intValue = p.input[it.id]
-                for (j in 0 until SIZE) {
-                    val note = j + 1
-                    if (p.inputNotes[it.id].contains(note) != it.hasNote(note)) {
-                        it.setNote(note)
-                    }
+    private fun onPuzzleLoaded(p: SudokuProgress?) {
+        Logger.d("[sudoku] onPuzzleLoaded")
+        if (p == null || cells.size != p.input.size) {
+            _puzzleLoaded.value = false
+            return
+        }
+        Logger.d(
+            "[sudoku] Puzzle Loaded: ${p.difficulty}:\n${p.clues.joinToString("")}\n${
+                p.input.joinToString("")
+            }"
+        )
+        cells.forEach {
+            it.reset()
+            it.isClue.value = p.clues[it.id] != 0
+            it.value.intValue = p.input[it.id]
+            for (j in 0 until SIZE) {
+                val note = j + 1
+                if (p.inputNotes[it.id].contains(note) != it.hasNote(note)) {
+                    it.setNote(note)
                 }
             }
-            if (checkConflictingCells.value) cells.forEach { c -> checkConflictingCell(c, true) }
-            else cells.forEach { it.isIncorrect.value = false }
-            _puzzleLoaded.value = true
         }
+        if (checkConflictingCells.value) cells.forEach { checkConflictingCell(it, true) }
+        else cells.forEach { it.isIncorrect.value = false }
+        _puzzleLoaded.value = true
     }
 
     private fun reset() {
@@ -187,6 +181,7 @@ class SudokuViewModel @Inject constructor(
         saveJob?.cancel()
         saveJob = CoroutineScope(Dispatchers.IO).launch {
             delay(2000)
+            if (finished) return@launch
             sudokuRepository.setPuzzleProgressForDifficulty(difficulty.value, cells)
         }
     }
@@ -198,14 +193,15 @@ class SudokuViewModel @Inject constructor(
                 param(FirebaseAnalytics.Param.LEVEL_NAME, SceneRegistry.Sudoku.name)
                 param(FirebaseAnalytics.Param.SUCCESS, 1)
             }
+            sudokuRepository.removeProgressForDifficulty(difficulty.value)
             onGameFinished(navController)
         }
     }
 
     private fun isFinished(): Boolean {
         try {
-            if (cells.any { c -> c.value.intValue == 0 }) return false
-            val input = cells.map { c -> c.value.intValue }.toIntArray()
+            if (cells.any { it.value.intValue == 0 }) return false
+            val input = cells.map { it.value.intValue }.toIntArray()
             return SudokuPuzzle.Companion.getSolution(input).contentEquals(input)
         } catch (_: Exception) {
             return false
@@ -312,19 +308,16 @@ class SudokuViewModel @Inject constructor(
     private fun saveAndLoadProgress(prevDifficulty: Difficulty, difficulty: Difficulty) {
         Logger.d("[sudoku] saveAndLoadProgress")
         if (prevDifficulty == difficulty) return
-        if (_puzzleLoaded.value) sudokuRepository.setPuzzleProgressForDifficulty(
-            prevDifficulty, cells
-        )
+        if (_puzzleLoaded.value && !finished) {
+            sudokuRepository.setPuzzleProgressForDifficulty(prevDifficulty, cells)
+        }
 
         reset()
         viewModelScope.launch(Dispatchers.IO) {
-            Logger.d("[sudoku] saveAndLoadProgress - launch")
             onPuzzleLoaded(
                 sudokuRepository.getPuzzleProgress(difficulty)
                     ?: sudokuRepository.requestNewPuzzleFlow(difficulty, gameMode).firstOrNull()
             )
-            Logger.d("[sudoku] saveAndLoadProgress - launch --done")
         }
-        Logger.d("[sudoku] saveAndLoadProgress --done")
     }
 }

@@ -147,7 +147,7 @@ class AdManager @Inject constructor(
     }
 
     private fun notifyStateAdLoaded() {
-        adLoadedStates.forEach { s -> s.value = true }
+        adLoadedStates.forEach { it.value = true }
         adLoadedStates.clear()
     }
 

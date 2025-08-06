@@ -1,4 +1,4 @@
-package com.vanbrusselgames.mindmix.games.game2048
+package com.vanbrusselgames.mindmix.games.game2048.model
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
@@ -11,7 +11,7 @@ data class GridCell2048(val id: Int, private var _value: Long) {
     private val color11 = Color.Red
     private val color22 = Color.Blue
     private val color33 = Color.Black
-    val background = mutableStateOf<Color>(Color.Transparent)
+    val background = mutableStateOf(Color.Transparent)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -26,7 +26,7 @@ data class GridCell2048(val id: Int, private var _value: Long) {
     }
 
     init {
-        updateBackground()
+        updateBackground() // TODO: Move to StateFlow with onStart
     }
 
     var value

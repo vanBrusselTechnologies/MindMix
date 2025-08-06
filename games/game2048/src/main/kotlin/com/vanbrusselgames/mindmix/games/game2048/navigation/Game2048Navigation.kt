@@ -1,35 +1,90 @@
 package com.vanbrusselgames.mindmix.games.game2048.navigation
 
-import androidx.compose.material3.SnackbarHostState
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.remember
-import androidx.navigation.NamedNavArgument
+import androidx.compose.ui.window.DialogProperties
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.dialog
+import androidx.navigation.navigation
+import com.vanbrusselgames.mindmix.core.common.BaseScreenViewModel
 import com.vanbrusselgames.mindmix.core.logging.Logger
+import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
-import com.vanbrusselgames.mindmix.games.game2048.Game2048ViewModel
-import com.vanbrusselgames.mindmix.games.game2048.GameUI
+import com.vanbrusselgames.mindmix.games.game2048.ui.GameUI
+import com.vanbrusselgames.mindmix.games.game2048.ui.dialogs.Game2048GameMenuDialog
+import com.vanbrusselgames.mindmix.games.game2048.ui.dialogs.Game2048SettingsDialog
+import com.vanbrusselgames.mindmix.games.game2048.viewmodel.Game2048ViewModel
 import kotlinx.serialization.Serializable
 
 @Serializable
-object Game2048Route {
-    const val NAV_ROUTE = "game/2048"
-    val NAV_ARGUMENTS = emptyList<NamedNavArgument>()
+object Game2048FeatureRoute
+
+@Serializable
+object/*data class*/ Game2048GameRoute/*(val mode: Int = 0)*/
+
+@Serializable
+object Game2048GameMenuRoute
+
+@Serializable
+object Game2048SettingsRoute
+
+fun NavController.navigateToGame2048(
+    route: Game2048GameRoute = Game2048GameRoute, navOptions: NavOptions? = null
+) {
+    Logger.d("Navigate to: 2048")
+    SceneManager.currentScene = SceneRegistry.Game2048
+    navigate(route, navOptions)
 }
 
-fun NavController.navigateTo2048(navOptions: NavOptions? = null) {
-    Logger.d("Navigate to: 2048")
-    SceneManager.currentScene = SceneManager.Scene.GAME2048
-    navigate(Game2048Route, navOptions)
+fun NavController.navigateToGame2048GameMenu(
+    route: Game2048GameMenuRoute = Game2048GameMenuRoute, navOptions: NavOptions? = null
+) {
+    Logger.d("Navigate to: 2048 GameMenu")
+    navigate(route, navOptions)
+}
+
+fun NavController.navigateToGame2048Settings(
+    route: Game2048SettingsRoute = Game2048SettingsRoute, navOptions: NavOptions? = null
+) {
+    Logger.d("Navigate to: 2048 Settings")
+    navigate(route, navOptions)
 }
 
 fun NavGraphBuilder.game2048(
-    navController: NavController, viewModel: Game2048ViewModel, snackbarHostState: SnackbarHostState
+    navController: NavController, setCurrentViewModel: (BaseScreenViewModel?) -> Unit
 ) {
-    composable<Game2048Route> {
-        remember { viewModel.loadPuzzle();0 }
-        GameUI(viewModel, navController, snackbarHostState)
+    navigation<Game2048FeatureRoute>(Game2048GameRoute) {
+        composable<Game2048GameRoute> { navBackStackEntry ->
+            val vm = hiltViewModel<Game2048ViewModel>(remember(navBackStackEntry) {
+                navController.getBackStackEntry<Game2048FeatureRoute>()
+            })
+            setCurrentViewModel(vm)
+            // val route = navBackStackEntry.toRoute<SudokuGameRoute>()
+            // route.mode
+            GameUI(vm, navController)
+            BackHandler { navController.navigateToGame2048GameMenu() }
+        }
+
+        dialog<Game2048GameMenuRoute>(
+            dialogProperties = DialogProperties(true, false, false)
+        ) { navBackStackEntry ->
+            val vm = hiltViewModel<Game2048ViewModel>(remember(navBackStackEntry) {
+                navController.getBackStackEntry<Game2048FeatureRoute>()
+            })
+            Game2048GameMenuDialog(vm, navController)
+        }
+
+        dialog<Game2048SettingsRoute>(
+            dialogProperties = DialogProperties(true, false, false)
+        ) { navBackStackEntry ->
+            val vm = hiltViewModel<Game2048ViewModel>(remember(navBackStackEntry) {
+                navController.getBackStackEntry<Game2048FeatureRoute>()
+            })
+            Game2048SettingsDialog(vm, navController)
+        }
     }
 }

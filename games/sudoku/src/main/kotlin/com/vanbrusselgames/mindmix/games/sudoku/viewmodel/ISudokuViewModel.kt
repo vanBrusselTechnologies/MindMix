@@ -18,7 +18,6 @@ interface ISudokuViewModel : IBaseGameViewModel {
     val puzzleLoaded: StateFlow<Boolean>
     val preferencesLoaded: StateFlow<Boolean>
 
-    fun startPuzzle()
     fun setSelectedCell(cellId: Int)
     fun changeInputMode()
     fun onClickNumPadCell(numPadCellIndex: Int, navController: NavController)

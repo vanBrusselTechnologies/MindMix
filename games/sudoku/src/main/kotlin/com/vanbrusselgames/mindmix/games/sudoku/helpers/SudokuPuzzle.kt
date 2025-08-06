@@ -156,7 +156,7 @@ class SudokuPuzzle private constructor(private val n: Int) {
                 }
 
                 clues = workingClues
-                if (clues.filter { c -> c != 0 }.size <= maxClues) return clues
+                if (clues.filter { it != 0 }.size <= maxClues) return clues
             }
         }
 

@@ -23,7 +23,6 @@ android {
     tasks.withType<KotlinJvmCompile>().configureEach {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_21)
-            freeCompilerArgs = listOf("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
         }
     }
 }
@@ -36,8 +35,8 @@ dependencies {
     implementation(project(":core:logging"))
     implementation(project(":core:model"))
     implementation(project(":core:navigation"))
-    implementation(project(":core:utils"))
     implementation(project(":core:ui"))
+    implementation(project(":core:utils"))
     implementation(project(":feature:gamefinished"))
     implementation(project(":feature:gamemenu"))
     implementation(project(":feature:settings"))

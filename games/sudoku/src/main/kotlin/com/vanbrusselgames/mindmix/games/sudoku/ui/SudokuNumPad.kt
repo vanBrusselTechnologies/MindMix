@@ -42,7 +42,7 @@ fun SudokuNumPad(viewModel: ISudokuViewModel, navController: NavController, hori
             .aspectRatio(if (horizontal) 1f / 2.5f else 2.5f)
             .fillMaxSize()
     ) {
-        items(10, { index -> index }) { index ->
+        items(10, { it }) { index ->
             if (index == 9) SudokuNumPadInputModeCell(viewModel, modifier)
             else SudokuNumPadNumberCell(viewModel, modifier, index, navController)
         }

@@ -19,7 +19,6 @@ import com.vanbrusselgames.mindmix.games.sudoku.model.SudokuSavedProgress
 import com.vanbrusselgames.mindmix.games.sudoku.viewmodel.SudokuViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -41,7 +40,12 @@ class SudokuRepository @Inject constructor(
     private var _loadedFromFiles = false
     private val jsonParser = Json { ignoreUnknownKeys = true }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun getFileName(gameMode: PuzzleType, difficulty: Difficulty): String {
+        return gameLoader.getFileName(
+            SceneRegistry.Sudoku.gameId, gameMode.ordinal, difficulty.name
+        )
+    }
+
     fun requestNewPuzzleFlow(difficulty: Difficulty, gameMode: PuzzleType): Flow<SudokuProgress> =
         callbackFlow {
             if (!_loadedFromFiles) {
@@ -61,9 +65,11 @@ class SudokuRepository @Inject constructor(
         return newPuzzles[difficulty]?.size ?: 0
     }
 
-    private fun getCachedPuzzle(difficulty: Difficulty): SudokuProgress? {
+    private fun getCachedPuzzle(difficulty: Difficulty, gameMode: PuzzleType): SudokuProgress? {
         val newPuzzleEncodedClues = newPuzzles[difficulty]?.removeFirstOrNull()
         if (newPuzzleEncodedClues == null) return null
+        gameLoader.removeFromFile(getFileName(gameMode, difficulty), newPuzzleEncodedClues)
+
         val clues = Decode.base94toIntList(newPuzzleEncodedClues.trim(), size * size)
         val puzzle = LoadedPuzzle(difficulty, clues)
         val progress = puzzle.toSudokuProgress()
@@ -85,10 +91,7 @@ class SudokuRepository @Inject constructor(
             pages[difficulty] = page + 1
             val encodedClues = encodedClueList.shuffled().toMutableList()
             newPuzzles[difficulty]?.addAll(encodedClues)
-            val fileName = gameLoader.getFileName(
-                SceneRegistry.Sudoku.gameId, gameMode.ordinal, difficulty.name
-            )
-            gameLoader.appendToFile(fileName, encodedClues)
+            gameLoader.appendToFile(getFileName(gameMode, difficulty), encodedClues)
             if (cachedAmount == 0) onCacheAvailable()
         })
     }
@@ -97,15 +100,13 @@ class SudokuRepository @Inject constructor(
         difficulty: Difficulty, gameMode: PuzzleType, callback: (SudokuProgress) -> Unit
     ) {
         downloadNewPuzzles(difficulty, gameMode) {
-            Logger.d("Cached Puzzle available")
-            callback(getCachedPuzzle(difficulty)!!)
+            Logger.d("[sudoku] Cached Puzzle available")
+            callback(getCachedPuzzle(difficulty, gameMode)!!)
         }
     }
 
     private fun loadNewPuzzlesFromFile(difficulty: Difficulty, gameMode: PuzzleType) {
-        val fileName =
-            gameLoader.getFileName(SceneRegistry.Sudoku.gameId, gameMode.ordinal, difficulty.name)
-        val content = gameLoader.readFile(fileName)
+        val content = gameLoader.readFile(getFileName(gameMode, difficulty))
         newPuzzles[difficulty]?.addAll(content)
     }
 
@@ -127,13 +128,13 @@ class SudokuRepository @Inject constructor(
 
         Firebase.functions.getHttpsCallable("puzzles").call(data).continueWith { task ->
             val result = task.result?.data as? List<*> ?: return@continueWith
-            Logger.d("Downloaded ${result.size} puzzles")
+            Logger.d("[sudoku] Downloaded ${result.size} puzzles")
             onSuccess(result.filterIsInstance<String>())
         }.addOnFailureListener { e ->
             if (e is FirebaseFunctionsException) {
-                Logger.e("Firebase error: ${e.code}, ${e.details}")
+                Logger.e("[sudoku] Firebase error: ${e.code}, ${e.details}")
             }
-            Logger.e("Failed to fetch puzzles", e)
+            Logger.e("[sudoku] Failed to fetch puzzles", e)
             onError(e)
         }
     }
@@ -154,7 +155,7 @@ class SudokuRepository @Inject constructor(
                     Decode.base94toIntList(progress.input, size * size),
                     progress.inputNotes.map { notes ->
                         val decodedNotes = Decode.base94toBooleanList(notes, SudokuViewModel.SIZE)
-                        List(SudokuViewModel.SIZE) { i -> if (decodedNotes[i]) i + 1 else 0 }
+                        List(SudokuViewModel.SIZE) { if (decodedNotes[it]) it + 1 else 0 }
                     },
                     progress.difficulty
                 )
@@ -169,8 +170,8 @@ class SudokuRepository @Inject constructor(
 
     fun setPuzzleProgressForDifficulty(difficulty: Difficulty, cells: Array<SudokuPuzzleCell>) {
         val index = _puzzleProgress.indexOfFirst { it.difficulty == difficulty }
-        val clues = cells.map { c -> if (c.isClue.value) c.value.intValue else 0 }
-        val input = cells.map { c -> c.value.intValue }
+        val clues = cells.map { if (it.isClue.value) it.value.intValue else 0 }
+        val input = cells.map { it.value.intValue }
         val inputNotes = cells.map { c ->
             c.notes.mapIndexed { i, n -> if (n) i + 1 else 0 }.toMutableList()
         }
@@ -179,8 +180,8 @@ class SudokuRepository @Inject constructor(
             val input1 = _puzzleProgress[index].input.joinToString("")
             val input2 = progress.input.joinToString("")
             val notes1 =
-                _puzzleProgress[index].inputNotes.joinToString("") { n -> n.joinToString { "" } }
-            val notes2 = progress.inputNotes.joinToString("") { n -> n.joinToString { "" } }
+                _puzzleProgress[index].inputNotes.joinToString("") { it.joinToString { "" } }
+            val notes2 = progress.inputNotes.joinToString("") { it.joinToString { "" } }
             if (input1 == input2 && notes1 == notes2) return
             _puzzleProgress[index] = progress
         }
@@ -204,7 +205,7 @@ class SudokuRepository @Inject constructor(
             Encode.base94IntCollection(progress.clues),
             Encode.base94IntCollection(progress.input),
             progress.inputNotes.map { notes ->
-                val booleans = notes.map { n -> n != 0 }
+                val booleans = notes.map { it != 0 }
                 Encode.base94BooleanCollection(booleans)
             },
             progress.difficulty
@@ -221,5 +222,12 @@ class SudokuRepository @Inject constructor(
             progress.inputNotes.map { encodedNotes },
             progress.difficulty
         )
+    }
+
+    fun removeProgressForDifficulty(difficulty: Difficulty) {
+        _puzzleProgress.removeAll { it.difficulty == difficulty }
+        _stringProgress.removeAll { it.difficulty == difficulty }
+        val data = Json.encodeToString(SudokuData(_stringProgress, pages.toMap()))
+        dataManager.saveScene(SceneRegistry.Sudoku, data)
     }
 }

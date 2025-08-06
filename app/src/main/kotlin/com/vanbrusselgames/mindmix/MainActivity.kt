@@ -55,10 +55,10 @@ import com.vanbrusselgames.mindmix.feature.menu.MenuSettings
 import com.vanbrusselgames.mindmix.feature.menu.navigation.menu
 import com.vanbrusselgames.mindmix.feature.settings.navigation.navigateToSettings
 import com.vanbrusselgames.mindmix.feature.settings.navigation.settingsDialog
-import com.vanbrusselgames.mindmix.games.game2048.Game2048GameFinishedDialog
-import com.vanbrusselgames.mindmix.games.game2048.Game2048Settings
-import com.vanbrusselgames.mindmix.games.game2048.Game2048ViewModel
 import com.vanbrusselgames.mindmix.games.game2048.navigation.game2048
+import com.vanbrusselgames.mindmix.games.game2048.navigation.navigateToGame2048GameMenu
+import com.vanbrusselgames.mindmix.games.game2048.ui.dialogs.Game2048GameFinishedDialog
+import com.vanbrusselgames.mindmix.games.game2048.viewmodel.Game2048ViewModel
 import com.vanbrusselgames.mindmix.games.minesweeper.MinesweeperGameFinishedDialog
 import com.vanbrusselgames.mindmix.games.minesweeper.MinesweeperSettings
 import com.vanbrusselgames.mindmix.games.minesweeper.MinesweeperViewModel
@@ -66,7 +66,6 @@ import com.vanbrusselgames.mindmix.games.minesweeper.navigation.minesweeper
 import com.vanbrusselgames.mindmix.games.solitaire.SolitaireGameFinishedDialog
 import com.vanbrusselgames.mindmix.games.solitaire.SolitaireViewModel
 import com.vanbrusselgames.mindmix.games.sudoku.navigation.navigateToSudokuGameMenu
-import com.vanbrusselgames.mindmix.games.sudoku.navigation.navigateToSudokuSettings
 import com.vanbrusselgames.mindmix.games.sudoku.navigation.sudoku
 import com.vanbrusselgames.mindmix.games.sudoku.ui.dialogs.SudokuGameFinishedDialog
 import com.vanbrusselgames.mindmix.games.sudoku.viewmodel.SudokuViewModel
@@ -96,7 +95,6 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var updateManager: UpdateManager
 
-    val game2048ViewModel by viewModels<Game2048ViewModel>()
     val menuScreenViewModel by viewModels<MenuScreenViewModel>()
     val minesweeperViewModel by viewModels<MinesweeperViewModel>()
     //val solitaireViewModel by viewModels<SolitaireViewModel>()
@@ -138,7 +136,6 @@ class MainActivity : ComponentActivity() {
         splashscreen.setKeepOnScreenCondition { keepSplashScreen }
         setContentView(ComposeView(this).apply {
             setContent {
-                Logger.d("setContent")
                 val darkTheme = when (menuScreenViewModel.theme.value) {
                     SelectedTheme.System -> isSystemInDarkTheme()
                     SelectedTheme.Dark -> true
@@ -171,12 +168,12 @@ class MainActivity : ComponentActivity() {
                                 minesweeper(
                                     navController, minesweeperViewModel, ::setCurrentViewModel
                                 )
-                                game2048(navController, game2048ViewModel, ::setCurrentViewModel)
+                                game2048(navController, ::setCurrentViewModel)
                                 gameMenuDialog(
                                     navController,
                                     { currentViewModel.value!!.nameResId },
                                     { (currentViewModel.value as BaseGameViewModel).startNewGame() },
-                                    { if (SceneManager.currentScene == SceneRegistry.Sudoku) navController.navigateToSudokuSettings() else navController.navigateToSettings() }) { navController.navigateToMenu() }
+                                    { navController.navigateToSettings() }) { navController.navigateToMenu() }
                                 gameHelpDialog(
                                     navController,
                                     { currentViewModel.value!!.nameResId }) { (currentViewModel.value as BaseGameViewModel).descResId }
@@ -260,8 +257,6 @@ class MainActivity : ComponentActivity() {
                                         if (SceneManager.currentScene == SceneRegistry.Menu) menuScreenViewModel.settingsGame else SceneManager.currentScene
                                     menuScreenViewModel.settingsGame = SceneRegistry.Menu
                                     when (settingsScene) {
-                                        SceneRegistry.Game2048 -> Game2048Settings(game2048ViewModel)
-
                                         SceneRegistry.Menu -> MenuSettings(
                                             context, menuScreenViewModel, authManager
                                         ) { authManager.signIn(this@MainActivity) }
@@ -304,7 +299,11 @@ class MainActivity : ComponentActivity() {
 
     private fun openGameMenu() {
         if (!SceneManager.dialogActiveState.value && currentViewModel.value !is MenuScreenViewModel) {
-            if (SceneManager.currentScene == SceneRegistry.Sudoku) navController.navigateToSudokuGameMenu() else navController.navigateToGameMenu()
+            when (SceneManager.currentScene) {
+                SceneRegistry.Game2048 -> navController.navigateToGame2048GameMenu()
+                SceneRegistry.Sudoku -> navController.navigateToSudokuGameMenu()
+                else -> navController.navigateToGameMenu()
+            }
             currentViewModel.value!!.onOpenDialog()
         }
     }

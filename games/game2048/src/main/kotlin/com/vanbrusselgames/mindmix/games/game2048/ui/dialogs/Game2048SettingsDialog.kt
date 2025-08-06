@@ -1,4 +1,4 @@
-package com.vanbrusselgames.mindmix.games.game2048
+package com.vanbrusselgames.mindmix.games.game2048.ui.dialogs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +15,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -23,31 +24,44 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.vanbrusselgames.mindmix.core.designsystem.theme.MindMixTheme
 import com.vanbrusselgames.mindmix.core.ui.EnumDropdown
+import com.vanbrusselgames.mindmix.feature.settings.SettingsDialog
+import com.vanbrusselgames.mindmix.games.game2048.R
+import com.vanbrusselgames.mindmix.games.game2048.model.Game2048
+import com.vanbrusselgames.mindmix.games.game2048.model.GridSize2048
+import com.vanbrusselgames.mindmix.games.game2048.viewmodel.IGame2048ViewModel
+import com.vanbrusselgames.mindmix.games.game2048.viewmodel.MockGame2048ViewModel
 
 @Composable
-fun Game2048Settings(viewModel: Game2048ViewModel) {
-    Column(
-        Modifier
-            .padding(24.dp)
-            .width(IntrinsicSize.Max),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = stringResource(Game2048.NAME_RES_ID),
-            Modifier.fillMaxWidth(),
-            fontSize = 36.sp,
-            fontWeight = FontWeight.ExtraBold,
-            textAlign = TextAlign.Center
-        )
-        Spacer(Modifier.height(20.dp))
-        SizeDropdownRow(viewModel)
+fun Game2048SettingsDialog(viewModel: IGame2048ViewModel, navController: NavController) {
+    SettingsDialog(navController) {
+        Column(
+            Modifier
+                .padding(24.dp)
+                .width(IntrinsicSize.Max),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = stringResource(Game2048.NAME_RES_ID),
+                Modifier.fillMaxWidth(),
+                fontSize = 36.sp,
+                fontWeight = FontWeight.ExtraBold,
+                textAlign = TextAlign.Center
+            )
+            val loadedState = viewModel.preferencesLoaded.collectAsStateWithLifecycle()
+            if (!loadedState.value) return@SettingsDialog
+            Spacer(Modifier.height(20.dp))
+            SizeDropdownRow(viewModel)
+        }
     }
 }
 
 @Composable
-fun SizeDropdownRow(viewModel: Game2048ViewModel) {
+fun SizeDropdownRow(viewModel: IGame2048ViewModel) {
     val defaultButtonColors = ButtonDefaults.buttonColors()
     Row(
         Modifier
@@ -75,7 +89,8 @@ fun SizeDropdownRow(viewModel: Game2048ViewModel) {
 fun Prev_Settings() {
     MindMixTheme {
         Surface {
-            Game2048Settings(Game2048ViewModel())
+            val vm = remember { MockGame2048ViewModel() }
+            Game2048SettingsDialog(vm, rememberNavController())
         }
     }
 }

@@ -1,4 +1,3 @@
-
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
@@ -13,7 +12,7 @@ plugins {
 android {
     namespace = "com.vanbrusselgames.mindmix.core.advertisement"
     compileSdk = 36
-    defaultConfig{
+    defaultConfig {
         minSdk = 21
     }
     compileOptions {
@@ -23,7 +22,6 @@ android {
     tasks.withType<KotlinJvmCompile>().configureEach {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_21)
-            freeCompilerArgs = listOf("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
         }
     }
 }

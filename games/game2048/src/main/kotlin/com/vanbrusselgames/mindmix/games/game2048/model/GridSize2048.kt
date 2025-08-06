@@ -1,8 +1,9 @@
-package com.vanbrusselgames.mindmix.games.game2048
+package com.vanbrusselgames.mindmix.games.game2048.model
 
 import com.vanbrusselgames.mindmix.core.utils.constants.StringEnum
+import com.vanbrusselgames.mindmix.games.game2048.R
 
-enum class GridSize2048: StringEnum {
+enum class GridSize2048 : StringEnum {
     THREE, FOUR, FIVE, SIX, SEVEN;
 
     override fun getStringResource(): Int {
@@ -15,7 +16,7 @@ enum class GridSize2048: StringEnum {
         }
     }
 
-    fun getSize() : Int{
+    fun getSize(): Int {
         return when (this) {
             THREE -> 3
             FOUR -> 4
@@ -23,5 +24,9 @@ enum class GridSize2048: StringEnum {
             SIX -> 6
             SEVEN -> 7
         }
+    }
+
+    fun getMaxCellCount(): Int {
+        return this.getSize() * this.getSize()
     }
 }
