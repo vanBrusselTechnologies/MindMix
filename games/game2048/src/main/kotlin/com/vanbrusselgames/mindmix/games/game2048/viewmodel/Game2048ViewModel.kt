@@ -141,6 +141,8 @@ class Game2048ViewModel @Inject constructor(
         }
         cellList.clear()
         cellList.addAll(p.cellValues.map { GridCell2048(newId++, it) })
+        //moves = p.moves
+        score.longValue = p.score
         _puzzleLoaded.value = true
     }
 
