@@ -63,7 +63,7 @@ fun NavGraphBuilder.game2048(
                 navController.getBackStackEntry<Game2048FeatureRoute>()
             })
             setCurrentViewModel(vm)
-            // val route = navBackStackEntry.toRoute<SudokuGameRoute>()
+            // val route = navBackStackEntry.toRoute<Game2048GameRoute>()
             // route.mode
             GameUI(vm, navController)
             BackHandler { navController.navigateToGame2048GameMenu() }

@@ -46,7 +46,7 @@ class SudokuViewModel @Inject constructor(
         const val SIZE = 9
     }
 
-    override val nameResId = Sudoku.Companion.NAME_RES_ID
+    override val nameResId = Sudoku.NAME_RES_ID
     override val descResId = R.string.sudoku_desc
 
     override val cells = Array(SIZE * SIZE) { SudokuPuzzleCell(it, false, 0, SIZE) }
@@ -74,16 +74,15 @@ class SudokuViewModel @Inject constructor(
 
     private fun applyPreferences(preferences: SudokuPreferences) {
         Logger.d("[sudoku] applyPreferences")
-        checkConflictingCells.value = preferences.checkConflictingCells
         autoEditNotes.value = preferences.autoEditNotes
+        checkConflictingCells.value = preferences.checkConflictingCells
         difficulty.value = Difficulty.entries[preferences.difficulty]
         _preferencesLoaded.value = true
     }
 
     private suspend fun loadData() {
         withContext(Dispatchers.IO) {
-            preferencesLoaded.first()
-            applyPreferences(prefsRepository.getPreferences())
+            preferencesLoaded.first { it }
             val savedProgress = sudokuRepository.getPuzzleProgress(difficulty.value)
             if (savedProgress != null) onPuzzleLoaded(savedProgress)
             else onPuzzleLoaded(
@@ -202,14 +201,14 @@ class SudokuViewModel @Inject constructor(
         try {
             if (cells.any { it.value.intValue == 0 }) return false
             val input = cells.map { it.value.intValue }.toIntArray()
-            return SudokuPuzzle.Companion.getSolution(input).contentEquals(input)
+            return SudokuPuzzle.getSolution(input).contentEquals(input)
         } catch (_: Exception) {
             return false
         }
     }
 
     private fun onGameFinished(navController: NavController) {
-        FinishedGame.titleResId = Sudoku.Companion.NAME_RES_ID// "Congrats / Smart / Well done"
+        FinishedGame.titleResId = Sudoku.NAME_RES_ID// "Congrats / Smart / Well done"
         FinishedGame.textResId = R.string.sudoku_success
         // """You did great and solved puzzle in ${0} seconds!!
         //     |That's Awesome!
@@ -235,7 +234,7 @@ class SudokuViewModel @Inject constructor(
         val index = cell.id
         val number: Int = cell.value.intValue
         if (number == 0) return
-        val indices: IntArray = SudokuPuzzle.Companion.peers(index, cells.size)
+        val indices: IntArray = SudokuPuzzle.peers(index, cells.size)
         for (n: Int in indices) {
             if (index == n) continue
             if (!cells[n].hasNote(number)) continue
@@ -259,7 +258,7 @@ class SudokuViewModel @Inject constructor(
     private fun checkConflictingCell(cell: SudokuPuzzleCell, isSecondary: Boolean) {
         if (cell.isClue.value) return
         val index = cell.id
-        val indices: IntArray = SudokuPuzzle.Companion.peers(index, cells.size)
+        val indices: IntArray = SudokuPuzzle.peers(index, cells.size)
         var isConflicting = false
         val v = cell.value.intValue
         for (n: Int in indices) {

@@ -16,7 +16,6 @@ import com.vanbrusselgames.mindmix.games.game2048.model.FinishedGame
 import com.vanbrusselgames.mindmix.games.game2048.model.Game2048
 import com.vanbrusselgames.mindmix.games.game2048.model.GridCell2048
 import com.vanbrusselgames.mindmix.games.game2048.model.GridSize2048
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -29,9 +28,8 @@ import kotlin.math.log2
 import kotlin.math.pow
 import kotlin.random.Random
 
-@HiltViewModel
 class MockGame2048ViewModel @Inject constructor() : BaseGameViewModel(), IGame2048ViewModel {
-    override val nameResId = Game2048.Companion.NAME_RES_ID
+    override val nameResId = Game2048.NAME_RES_ID
     override val descResId = R.string.game_2048_desc
 
     override val gridSize = mutableStateOf(GridSize2048.FOUR)
@@ -258,7 +256,7 @@ class MockGame2048ViewModel @Inject constructor() : BaseGameViewModel(), IGame20
 
     private fun onGameFinished(navController: NavController, reachedTarget: Boolean) {
         FinishedGame.titleResId =
-            if (!isStuck && reachedTarget) R.string.game_2048_reach_target_title else if (isStuck && !reachedTarget) R.string.game_2048_game_over_title else Game2048.Companion.NAME_RES_ID
+            if (!isStuck && reachedTarget) R.string.game_2048_reach_target_title else if (isStuck && !reachedTarget) R.string.game_2048_game_over_title else Game2048.NAME_RES_ID
         FinishedGame.textResId =
             if (!isStuck && reachedTarget) R.string.game_2048_reach_target_text else if (isStuck && !reachedTarget) R.string.game_2048_game_over_text else R.string.game_2048_success
         FinishedGame.score = score.longValue

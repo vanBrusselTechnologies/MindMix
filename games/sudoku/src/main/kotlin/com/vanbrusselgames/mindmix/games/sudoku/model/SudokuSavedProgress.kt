@@ -5,5 +5,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class SudokuSavedProgress(
-    val clues: String, var input: String, var inputNotes: List<String>, val difficulty: Difficulty
+    val clues: String = "",
+    var input: String = "",
+    var inputNotes: List<String> = listOf(),
+    val difficulty: Difficulty = Difficulty.MEDIUM
 )

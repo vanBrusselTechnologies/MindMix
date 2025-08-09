@@ -38,7 +38,6 @@ import com.vanbrusselgames.mindmix.core.common.BaseScreenViewModel
 import com.vanbrusselgames.mindmix.core.data.DataManager
 import com.vanbrusselgames.mindmix.core.designsystem.theme.MindMixTheme
 import com.vanbrusselgames.mindmix.core.designsystem.theme.SelectedTheme
-import com.vanbrusselgames.mindmix.core.games.GameLoader
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.model.GameScene
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
@@ -59,12 +58,13 @@ import com.vanbrusselgames.mindmix.games.game2048.navigation.game2048
 import com.vanbrusselgames.mindmix.games.game2048.navigation.navigateToGame2048GameMenu
 import com.vanbrusselgames.mindmix.games.game2048.ui.dialogs.Game2048GameFinishedDialog
 import com.vanbrusselgames.mindmix.games.game2048.viewmodel.Game2048ViewModel
-import com.vanbrusselgames.mindmix.games.minesweeper.MinesweeperGameFinishedDialog
-import com.vanbrusselgames.mindmix.games.minesweeper.MinesweeperSettings
-import com.vanbrusselgames.mindmix.games.minesweeper.MinesweeperViewModel
 import com.vanbrusselgames.mindmix.games.minesweeper.navigation.minesweeper
+import com.vanbrusselgames.mindmix.games.minesweeper.navigation.navigateToMinesweeperGameMenu
+import com.vanbrusselgames.mindmix.games.minesweeper.ui.dialogs.MinesweeperGameFinishedDialog
+import com.vanbrusselgames.mindmix.games.minesweeper.viewmodel.MinesweeperViewModel
 import com.vanbrusselgames.mindmix.games.solitaire.SolitaireGameFinishedDialog
 import com.vanbrusselgames.mindmix.games.solitaire.SolitaireViewModel
+import com.vanbrusselgames.mindmix.games.solitaire.navigation.solitaire
 import com.vanbrusselgames.mindmix.games.sudoku.navigation.navigateToSudokuGameMenu
 import com.vanbrusselgames.mindmix.games.sudoku.navigation.sudoku
 import com.vanbrusselgames.mindmix.games.sudoku.ui.dialogs.SudokuGameFinishedDialog
@@ -87,17 +87,13 @@ class MainActivity : ComponentActivity() {
     lateinit var dataManager: DataManager
 
     @Inject
-    lateinit var gameLoader: GameLoader
-
-    @Inject
     lateinit var reviewManager: ReviewManager
 
     @Inject
     lateinit var updateManager: UpdateManager
 
     val menuScreenViewModel by viewModels<MenuScreenViewModel>()
-    val minesweeperViewModel by viewModels<MinesweeperViewModel>()
-    //val solitaireViewModel by viewModels<SolitaireViewModel>()
+    val solitaireViewModel by viewModels<SolitaireViewModel>()
 
     private val _currentViewModel = mutableStateOf<BaseScreenViewModel?>(null)
     val currentViewModel: State<BaseScreenViewModel?> = _currentViewModel
@@ -161,13 +157,10 @@ class MainActivity : ComponentActivity() {
                                     .padding(it),
                                 enterTransition = { fadeIn() },
                                 exitTransition = { fadeOut() }) {
-
                                 menu(navController, menuScreenViewModel, ::setCurrentViewModel)
-                                //solitaire(navController, solitaireViewModel, ::setCurrentViewModel)
+                                solitaire(navController, solitaireViewModel, ::setCurrentViewModel)
                                 sudoku(navController, ::setCurrentViewModel)
-                                minesweeper(
-                                    navController, minesweeperViewModel, ::setCurrentViewModel
-                                )
+                                minesweeper(navController, ::setCurrentViewModel)
                                 game2048(navController, ::setCurrentViewModel)
                                 gameMenuDialog(
                                     navController,
@@ -261,10 +254,6 @@ class MainActivity : ComponentActivity() {
                                             context, menuScreenViewModel, authManager
                                         ) { authManager.signIn(this@MainActivity) }
 
-                                        SceneRegistry.Minesweeper -> MinesweeperSettings(
-                                            context, minesweeperViewModel
-                                        )
-
                                         //SceneRegistry.Solitaire -> SolitaireSettings(
                                         //    context, solitaireViewModel
                                         //)
@@ -301,6 +290,7 @@ class MainActivity : ComponentActivity() {
         if (!SceneManager.dialogActiveState.value && currentViewModel.value !is MenuScreenViewModel) {
             when (SceneManager.currentScene) {
                 SceneRegistry.Game2048 -> navController.navigateToGame2048GameMenu()
+                SceneRegistry.Minesweeper -> navController.navigateToMinesweeperGameMenu()
                 SceneRegistry.Sudoku -> navController.navigateToSudokuGameMenu()
                 else -> navController.navigateToGameMenu()
             }

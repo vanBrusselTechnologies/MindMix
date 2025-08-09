@@ -62,7 +62,8 @@ import com.vanbrusselgames.mindmix.core.ui.measureTextWidth
 import com.vanbrusselgames.mindmix.feature.settings.navigation.navigateToSettings
 import com.vanbrusselgames.mindmix.games.game2048.model.Game2048
 import com.vanbrusselgames.mindmix.games.game2048.navigation.navigateToGame2048Settings
-import com.vanbrusselgames.mindmix.games.minesweeper.Minesweeper
+import com.vanbrusselgames.mindmix.games.minesweeper.model.Minesweeper
+import com.vanbrusselgames.mindmix.games.minesweeper.navigation.navigateToMinesweeperSettings
 import com.vanbrusselgames.mindmix.games.solitaire.Solitaire
 import com.vanbrusselgames.mindmix.games.sudoku.model.Sudoku
 import com.vanbrusselgames.mindmix.games.sudoku.navigation.navigateToSudokuSettings
@@ -171,6 +172,7 @@ fun WheelItemIconButton(
             viewModel.settingsGame = game
             when (game) {
                 SceneRegistry.Game2048 -> navController.navigateToGame2048Settings()
+                SceneRegistry.Minesweeper -> navController.navigateToMinesweeperSettings()
                 SceneRegistry.Sudoku -> navController.navigateToSudokuSettings()
                 else -> navController.navigateToSettings()
             }

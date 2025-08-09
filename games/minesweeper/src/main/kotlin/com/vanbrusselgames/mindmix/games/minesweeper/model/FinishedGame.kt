@@ -1,4 +1,4 @@
-package com.vanbrusselgames.mindmix.games.minesweeper
+package com.vanbrusselgames.mindmix.games.minesweeper.model
 
 object FinishedGame {
     var titleResId: Int = 0

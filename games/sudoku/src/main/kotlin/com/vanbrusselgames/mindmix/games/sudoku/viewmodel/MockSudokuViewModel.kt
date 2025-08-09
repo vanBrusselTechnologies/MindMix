@@ -9,7 +9,6 @@ import com.vanbrusselgames.mindmix.games.sudoku.model.InputMode
 import com.vanbrusselgames.mindmix.games.sudoku.model.Sudoku
 import com.vanbrusselgames.mindmix.games.sudoku.model.SudokuPuzzleCell
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class MockSudokuViewModel : BaseGameViewModel(), ISudokuViewModel {
@@ -17,7 +16,7 @@ class MockSudokuViewModel : BaseGameViewModel(), ISudokuViewModel {
         const val SIZE = 9
     }
 
-    override val nameResId = Sudoku.Companion.NAME_RES_ID
+    override val nameResId = Sudoku.NAME_RES_ID
     override val descResId = R.string.sudoku_desc
 
     override val cells = Array(SIZE * SIZE) { SudokuPuzzleCell(it, false, 0, SIZE) }

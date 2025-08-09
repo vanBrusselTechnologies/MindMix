@@ -1,13 +1,14 @@
-package com.vanbrusselgames.mindmix.games.minesweeper
+package com.vanbrusselgames.mindmix.games.minesweeper.model
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
+import com.vanbrusselgames.mindmix.games.minesweeper.viewmodel.IMinesweeperViewModel
 
-data class MinesweeperCell(val viewModel: MinesweeperViewModel, val id: Int) {
+data class MinesweeperCell(val viewModel: IMinesweeperViewModel, val id: Int) {
     var isMine = false
     var pressed = false
 
-    var state = State.Empty
+    var state = CellState.Empty
         set(value) {
             field = value
             mutableCellState.value = value
@@ -18,8 +19,6 @@ data class MinesweeperCell(val viewModel: MinesweeperViewModel, val id: Int) {
         private set
 
     val background = mutableStateOf(Color.White)
-
-    enum class State { Bomb, Flag, Number, Empty }
 
     fun getCellMineCount() {
         if (isMine) {
@@ -41,5 +40,11 @@ data class MinesweeperCell(val viewModel: MinesweeperViewModel, val id: Int) {
             i++
         }
         this.mineCount = mineCount
+    }
+
+    fun reset() {
+        state = CellState.Empty
+        pressed = false
+        background.value = Color.White
     }
 }

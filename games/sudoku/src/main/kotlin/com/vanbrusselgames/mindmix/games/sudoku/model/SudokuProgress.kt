@@ -5,8 +5,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class SudokuProgress(
-    val clues: List<Int>,
-    val input: List<Int>,
-    val inputNotes: List<List<Int>>,
-    val difficulty: Difficulty
+    val clues: List<Int> = listOf(),
+    val input: List<Int> = listOf(),
+    val inputNotes: List<List<Int>> = listOf(),
+    val difficulty: Difficulty = Difficulty.MEDIUM
 )

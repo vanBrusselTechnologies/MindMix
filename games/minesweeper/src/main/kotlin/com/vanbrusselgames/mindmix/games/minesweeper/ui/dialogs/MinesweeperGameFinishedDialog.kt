@@ -1,4 +1,4 @@
-package com.vanbrusselgames.mindmix.games.minesweeper
+package com.vanbrusselgames.mindmix.games.minesweeper.ui.dialogs
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -20,16 +22,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.vanbrusselgames.mindmix.core.advertisement.AdManager
 import com.vanbrusselgames.mindmix.core.designsystem.theme.MindMixTheme
 import com.vanbrusselgames.mindmix.feature.gamefinished.Buttons
 import com.vanbrusselgames.mindmix.feature.gamefinished.GameFinishedRewardRow
+import com.vanbrusselgames.mindmix.games.minesweeper.model.FinishedGame
+import com.vanbrusselgames.mindmix.games.minesweeper.viewmodel.IMinesweeperViewModel
+import com.vanbrusselgames.mindmix.games.minesweeper.viewmodel.MockMinesweeperViewModel
 
 @Composable
 fun MinesweeperGameFinishedDialog(
     navController: NavController,
-    viewModel: MinesweeperViewModel,
-    adManager: (() -> AdManager)?,
+    viewModel: IMinesweeperViewModel,
+    checkAdLoaded: (adLoaded: MutableState<Boolean>) -> Unit,
+    showAd: (adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit) -> Unit,
     backToMenu: () -> Unit,
     forceSave: () -> Unit
 ) {
@@ -46,9 +51,9 @@ fun MinesweeperGameFinishedDialog(
         )
         Spacer(Modifier.height(2.dp))
         Text(stringResource(FinishedGame.textResId), textAlign = TextAlign.Center)
-        if (FinishedGame.reward != 0 && adManager != null) {
+        if (FinishedGame.reward != 0) {
             Spacer(Modifier.height(8.dp))
-            GameFinishedRewardRow(FinishedGame.reward, adManager, forceSave)
+            GameFinishedRewardRow(FinishedGame.reward, checkAdLoaded, showAd, forceSave)
         }
         Spacer(Modifier.height(8.dp))
         Buttons(
@@ -62,7 +67,8 @@ fun MinesweeperGameFinishedDialog(
 fun Prev_GameFinished() {
     MindMixTheme {
         Surface {
-            MinesweeperGameFinishedDialog(rememberNavController(), MinesweeperViewModel(), null, {}) {}
+            val vm = remember { MockMinesweeperViewModel() }
+            MinesweeperGameFinishedDialog(rememberNavController(), vm, { }, { a, b -> }, {}) {}
         }
     }
 }

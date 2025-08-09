@@ -1,43 +1,13 @@
 package com.vanbrusselgames.mindmix.core.games
 
 import android.content.Context
-import android.net.ConnectivityManager
-import android.net.Network
-import com.vanbrusselgames.mindmix.core.common.NetworkMonitor
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class GameLoader @Inject constructor(
-    @ApplicationContext private val ctx: Context, private val networkMonitor: NetworkMonitor
-) {
-    suspend fun registerLoader(loader: suspend (loadFromFile: Boolean) -> Unit) {
-        startLoading(true, loader)
-        networkMonitor.registerNetworkCallback(object : ConnectivityManager.NetworkCallback() {
-            override fun onAvailable(network: Network) {
-                CoroutineScope(Dispatchers.IO).launch {
-                    startLoading(false, loader)
-                }
-            }
-        })
-    }
-
-    private suspend fun startLoading(
-        loadFromFile: Boolean, loader: suspend (loadFromFile: Boolean) -> Unit
-    ) {
-        coroutineScope {
-            launch(coroutineContext) {
-                loader(loadFromFile)
-            }
-        }
-    }
-
+class GameLoader @Inject constructor(@ApplicationContext private val ctx: Context) {
     fun getFileName(gameId: Int, gameModeId: Int, difficulty: String): String {
         return "loadedPuzzles/${gameId}/${gameModeId}/${difficulty}.save.vbg"
     }

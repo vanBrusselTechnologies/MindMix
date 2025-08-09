@@ -47,7 +47,7 @@ class Game2048ViewModel @Inject constructor(
     private val game2048Repository: Game2048Repository,
     private val prefsRepository: Game2048PreferencesRepository
 ) : BaseGameViewModel(), IGame2048ViewModel {
-    override val nameResId = Game2048.Companion.NAME_RES_ID
+    override val nameResId = Game2048.NAME_RES_ID
     override val descResId = R.string.game_2048_desc
 
     override val gridSize = mutableStateOf(GridSize2048.FOUR)
@@ -88,8 +88,7 @@ class Game2048ViewModel @Inject constructor(
 
     private suspend fun loadData() {
         withContext(Dispatchers.IO) {
-            preferencesLoaded.first()
-            applyPreferences(prefsRepository.getPreferences())
+            preferencesLoaded.first { it }
             val savedProgress = game2048Repository.getPuzzleProgress(gridSize.value)
             if (savedProgress != null) onPuzzleLoaded(savedProgress)
             else onPuzzleLoaded(game2048Repository.createNewPuzzle(gridSize.value))
@@ -360,7 +359,7 @@ class Game2048ViewModel @Inject constructor(
 
     private fun onGameFinished(navController: NavController, reachedTarget: Boolean) {
         FinishedGame.titleResId =
-            if (!isStuck && reachedTarget) R.string.game_2048_reach_target_title else if (isStuck && !reachedTarget) R.string.game_2048_game_over_title else Game2048.Companion.NAME_RES_ID
+            if (!isStuck && reachedTarget) R.string.game_2048_reach_target_title else if (isStuck && !reachedTarget) R.string.game_2048_game_over_title else Game2048.NAME_RES_ID
         FinishedGame.textResId =
             if (!isStuck && reachedTarget) R.string.game_2048_reach_target_text else if (isStuck && !reachedTarget) R.string.game_2048_game_over_text else R.string.game_2048_success
         FinishedGame.score = score.longValue
