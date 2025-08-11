@@ -146,7 +146,6 @@ class SudokuRepository @Inject constructor(
         if (json.trim() == "") return null
         val data = jsonParser.decodeFromString<SudokuData>(json)
         for (kvp in data.page) pages[kvp.key] = kvp.value
-        if (data.progress.isEmpty()) return null
 
         val savedProgress = withContext(Dispatchers.Default) {
             data.progress.filter { it.clues != "" }.map { progress ->

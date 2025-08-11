@@ -52,10 +52,10 @@ class MinesweeperViewModel @Inject constructor(
 
     override var sizeX = 16
     override var sizeY = 22
-    override val cellCount
+    val cellCount
         get() = sizeX * sizeY
-    override val cells = Array(cellCount) { MinesweeperCell(this, it) }
-    override val mines = BooleanArray(cellCount) { false }
+    override val cells = Array(cellCount) { MinesweeperCell(it) }
+    val mines = BooleanArray(cellCount) { false }
     override val minesLeft = mutableIntStateOf(-1)
 
     private val _preferencesLoaded = MutableStateFlow(false)
@@ -67,7 +67,6 @@ class MinesweeperViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), false)
 
     override var finished = false
-
 
     private suspend fun loadPreferences() {
         applyPreferences(prefsRepository.getPreferences())
@@ -129,7 +128,7 @@ class MinesweeperViewModel @Inject constructor(
             c.reset()
             c.isMine = mines[i]
             c.state = stateEntries[p.input[i]]
-            c.getCellMineCount()
+            setCellMineCount(c)
         }
 
         if (safeStart.value && cells.all { it.state == CellState.Empty }) {
@@ -142,6 +141,28 @@ class MinesweeperViewModel @Inject constructor(
         calculateMinesLeft()
         minesweeperRepository.setPuzzleProgressForDifficulty(difficulty.value, cells)
         _puzzleLoaded.value = true
+    }
+
+    private fun setCellMineCount(cell: MinesweeperCell) {
+        if (cell.isMine) {
+            cell.mineCount = 99
+            return
+        }
+        val shortSide: Int = minOf(sizeX, sizeY)
+        var mineCount = 0
+        var i = -1
+        while (i <= 1) {
+            var j = -2
+            while (j < 1) {
+                j++
+                val mineIndex = cell.id + i + j * shortSide
+                if (mineIndex < 0 || mineIndex >= cellCount) continue
+                if (mineIndex % shortSide == 0 && i == 1 || cell.id % shortSide == 0 && i == -1) continue
+                mineCount += if (mines[mineIndex]) 1 else 0
+            }
+            i++
+        }
+        cell.mineCount = mineCount
     }
 
     override fun changeInputMode() {

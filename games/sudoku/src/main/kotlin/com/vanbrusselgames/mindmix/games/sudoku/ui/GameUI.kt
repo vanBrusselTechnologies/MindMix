@@ -63,9 +63,10 @@ fun GameUI(viewModel: ISudokuViewModel, navController: NavController) {
                 SceneContent(viewModel, navController, horizontal)
             }
         }
-        val loadedState = viewModel.puzzleLoaded.collectAsStateWithLifecycle()
-        if (!loadedState.value) GameLoadingScreen()
     }
+
+    val loadedState = viewModel.puzzleLoaded.collectAsStateWithLifecycle()
+    if (!loadedState.value) GameLoadingScreen()
 }
 
 @Composable

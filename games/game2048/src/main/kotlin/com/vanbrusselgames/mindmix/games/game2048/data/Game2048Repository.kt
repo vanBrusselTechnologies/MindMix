@@ -4,8 +4,7 @@ import com.vanbrusselgames.mindmix.core.data.DataManager
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.games.game2048.model.Game2048Data
 import com.vanbrusselgames.mindmix.games.game2048.model.Game2048Progress
-import com.vanbrusselgames.mindmix.games.game2048.model.Game2048Records
-import com.vanbrusselgames.mindmix.games.game2048.model.GridCell2048
+import com.vanbrusselgames.mindmix.games.game2048.model.Game2048Record
 import com.vanbrusselgames.mindmix.games.game2048.model.GridSize2048
 import kotlinx.serialization.json.Json
 import javax.inject.Inject
@@ -14,7 +13,7 @@ import javax.inject.Singleton
 @Singleton
 class Game2048Repository @Inject constructor(private val dataManager: DataManager) {
     private val _puzzleProgress = mutableListOf<Game2048Progress>()
-    private val _puzzleRecords = mutableListOf<Game2048Records>()
+    private val _puzzleRecords = mutableListOf<Game2048Record>()
     private val jsonParser = Json { ignoreUnknownKeys = true }
 
     fun createNewPuzzle(size: GridSize2048): Game2048Progress {
@@ -38,7 +37,6 @@ class Game2048Repository @Inject constructor(private val dataManager: DataManage
         if (json.trim() == "") return null
         val data = jsonParser.decodeFromString<Game2048Data>(json)
 
-        if (data.progress.isEmpty()) return null
         _puzzleProgress.clear()
         _puzzleProgress.addAll(data.progress)
         _puzzleRecords.clear()

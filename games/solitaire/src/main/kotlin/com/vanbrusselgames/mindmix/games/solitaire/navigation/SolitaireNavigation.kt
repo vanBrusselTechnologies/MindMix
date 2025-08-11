@@ -1,41 +1,97 @@
 package com.vanbrusselgames.mindmix.games.solitaire.navigation
 
-import androidx.compose.material3.SnackbarHostState
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.window.DialogWindowProvider
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
+import androidx.navigation.compose.dialog
+import androidx.navigation.compose.navigation
+import com.vanbrusselgames.mindmix.core.common.BaseScreenViewModel
+import com.vanbrusselgames.mindmix.core.designsystem.theme.setFullScreen
 import com.vanbrusselgames.mindmix.core.logging.Logger
+import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
-import com.vanbrusselgames.mindmix.games.solitaire.GameUI
-import com.vanbrusselgames.mindmix.games.solitaire.SolitaireViewModel
+import com.vanbrusselgames.mindmix.games.solitaire.ui.GameUI
+import com.vanbrusselgames.mindmix.games.solitaire.ui.dialogs.SolitaireGameMenuDialog
+import com.vanbrusselgames.mindmix.games.solitaire.ui.dialogs.SolitaireSettingsDialog
+import com.vanbrusselgames.mindmix.games.solitaire.viewmodel.SolitaireViewModel
 import kotlinx.serialization.Serializable
 
 @Serializable
-object SolitaireRoute {
-    const val NAV_ROUTE = "game/solitaire?mode={mode}"
-    val NAV_ARGUMENTS = listOf(navArgument("mode") { defaultValue = "0" })
+object SolitaireFeatureRoute
+
+@Serializable
+object/*data class*/ SolitaireGameRoute/*(val mode: Int = 0)*/
+
+@Serializable
+object SolitaireGameMenuRoute
+
+@Serializable
+object SolitaireSettingsRoute
+
+fun NavController.navigateToSolitaire(
+    route: SolitaireGameRoute = SolitaireGameRoute, navOptions: NavOptions? = null
+) {
+    Logger.d("Navigate to: Solitaire")
+    SceneManager.currentScene = SceneRegistry.Solitaire
+    navigate(route, navOptions)
 }
 
-fun NavController.navigateToSolitaire(navOptions: NavOptions? = null) {
-    Logger.d("Navigate to: Solitaire")
-    SceneManager.currentScene = SceneManager.Scene.SOLITAIRE
-    navigate(SolitaireRoute, navOptions)
+fun NavController.navigateToSolitaireGameMenu(
+    route: SolitaireGameMenuRoute = SolitaireGameMenuRoute, navOptions: NavOptions? = null
+) {
+    Logger.d("Navigate to: Solitaire GameMenu")
+    navigate(route, navOptions)
+}
+
+fun NavController.navigateToSolitaireSettings(
+    route: SolitaireSettingsRoute = SolitaireSettingsRoute, navOptions: NavOptions? = null
+) {
+    Logger.d("Navigate to: Solitaire Settings")
+    navigate(route, navOptions)
 }
 
 fun NavGraphBuilder.solitaire(
-    navController: NavController,
-    viewModel: SolitaireViewModel,
-    snackbarHostState: SnackbarHostState
+    navController: NavController, setCurrentViewModel: (BaseScreenViewModel?) -> Unit
 ) {
-    composable<SolitaireRoute> {
-        val coroutineScope = rememberCoroutineScope()
-        viewModel.setCoroutineScope(coroutineScope)
-        remember { viewModel.loadPuzzle();0 }
-        //it.arguments?.getString("mode")
-        GameUI(viewModel, navController, snackbarHostState)
+    navigation<SolitaireFeatureRoute>(SolitaireGameRoute) {
+        composable<SolitaireGameRoute> { navBackStackEntry ->
+            val vm = hiltViewModel<SolitaireViewModel>(remember(navBackStackEntry) {
+                navController.getBackStackEntry<SolitaireFeatureRoute>()
+            })
+            setCurrentViewModel(vm)
+            // val route = navBackStackEntry.toRoute<SolitaireGameRoute>()
+            // route.mode
+            GameUI(vm, navController)
+            BackHandler { navController.navigateToSolitaireGameMenu() }
+        }
+
+        dialog<SolitaireGameMenuRoute>(
+            dialogProperties = DialogProperties(true, false, false)
+        ) { navBackStackEntry ->
+            val vm = hiltViewModel<SolitaireViewModel>(remember(navBackStackEntry) {
+                navController.getBackStackEntry<SolitaireFeatureRoute>()
+            })
+            val window = (LocalView.current.parent as? DialogWindowProvider)?.window
+            if (window != null) setFullScreen(null, window)
+            SolitaireGameMenuDialog(vm, navController)
+        }
+
+        dialog<SolitaireSettingsRoute>(
+            dialogProperties = DialogProperties(true, false, false)
+        ) { navBackStackEntry ->
+            val vm = hiltViewModel<SolitaireViewModel>(remember(navBackStackEntry) {
+                navController.getBackStackEntry<SolitaireFeatureRoute>()
+            })
+            val window = (LocalView.current.parent as? DialogWindowProvider)?.window
+            if (window != null) setFullScreen(null, window)
+            SolitaireSettingsDialog(vm, navController)
+        }
     }
 }

@@ -19,10 +19,8 @@ interface IMinesweeperViewModel : IBaseGameViewModel {
     val puzzleLoaded: StateFlow<Boolean>
     val preferencesLoaded: StateFlow<Boolean>
 
-    val cellCount: Int
     val cells: Array<MinesweeperCell>
     var finished: Boolean
-    val mines: BooleanArray
     var sizeX: Int
     var sizeY: Int
 

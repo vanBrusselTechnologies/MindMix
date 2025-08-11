@@ -34,7 +34,6 @@ class MenuScreenViewModel : BaseScreenViewModel() {
         SceneRegistry.Game2048.gameId to SceneRegistry.Game2048
     )
     var selectedGame: GameScene = SceneRegistry.Minesweeper
-    var settingsGame: Scene = SceneRegistry.Menu
 
     val wheelModel = GameWheel(this, games.size)
 

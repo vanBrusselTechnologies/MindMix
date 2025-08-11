@@ -47,12 +47,9 @@ import com.vanbrusselgames.mindmix.core.navigation.SceneManager
 import com.vanbrusselgames.mindmix.core.navigation.navigateToMenu
 import com.vanbrusselgames.mindmix.feature.gamefinished.navigation.gameFinishedDialog
 import com.vanbrusselgames.mindmix.feature.gamehelp.navigation.gameHelpDialog
-import com.vanbrusselgames.mindmix.feature.gamemenu.navigation.gameMenuDialog
-import com.vanbrusselgames.mindmix.feature.gamemenu.navigation.navigateToGameMenu
 import com.vanbrusselgames.mindmix.feature.menu.MenuScreenViewModel
 import com.vanbrusselgames.mindmix.feature.menu.MenuSettings
 import com.vanbrusselgames.mindmix.feature.menu.navigation.menu
-import com.vanbrusselgames.mindmix.feature.settings.navigation.navigateToSettings
 import com.vanbrusselgames.mindmix.feature.settings.navigation.settingsDialog
 import com.vanbrusselgames.mindmix.games.game2048.navigation.game2048
 import com.vanbrusselgames.mindmix.games.game2048.navigation.navigateToGame2048GameMenu
@@ -62,9 +59,10 @@ import com.vanbrusselgames.mindmix.games.minesweeper.navigation.minesweeper
 import com.vanbrusselgames.mindmix.games.minesweeper.navigation.navigateToMinesweeperGameMenu
 import com.vanbrusselgames.mindmix.games.minesweeper.ui.dialogs.MinesweeperGameFinishedDialog
 import com.vanbrusselgames.mindmix.games.minesweeper.viewmodel.MinesweeperViewModel
-import com.vanbrusselgames.mindmix.games.solitaire.SolitaireGameFinishedDialog
-import com.vanbrusselgames.mindmix.games.solitaire.SolitaireViewModel
+import com.vanbrusselgames.mindmix.games.solitaire.navigation.navigateToSolitaireGameMenu
 import com.vanbrusselgames.mindmix.games.solitaire.navigation.solitaire
+import com.vanbrusselgames.mindmix.games.solitaire.ui.dialogs.SolitaireGameFinishedDialog
+import com.vanbrusselgames.mindmix.games.solitaire.viewmodel.SolitaireViewModel
 import com.vanbrusselgames.mindmix.games.sudoku.navigation.navigateToSudokuGameMenu
 import com.vanbrusselgames.mindmix.games.sudoku.navigation.sudoku
 import com.vanbrusselgames.mindmix.games.sudoku.ui.dialogs.SudokuGameFinishedDialog
@@ -93,7 +91,6 @@ class MainActivity : ComponentActivity() {
     lateinit var updateManager: UpdateManager
 
     val menuScreenViewModel by viewModels<MenuScreenViewModel>()
-    val solitaireViewModel by viewModels<SolitaireViewModel>()
 
     private val _currentViewModel = mutableStateOf<BaseScreenViewModel?>(null)
     val currentViewModel: State<BaseScreenViewModel?> = _currentViewModel
@@ -158,15 +155,10 @@ class MainActivity : ComponentActivity() {
                                 enterTransition = { fadeIn() },
                                 exitTransition = { fadeOut() }) {
                                 menu(navController, menuScreenViewModel, ::setCurrentViewModel)
-                                solitaire(navController, solitaireViewModel, ::setCurrentViewModel)
+                                solitaire(navController, ::setCurrentViewModel)
                                 sudoku(navController, ::setCurrentViewModel)
                                 minesweeper(navController, ::setCurrentViewModel)
                                 game2048(navController, ::setCurrentViewModel)
-                                gameMenuDialog(
-                                    navController,
-                                    { currentViewModel.value!!.nameResId },
-                                    { (currentViewModel.value as BaseGameViewModel).startNewGame() },
-                                    { navController.navigateToSettings() }) { navController.navigateToMenu() }
                                 gameHelpDialog(
                                     navController,
                                     { currentViewModel.value!!.nameResId }) { (currentViewModel.value as BaseGameViewModel).descResId }
@@ -246,21 +238,9 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                                 settingsDialog(navController) {
-                                    val settingsScene =
-                                        if (SceneManager.currentScene == SceneRegistry.Menu) menuScreenViewModel.settingsGame else SceneManager.currentScene
-                                    menuScreenViewModel.settingsGame = SceneRegistry.Menu
-                                    when (settingsScene) {
-                                        SceneRegistry.Menu -> MenuSettings(
-                                            context, menuScreenViewModel, authManager
-                                        ) { authManager.signIn(this@MainActivity) }
-
-                                        //SceneRegistry.Solitaire -> SolitaireSettings(
-                                        //    context, solitaireViewModel
-                                        //)
-
-                                        is GameScene -> {}
-                                        is StaticScene -> {}
-                                    }
+                                    MenuSettings(
+                                        context, menuScreenViewModel, authManager
+                                    ) { authManager.signIn(this@MainActivity) }
                                 }
                             }
                         }
@@ -287,12 +267,14 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun openGameMenu() {
-        if (!SceneManager.dialogActiveState.value && currentViewModel.value !is MenuScreenViewModel) {
+        if (!SceneManager.dialogActiveState.value) {
             when (SceneManager.currentScene) {
+                SceneRegistry.Menu -> return
                 SceneRegistry.Game2048 -> navController.navigateToGame2048GameMenu()
                 SceneRegistry.Minesweeper -> navController.navigateToMinesweeperGameMenu()
+                SceneRegistry.Solitaire -> navController.navigateToSolitaireGameMenu()
                 SceneRegistry.Sudoku -> navController.navigateToSudokuGameMenu()
-                else -> navController.navigateToGameMenu()
+                else -> throw NotImplementedError()
             }
             currentViewModel.value!!.onOpenDialog()
         }

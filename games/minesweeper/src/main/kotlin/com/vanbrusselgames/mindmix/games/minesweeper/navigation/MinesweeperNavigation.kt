@@ -2,7 +2,9 @@ package com.vanbrusselgames.mindmix.games.minesweeper.navigation
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.window.DialogWindowProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -11,6 +13,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.navigation
 import com.vanbrusselgames.mindmix.core.common.BaseScreenViewModel
+import com.vanbrusselgames.mindmix.core.designsystem.theme.setFullScreen
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
@@ -75,6 +78,8 @@ fun NavGraphBuilder.minesweeper(
             val vm = hiltViewModel<MinesweeperViewModel>(remember(navBackStackEntry) {
                 navController.getBackStackEntry<MinesweeperFeatureRoute>()
             })
+            val window = (LocalView.current.parent as? DialogWindowProvider)?.window
+            if (window != null) setFullScreen(null, window)
             MinesweeperGameMenuDialog(vm, navController)
         }
 
@@ -84,6 +89,8 @@ fun NavGraphBuilder.minesweeper(
             val vm = hiltViewModel<MinesweeperViewModel>(remember(navBackStackEntry) {
                 navController.getBackStackEntry<MinesweeperFeatureRoute>()
             })
+            val window = (LocalView.current.parent as? DialogWindowProvider)?.window
+            if (window != null) setFullScreen(null, window)
             MinesweeperSettingsDialog(vm, navController)
         }
     }

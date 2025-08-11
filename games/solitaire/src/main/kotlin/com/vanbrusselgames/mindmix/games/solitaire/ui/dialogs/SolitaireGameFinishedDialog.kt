@@ -1,4 +1,4 @@
-package com.vanbrusselgames.mindmix.games.solitaire
+package com.vanbrusselgames.mindmix.games.solitaire.ui.dialogs
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -23,19 +25,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.vanbrusselgames.mindmix.core.advertisement.AdManager
 import com.vanbrusselgames.mindmix.core.designsystem.theme.MindMixTheme
 import com.vanbrusselgames.mindmix.feature.gamefinished.Buttons
 import com.vanbrusselgames.mindmix.feature.gamefinished.GameFinishedRewardRow
 import com.vanbrusselgames.mindmix.feature.gamefinished.StatRow
 import com.vanbrusselgames.mindmix.feature.gamefinished.Stats
+import com.vanbrusselgames.mindmix.games.solitaire.R
+import com.vanbrusselgames.mindmix.games.solitaire.model.FinishedGame
+import com.vanbrusselgames.mindmix.games.solitaire.viewmodel.ISolitaireViewModel
+import com.vanbrusselgames.mindmix.games.solitaire.viewmodel.MockSolitaireViewModel
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun SolitaireGameFinishedDialog(
     navController: NavController,
-    viewModel: SolitaireViewModel,
-    adManager: (() -> AdManager)?,
+    viewModel: ISolitaireViewModel,
+    checkAdLoaded: (adLoaded: MutableState<Boolean>) -> Unit,
+    showAd: (adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit) -> Unit,
     backToMenu: () -> Unit,
     forceSave: () -> Unit
 ) {
@@ -95,9 +101,9 @@ fun SolitaireGameFinishedDialog(
             )
         }
 
-        if (FinishedGame.reward != 0 && adManager != null) {
+        if (FinishedGame.reward != 0) {
             Spacer(Modifier.height(8.dp))
-            GameFinishedRewardRow(FinishedGame.reward, adManager, forceSave)
+            GameFinishedRewardRow(FinishedGame.reward, checkAdLoaded, showAd, forceSave)
         }
         Spacer(Modifier.height(8.dp))
         Buttons(
@@ -124,7 +130,13 @@ fun Prev_GameFinished() {
             FinishedGame.usedMillis = 10000000
             FinishedGame.lastRecordMillis = 9999999
             FinishedGame.isNewRecord = false
-            SolitaireGameFinishedDialog(rememberNavController(), SolitaireViewModel(), null, {}) {}
+            val vm = remember { MockSolitaireViewModel() }
+            SolitaireGameFinishedDialog(
+                rememberNavController(),
+                vm,
+                {},
+                { a, b -> },
+                {}) {}
         }
     }
 }

@@ -36,10 +36,10 @@ class MockMinesweeperViewModel @Inject constructor() : BaseGameViewModel(), IMin
 
     override var sizeX = 16
     override var sizeY = 22
-    override val cellCount
+    val cellCount
         get() = sizeX * sizeY
-    override val cells = Array(cellCount) { MinesweeperCell(this, it) }
-    override val mines = BooleanArray(cellCount) { false }
+    override val cells = Array(cellCount) { MinesweeperCell(it) }
+    val mines = BooleanArray(cellCount) { false }
     override val minesLeft = mutableIntStateOf(-1)
 
     override val preferencesLoaded = MutableStateFlow(false).asStateFlow()

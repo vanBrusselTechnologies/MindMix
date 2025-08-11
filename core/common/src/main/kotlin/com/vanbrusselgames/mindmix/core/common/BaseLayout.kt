@@ -58,7 +58,7 @@ private fun TopBar(
             if (!viewModel.isMenu) {
                 IconButton(
                     onClick = {
-                        openGameMenu()//navController.navigateToGameMenu()
+                        openGameMenu()
                         viewModel.onOpenDialog()
                     },
                     modifier = Modifier

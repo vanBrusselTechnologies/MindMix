@@ -33,7 +33,6 @@ class MinesweeperRepository @Inject constructor(private val dataManager: DataMan
         val json = dataManager.getSavedDataForScene(SceneRegistry.Minesweeper)
         if (json.trim() == "") return null
         val data = jsonParser.decodeFromString<MinesweeperData>(json)
-        if (data.progress.isEmpty()) return null
 
         _puzzleProgress.clear()
         _puzzleProgress.addAll(data.progress)

@@ -58,7 +58,7 @@ class GameTimer {
             currentMillis = System.currentTimeMillis() - startMillis
             currentTime.longValue = currentMillis + addedMillis
         }
-        if (startMillis == 0L) reset()
+        if (startMillis == 0L) start()
         running.value = true
     }
 

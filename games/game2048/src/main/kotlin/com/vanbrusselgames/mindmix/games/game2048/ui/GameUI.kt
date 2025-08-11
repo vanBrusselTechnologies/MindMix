@@ -80,9 +80,10 @@ fun GameUI(viewModel: IGame2048ViewModel, navController: NavController) {
                 ) { Grid2048(viewModel, navController) }
             }
         }
-        val loadedState = viewModel.puzzleLoaded.collectAsStateWithLifecycle()
-        if (!loadedState.value) GameLoadingScreen()
     }
+
+    val loadedState = viewModel.puzzleLoaded.collectAsStateWithLifecycle()
+    if (!loadedState.value) GameLoadingScreen()
 }
 
 @Composable

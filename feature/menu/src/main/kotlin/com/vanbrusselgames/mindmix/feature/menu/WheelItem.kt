@@ -64,7 +64,8 @@ import com.vanbrusselgames.mindmix.games.game2048.model.Game2048
 import com.vanbrusselgames.mindmix.games.game2048.navigation.navigateToGame2048Settings
 import com.vanbrusselgames.mindmix.games.minesweeper.model.Minesweeper
 import com.vanbrusselgames.mindmix.games.minesweeper.navigation.navigateToMinesweeperSettings
-import com.vanbrusselgames.mindmix.games.solitaire.Solitaire
+import com.vanbrusselgames.mindmix.games.solitaire.model.Solitaire
+import com.vanbrusselgames.mindmix.games.solitaire.navigation.navigateToSolitaireSettings
 import com.vanbrusselgames.mindmix.games.sudoku.model.Sudoku
 import com.vanbrusselgames.mindmix.games.sudoku.navigation.navigateToSudokuSettings
 import kotlin.math.cos
@@ -169,10 +170,10 @@ fun WheelItemIconButton(
         ), label = "ShowSettings"
     ) {
         IconButton({
-            viewModel.settingsGame = game
             when (game) {
                 SceneRegistry.Game2048 -> navController.navigateToGame2048Settings()
                 SceneRegistry.Minesweeper -> navController.navigateToMinesweeperSettings()
+                SceneRegistry.Solitaire -> navController.navigateToSolitaireSettings()
                 SceneRegistry.Sudoku -> navController.navigateToSudokuSettings()
                 else -> navController.navigateToSettings()
             }
