@@ -238,6 +238,7 @@ class MinesweeperViewModel @Inject constructor(
             param(FirebaseAnalytics.Param.LEVEL_NAME, SceneRegistry.Minesweeper.name)
             param(FirebaseAnalytics.Param.SUCCESS, 0)
         }
+        minesweeperRepository.removeProgressForDifficulty(difficulty.value)
         cells.forEach {
             if (it.isMine && it.state == CellState.Empty) it.state = CellState.Bomb
         }
@@ -260,6 +261,7 @@ class MinesweeperViewModel @Inject constructor(
                 param(FirebaseAnalytics.Param.LEVEL_NAME, SceneRegistry.Minesweeper.name)
                 param(FirebaseAnalytics.Param.SUCCESS, 1)
             }
+            minesweeperRepository.removeProgressForDifficulty(difficulty.value)
             onGameFinished(navController, true)
         }
     }

@@ -545,6 +545,7 @@ class SolitaireViewModel @Inject constructor(
     override fun onOpenDialog() {
         super.onOpenDialog()
         timer.pause()
+        solitaireRepository.setPuzzleProgress(cardStacks, moves, timer)
     }
 
     override fun setCardVisualType(value: CardVisualType) {
