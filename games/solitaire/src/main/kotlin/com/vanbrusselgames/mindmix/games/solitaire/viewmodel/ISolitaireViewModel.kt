@@ -1,5 +1,7 @@
 package com.vanbrusselgames.mindmix.games.solitaire.viewmodel
 
+import android.app.Activity
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.Density
@@ -10,11 +12,13 @@ import androidx.navigation.NavController
 import com.vanbrusselgames.mindmix.core.common.IBaseGameViewModel
 import com.vanbrusselgames.mindmix.core.common.ITimerVM
 import com.vanbrusselgames.mindmix.games.solitaire.model.CardVisualType
+import com.vanbrusselgames.mindmix.games.solitaire.model.FinishedGame
 import com.vanbrusselgames.mindmix.games.solitaire.model.PlayingCard
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
 
 interface ISolitaireViewModel : IBaseGameViewModel, ITimerVM {
+    val finishedGame: State<FinishedGame>
     val cardVisualType: State<CardVisualType>
     val couldGetFinished: State<Boolean>
     val restStackEnabled: State<Boolean>
@@ -38,6 +42,10 @@ interface ISolitaireViewModel : IBaseGameViewModel, ITimerVM {
     fun turnFromRestStack()
     fun onUpdateTableSize(width: Dp, height: Dp, density: Density): DpSize
     fun onClickFinishGame(navController: NavController)
+
+    fun forceSave()
+    fun checkAdLoaded(activity: Activity, adLoaded: MutableState<Boolean>)
+    fun showAd(activity: Activity, adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit)
 
     fun setCardVisualType(value: CardVisualType)
 }

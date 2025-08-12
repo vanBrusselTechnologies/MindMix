@@ -1,15 +1,16 @@
 package com.vanbrusselgames.mindmix.games.sudoku.viewmodel
 
+import android.app.Activity
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.vanbrusselgames.mindmix.core.advertisement.AdManager
 import com.vanbrusselgames.mindmix.core.common.BaseGameViewModel
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.core.utils.constants.Difficulty
-import com.vanbrusselgames.mindmix.feature.gamefinished.navigation.navigateToGameFinished
-import com.vanbrusselgames.mindmix.games.sudoku.R
 import com.vanbrusselgames.mindmix.games.sudoku.data.SudokuRepository
 import com.vanbrusselgames.mindmix.games.sudoku.data.preferences.SudokuPreferences
 import com.vanbrusselgames.mindmix.games.sudoku.data.preferences.SudokuPreferencesRepository
@@ -17,10 +18,10 @@ import com.vanbrusselgames.mindmix.games.sudoku.helpers.SudokuPuzzle
 import com.vanbrusselgames.mindmix.games.sudoku.model.FinishedGame
 import com.vanbrusselgames.mindmix.games.sudoku.model.InputMode
 import com.vanbrusselgames.mindmix.games.sudoku.model.PuzzleType
-import com.vanbrusselgames.mindmix.games.sudoku.model.Sudoku
 import com.vanbrusselgames.mindmix.games.sudoku.model.SudokuProgress
 import com.vanbrusselgames.mindmix.games.sudoku.model.SudokuPuzzleCell
 import com.vanbrusselgames.mindmix.games.sudoku.model.rewardForDifficulty
+import com.vanbrusselgames.mindmix.games.sudoku.navigation.navigateToSudokuGameFinished
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -39,6 +40,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SudokuViewModel @Inject constructor(
+    private val adManager: AdManager,
     private val sudokuRepository: SudokuRepository,
     private val prefsRepository: SudokuPreferencesRepository
 ) : BaseGameViewModel(), ISudokuViewModel {
@@ -46,11 +48,9 @@ class SudokuViewModel @Inject constructor(
         const val SIZE = 9
     }
 
-    override val nameResId = Sudoku.NAME_RES_ID
-    override val descResId = R.string.sudoku_desc
-
     override val cells = Array(SIZE * SIZE) { SudokuPuzzleCell(it, false, 0, SIZE) }
 
+    override val finishedGame = mutableStateOf(FinishedGame())
     override val autoEditNotes = mutableStateOf(false)
     override val checkConflictingCells = mutableStateOf(false)
     override val difficulty = mutableStateOf(Difficulty.MEDIUM)
@@ -208,13 +208,23 @@ class SudokuViewModel @Inject constructor(
     }
 
     private fun onGameFinished(navController: NavController) {
-        FinishedGame.titleResId = Sudoku.NAME_RES_ID// "Congrats / Smart / Well done"
-        FinishedGame.textResId = R.string.sudoku_success
-        // """You did great and solved puzzle in ${0} seconds!!
-        //     |That's Awesome!
-        //     |Share with your friends and challenge them to beat your time!""".trimMargin()
-        FinishedGame.reward = rewardForDifficulty[difficulty.value]!!
-        navController.navigateToGameFinished()
+        val reward = rewardForDifficulty[difficulty.value]!!
+        finishedGame.value = FinishedGame(reward)
+        navController.navigateToSudokuGameFinished()
+    }
+
+    override fun forceSave() {
+        sudokuRepository.forceSave()
+    }
+
+    override fun checkAdLoaded(activity: Activity, adLoaded: MutableState<Boolean>) {
+        adManager.checkAdLoaded(activity, adLoaded)
+    }
+
+    override fun showAd(
+        activity: Activity, adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit
+    ) {
+        adManager.showAd(activity, adLoaded, onAdWatched)
     }
 
     override fun onClickUpdateAutoEditNotes() {

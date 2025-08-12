@@ -19,21 +19,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.navigation.NavController
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
-import com.vanbrusselgames.mindmix.feature.gamehelp.navigation.navigateToGameHelp
 
 @Composable
 fun BaseScene(
     viewModel: IBaseScreenViewModel,
-    navController: NavController,
+    openGameHelp: () -> Unit,
     openGameMenu: () -> Unit,
     openSettings: () -> Unit,
     sceneSpecific: @Composable BoxScope.() -> Unit
 ) {
     Scaffold(
         Modifier.safeDrawingPadding(),
-        { TopBar(viewModel, navController, openGameMenu, openSettings) }) {
+        { TopBar(viewModel, openGameHelp, openGameMenu, openSettings) }) {
         Box(
             Modifier
                 .fillMaxSize()
@@ -45,7 +43,7 @@ fun BaseScene(
 @Composable
 private fun TopBar(
     viewModel: IBaseScreenViewModel,
-    navController: NavController,
+    openGameHelp: () -> Unit,
     openGameMenu: () -> Unit,
     openSettings: () -> Unit
 ) {
@@ -69,7 +67,7 @@ private fun TopBar(
                 Row(Modifier.align(Alignment.TopEnd)) {
                     IconButton(
                         onClick = {
-                            navController.navigateToGameHelp()
+                            openGameHelp()
                             viewModel.onOpenDialog()
                         },
                         modifier = Modifier
@@ -99,7 +97,7 @@ private fun TopBar(
                  */
                 IconButton(
                     onClick = {
-                        openSettings()//navController.navigateToSettings()
+                        openSettings()
                         viewModel.onOpenDialog()
                     },
                     modifier = Modifier

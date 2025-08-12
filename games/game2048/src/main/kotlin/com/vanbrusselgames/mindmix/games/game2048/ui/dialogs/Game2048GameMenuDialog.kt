@@ -9,17 +9,16 @@ import androidx.navigation.compose.rememberNavController
 import com.vanbrusselgames.mindmix.core.designsystem.theme.MindMixTheme
 import com.vanbrusselgames.mindmix.core.navigation.navigateToMenu
 import com.vanbrusselgames.mindmix.feature.gamemenu.GameMenuDialog
+import com.vanbrusselgames.mindmix.games.game2048.R
 import com.vanbrusselgames.mindmix.games.game2048.navigation.navigateToGame2048Settings
 import com.vanbrusselgames.mindmix.games.game2048.viewmodel.IGame2048ViewModel
 import com.vanbrusselgames.mindmix.games.game2048.viewmodel.MockGame2048ViewModel
 
 @Composable
-fun Game2048GameMenuDialog(
-    viewModel: IGame2048ViewModel, navController: NavController
-) {
+fun Game2048GameMenuDialog(viewModel: IGame2048ViewModel, navController: NavController) {
     GameMenuDialog(
         navController,
-        viewModel.nameResId,
+        R.string.game_2048_name,
         { viewModel.startNewGame() },
         { navController.navigateToGame2048Settings() }) { navController.navigateToMenu() }
 }

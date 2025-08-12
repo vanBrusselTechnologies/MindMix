@@ -18,6 +18,8 @@ import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
 import com.vanbrusselgames.mindmix.games.solitaire.ui.GameUI
+import com.vanbrusselgames.mindmix.games.solitaire.ui.dialogs.SolitaireGameFinishedDialog
+import com.vanbrusselgames.mindmix.games.solitaire.ui.dialogs.SolitaireGameHelpDialog
 import com.vanbrusselgames.mindmix.games.solitaire.ui.dialogs.SolitaireGameMenuDialog
 import com.vanbrusselgames.mindmix.games.solitaire.ui.dialogs.SolitaireSettingsDialog
 import com.vanbrusselgames.mindmix.games.solitaire.viewmodel.SolitaireViewModel
@@ -30,6 +32,12 @@ object SolitaireFeatureRoute
 object/*data class*/ SolitaireGameRoute/*(val mode: Int = 0)*/
 
 @Serializable
+object SolitaireGameFinishedRoute
+
+@Serializable
+object SolitaireGameHelpRoute
+
+@Serializable
 object SolitaireGameMenuRoute
 
 @Serializable
@@ -40,6 +48,20 @@ fun NavController.navigateToSolitaire(
 ) {
     Logger.d("Navigate to: Solitaire")
     SceneManager.currentScene = SceneRegistry.Solitaire
+    navigate(route, navOptions)
+}
+
+fun NavController.navigateToSolitaireGameFinished(
+    route: SolitaireGameFinishedRoute = SolitaireGameFinishedRoute, navOptions: NavOptions? = null
+) {
+    Logger.d("Navigate to: Solitaire GameFinished")
+    navigate(route, navOptions)
+}
+
+fun NavController.navigateToSolitaireGameHelp(
+    route: SolitaireGameHelpRoute = SolitaireGameHelpRoute, navOptions: NavOptions? = null
+) {
+    Logger.d("Navigate to: Solitaire GameHelp")
     navigate(route, navOptions)
 }
 
@@ -70,6 +92,25 @@ fun NavGraphBuilder.solitaire(
             // route.mode
             GameUI(vm, navController)
             BackHandler { navController.navigateToSolitaireGameMenu() }
+        }
+
+        dialog<SolitaireGameFinishedRoute>(
+            dialogProperties = DialogProperties(false, false, false)
+        ) { navBackStackEntry ->
+            val vm = hiltViewModel<SolitaireViewModel>(remember(navBackStackEntry) {
+                navController.getBackStackEntry<SolitaireFeatureRoute>()
+            })
+            val window = (LocalView.current.parent as? DialogWindowProvider)?.window
+            if (window != null) setFullScreen(null, window)
+            SolitaireGameFinishedDialog(vm, navController)
+        }
+
+        dialog<SolitaireGameHelpRoute>(
+            dialogProperties = DialogProperties(true, false, false)
+        ) { navBackStackEntry ->
+            val window = (LocalView.current.parent as? DialogWindowProvider)?.window
+            if (window != null) setFullScreen(null, window)
+            SolitaireGameHelpDialog(navController)
         }
 
         dialog<SolitaireGameMenuRoute>(

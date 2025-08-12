@@ -1,5 +1,6 @@
 package com.vanbrusselgames.mindmix.games.sudoku.ui.dialogs
 
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Spacer
@@ -23,43 +24,68 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.vanbrusselgames.mindmix.core.designsystem.theme.MindMixTheme
+import com.vanbrusselgames.mindmix.core.navigation.navigateToMenu
 import com.vanbrusselgames.mindmix.feature.gamefinished.Buttons
+import com.vanbrusselgames.mindmix.feature.gamefinished.GameFinishedDialog
 import com.vanbrusselgames.mindmix.feature.gamefinished.GameFinishedRewardRow
+import com.vanbrusselgames.mindmix.games.sudoku.R
 import com.vanbrusselgames.mindmix.games.sudoku.model.FinishedGame
 import com.vanbrusselgames.mindmix.games.sudoku.viewmodel.ISudokuViewModel
 import com.vanbrusselgames.mindmix.games.sudoku.viewmodel.MockSudokuViewModel
 
 @Composable
-fun SudokuGameFinishedDialog(
-    navController: NavController,
-    viewModel: ISudokuViewModel,
-    checkAdLoaded: (adLoaded: MutableState<Boolean>) -> Unit,
-    showAd: (adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit) -> Unit,
-    backToMenu: () -> Unit,
-    forceSave: () -> Unit
-) {
-    Column(
-        Modifier
-            .padding(16.dp)
-            .width(IntrinsicSize.Max),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            stringResource(FinishedGame.titleResId),
-            fontSize = 25.sp,
-            fontWeight = FontWeight.ExtraBold
-        )
-        Spacer(Modifier.height(2.dp))
-        Text(stringResource(FinishedGame.textResId), textAlign = TextAlign.Center)
-        if (FinishedGame.reward != 0) {
+fun SudokuGameFinishedDialog(viewModel: ISudokuViewModel, navController: NavController) {
+    GameFinishedDialog {
+        Column(
+            Modifier
+                .padding(16.dp)
+                .width(IntrinsicSize.Min),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            val finishedGame = viewModel.finishedGame.value
+
+            GameFinishedDialogTitle()
+            Spacer(Modifier.height(2.dp))
+            GameFinishedDialogText()
+            if (finishedGame.reward != 0) {
+                val activity = LocalActivity.current
+                val checkAdLoaded = { adLoaded: MutableState<Boolean> ->
+                    if (activity != null) viewModel.checkAdLoaded(activity, adLoaded)
+                }
+                val showAd = { adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit ->
+                    if (activity != null) viewModel.showAd(activity, adLoaded, onAdWatched)
+                }
+                val forceSave = { viewModel.forceSave() }
+                Spacer(Modifier.height(8.dp))
+                GameFinishedRewardRow(finishedGame.reward, checkAdLoaded, showAd, forceSave)
+            }
             Spacer(Modifier.height(8.dp))
-            GameFinishedRewardRow(FinishedGame.reward, checkAdLoaded, showAd, forceSave)
+            Buttons(
+                navController,
+                Modifier.fillMaxWidth(),
+                null,
+                { viewModel.startNewGame() }) { navController.navigateToMenu() }
         }
-        Spacer(Modifier.height(8.dp))
-        Buttons(
-            navController, Modifier.fillMaxWidth(), null, { viewModel.startNewGame() }, backToMenu
-        )
     }
+}
+
+@Composable
+private fun GameFinishedDialogTitle() {
+    Text(
+        stringResource(R.string.sudoku_name), // "Congrats / Smart / Well done"
+        fontSize = 25.sp, fontWeight = FontWeight.ExtraBold
+    )
+}
+
+@Composable
+private fun GameFinishedDialogText() {
+    Text(
+        stringResource(R.string.sudoku_success),
+        // """You did great and solved puzzle in ${0} seconds!!
+        //     |That's Awesome!
+        //     |Share with your friends and challenge them to beat your time!""".trimMargin()
+        Modifier.width(IntrinsicSize.Max), textAlign = TextAlign.Center
+    )
 }
 
 @PreviewLightDark
@@ -68,7 +94,8 @@ fun Prev_GameFinished() {
     MindMixTheme {
         Surface {
             val vm = remember { MockSudokuViewModel() }
-            SudokuGameFinishedDialog(rememberNavController(), vm, {}, { a, b -> }, {}) {}
+            vm.finishedGame.value = FinishedGame(1)
+            SudokuGameFinishedDialog(vm, rememberNavController())
         }
     }
 }

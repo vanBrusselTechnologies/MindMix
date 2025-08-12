@@ -1,5 +1,6 @@
 package com.vanbrusselgames.mindmix.games.solitaire.ui.dialogs
 
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -26,7 +27,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.vanbrusselgames.mindmix.core.designsystem.theme.MindMixTheme
+import com.vanbrusselgames.mindmix.core.navigation.navigateToMenu
 import com.vanbrusselgames.mindmix.feature.gamefinished.Buttons
+import com.vanbrusselgames.mindmix.feature.gamefinished.GameFinishedDialog
 import com.vanbrusselgames.mindmix.feature.gamefinished.GameFinishedRewardRow
 import com.vanbrusselgames.mindmix.feature.gamefinished.StatRow
 import com.vanbrusselgames.mindmix.feature.gamefinished.Stats
@@ -37,79 +40,97 @@ import com.vanbrusselgames.mindmix.games.solitaire.viewmodel.MockSolitaireViewMo
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
-fun SolitaireGameFinishedDialog(
-    navController: NavController,
-    viewModel: ISolitaireViewModel,
-    checkAdLoaded: (adLoaded: MutableState<Boolean>) -> Unit,
-    showAd: (adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit) -> Unit,
-    backToMenu: () -> Unit,
-    forceSave: () -> Unit
-) {
-    Column(
-        Modifier
-            .padding(16.dp)
-            .width(IntrinsicSize.Min),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            stringResource(FinishedGame.titleResId),
-            fontSize = 25.sp,
-            fontWeight = FontWeight.ExtraBold
-        )
-        Spacer(Modifier.height(2.dp))
-        Text(
-            stringResource(FinishedGame.textResId),
-            Modifier.width(IntrinsicSize.Max),
-            textAlign = TextAlign.Center
-        )
-        Spacer(Modifier.height(8.dp))
-        Stats {
-            StatRow(
-                fieldText = stringResource(R.string.game_soltaire_label_moves),
-                valueText = FinishedGame.moves.toString()
-            )
-            StatRow(
-                fieldText = stringResource(R.string.game_solitaire_label_current_time),
-                valueText = formatDuration(FinishedGame.usedMillis)
-            )
-            if (FinishedGame.penaltyMillis > 0) {
+fun SolitaireGameFinishedDialog(viewModel: ISolitaireViewModel, navController: NavController) {
+    GameFinishedDialog {
+        Column(
+            Modifier
+                .padding(16.dp)
+                .width(IntrinsicSize.Min),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            val finishedGame = viewModel.finishedGame.value
+
+            GameFinishedDialogTitle()
+            Spacer(Modifier.height(2.dp))
+            GameFinishedDialogText()
+            Spacer(Modifier.height(8.dp))
+            Stats {
                 StatRow(
-                    fieldText = stringResource(R.string.game_soltaire_label_penalty_time),
-                    valueText = formatDuration(FinishedGame.penaltyMillis)
+                    fieldText = stringResource(R.string.game_soltaire_label_moves),
+                    valueText = finishedGame.moves.toString()
                 )
-            }
-            if (FinishedGame.isNewRecord) {
-                Box {
+                StatRow(
+                    fieldText = stringResource(R.string.game_solitaire_label_current_time),
+                    valueText = formatDuration(finishedGame.usedMillis)
+                )
+                if (finishedGame.penaltyMillis > 0) {
                     StatRow(
-                        fieldText = stringResource(R.string.game_solitaire_label_fastest_time),
-                        valueText = formatDuration(FinishedGame.usedMillis + FinishedGame.penaltyMillis)
-                    )
-                    Text(
-                        stringResource(R.string.game_solitaire_new_record),
-                        Modifier
-                            .rotate(-16.25f)
-                            .align(Alignment.CenterEnd),
-                        Color.Red,
-                        13.5f.sp,
-                        fontWeight = FontWeight.ExtraBold
+                        fieldText = stringResource(R.string.game_soltaire_label_penalty_time),
+                        valueText = formatDuration(finishedGame.penaltyMillis)
                     )
                 }
+                if (finishedGame.isNewRecord) {
+                    Box {
+                        StatRow(
+                            fieldText = stringResource(R.string.game_solitaire_label_fastest_time),
+                            valueText = formatDuration(finishedGame.usedMillis + finishedGame.penaltyMillis)
+                        )
+                        Text(
+                            stringResource(R.string.game_solitaire_new_record),
+                            Modifier
+                                .rotate(-16.25f)
+                                .align(Alignment.CenterEnd),
+                            Color.Red,
+                            13.5f.sp,
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                    }
+                }
+                if (finishedGame.lastRecordMillis != -1L) StatRow(
+                    fieldText = stringResource(if (finishedGame.isNewRecord) R.string.game_solitaire_label_last_best else R.string.game_solitaire_label_fastest_time),
+                    valueText = formatDuration(finishedGame.lastRecordMillis)
+                )
             }
-            if (FinishedGame.lastRecordMillis != -1L) StatRow(
-                fieldText = stringResource(if (FinishedGame.isNewRecord) R.string.game_solitaire_label_last_best else R.string.game_solitaire_label_fastest_time),
-                valueText = formatDuration(FinishedGame.lastRecordMillis)
-            )
-        }
 
-        if (FinishedGame.reward != 0) {
+            if (finishedGame.reward != 0) {
+                val activity = LocalActivity.current
+                val checkAdLoaded = { adLoaded: MutableState<Boolean> ->
+                    if (activity != null) viewModel.checkAdLoaded(activity, adLoaded)
+                }
+                val showAd = { adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit ->
+                    if (activity != null) viewModel.showAd(activity, adLoaded, onAdWatched)
+                }
+                val forceSave = { viewModel.forceSave() }
+                Spacer(Modifier.height(8.dp))
+                GameFinishedRewardRow(finishedGame.reward, checkAdLoaded, showAd, forceSave)
+            }
             Spacer(Modifier.height(8.dp))
-            GameFinishedRewardRow(FinishedGame.reward, checkAdLoaded, showAd, forceSave)
+            Buttons(
+                navController,
+                Modifier.fillMaxWidth(),
+                null,
+                { viewModel.startNewGame() }) { navController.navigateToMenu() }
         }
-        Spacer(Modifier.height(8.dp))
-        Buttons(
-            navController, Modifier.fillMaxWidth(), null, { viewModel.startNewGame() }, backToMenu
-        )
     }
+}
+
+@Composable
+private fun GameFinishedDialogTitle() {
+    Text(
+        stringResource(R.string.solitaire_name), // "Congrats / Smart / Well done"
+        fontSize = 25.sp, fontWeight = FontWeight.ExtraBold
+    )
+}
+
+@Composable
+private fun GameFinishedDialogText() {
+    Text(
+        stringResource(R.string.solitaire_success),
+        // """You did great and solved puzzle in ${0} seconds!!
+        //     |That's Awesome!
+        //     |Share with your friends and challenge them to beat your time!""".trimMargin()
+        Modifier.width(IntrinsicSize.Max), textAlign = TextAlign.Center
+    )
 }
 
 fun formatDuration(millis: Long): String {
@@ -127,16 +148,9 @@ fun formatDuration(millis: Long): String {
 fun Prev_GameFinished() {
     MindMixTheme {
         Surface {
-            FinishedGame.usedMillis = 10000000
-            FinishedGame.lastRecordMillis = 9999999
-            FinishedGame.isNewRecord = false
             val vm = remember { MockSolitaireViewModel() }
-            SolitaireGameFinishedDialog(
-                rememberNavController(),
-                vm,
-                {},
-                { a, b -> },
-                {}) {}
+            vm.finishedGame.value = FinishedGame(1, 10000000, 0, 9999999, true)
+            SolitaireGameFinishedDialog(vm, rememberNavController())
         }
     }
 }

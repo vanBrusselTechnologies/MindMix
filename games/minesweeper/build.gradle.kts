@@ -28,6 +28,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:advertisement"))
     implementation(project(":core:common"))
     implementation(project(":core:data"))
     implementation(project(":core:designsystem"))
@@ -37,6 +38,7 @@ dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:utils"))
     implementation(project(":feature:gamefinished"))
+    implementation(project(":feature:gamehelp"))
     implementation(project(":feature:gamemenu"))
     implementation(project(":feature:settings"))
 

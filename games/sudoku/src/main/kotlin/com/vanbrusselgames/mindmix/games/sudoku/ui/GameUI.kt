@@ -46,6 +46,7 @@ import com.vanbrusselgames.mindmix.core.common.BaseScene
 import com.vanbrusselgames.mindmix.core.common.GameLoadingScreen
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
 import com.vanbrusselgames.mindmix.games.sudoku.model.SudokuPuzzleCell
+import com.vanbrusselgames.mindmix.games.sudoku.navigation.navigateToSudokuGameHelp
 import com.vanbrusselgames.mindmix.games.sudoku.navigation.navigateToSudokuGameMenu
 import com.vanbrusselgames.mindmix.games.sudoku.navigation.navigateToSudokuSettings
 import com.vanbrusselgames.mindmix.games.sudoku.viewmodel.ISudokuViewModel
@@ -55,7 +56,7 @@ import kotlin.math.floor
 fun GameUI(viewModel: ISudokuViewModel, navController: NavController) {
     BaseScene(
         viewModel,
-        navController,
+        { navController.navigateToSudokuGameHelp() },
         { navController.navigateToSudokuGameMenu() },
         { navController.navigateToSudokuSettings() }) {
         BlurBox(viewModel.blurStrength) { maxWidth, maxHeight ->

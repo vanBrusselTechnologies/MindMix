@@ -46,7 +46,7 @@ fun Game2048SettingsDialog(viewModel: IGame2048ViewModel, navController: NavCont
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = stringResource(Game2048.NAME_RES_ID),
+                text = stringResource(R.string.game_2048_name),
                 Modifier.fillMaxWidth(),
                 fontSize = 36.sp,
                 fontWeight = FontWeight.ExtraBold,

@@ -26,6 +26,7 @@ import androidx.navigation.NavController
 import com.vanbrusselgames.mindmix.core.common.BaseScene
 import com.vanbrusselgames.mindmix.core.common.GameLoadingScreen
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
+import com.vanbrusselgames.mindmix.games.minesweeper.navigation.navigateToMinesweeperGameHelp
 import com.vanbrusselgames.mindmix.games.minesweeper.navigation.navigateToMinesweeperGameMenu
 import com.vanbrusselgames.mindmix.games.minesweeper.navigation.navigateToMinesweeperSettings
 import com.vanbrusselgames.mindmix.games.minesweeper.viewmodel.IMinesweeperViewModel
@@ -36,7 +37,7 @@ import kotlin.math.min
 fun GameUI(viewModel: IMinesweeperViewModel, navController: NavController) {
     BaseScene(
         viewModel,
-        navController,
+        { navController.navigateToMinesweeperGameHelp() },
         { navController.navigateToMinesweeperGameMenu() },
         { navController.navigateToMinesweeperSettings() }) {
         BlurBox(viewModel.blurStrength) { maxWidth, maxHeight ->

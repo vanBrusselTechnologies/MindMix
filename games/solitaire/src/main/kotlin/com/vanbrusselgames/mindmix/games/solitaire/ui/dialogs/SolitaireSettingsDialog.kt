@@ -47,7 +47,7 @@ fun SolitaireSettingsDialog(viewModel: ISolitaireViewModel, navController: NavCo
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = stringResource(Solitaire.NAME_RES_ID),
+                text = stringResource(R.string.solitaire_name),
                 Modifier.fillMaxWidth(),
                 fontSize = 36.sp,
                 fontWeight = FontWeight.ExtraBold,

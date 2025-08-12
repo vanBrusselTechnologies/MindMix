@@ -6,10 +6,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
-class SudokuPreferencesRepository @Inject constructor(
-    @ApplicationContext private val context: Context
-) {
-    private val dataStore = context.dataStore
+class SudokuPreferencesRepository @Inject constructor(@ApplicationContext ctx: Context) {
+    private val dataStore = ctx.dataStore
 
     suspend fun getPreferences(): SudokuPreferences {
         return dataStore.data.first().toSudokuPreferences()

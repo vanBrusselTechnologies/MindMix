@@ -46,7 +46,7 @@ fun MinesweeperSettingsDialog(viewModel: IMinesweeperViewModel, navController: N
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = stringResource(Minesweeper.NAME_RES_ID),
+                text = stringResource(R.string.minesweeper_name),
                 Modifier.fillMaxWidth(),
                 fontSize = 36.sp,
                 fontWeight = FontWeight.ExtraBold,

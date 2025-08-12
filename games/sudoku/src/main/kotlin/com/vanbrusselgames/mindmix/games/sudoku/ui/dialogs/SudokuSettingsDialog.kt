@@ -50,7 +50,7 @@ fun SudokuSettingsDialog(viewModel: ISudokuViewModel, navController: NavControll
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = stringResource(Sudoku.NAME_RES_ID),
+                text = stringResource(R.string.sudoku_name),
                 Modifier.fillMaxWidth(),
                 fontSize = 36.sp,
                 fontWeight = FontWeight.ExtraBold,

@@ -30,9 +30,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.vanbrusselgames.mindmix.core.ui.AdDoublerButton
 import com.vanbrusselgames.mindmix.core.common.coins
 import com.vanbrusselgames.mindmix.core.logging.Logger
+import com.vanbrusselgames.mindmix.core.ui.AdDoublerButton
 import com.vanbrusselgames.mindmix.core.ui.DialogButton
 
 @Composable
@@ -50,7 +50,12 @@ fun GameFinishedDialog(content: @Composable () -> Unit) {
 }
 
 @Composable
-fun GameFinishedRewardRow(reward: Int, checkAdLoaded: (adLoaded: MutableState<Boolean>) -> Unit, showAd: (adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit) -> Unit, forceSave: () -> Unit) {
+fun GameFinishedRewardRow(
+    reward: Int,
+    checkAdLoaded: (adLoaded: MutableState<Boolean>) -> Unit,
+    showAd: (adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit) -> Unit,
+    forceSave: () -> Unit
+) {
     Row(
         Modifier.heightIn(max = 48.dp),
         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -97,9 +102,7 @@ fun Buttons(
         }, modifier) { Text(stringResource(R.string.play_again)) }
     }
     DialogButton(backToMenu, modifier) {
-        Text(
-            stringResource(R.string.back_to_menu), textAlign = TextAlign.Center
-        )
+        Text(stringResource(R.string.back_to_menu), textAlign = TextAlign.Center)
     }
 }
 

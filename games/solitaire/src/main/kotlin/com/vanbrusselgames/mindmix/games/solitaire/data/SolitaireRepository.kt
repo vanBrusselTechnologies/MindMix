@@ -92,4 +92,8 @@ class SolitaireRepository @Inject constructor(private val dataManager: DataManag
         val data = Json.encodeToString(SolitaireData(_puzzleProgress, _puzzleRecords))
         dataManager.saveScene(SceneRegistry.Solitaire, data)
     }
+
+    fun forceSave() {
+        dataManager.save(true)
+    }
 }

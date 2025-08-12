@@ -13,6 +13,7 @@ import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -34,7 +35,7 @@ import com.vanbrusselgames.mindmix.feature.settings.navigation.navigateToSetting
 
 @Composable
 fun SceneUI(viewModel: MenuScreenViewModel, navController: NavController) {
-    BaseScene(viewModel, navController, {}, { navController.navigateToSettings() }) {
+    BaseScene(viewModel, {}, {}, { navController.navigateToSettings() }) {
         SetLayoutGameWheel(viewModel, navController)
     }
 }
@@ -91,7 +92,8 @@ fun PlayButton(viewModel: MenuScreenViewModel, navController: NavController, mod
 private fun PrevSettings() {
     MindMixTheme {
         Surface {
-            SetLayoutGameWheel(MenuScreenViewModel(), rememberNavController())
+            val vm = remember { MenuScreenViewModel() }
+            SetLayoutGameWheel(vm, rememberNavController())
         }
     }
 }

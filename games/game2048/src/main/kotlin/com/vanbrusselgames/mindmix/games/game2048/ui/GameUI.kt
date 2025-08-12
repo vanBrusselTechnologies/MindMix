@@ -55,6 +55,7 @@ import com.vanbrusselgames.mindmix.core.designsystem.theme.MindMixTheme
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
 import com.vanbrusselgames.mindmix.games.game2048.R
 import com.vanbrusselgames.mindmix.games.game2048.model.GridCell2048
+import com.vanbrusselgames.mindmix.games.game2048.navigation.navigateToGame2048GameHelp
 import com.vanbrusselgames.mindmix.games.game2048.navigation.navigateToGame2048GameMenu
 import com.vanbrusselgames.mindmix.games.game2048.navigation.navigateToGame2048Settings
 import com.vanbrusselgames.mindmix.games.game2048.viewmodel.IGame2048ViewModel
@@ -65,7 +66,7 @@ import kotlin.math.sqrt
 fun GameUI(viewModel: IGame2048ViewModel, navController: NavController) {
     BaseScene(
         viewModel,
-        navController,
+        { navController.navigateToGame2048GameHelp() },
         { navController.navigateToGame2048GameMenu() },
         { navController.navigateToGame2048Settings() }) {
         BlurBox(viewModel.blurStrength) {

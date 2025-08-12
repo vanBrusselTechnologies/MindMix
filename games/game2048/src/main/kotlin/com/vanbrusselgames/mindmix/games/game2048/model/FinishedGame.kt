@@ -1,11 +1,9 @@
 package com.vanbrusselgames.mindmix.games.game2048.model
 
-object FinishedGame {
-    var titleResId: Int = 0
-    var textResId: Int = 0
-    var reward: Int = 0
-    var highestTileValue: Long = 0
-    var targetTile: Long = 0
-    var score: Long = 0
-    var isStuck = false
-}
+data class FinishedGame(
+    val successType: SuccessType = SuccessType.GAME_OVER,
+    val reward: Int = 0,
+    val highestTileValue: Long = 0,
+    val targetTile: Long = 0,
+    val score: Long = 0,
+)

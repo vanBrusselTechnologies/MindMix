@@ -44,6 +44,7 @@ import com.vanbrusselgames.mindmix.core.common.BaseScene
 import com.vanbrusselgames.mindmix.core.common.GameLoadingScreen
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
 import com.vanbrusselgames.mindmix.games.solitaire.R
+import com.vanbrusselgames.mindmix.games.solitaire.navigation.navigateToSolitaireGameHelp
 import com.vanbrusselgames.mindmix.games.solitaire.navigation.navigateToSolitaireGameMenu
 import com.vanbrusselgames.mindmix.games.solitaire.navigation.navigateToSolitaireSettings
 import com.vanbrusselgames.mindmix.games.solitaire.viewmodel.ISolitaireViewModel
@@ -52,7 +53,7 @@ import com.vanbrusselgames.mindmix.games.solitaire.viewmodel.ISolitaireViewModel
 fun GameUI(viewModel: ISolitaireViewModel, navController: NavController) {
     BaseScene(
         viewModel,
-        navController,
+        { navController.navigateToSolitaireGameHelp() },
         { navController.navigateToSolitaireGameMenu() },
         { navController.navigateToSolitaireSettings() }) {
         BlurBox(viewModel.blurStrength) { width, height ->

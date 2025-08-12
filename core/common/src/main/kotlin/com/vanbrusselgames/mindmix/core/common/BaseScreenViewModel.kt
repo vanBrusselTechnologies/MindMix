@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 
 abstract class BaseScreenViewModel : ViewModel(), IBaseScreenViewModel {
     abstract override val isMenu: Boolean
-    abstract override val nameResId: Int
 
     override val blurStrength = 10.dp
 

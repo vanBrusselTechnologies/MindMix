@@ -1,21 +1,26 @@
 package com.vanbrusselgames.mindmix.games.minesweeper.viewmodel
 
+import android.app.Activity
 import androidx.compose.runtime.MutableIntState
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.ui.geometry.Offset
 import androidx.navigation.NavController
 import com.vanbrusselgames.mindmix.core.common.IBaseGameViewModel
 import com.vanbrusselgames.mindmix.core.utils.constants.Difficulty
+import com.vanbrusselgames.mindmix.games.minesweeper.model.FinishedGame
 import com.vanbrusselgames.mindmix.games.minesweeper.model.InputMode
 import com.vanbrusselgames.mindmix.games.minesweeper.model.MinesweeperCell
 import kotlinx.coroutines.flow.StateFlow
 
 interface IMinesweeperViewModel : IBaseGameViewModel {
+    val finishedGame: State<FinishedGame>
     val autoFlag: State<Boolean>
     val difficulty: State<Difficulty>
     val inputMode: State<InputMode>
     val minesLeft: MutableIntState
     val safeStart: State<Boolean>
+
     val puzzleLoaded: StateFlow<Boolean>
     val preferencesLoaded: StateFlow<Boolean>
 
@@ -26,6 +31,10 @@ interface IMinesweeperViewModel : IBaseGameViewModel {
 
     fun onSelectCell(offset: Offset, cellSize: Float, navController: NavController)
     fun changeInputMode()
+
+    fun forceSave()
+    fun checkAdLoaded(activity: Activity, adLoaded: MutableState<Boolean>)
+    fun showAd(activity: Activity, adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit)
 
     fun onClickUpdateAutoFlag()
     fun onClickUpdateSafeStart()

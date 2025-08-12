@@ -74,4 +74,8 @@ class Game2048Repository @Inject constructor(private val dataManager: DataManage
         val data = Json.encodeToString(Game2048Data(_puzzleProgress, _puzzleRecords))
         dataManager.saveScene(SceneRegistry.Game2048, data)
     }
+
+    fun forceSave() {
+        dataManager.save(true)
+    }
 }

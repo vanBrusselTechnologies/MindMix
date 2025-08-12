@@ -1,12 +1,14 @@
 package com.vanbrusselgames.mindmix.games.sudoku.viewmodel
 
+import android.app.Activity
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.navigation.NavController
 import com.vanbrusselgames.mindmix.core.common.BaseGameViewModel
 import com.vanbrusselgames.mindmix.core.utils.constants.Difficulty
 import com.vanbrusselgames.mindmix.games.sudoku.R
+import com.vanbrusselgames.mindmix.games.sudoku.model.FinishedGame
 import com.vanbrusselgames.mindmix.games.sudoku.model.InputMode
-import com.vanbrusselgames.mindmix.games.sudoku.model.Sudoku
 import com.vanbrusselgames.mindmix.games.sudoku.model.SudokuPuzzleCell
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,11 +18,9 @@ class MockSudokuViewModel : BaseGameViewModel(), ISudokuViewModel {
         const val SIZE = 9
     }
 
-    override val nameResId = Sudoku.NAME_RES_ID
-    override val descResId = R.string.sudoku_desc
-
     override val cells = Array(SIZE * SIZE) { SudokuPuzzleCell(it, false, 0, SIZE) }
 
+    override val finishedGame = mutableStateOf(FinishedGame())
     override val autoEditNotes = mutableStateOf(false)
     override val checkConflictingCells = mutableStateOf(false)
     override val difficulty = mutableStateOf(Difficulty.MEDIUM)
@@ -62,6 +62,17 @@ class MockSudokuViewModel : BaseGameViewModel(), ISudokuViewModel {
 
     override fun onClickUpdateCheckConflictingCells() {
         checkConflictingCells.value = !checkConflictingCells.value
+    }
+
+    override fun forceSave() {
+    }
+
+    override fun checkAdLoaded(activity: Activity, adLoaded: MutableState<Boolean>) {
+    }
+
+    override fun showAd(
+        activity: Activity, adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit
+    ) {
     }
 
     override fun setDifficulty(value: Difficulty) {

@@ -18,6 +18,8 @@ import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
 import com.vanbrusselgames.mindmix.games.minesweeper.ui.GameUI
+import com.vanbrusselgames.mindmix.games.minesweeper.ui.dialogs.MinesweeperGameFinishedDialog
+import com.vanbrusselgames.mindmix.games.minesweeper.ui.dialogs.MinesweeperGameHelpDialog
 import com.vanbrusselgames.mindmix.games.minesweeper.ui.dialogs.MinesweeperGameMenuDialog
 import com.vanbrusselgames.mindmix.games.minesweeper.ui.dialogs.MinesweeperSettingsDialog
 import com.vanbrusselgames.mindmix.games.minesweeper.viewmodel.MinesweeperViewModel
@@ -30,6 +32,12 @@ object MinesweeperFeatureRoute
 object/*data class*/ MinesweeperGameRoute/*(val mode: Int = 0)*/
 
 @Serializable
+object MinesweeperGameFinishedRoute
+
+@Serializable
+object MinesweeperGameHelpRoute
+
+@Serializable
 object MinesweeperGameMenuRoute
 
 @Serializable
@@ -40,6 +48,21 @@ fun NavController.navigateToMinesweeper(
 ) {
     Logger.d("Navigate to: Minesweeper")
     SceneManager.currentScene = SceneRegistry.Minesweeper
+    navigate(route, navOptions)
+}
+
+fun NavController.navigateToMinesweeperGameFinished(
+    route: MinesweeperGameFinishedRoute = MinesweeperGameFinishedRoute,
+    navOptions: NavOptions? = null
+) {
+    Logger.d("Navigate to: Minesweeper GameFinished")
+    navigate(route, navOptions)
+}
+
+fun NavController.navigateToMinesweeperGameHelp(
+    route: MinesweeperGameHelpRoute = MinesweeperGameHelpRoute, navOptions: NavOptions? = null
+) {
+    Logger.d("Navigate to: Minesweeper GameHelp")
     navigate(route, navOptions)
 }
 
@@ -70,6 +93,25 @@ fun NavGraphBuilder.minesweeper(
             // route.mode
             GameUI(vm, navController)
             BackHandler { navController.navigateToMinesweeperGameMenu() }
+        }
+
+        dialog<MinesweeperGameFinishedRoute>(
+            dialogProperties = DialogProperties(false, false, false)
+        ) { navBackStackEntry ->
+            val vm = hiltViewModel<MinesweeperViewModel>(remember(navBackStackEntry) {
+                navController.getBackStackEntry<MinesweeperFeatureRoute>()
+            })
+            val window = (LocalView.current.parent as? DialogWindowProvider)?.window
+            if (window != null) setFullScreen(null, window)
+            MinesweeperGameFinishedDialog(vm, navController)
+        }
+
+        dialog<MinesweeperGameHelpRoute>(
+            dialogProperties = DialogProperties(true, false, false)
+        ) { navBackStackEntry ->
+            val window = (LocalView.current.parent as? DialogWindowProvider)?.window
+            if (window != null) setFullScreen(null, window)
+            MinesweeperGameHelpDialog(navController)
         }
 
         dialog<MinesweeperGameMenuRoute>(

@@ -22,7 +22,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class UpdateManager @Inject constructor(@ApplicationContext private val ctx: Context) {
+class UpdateManager @Inject constructor(@param:ApplicationContext private val ctx: Context) {
     //private const val DAYS_FOR_FLEXIBLE_UPDATE = 3
     private val appUpdateManager: AppUpdateManager = AppUpdateManagerFactory.create(ctx)
 

@@ -6,10 +6,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
-class Game2048PreferencesRepository @Inject constructor(
-    @ApplicationContext private val context: Context
-) {
-    private val dataStore = context.dataStore
+class Game2048PreferencesRepository @Inject constructor(@ApplicationContext ctx: Context) {
+    private val dataStore = ctx.dataStore
 
     suspend fun getPreferences(): Game2048Preferences {
         return dataStore.data.first().toGame2048Preferences()

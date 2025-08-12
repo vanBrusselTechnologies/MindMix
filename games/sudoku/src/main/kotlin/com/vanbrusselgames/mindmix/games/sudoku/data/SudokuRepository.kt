@@ -229,4 +229,8 @@ class SudokuRepository @Inject constructor(
         val data = Json.encodeToString(SudokuData(_stringProgress, pages.toMap()))
         dataManager.saveScene(SceneRegistry.Sudoku, data)
     }
+
+    fun forceSave() {
+        dataManager.save(true)
+    }
 }

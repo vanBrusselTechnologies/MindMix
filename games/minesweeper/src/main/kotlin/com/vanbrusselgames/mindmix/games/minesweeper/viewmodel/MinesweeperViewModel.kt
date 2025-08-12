@@ -1,28 +1,30 @@
 package com.vanbrusselgames.mindmix.games.minesweeper.viewmodel
 
+import android.app.Activity
 import androidx.collection.MutableIntList
 import androidx.collection.mutableIntListOf
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.vanbrusselgames.mindmix.core.advertisement.AdManager
 import com.vanbrusselgames.mindmix.core.common.BaseGameViewModel
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.core.utils.constants.Difficulty
-import com.vanbrusselgames.mindmix.feature.gamefinished.navigation.navigateToGameFinished
-import com.vanbrusselgames.mindmix.games.minesweeper.R
 import com.vanbrusselgames.mindmix.games.minesweeper.data.MinesweeperRepository
 import com.vanbrusselgames.mindmix.games.minesweeper.data.preferences.MinesweeperPreferences
 import com.vanbrusselgames.mindmix.games.minesweeper.data.preferences.MinesweeperPreferencesRepository
 import com.vanbrusselgames.mindmix.games.minesweeper.model.CellState
 import com.vanbrusselgames.mindmix.games.minesweeper.model.FinishedGame
 import com.vanbrusselgames.mindmix.games.minesweeper.model.InputMode
-import com.vanbrusselgames.mindmix.games.minesweeper.model.Minesweeper
 import com.vanbrusselgames.mindmix.games.minesweeper.model.MinesweeperCell
 import com.vanbrusselgames.mindmix.games.minesweeper.model.MinesweeperProgress
+import com.vanbrusselgames.mindmix.games.minesweeper.model.SuccessType
+import com.vanbrusselgames.mindmix.games.minesweeper.navigation.navigateToMinesweeperGameFinished
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,12 +41,11 @@ import kotlin.math.roundToInt
 
 @HiltViewModel
 class MinesweeperViewModel @Inject constructor(
+    private val adManager: AdManager,
     private val minesweeperRepository: MinesweeperRepository,
     private val prefsRepository: MinesweeperPreferencesRepository
 ) : BaseGameViewModel(), IMinesweeperViewModel {
-    override val nameResId = Minesweeper.NAME_RES_ID
-    override val descResId = R.string.minesweeper_desc
-
+    override val finishedGame = mutableStateOf(FinishedGame())
     override val autoFlag = mutableStateOf(false)
     override val difficulty = mutableStateOf(Difficulty.MEDIUM)
     override val inputMode = mutableStateOf(InputMode.Normal)
@@ -275,16 +276,24 @@ class MinesweeperViewModel @Inject constructor(
     }
 
     private fun onGameFinished(navController: NavController, success: Boolean) {
-        FinishedGame.titleResId = Minesweeper.NAME_RES_ID
-        // if (failed) "Failed" else "Congrats / Smart / Well done"
-        FinishedGame.textResId =
-            if (!success) R.string.minesweeper_failed else R.string.minesweeper_success
-        // if (failed) "A mine exploded" else """You did great and solved puzzle in ${0} seconds!!
-        //     |That's Awesome!
-        //     |Share with your friends and challenge them to beat your time!""".trimMargin()
-        FinishedGame.reward = if (!success) 0 else 10
+        val successType = if (success) SuccessType.SUCCESS else SuccessType.GAME_OVER
+        val reward = if (success) 10 else 0
+        finishedGame.value = FinishedGame(successType, reward)
+        navController.navigateToMinesweeperGameFinished()
+    }
 
-        navController.navigateToGameFinished()
+    override fun forceSave() {
+        minesweeperRepository.forceSave()
+    }
+
+    override fun checkAdLoaded(activity: Activity, adLoaded: MutableState<Boolean>) {
+        adManager.checkAdLoaded(activity, adLoaded)
+    }
+
+    override fun showAd(
+        activity: Activity, adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit
+    ) {
+        adManager.showAd(activity, adLoaded, onAdWatched)
     }
 
     override fun onClickUpdateAutoFlag() {

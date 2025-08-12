@@ -29,7 +29,7 @@ import javax.inject.Singleton
 
 @Singleton
 class AdManager @Inject constructor(
-    @ApplicationContext private val ctx: Context,
+    @param:ApplicationContext private val ctx: Context,
     private val networkMonitor: NetworkMonitor
 ) {
     private lateinit var consentInformation: ConsentInformation

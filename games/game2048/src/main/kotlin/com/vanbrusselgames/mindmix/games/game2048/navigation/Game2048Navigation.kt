@@ -18,6 +18,8 @@ import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
 import com.vanbrusselgames.mindmix.games.game2048.ui.GameUI
+import com.vanbrusselgames.mindmix.games.game2048.ui.dialogs.Game2048GameFinishedDialog
+import com.vanbrusselgames.mindmix.games.game2048.ui.dialogs.Game2048GameHelpDialog
 import com.vanbrusselgames.mindmix.games.game2048.ui.dialogs.Game2048GameMenuDialog
 import com.vanbrusselgames.mindmix.games.game2048.ui.dialogs.Game2048SettingsDialog
 import com.vanbrusselgames.mindmix.games.game2048.viewmodel.Game2048ViewModel
@@ -30,6 +32,12 @@ object Game2048FeatureRoute
 object/*data class*/ Game2048GameRoute/*(val mode: Int = 0)*/
 
 @Serializable
+object Game2048GameFinishedRoute
+
+@Serializable
+object Game2048GameHelpRoute
+
+@Serializable
 object Game2048GameMenuRoute
 
 @Serializable
@@ -40,6 +48,20 @@ fun NavController.navigateToGame2048(
 ) {
     Logger.d("Navigate to: 2048")
     SceneManager.currentScene = SceneRegistry.Game2048
+    navigate(route, navOptions)
+}
+
+fun NavController.navigateToGame2048GameFinished(
+    route: Game2048GameFinishedRoute = Game2048GameFinishedRoute, navOptions: NavOptions? = null
+) {
+    Logger.d("Navigate to: 2048 GameFinished")
+    navigate(route, navOptions)
+}
+
+fun NavController.navigateToGame2048GameHelp(
+    route: Game2048GameHelpRoute = Game2048GameHelpRoute, navOptions: NavOptions? = null
+) {
+    Logger.d("Navigate to: 2048 GameHelp")
     navigate(route, navOptions)
 }
 
@@ -70,6 +92,25 @@ fun NavGraphBuilder.game2048(
             // route.mode
             GameUI(vm, navController)
             BackHandler { navController.navigateToGame2048GameMenu() }
+        }
+
+        dialog<Game2048GameFinishedRoute>(
+            dialogProperties = DialogProperties(false, false, false)
+        ) { navBackStackEntry ->
+            val vm = hiltViewModel<Game2048ViewModel>(remember(navBackStackEntry) {
+                navController.getBackStackEntry<Game2048FeatureRoute>()
+            })
+            val window = (LocalView.current.parent as? DialogWindowProvider)?.window
+            if (window != null) setFullScreen(null, window)
+            Game2048GameFinishedDialog(vm, navController)
+        }
+
+        dialog<Game2048GameHelpRoute>(
+            dialogProperties = DialogProperties(true, false, false)
+        ) { navBackStackEntry ->
+            val window = (LocalView.current.parent as? DialogWindowProvider)?.window
+            if (window != null) setFullScreen(null, window)
+            Game2048GameHelpDialog(navController)
         }
 
         dialog<Game2048GameMenuRoute>(

@@ -1,5 +1,7 @@
 package com.vanbrusselgames.mindmix.games.solitaire.viewmodel
 
+import android.app.Activity
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.Density
@@ -10,21 +12,15 @@ import androidx.compose.ui.unit.dp
 import androidx.core.math.MathUtils
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import com.google.firebase.analytics.FirebaseAnalytics
 import com.vanbrusselgames.mindmix.core.common.BaseGameViewModel
 import com.vanbrusselgames.mindmix.core.common.GameTimer
 import com.vanbrusselgames.mindmix.core.common.ITimerVM
-import com.vanbrusselgames.mindmix.core.logging.Logger
-import com.vanbrusselgames.mindmix.core.model.SceneRegistry
-import com.vanbrusselgames.mindmix.feature.gamefinished.navigation.navigateToGameFinished
 import com.vanbrusselgames.mindmix.games.solitaire.R
 import com.vanbrusselgames.mindmix.games.solitaire.model.CardIndex
 import com.vanbrusselgames.mindmix.games.solitaire.model.CardType
 import com.vanbrusselgames.mindmix.games.solitaire.model.CardVisualType
 import com.vanbrusselgames.mindmix.games.solitaire.model.FinishedGame
-import com.vanbrusselgames.mindmix.games.solitaire.model.MAX_REWARD
 import com.vanbrusselgames.mindmix.games.solitaire.model.PlayingCard
-import com.vanbrusselgames.mindmix.games.solitaire.model.Solitaire
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,7 +29,6 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.ceil
 import kotlin.math.floor
-import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 
@@ -46,10 +41,9 @@ class MockSolitaireViewModel @Inject constructor() : BaseGameViewModel(), ISolit
         const val CARD_ASPECT_RATIO = CARD_PIXEL_WIDTH / CARD_PIXEL_HEIGHT
     }
 
-    override val nameResId = Solitaire.Companion.NAME_RES_ID
-    override val descResId = R.string.solitaire_desc
     override val timer = GameTimer()
 
+    override val finishedGame = mutableStateOf(FinishedGame())
     override val cardVisualType = mutableStateOf(CardVisualType.SIMPLE)
     override val couldGetFinished = mutableStateOf(false)
     override val restStackEnabled = mutableStateOf(true)
@@ -127,8 +121,12 @@ class MockSolitaireViewModel @Inject constructor() : BaseGameViewModel(), ISolit
 
     private val movingCards: MutableList<PlayingCard> = mutableListOf()
     private val cardStacks: Array<MutableList<PlayingCard>> = Array(14) { mutableListOf() }
-
     private var moves = 0
+
+    override fun onOpenDialog() {
+        super.onOpenDialog()
+        timer.pause()
+    }
 
     override fun startNewGame() {
     }
@@ -298,8 +296,7 @@ class MockSolitaireViewModel @Inject constructor() : BaseGameViewModel(), ISolit
 
         moves++
 
-        if (foundNewStack) checkFinished(navController)
-        else timer.addMillis(15000)
+        if (!foundNewStack) timer.addMillis(15000)
 
         if (cardStacks[6].isEmpty() && cardStacks[5].size <= 1) restStackEnabled.value = false
     }
@@ -394,58 +391,17 @@ class MockSolitaireViewModel @Inject constructor() : BaseGameViewModel(), ISolit
             setCardBaseOffset(it)
             it.targetOffset.value = it.baseOffset
         }
-        checkFinished(navController)
     }
 
-    private fun checkFinished(navController: NavController) {
-        finished = isFinished()
-        if (finished) {
-            timer.stop()
-            Logger.logEvent(FirebaseAnalytics.Event.LEVEL_END) {
-                param(FirebaseAnalytics.Param.LEVEL_NAME, SceneRegistry.Solitaire.name)
-                param(FirebaseAnalytics.Param.SUCCESS, 1)
-            }
-            onGameFinished(navController)
-        }
-        couldGetFinished.value = !finished && couldGetFinished()
+    override fun forceSave() {
     }
 
-    private fun isFinished(): Boolean {
-        return cards.none { !it.frontVisible.value || it.stackId >= 4 }
+    override fun checkAdLoaded(activity: Activity, adLoaded: MutableState<Boolean>) {
     }
 
-    private fun couldGetFinished(): Boolean {
-        return !cards.any { !it.frontVisible.value && it.stackId >= 7 }
-    }
-
-    private fun onGameFinished(navController: NavController) {
-        val lastRecordFastestMillis = -1L
-
-        FinishedGame.titleResId = Solitaire.Companion.NAME_RES_ID// "Congrats / Smart / Well done"
-        FinishedGame.textResId = R.string.solitaire_success
-        // """You did great and solved puzzle in ${0} seconds!!
-        //     |That's Awesome!
-        //     |Share with your friends and challenge them to beat your time!""".trimMargin()
-
-        FinishedGame.moves = moves
-        FinishedGame.usedMillis = timer.currentMillis
-        FinishedGame.penaltyMillis = timer.addedMillis
-        FinishedGame.lastRecordMillis = lastRecordFastestMillis
-
-        val totalUsedTime = timer.currentMillis + timer.addedMillis
-        val isNewRecord = lastRecordFastestMillis == -1L || lastRecordFastestMillis > totalUsedTime
-        FinishedGame.isNewRecord = isNewRecord
-
-        val minutes = max(1f, totalUsedTime / 1000f / 60f)
-        FinishedGame.reward =
-            max(1, floor(MAX_REWARD / minutes).toInt()) + if (isNewRecord) 2 else 0
-
-        navController.navigateToGameFinished()
-    }
-
-    override fun onOpenDialog() {
-        super.onOpenDialog()
-        timer.pause()
+    override fun showAd(
+        activity: Activity, adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit
+    ) {
     }
 
     override fun setCardVisualType(value: CardVisualType) {

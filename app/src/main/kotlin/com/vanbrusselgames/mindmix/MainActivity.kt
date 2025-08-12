@@ -17,7 +17,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
@@ -33,40 +32,26 @@ import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderF
 import com.google.firebase.initialize
 import com.vanbrusselgames.mindmix.core.advertisement.AdManager
 import com.vanbrusselgames.mindmix.core.authentication.AuthManager
-import com.vanbrusselgames.mindmix.core.common.BaseGameViewModel
 import com.vanbrusselgames.mindmix.core.common.BaseScreenViewModel
 import com.vanbrusselgames.mindmix.core.data.DataManager
 import com.vanbrusselgames.mindmix.core.designsystem.theme.MindMixTheme
 import com.vanbrusselgames.mindmix.core.designsystem.theme.SelectedTheme
 import com.vanbrusselgames.mindmix.core.logging.Logger
-import com.vanbrusselgames.mindmix.core.model.GameScene
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
-import com.vanbrusselgames.mindmix.core.model.StaticScene
 import com.vanbrusselgames.mindmix.core.navigation.AppRoutes
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
-import com.vanbrusselgames.mindmix.core.navigation.navigateToMenu
-import com.vanbrusselgames.mindmix.feature.gamefinished.navigation.gameFinishedDialog
-import com.vanbrusselgames.mindmix.feature.gamehelp.navigation.gameHelpDialog
 import com.vanbrusselgames.mindmix.feature.menu.MenuScreenViewModel
 import com.vanbrusselgames.mindmix.feature.menu.MenuSettings
 import com.vanbrusselgames.mindmix.feature.menu.navigation.menu
 import com.vanbrusselgames.mindmix.feature.settings.navigation.settingsDialog
 import com.vanbrusselgames.mindmix.games.game2048.navigation.game2048
 import com.vanbrusselgames.mindmix.games.game2048.navigation.navigateToGame2048GameMenu
-import com.vanbrusselgames.mindmix.games.game2048.ui.dialogs.Game2048GameFinishedDialog
-import com.vanbrusselgames.mindmix.games.game2048.viewmodel.Game2048ViewModel
 import com.vanbrusselgames.mindmix.games.minesweeper.navigation.minesweeper
 import com.vanbrusselgames.mindmix.games.minesweeper.navigation.navigateToMinesweeperGameMenu
-import com.vanbrusselgames.mindmix.games.minesweeper.ui.dialogs.MinesweeperGameFinishedDialog
-import com.vanbrusselgames.mindmix.games.minesweeper.viewmodel.MinesweeperViewModel
 import com.vanbrusselgames.mindmix.games.solitaire.navigation.navigateToSolitaireGameMenu
 import com.vanbrusselgames.mindmix.games.solitaire.navigation.solitaire
-import com.vanbrusselgames.mindmix.games.solitaire.ui.dialogs.SolitaireGameFinishedDialog
-import com.vanbrusselgames.mindmix.games.solitaire.viewmodel.SolitaireViewModel
 import com.vanbrusselgames.mindmix.games.sudoku.navigation.navigateToSudokuGameMenu
 import com.vanbrusselgames.mindmix.games.sudoku.navigation.sudoku
-import com.vanbrusselgames.mindmix.games.sudoku.ui.dialogs.SudokuGameFinishedDialog
-import com.vanbrusselgames.mindmix.games.sudoku.viewmodel.SudokuViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -90,7 +75,7 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var updateManager: UpdateManager
 
-    val menuScreenViewModel by viewModels<MenuScreenViewModel>()
+    private val menuScreenViewModel by viewModels<MenuScreenViewModel>()
 
     private val _currentViewModel = mutableStateOf<BaseScreenViewModel?>(null)
     val currentViewModel: State<BaseScreenViewModel?> = _currentViewModel
@@ -99,7 +84,7 @@ class MainActivity : ComponentActivity() {
         _currentViewModel.value = viewModel
     }
 
-    val snackbarHostState = SnackbarHostState()
+    private val snackbarHostState = SnackbarHostState()
 
     lateinit var navController: NavHostController
 
@@ -154,89 +139,12 @@ class MainActivity : ComponentActivity() {
                                     .padding(it),
                                 enterTransition = { fadeIn() },
                                 exitTransition = { fadeOut() }) {
-                                menu(navController, menuScreenViewModel, ::setCurrentViewModel)
                                 solitaire(navController, ::setCurrentViewModel)
                                 sudoku(navController, ::setCurrentViewModel)
                                 minesweeper(navController, ::setCurrentViewModel)
                                 game2048(navController, ::setCurrentViewModel)
-                                gameHelpDialog(
-                                    navController,
-                                    { currentViewModel.value!!.nameResId }) { (currentViewModel.value as BaseGameViewModel).descResId }
-                                gameFinishedDialog {
-                                    when (SceneManager.currentScene) {
-                                        SceneRegistry.Game2048 -> Game2048GameFinishedDialog(
-                                            navController,
-                                            currentViewModel.value as Game2048ViewModel,
-                                            { adLoaded: MutableState<Boolean> ->
-                                                adManager.checkAdLoaded(
-                                                    this@MainActivity, adLoaded
-                                                )
-                                            },
-                                            { adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit ->
-                                                adManager.showAd(
-                                                    this@MainActivity, adLoaded, onAdWatched
-                                                )
-                                            },
-                                            { navController.navigateToMenu() }) {
-                                            dataManager.save(true)
-                                        }
 
-                                        SceneRegistry.Minesweeper -> MinesweeperGameFinishedDialog(
-                                            navController,
-                                            currentViewModel.value as MinesweeperViewModel,
-                                            { adLoaded: MutableState<Boolean> ->
-                                                adManager.checkAdLoaded(
-                                                    this@MainActivity, adLoaded
-                                                )
-                                            },
-                                            { adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit ->
-                                                adManager.showAd(
-                                                    this@MainActivity, adLoaded, onAdWatched
-                                                )
-                                            },
-                                            { navController.navigateToMenu() }) {
-                                            dataManager.save(true)
-                                        }
-
-                                        SceneRegistry.Solitaire -> SolitaireGameFinishedDialog(
-                                            navController,
-                                            currentViewModel.value as SolitaireViewModel,
-                                            { adLoaded: MutableState<Boolean> ->
-                                                adManager.checkAdLoaded(
-                                                    this@MainActivity, adLoaded
-                                                )
-                                            },
-                                            { adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit ->
-                                                adManager.showAd(
-                                                    this@MainActivity, adLoaded, onAdWatched
-                                                )
-                                            },
-                                            { navController.navigateToMenu() }) {
-                                            dataManager.save(true)
-                                        }
-
-                                        SceneRegistry.Sudoku -> SudokuGameFinishedDialog(
-                                            navController,
-                                            currentViewModel.value as SudokuViewModel,
-                                            { adLoaded: MutableState<Boolean> ->
-                                                adManager.checkAdLoaded(
-                                                    this@MainActivity, adLoaded
-                                                )
-                                            },
-                                            { adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit ->
-                                                adManager.showAd(
-                                                    this@MainActivity, adLoaded, onAdWatched
-                                                )
-                                            },
-                                            { navController.navigateToMenu() }) {
-                                            dataManager.save(true)
-                                        }
-
-                                        SceneRegistry.Menu -> {}
-                                        is GameScene -> {}
-                                        is StaticScene -> {}
-                                    }
-                                }
+                                menu(navController, menuScreenViewModel, ::setCurrentViewModel)
                                 settingsDialog(navController) {
                                     MenuSettings(
                                         context, menuScreenViewModel, authManager
@@ -245,7 +153,7 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     }
-                    BackHandler { openGameMenu() }
+                    BackHandler { }
                 }
             }
         })

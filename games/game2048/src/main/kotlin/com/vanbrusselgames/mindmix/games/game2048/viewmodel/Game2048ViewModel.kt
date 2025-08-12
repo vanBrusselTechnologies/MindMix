@@ -1,5 +1,7 @@
 package com.vanbrusselgames.mindmix.games.game2048.viewmodel
 
+import android.app.Activity
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -11,19 +13,19 @@ import androidx.compose.ui.util.fastRoundToInt
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.vanbrusselgames.mindmix.core.advertisement.AdManager
 import com.vanbrusselgames.mindmix.core.common.BaseGameViewModel
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
-import com.vanbrusselgames.mindmix.feature.gamefinished.navigation.navigateToGameFinished
-import com.vanbrusselgames.mindmix.games.game2048.R
 import com.vanbrusselgames.mindmix.games.game2048.data.Game2048Repository
 import com.vanbrusselgames.mindmix.games.game2048.data.preferences.Game2048Preferences
 import com.vanbrusselgames.mindmix.games.game2048.data.preferences.Game2048PreferencesRepository
 import com.vanbrusselgames.mindmix.games.game2048.model.FinishedGame
-import com.vanbrusselgames.mindmix.games.game2048.model.Game2048
 import com.vanbrusselgames.mindmix.games.game2048.model.Game2048Progress
 import com.vanbrusselgames.mindmix.games.game2048.model.GridCell2048
 import com.vanbrusselgames.mindmix.games.game2048.model.GridSize2048
+import com.vanbrusselgames.mindmix.games.game2048.model.SuccessType
+import com.vanbrusselgames.mindmix.games.game2048.navigation.navigateToGame2048GameFinished
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -44,12 +46,11 @@ import kotlin.random.Random
 
 @HiltViewModel
 class Game2048ViewModel @Inject constructor(
+    private val adManager: AdManager,
     private val game2048Repository: Game2048Repository,
     private val prefsRepository: Game2048PreferencesRepository
 ) : BaseGameViewModel(), IGame2048ViewModel {
-    override val nameResId = Game2048.NAME_RES_ID
-    override val descResId = R.string.game_2048_desc
-
+    override val finishedGame = mutableStateOf(FinishedGame())
     override val gridSize = mutableStateOf(GridSize2048.FOUR)
     override val cellList =
         SnapshotStateList(gridSize.value.getMaxCellCount()) { GridCell2048(it, 0) }
@@ -358,21 +359,34 @@ class Game2048ViewModel @Inject constructor(
     }
 
     private fun onGameFinished(navController: NavController, reachedTarget: Boolean) {
-        FinishedGame.titleResId =
-            if (!isStuck && reachedTarget) R.string.game_2048_reach_target_title else if (isStuck && !reachedTarget) R.string.game_2048_game_over_title else Game2048.NAME_RES_ID
-        FinishedGame.textResId =
-            if (!isStuck && reachedTarget) R.string.game_2048_reach_target_text else if (isStuck && !reachedTarget) R.string.game_2048_game_over_text else R.string.game_2048_success
-        FinishedGame.score = score.longValue
-        FinishedGame.highestTileValue = getHighestTileValue()
-        FinishedGame.targetTile = getTarget()
-        FinishedGame.isStuck = isStuck
-        FinishedGame.reward = if (reachedTarget && isStuck) 10 + getBonusReward() else 0
-        navController.navigateToGameFinished()
+        val successType = if (reachedTarget) {
+            if (isStuck) SuccessType.SUCCESS
+            else SuccessType.REACHED_TARGET
+        } else SuccessType.GAME_OVER
+        val reward = if (successType == SuccessType.SUCCESS) 10 + getBonusReward() else 0
+        finishedGame.value = FinishedGame(
+            successType, reward, getHighestTileValue(), getTarget(), score.longValue
+        )
+        navController.navigateToGame2048GameFinished()
     }
 
     private fun getBonusReward(): Int {
         return 1.5.pow((log2(getHighestTileValue().toDouble()) - log2(getTarget().toDouble())))
             .fastRoundToInt()
+    }
+
+    override fun forceSave() {
+        game2048Repository.forceSave()
+    }
+
+    override fun checkAdLoaded(activity: Activity, adLoaded: MutableState<Boolean>) {
+        adManager.checkAdLoaded(activity, adLoaded)
+    }
+
+    override fun showAd(
+        activity: Activity, adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit
+    ) {
+        adManager.showAd(activity, adLoaded, onAdWatched)
     }
 
     override fun setSize(value: GridSize2048) {

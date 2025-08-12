@@ -16,7 +16,10 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun AdDoublerButton(
-    modifier: Modifier = Modifier, checkAdLoaded: (adLoaded: MutableState<Boolean>) -> Unit, showAd: (adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit) -> Unit, onAdWatched: (Int) -> Unit
+    modifier: Modifier = Modifier,
+    checkAdLoaded: (adLoaded: MutableState<Boolean>) -> Unit,
+    showAd: (adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit) -> Unit,
+    onAdWatched: (Int) -> Unit
 ) {
     val adLoaded = remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
@@ -25,6 +28,9 @@ fun AdDoublerButton(
     DialogButton({ showAd(adLoaded, onAdWatched) }, modifier, enabled = adLoaded.value) {
         Icon(painterResource(R.drawable.outline_smart_display_24), "Advertisement")
         Spacer(Modifier.width(4.dp))
-        Text(stringResource(if (!adLoaded.value) R.string.ad_loading else R.string.ad_tripler_percentage))
+        Text(
+            stringResource(if (!adLoaded.value) R.string.ad_loading else R.string.ad_tripler_percentage),
+            maxLines = 1,
+        )
     }
 }

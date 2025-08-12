@@ -9,9 +9,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class NetworkMonitor @Inject constructor(@ApplicationContext context: Context) {
+class NetworkMonitor @Inject constructor(@ApplicationContext ctx: Context) {
     private val connectivityManager =
-        context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
     fun registerNetworkCallback(networkCallback: ConnectivityManager.NetworkCallback) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

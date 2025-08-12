@@ -7,7 +7,6 @@ import com.vanbrusselgames.mindmix.core.common.BaseScreenViewModel
 import com.vanbrusselgames.mindmix.core.common.coins
 import com.vanbrusselgames.mindmix.core.designsystem.theme.SelectedTheme
 import com.vanbrusselgames.mindmix.core.model.GameScene
-import com.vanbrusselgames.mindmix.core.model.Scene
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.feature.menu.data.PREF_KEY_THEME
 import com.vanbrusselgames.mindmix.games.game2048.navigation.navigateToGame2048
@@ -18,7 +17,6 @@ import kotlinx.serialization.json.Json
 
 //@HiltViewModel -- only when using Hilt @Inject
 class MenuScreenViewModel : BaseScreenViewModel() {
-    override val nameResId: Int = Menu.NAME_RES_ID
 
     override val isMenu = true
 
@@ -59,7 +57,12 @@ class MenuScreenViewModel : BaseScreenViewModel() {
     }
 
     fun saveToFile(): String {
-        return Json.encodeToString(MenuData(selectedGame.sceneId, coins/*, selectedGameModeIndices*/))
+        return Json.encodeToString(
+            MenuData(
+                selectedGame.sceneId,
+                coins/*, selectedGameModeIndices*/
+            )
+        )
     }
 
     //fun getSelectedGameModeIndex(gameIndex: Int = -1): Int {

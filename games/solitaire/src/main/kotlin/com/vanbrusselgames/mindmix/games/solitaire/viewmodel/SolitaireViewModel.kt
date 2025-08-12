@@ -1,5 +1,7 @@
 package com.vanbrusselgames.mindmix.games.solitaire.viewmodel
 
+import android.app.Activity
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.Density
@@ -11,12 +13,12 @@ import androidx.core.math.MathUtils
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.vanbrusselgames.mindmix.core.advertisement.AdManager
 import com.vanbrusselgames.mindmix.core.common.BaseGameViewModel
 import com.vanbrusselgames.mindmix.core.common.GameTimer
 import com.vanbrusselgames.mindmix.core.common.ITimerVM
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
-import com.vanbrusselgames.mindmix.feature.gamefinished.navigation.navigateToGameFinished
 import com.vanbrusselgames.mindmix.games.solitaire.R
 import com.vanbrusselgames.mindmix.games.solitaire.data.SolitaireRepository
 import com.vanbrusselgames.mindmix.games.solitaire.data.preferences.SolitairePreferences
@@ -27,8 +29,8 @@ import com.vanbrusselgames.mindmix.games.solitaire.model.CardVisualType
 import com.vanbrusselgames.mindmix.games.solitaire.model.FinishedGame
 import com.vanbrusselgames.mindmix.games.solitaire.model.MAX_REWARD
 import com.vanbrusselgames.mindmix.games.solitaire.model.PlayingCard
-import com.vanbrusselgames.mindmix.games.solitaire.model.Solitaire
 import com.vanbrusselgames.mindmix.games.solitaire.model.SolitaireProgress
+import com.vanbrusselgames.mindmix.games.solitaire.navigation.navigateToSolitaireGameFinished
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -48,6 +50,7 @@ import kotlin.math.roundToInt
 
 @HiltViewModel
 class SolitaireViewModel @Inject constructor(
+    private val adManager: AdManager,
     private val solitaireRepository: SolitaireRepository,
     private val prefsRepository: SolitairePreferencesRepository
 ) : BaseGameViewModel(), ISolitaireViewModel, ITimerVM {
@@ -57,10 +60,9 @@ class SolitaireViewModel @Inject constructor(
         const val CARD_ASPECT_RATIO = CARD_PIXEL_WIDTH / CARD_PIXEL_HEIGHT
     }
 
-    override val nameResId = Solitaire.Companion.NAME_RES_ID
-    override val descResId = R.string.solitaire_desc
     override val timer = GameTimer()
 
+    override val finishedGame = mutableStateOf(FinishedGame())
     override val cardVisualType = mutableStateOf(CardVisualType.SIMPLE)
     override val couldGetFinished = mutableStateOf(false)
     override val restStackEnabled = mutableStateOf(true)
@@ -518,28 +520,34 @@ class SolitaireViewModel @Inject constructor(
     private fun onGameFinished(navController: NavController) {
         val lastRecord = solitaireRepository.getPuzzleRecord()
         val lastRecordFastestMillis = lastRecord?.fastestMillis ?: -1L
-
-        FinishedGame.titleResId = Solitaire.NAME_RES_ID// "Congrats / Smart / Well done"
-        FinishedGame.textResId = R.string.solitaire_success
-        // """You did great and solved puzzle in ${0} seconds!!
-        //     |That's Awesome!
-        //     |Share with your friends and challenge them to beat your time!""".trimMargin()
-
-        FinishedGame.moves = moves
-        FinishedGame.usedMillis = timer.currentMillis
-        FinishedGame.penaltyMillis = timer.addedMillis
-        FinishedGame.lastRecordMillis = lastRecordFastestMillis
-
         val totalUsedTime = timer.currentMillis + timer.addedMillis
         val isNewRecord = lastRecordFastestMillis == -1L || lastRecordFastestMillis > totalUsedTime
         if (isNewRecord) solitaireRepository.setPuzzleRecord(totalUsedTime)
-        FinishedGame.isNewRecord = isNewRecord
-
         val minutes = max(1f, totalUsedTime / 1000f / 60f)
-        FinishedGame.reward =
-            max(1, floor(MAX_REWARD / minutes).toInt()) + if (isNewRecord) 2 else 0
+        val reward = max(1, floor(MAX_REWARD / minutes).toInt()) + if (isNewRecord) 2 else 0
+        finishedGame.value = FinishedGame(
+            reward,
+            timer.currentMillis,
+            timer.addedMillis,
+            lastRecordFastestMillis,
+            isNewRecord,
+            moves
+        )
+        navController.navigateToSolitaireGameFinished()
+    }
 
-        navController.navigateToGameFinished()
+    override fun forceSave() {
+        solitaireRepository.forceSave()
+    }
+
+    override fun checkAdLoaded(activity: Activity, adLoaded: MutableState<Boolean>) {
+        adManager.checkAdLoaded(activity, adLoaded)
+    }
+
+    override fun showAd(
+        activity: Activity, adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit
+    ) {
+        adManager.showAd(activity, adLoaded, onAdWatched)
     }
 
     override fun onOpenDialog() {

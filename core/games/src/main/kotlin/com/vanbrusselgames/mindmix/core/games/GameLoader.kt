@@ -7,7 +7,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class GameLoader @Inject constructor(@ApplicationContext private val ctx: Context) {
+class GameLoader @Inject constructor(@param:ApplicationContext private val ctx: Context) {
     fun getFileName(gameId: Int, gameModeId: Int, difficulty: String): String {
         return "loadedPuzzles/${gameId}/${gameModeId}/${difficulty}.save.vbg"
     }

@@ -23,7 +23,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class AuthManager @Inject constructor(@ApplicationContext private val ctx: Context) {
+class AuthManager @Inject constructor(@param:ApplicationContext private val ctx: Context) {
     private var isAuthenticated = false
     val signedIn = mutableStateOf(false)
     val userId = mutableStateOf("")

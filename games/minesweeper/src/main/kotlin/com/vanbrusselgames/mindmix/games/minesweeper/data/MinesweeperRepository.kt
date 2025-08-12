@@ -64,4 +64,8 @@ class MinesweeperRepository @Inject constructor(private val dataManager: DataMan
         val data = Json.encodeToString(MinesweeperData(_puzzleProgress))
         dataManager.saveScene(SceneRegistry.Minesweeper, data)
     }
+
+    fun forceSave() {
+        dataManager.save(true)
+    }
 }

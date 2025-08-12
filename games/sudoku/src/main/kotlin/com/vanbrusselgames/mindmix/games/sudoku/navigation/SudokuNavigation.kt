@@ -18,6 +18,8 @@ import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
 import com.vanbrusselgames.mindmix.games.sudoku.ui.GameUI
+import com.vanbrusselgames.mindmix.games.sudoku.ui.dialogs.SudokuGameFinishedDialog
+import com.vanbrusselgames.mindmix.games.sudoku.ui.dialogs.SudokuGameHelpDialog
 import com.vanbrusselgames.mindmix.games.sudoku.ui.dialogs.SudokuGameMenuDialog
 import com.vanbrusselgames.mindmix.games.sudoku.ui.dialogs.SudokuSettingsDialog
 import com.vanbrusselgames.mindmix.games.sudoku.viewmodel.SudokuViewModel
@@ -30,6 +32,12 @@ object SudokuFeatureRoute
 object/*data class*/ SudokuGameRoute/*(val mode: Int = 0)*/
 
 @Serializable
+object SudokuGameFinishedRoute
+
+@Serializable
+object SudokuGameHelpRoute
+
+@Serializable
 object SudokuGameMenuRoute
 
 @Serializable
@@ -40,6 +48,20 @@ fun NavController.navigateToSudoku(
 ) {
     Logger.d("Navigate to: Sudoku")
     SceneManager.currentScene = SceneRegistry.Sudoku
+    navigate(route, navOptions)
+}
+
+fun NavController.navigateToSudokuGameFinished(
+    route: SudokuGameFinishedRoute = SudokuGameFinishedRoute, navOptions: NavOptions? = null
+) {
+    Logger.d("Navigate to: Sudoku GameFinished")
+    navigate(route, navOptions)
+}
+
+fun NavController.navigateToSudokuGameHelp(
+    route: SudokuGameHelpRoute = SudokuGameHelpRoute, navOptions: NavOptions? = null
+) {
+    Logger.d("Navigate to: Sudoku GameHelp")
     navigate(route, navOptions)
 }
 
@@ -70,6 +92,25 @@ fun NavGraphBuilder.sudoku(
             // route.mode
             GameUI(vm, navController)
             BackHandler { navController.navigateToSudokuGameMenu() }
+        }
+
+        dialog<SudokuGameFinishedRoute>(
+            dialogProperties = DialogProperties(false, false, false)
+        ) { navBackStackEntry ->
+            val vm = hiltViewModel<SudokuViewModel>(remember(navBackStackEntry) {
+                navController.getBackStackEntry<SudokuFeatureRoute>()
+            })
+            val window = (LocalView.current.parent as? DialogWindowProvider)?.window
+            if (window != null) setFullScreen(null, window)
+            SudokuGameFinishedDialog(vm, navController)
+        }
+
+        dialog<SudokuGameHelpRoute>(
+            dialogProperties = DialogProperties(true, false, false)
+        ) { navBackStackEntry ->
+            val window = (LocalView.current.parent as? DialogWindowProvider)?.window
+            if (window != null) setFullScreen(null, window)
+            SudokuGameHelpDialog(navController)
         }
 
         dialog<SudokuGameMenuRoute>(
