@@ -12,7 +12,6 @@ import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastRoundToInt
 import androidx.navigation.NavController
 import com.vanbrusselgames.mindmix.core.common.BaseGameViewModel
-import com.vanbrusselgames.mindmix.games.game2048.R
 import com.vanbrusselgames.mindmix.games.game2048.model.FinishedGame
 import com.vanbrusselgames.mindmix.games.game2048.model.GridCell2048
 import com.vanbrusselgames.mindmix.games.game2048.model.GridSize2048
@@ -24,13 +23,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 import kotlin.math.abs
 import kotlin.math.log2
 import kotlin.math.pow
 import kotlin.random.Random
 
-class MockGame2048ViewModel @Inject constructor() : BaseGameViewModel(), IGame2048ViewModel {
+class MockGame2048ViewModel : BaseGameViewModel(), IGame2048ViewModel {
     override val finishedGame = mutableStateOf(FinishedGame())
     override val gridSize = mutableStateOf(GridSize2048.FOUR)
     override val cellList =
@@ -47,7 +45,6 @@ class MockGame2048ViewModel @Inject constructor() : BaseGameViewModel(), IGame20
     private var cellCount = gridSize.value.getMaxCellCount()
     private var sideSize = gridSize.value.getSize()
     private var newId = cellCount
-    private var isStuck = false
 
     private fun getTarget(): Long = when (gridSize.value) {
         GridSize2048.THREE -> 256
@@ -205,7 +202,7 @@ class MockGame2048ViewModel @Inject constructor() : BaseGameViewModel(), IGame20
         if (reachedTarget) CoroutineScope(Dispatchers.Main).launch {
             finished = true
             delay(500)
-            onGameFinished(navController, true)
+            onGameFinished(navController, reachedTarget, false)
         }
     }
 
@@ -222,11 +219,10 @@ class MockGame2048ViewModel @Inject constructor() : BaseGameViewModel(), IGame20
     }
 
     private fun checkStuck(navController: NavController) {
-        isStuck = !canMove()
-        if (isStuck) CoroutineScope(Dispatchers.Main).launch {
+        if (!canMove()) CoroutineScope(Dispatchers.Main).launch {
             finished = true
             delay(1000)
-            onGameFinished(navController, getHighestTileValue() >= getTarget())
+            onGameFinished(navController, getHighestTileValue() >= getTarget(), true)
         }
     }
 
@@ -255,7 +251,9 @@ class MockGame2048ViewModel @Inject constructor() : BaseGameViewModel(), IGame20
         score.longValue += points
     }
 
-    private fun onGameFinished(navController: NavController, reachedTarget: Boolean) {
+    private fun onGameFinished(
+        navController: NavController, reachedTarget: Boolean, isStuck: Boolean
+    ) {
         val successType = if (reachedTarget) {
             if (isStuck) SuccessType.SUCCESS
             else SuccessType.REACHED_TARGET

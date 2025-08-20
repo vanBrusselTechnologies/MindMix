@@ -1,9 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="signin">Inloggen</string>
-    <string name="connected">Ingelogd</string>
     <string name="play">Play</string>
-    <string name="request_data_deletion">Vraag gegevensverwijdering aan</string>
-    <string name="settings">Instellingen</string>
-    <string name="theme">Thema</string>
 </resources>

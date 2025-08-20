@@ -29,9 +29,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.vanbrusselgames.mindmix.core.designsystem.theme.MindMixTheme
 import com.vanbrusselgames.mindmix.core.ui.EnumDropdown
-import com.vanbrusselgames.mindmix.feature.settings.SettingsDialog
+import com.vanbrusselgames.mindmix.core.ui.dialogs.settings.SettingsDialog
 import com.vanbrusselgames.mindmix.games.game2048.R
-import com.vanbrusselgames.mindmix.games.game2048.model.Game2048
 import com.vanbrusselgames.mindmix.games.game2048.model.GridSize2048
 import com.vanbrusselgames.mindmix.games.game2048.viewmodel.IGame2048ViewModel
 import com.vanbrusselgames.mindmix.games.game2048.viewmodel.MockGame2048ViewModel

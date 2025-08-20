@@ -19,7 +19,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.times
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
+
+val topRowButtonSize = 48.dp
+val padding = topRowButtonSize / 100f
+val topRowHeight = (topRowButtonSize + 2f * padding)
 
 @Composable
 fun BaseScene(
@@ -49,7 +55,7 @@ private fun TopBar(
 ) {
     Box(
         Modifier
-            .height(viewModel.topRowHeight)
+            .height(topRowHeight)
             .fillMaxWidth()
     ) {
         if (!SceneManager.dialogActiveState.value) {
@@ -60,8 +66,8 @@ private fun TopBar(
                         viewModel.onOpenDialog()
                     },
                     modifier = Modifier
-                        .size(viewModel.topRowButtonSize)
-                        .padding(viewModel.padding)
+                        .size(topRowButtonSize)
+                        .padding(padding)
                         .align(Alignment.TopStart)
                 ) { Icon(Icons.Default.Menu, "Open game menu", Modifier.fillMaxSize(0.9f)) }
                 Row(Modifier.align(Alignment.TopEnd)) {
@@ -69,10 +75,9 @@ private fun TopBar(
                         onClick = {
                             openGameHelp()
                             viewModel.onOpenDialog()
-                        },
-                        modifier = Modifier
-                            .size(viewModel.topRowButtonSize)
-                            .padding(viewModel.padding)
+                        }, modifier = Modifier
+                            .size(topRowButtonSize)
+                            .padding(padding)
                     ) {
                         Icon(
                             painterResource(R.drawable.outline_help_24),
@@ -99,10 +104,9 @@ private fun TopBar(
                     onClick = {
                         openSettings()
                         viewModel.onOpenDialog()
-                    },
-                    modifier = Modifier
-                        .size(viewModel.topRowButtonSize)
-                        .padding(viewModel.padding)
+                    }, modifier = Modifier
+                        .size(topRowButtonSize)
+                        .padding(padding)
                 ) { Icon(Icons.Filled.Settings, "Settings", Modifier.fillMaxSize(0.9f)) }
             }
         }

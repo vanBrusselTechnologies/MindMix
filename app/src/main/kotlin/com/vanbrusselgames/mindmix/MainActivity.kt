@@ -3,9 +3,9 @@ package com.vanbrusselgames.mindmix
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -17,11 +17,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -32,7 +31,6 @@ import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderF
 import com.google.firebase.initialize
 import com.vanbrusselgames.mindmix.core.advertisement.AdManager
 import com.vanbrusselgames.mindmix.core.authentication.AuthManager
-import com.vanbrusselgames.mindmix.core.common.BaseScreenViewModel
 import com.vanbrusselgames.mindmix.core.data.DataManager
 import com.vanbrusselgames.mindmix.core.designsystem.theme.MindMixTheme
 import com.vanbrusselgames.mindmix.core.designsystem.theme.SelectedTheme
@@ -40,8 +38,6 @@ import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.core.navigation.AppRoutes
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
-import com.vanbrusselgames.mindmix.feature.menu.MenuScreenViewModel
-import com.vanbrusselgames.mindmix.feature.menu.MenuSettings
 import com.vanbrusselgames.mindmix.feature.menu.navigation.menu
 import com.vanbrusselgames.mindmix.feature.settings.navigation.settingsDialog
 import com.vanbrusselgames.mindmix.games.game2048.navigation.game2048
@@ -75,20 +71,12 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var updateManager: UpdateManager
 
-    private val menuScreenViewModel by viewModels<MenuScreenViewModel>()
-
-    private val _currentViewModel = mutableStateOf<BaseScreenViewModel?>(null)
-    val currentViewModel: State<BaseScreenViewModel?> = _currentViewModel
-
-    fun setCurrentViewModel(viewModel: BaseScreenViewModel?) {
-        _currentViewModel.value = viewModel
-    }
-
     private val snackbarHostState = SnackbarHostState()
 
-    lateinit var navController: NavHostController
+    private lateinit var navController: NavHostController
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         val splashscreen = installSplashScreen()
         var keepSplashScreen = true
         super.onCreate(savedInstanceState)
@@ -114,7 +102,57 @@ class MainActivity : ComponentActivity() {
         splashscreen.setKeepOnScreenCondition { keepSplashScreen }
         setContentView(ComposeView(this).apply {
             setContent {
-                val darkTheme = when (menuScreenViewModel.theme.value) {
+                /* ////// https://github.com/tminet/ComposeThemeSwitch/tree/master //////
+                val viewModel: MainViewModel = hiltViewModel()
+                val activityState by viewModel.activityState.collectAsStateWithLifecycle()
+                val windowsInsets = appWindowInsets()
+
+                when (activityState.isLoading) {
+                    true -> AppTheme {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .windowInsetsPadding(insets = windowsInsets),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            AppLoadingAnimation()
+
+                            Spacer(modifier = Modifier.height(height = 16.dp))
+
+                            Text(
+                                text = stringResource(id = R.string.appName),
+                                textAlign = TextAlign.Center,
+                                style = MaterialTheme.typography.displayMedium
+                            )
+                        }
+                    }
+
+                    false -> {
+                        val shouldUseDarkTheme =
+                            shouldUseDarkTheme(themeStyle = activityState.themeStyle)
+
+                        DisposableEffect(key1 = shouldUseDarkTheme) {
+                            transparentEdge(darkMode = shouldUseDarkTheme)
+                            onDispose { }
+                        }
+
+                        AppTheme(
+                            useDarkTheme = shouldUseDarkTheme,
+                            useDynamicColors = activityState.useDynamicColors
+                        ) {
+                            TopNavHost(
+                                modifier = Modifier.fillMaxSize(),
+                                windowInsets = windowsInsets,
+                                onNavigateBack = { moveTaskToBack(true) }
+                            )
+                        }
+                    }
+                 }
+                 */
+
+                val viewModel = hiltViewModel<MainViewModel>()
+                val darkTheme = when (viewModel.theme.value) {
                     SelectedTheme.System -> isSystemInDarkTheme()
                     SelectedTheme.Dark -> true
                     SelectedTheme.Light -> false
@@ -139,17 +177,13 @@ class MainActivity : ComponentActivity() {
                                     .padding(it),
                                 enterTransition = { fadeIn() },
                                 exitTransition = { fadeOut() }) {
-                                solitaire(navController, ::setCurrentViewModel)
-                                sudoku(navController, ::setCurrentViewModel)
-                                minesweeper(navController, ::setCurrentViewModel)
-                                game2048(navController, ::setCurrentViewModel)
+                                solitaire(navController)
+                                sudoku(navController)
+                                minesweeper(navController)
+                                game2048(navController)
 
-                                menu(navController, menuScreenViewModel, ::setCurrentViewModel)
-                                settingsDialog(navController) {
-                                    MenuSettings(
-                                        context, menuScreenViewModel, authManager
-                                    ) { authManager.signIn(this@MainActivity) }
-                                }
+                                menu(navController)
+                                settingsDialog(navController) { authManager.signIn(this@MainActivity) }
                             }
                         }
                     }
@@ -184,7 +218,6 @@ class MainActivity : ComponentActivity() {
                 SceneRegistry.Sudoku -> navController.navigateToSudokuGameMenu()
                 else -> throw NotImplementedError()
             }
-            currentViewModel.value!!.onOpenDialog()
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.vanbrusselgames.mindmix.games.solitaire.navigation
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.window.DialogProperties
@@ -12,7 +13,6 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.navigation
-import com.vanbrusselgames.mindmix.core.common.BaseScreenViewModel
 import com.vanbrusselgames.mindmix.core.designsystem.theme.setFullScreen
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
@@ -79,15 +79,12 @@ fun NavController.navigateToSolitaireSettings(
     navigate(route, navOptions)
 }
 
-fun NavGraphBuilder.solitaire(
-    navController: NavController, setCurrentViewModel: (BaseScreenViewModel?) -> Unit
-) {
+fun NavGraphBuilder.solitaire(navController: NavController) {
     navigation<SolitaireFeatureRoute>(SolitaireGameRoute) {
         composable<SolitaireGameRoute> { navBackStackEntry ->
             val vm = hiltViewModel<SolitaireViewModel>(remember(navBackStackEntry) {
                 navController.getBackStackEntry<SolitaireFeatureRoute>()
             })
-            setCurrentViewModel(vm)
             // val route = navBackStackEntry.toRoute<SolitaireGameRoute>()
             // route.mode
             GameUI(vm, navController)
@@ -122,6 +119,9 @@ fun NavGraphBuilder.solitaire(
             val window = (LocalView.current.parent as? DialogWindowProvider)?.window
             if (window != null) setFullScreen(null, window)
             SolitaireGameMenuDialog(vm, navController)
+
+            // Force stop timer and save data
+            LaunchedEffect(Unit) { vm.onOpenDialog() }
         }
 
         dialog<SolitaireSettingsRoute>(

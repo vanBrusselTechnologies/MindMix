@@ -2,7 +2,7 @@ package com.vanbrusselgames.mindmix.core.utils.constants
 
 import com.vanbrusselgames.mindmix.core.utils.R
 
-enum class Difficulty: StringEnum {
+enum class Difficulty : StringEnum {
     EASY, MEDIUM, HARD, EXPERT, MASTER;
 
     override fun getStringResource(): Int {

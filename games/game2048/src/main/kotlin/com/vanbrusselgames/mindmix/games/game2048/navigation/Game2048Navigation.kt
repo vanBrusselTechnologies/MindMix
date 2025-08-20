@@ -12,7 +12,6 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.navigation
-import com.vanbrusselgames.mindmix.core.common.BaseScreenViewModel
 import com.vanbrusselgames.mindmix.core.designsystem.theme.setFullScreen
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
@@ -79,15 +78,12 @@ fun NavController.navigateToGame2048Settings(
     navigate(route, navOptions)
 }
 
-fun NavGraphBuilder.game2048(
-    navController: NavController, setCurrentViewModel: (BaseScreenViewModel?) -> Unit
-) {
+fun NavGraphBuilder.game2048(navController: NavController) {
     navigation<Game2048FeatureRoute>(Game2048GameRoute) {
         composable<Game2048GameRoute> { navBackStackEntry ->
             val vm = hiltViewModel<Game2048ViewModel>(remember(navBackStackEntry) {
                 navController.getBackStackEntry<Game2048FeatureRoute>()
             })
-            setCurrentViewModel(vm)
             // val route = navBackStackEntry.toRoute<Game2048GameRoute>()
             // route.mode
             GameUI(vm, navController)

@@ -10,9 +10,6 @@ plugins {
 android {
     namespace = "com.vanbrusselgames.mindmix.core.model"
     compileSdk = 36
-    defaultConfig {
-        minSdk = 0
-    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21

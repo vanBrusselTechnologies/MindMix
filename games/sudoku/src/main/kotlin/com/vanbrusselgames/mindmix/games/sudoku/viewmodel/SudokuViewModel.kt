@@ -69,15 +69,15 @@ class SudokuViewModel @Inject constructor(
     private var saveJob: Job? = null
 
     private suspend fun loadPreferences() {
-        applyPreferences(prefsRepository.getPreferences())
+        applyPreferences(prefsRepository.getPreferences().first())
     }
 
-    private fun applyPreferences(preferences: SudokuPreferences) {
+    private suspend fun applyPreferences(preferences: SudokuPreferences) {
         Logger.d("[sudoku] applyPreferences")
         autoEditNotes.value = preferences.autoEditNotes
         checkConflictingCells.value = preferences.checkConflictingCells
         difficulty.value = Difficulty.entries[preferences.difficulty]
-        _preferencesLoaded.value = true
+        _preferencesLoaded.emit(true)
     }
 
     private suspend fun loadData() {

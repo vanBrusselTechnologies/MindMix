@@ -70,20 +70,20 @@ class MinesweeperViewModel @Inject constructor(
     override var finished = false
 
     private suspend fun loadPreferences() {
-        applyPreferences(prefsRepository.getPreferences())
+        applyPreferences(prefsRepository.getPreferences().first())
     }
 
-    private fun applyPreferences(preferences: MinesweeperPreferences) {
+    private suspend fun applyPreferences(preferences: MinesweeperPreferences) {
         Logger.d("[minesweeper] applyPreferences")
         autoFlag.value = preferences.autoFlag
         difficulty.value = Difficulty.entries[preferences.difficulty]
         safeStart.value = preferences.safeStart
-        _preferencesLoaded.value = true
+        _preferencesLoaded.emit(true)
     }
 
     private suspend fun loadData() {
         withContext(Dispatchers.IO) {
-            preferencesLoaded.first { it }
+            preferencesLoaded.first { Logger.d("PreferencesLoaded? $it");it }
             val savedProgress = minesweeperRepository.getPuzzleProgress(difficulty.value)
             if (savedProgress != null) onPuzzleLoaded(savedProgress)
             else onPuzzleLoaded(minesweeperRepository.createNewPuzzle(difficulty.value, cellCount))

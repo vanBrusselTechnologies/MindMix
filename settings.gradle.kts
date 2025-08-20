@@ -13,6 +13,7 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "MindMix"
+
 include(":app")
 
 include(":core:advertisement")
@@ -38,9 +39,6 @@ include(":core:navigation")
 include(":core:ui")
 include(":core:utils")
 
-include(":feature:gamefinished")
-include(":feature:gamehelp")
-include(":feature:gamemenu")
 include(":feature:menu")
 include(":feature:settings")
 

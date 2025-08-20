@@ -12,7 +12,6 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.navigation
-import com.vanbrusselgames.mindmix.core.common.BaseScreenViewModel
 import com.vanbrusselgames.mindmix.core.designsystem.theme.setFullScreen
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
@@ -79,15 +78,12 @@ fun NavController.navigateToSudokuSettings(
     navigate(route, navOptions)
 }
 
-fun NavGraphBuilder.sudoku(
-    navController: NavController, setCurrentViewModel: (BaseScreenViewModel?) -> Unit
-) {
+fun NavGraphBuilder.sudoku(navController: NavController) {
     navigation<SudokuFeatureRoute>(SudokuGameRoute) {
         composable<SudokuGameRoute> { navBackStackEntry ->
             val vm = hiltViewModel<SudokuViewModel>(remember(navBackStackEntry) {
                 navController.getBackStackEntry<SudokuFeatureRoute>()
             })
-            setCurrentViewModel(vm)
             // val route = navBackStackEntry.toRoute<SudokuGameRoute>()
             // route.mode
             GameUI(vm, navController)

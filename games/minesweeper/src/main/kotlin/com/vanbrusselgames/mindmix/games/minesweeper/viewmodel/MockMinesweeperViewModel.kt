@@ -13,7 +13,6 @@ import com.vanbrusselgames.mindmix.core.common.BaseGameViewModel
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.core.utils.constants.Difficulty
-import com.vanbrusselgames.mindmix.games.minesweeper.R
 import com.vanbrusselgames.mindmix.games.minesweeper.model.CellState
 import com.vanbrusselgames.mindmix.games.minesweeper.model.FinishedGame
 import com.vanbrusselgames.mindmix.games.minesweeper.model.InputMode
@@ -22,12 +21,11 @@ import com.vanbrusselgames.mindmix.games.minesweeper.model.SuccessType
 import com.vanbrusselgames.mindmix.games.minesweeper.navigation.navigateToMinesweeperGameFinished
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import javax.inject.Inject
 import kotlin.math.floor
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-class MockMinesweeperViewModel @Inject constructor() : BaseGameViewModel(), IMinesweeperViewModel {
+class MockMinesweeperViewModel : BaseGameViewModel(), IMinesweeperViewModel {
     override val finishedGame = mutableStateOf(FinishedGame())
     override val autoFlag = mutableStateOf(false)
     override val difficulty = mutableStateOf(Difficulty.MEDIUM)

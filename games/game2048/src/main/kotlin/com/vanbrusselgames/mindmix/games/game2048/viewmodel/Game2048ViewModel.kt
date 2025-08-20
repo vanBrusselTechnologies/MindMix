@@ -71,20 +71,19 @@ class Game2048ViewModel @Inject constructor(
     private var cellCount = gridSize.value.getMaxCellCount()
     private var sideSize = gridSize.value.getSize()
     private var newId = cellCount
-    private var isStuck = false
     private var saveJob: Job? = null
 
     private suspend fun loadPreferences() {
-        applyPreferences(prefsRepository.getPreferences())
+        applyPreferences(prefsRepository.getPreferences().first())
     }
 
-    private fun applyPreferences(preferences: Game2048Preferences) {
+    private suspend fun applyPreferences(preferences: Game2048Preferences) {
         Logger.d("[2048] applyPreferences")
         val size = GridSize2048.entries[preferences.size]
         gridSize.value = size
         sideSize = size.getSize()
         cellCount = size.getMaxCellCount()
-        _preferencesLoaded.value = true
+        _preferencesLoaded.emit(true)
     }
 
     private suspend fun loadData() {
@@ -109,7 +108,6 @@ class Game2048ViewModel @Inject constructor(
     private fun reset() {
         finished = false
         cellList.forEach { it.value = 0 }
-        isStuck = false
         score.longValue = 0L
         _puzzleLoaded.value = false
     }
@@ -298,9 +296,8 @@ class Game2048ViewModel @Inject constructor(
                 param(FirebaseAnalytics.Param.LEVEL_NAME, SceneRegistry.Game2048.name)
                 param(FirebaseAnalytics.Param.SUCCESS, 1)
             }
-            game2048Repository.removeProgressForSize(gridSize.value)
             delay(500)
-            onGameFinished(navController, true)
+            onGameFinished(navController, true, false)
         }
     }
 
@@ -317,8 +314,7 @@ class Game2048ViewModel @Inject constructor(
     }
 
     private fun checkStuck(navController: NavController) {
-        isStuck = !canMove()
-        if (isStuck) viewModelScope.launch {
+        if (!canMove()) viewModelScope.launch {
             finished = true
             Logger.logEvent(FirebaseAnalytics.Event.LEVEL_END) {
                 param(FirebaseAnalytics.Param.LEVEL_NAME, SceneRegistry.Game2048.name)
@@ -329,7 +325,7 @@ class Game2048ViewModel @Inject constructor(
             }
             game2048Repository.removeProgressForSize(gridSize.value)
             delay(1000)
-            onGameFinished(navController, getHighestTileValue() >= getTarget())
+            onGameFinished(navController, getHighestTileValue() >= getTarget(), true)
         }
     }
 
@@ -358,7 +354,9 @@ class Game2048ViewModel @Inject constructor(
         score.longValue += points
     }
 
-    private fun onGameFinished(navController: NavController, reachedTarget: Boolean) {
+    private fun onGameFinished(
+        navController: NavController, reachedTarget: Boolean, isStuck: Boolean
+    ) {
         val successType = if (reachedTarget) {
             if (isStuck) SuccessType.SUCCESS
             else SuccessType.REACHED_TARGET

@@ -30,10 +30,9 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.vanbrusselgames.mindmix.core.designsystem.theme.MindMixTheme
 import com.vanbrusselgames.mindmix.core.ui.EnumDropdown
-import com.vanbrusselgames.mindmix.feature.settings.SettingsDialog
+import com.vanbrusselgames.mindmix.core.ui.dialogs.settings.SettingsDialog
 import com.vanbrusselgames.mindmix.games.solitaire.R
 import com.vanbrusselgames.mindmix.games.solitaire.model.CardVisualType
-import com.vanbrusselgames.mindmix.games.solitaire.model.Solitaire
 import com.vanbrusselgames.mindmix.games.solitaire.viewmodel.ISolitaireViewModel
 import com.vanbrusselgames.mindmix.games.solitaire.viewmodel.MockSolitaireViewModel
 

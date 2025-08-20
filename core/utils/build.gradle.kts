@@ -12,15 +12,6 @@ android {
     namespace = "com.vanbrusselgames.mindmix.core.utils"
     compileSdk = 36
 
-    defaultConfig {
-        minSdk = 23
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary = true
-        }
-    }
-
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
@@ -28,13 +19,6 @@ android {
     tasks.withType<KotlinJvmCompile>().configureEach {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_21)
-        }
-    }
-    buildTypes {
-        release {
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
-            )
         }
     }
 }

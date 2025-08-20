@@ -2,7 +2,7 @@ package com.vanbrusselgames.mindmix.games.game2048.ui.dialogs
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
-import com.vanbrusselgames.mindmix.feature.gamehelp.GameHelpDialog
+import com.vanbrusselgames.mindmix.core.ui.dialogs.gamehelp.GameHelpDialog
 import com.vanbrusselgames.mindmix.games.game2048.R
 
 @Composable

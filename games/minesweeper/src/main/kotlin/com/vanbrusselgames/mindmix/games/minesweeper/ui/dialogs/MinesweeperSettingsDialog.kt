@@ -30,9 +30,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.vanbrusselgames.mindmix.core.designsystem.theme.MindMixTheme
-import com.vanbrusselgames.mindmix.feature.settings.SettingsDialog
+import com.vanbrusselgames.mindmix.core.ui.dialogs.settings.SettingsDialog
 import com.vanbrusselgames.mindmix.games.minesweeper.R
-import com.vanbrusselgames.mindmix.games.minesweeper.model.Minesweeper
 import com.vanbrusselgames.mindmix.games.minesweeper.viewmodel.IMinesweeperViewModel
 import com.vanbrusselgames.mindmix.games.minesweeper.viewmodel.MockMinesweeperViewModel
 

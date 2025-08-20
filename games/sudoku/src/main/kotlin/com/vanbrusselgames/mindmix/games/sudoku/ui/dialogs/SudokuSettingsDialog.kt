@@ -33,9 +33,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.vanbrusselgames.mindmix.core.ui.EnumDropdown
 import com.vanbrusselgames.mindmix.core.utils.constants.Difficulty
-import com.vanbrusselgames.mindmix.feature.settings.SettingsDialog
+import com.vanbrusselgames.mindmix.core.ui.dialogs.settings.SettingsDialog
 import com.vanbrusselgames.mindmix.games.sudoku.R
-import com.vanbrusselgames.mindmix.games.sudoku.model.Sudoku
 import com.vanbrusselgames.mindmix.games.sudoku.model.enabledDifficulties
 import com.vanbrusselgames.mindmix.games.sudoku.viewmodel.ISudokuViewModel
 import com.vanbrusselgames.mindmix.games.sudoku.viewmodel.MockSudokuViewModel

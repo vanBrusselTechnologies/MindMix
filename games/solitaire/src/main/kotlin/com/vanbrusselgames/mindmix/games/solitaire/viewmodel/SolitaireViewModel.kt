@@ -149,13 +149,13 @@ class SolitaireViewModel @Inject constructor(
     private var moves = 0
 
     private suspend fun loadPreferences() {
-        applyPreferences(prefsRepository.getPreferences())
+        applyPreferences(prefsRepository.getPreferences().first())
     }
 
-    private fun applyPreferences(preferences: SolitairePreferences) {
+    private suspend fun applyPreferences(preferences: SolitairePreferences) {
         Logger.d("[solitaire] applyPreferences")
         cardVisualType.value = CardVisualType.entries[preferences.cardVisualType]
-        _preferencesLoaded.value = true
+        _preferencesLoaded.emit(true)
     }
 
     private suspend fun loadData() {

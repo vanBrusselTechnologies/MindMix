@@ -25,9 +25,9 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.vanbrusselgames.mindmix.core.designsystem.theme.MindMixTheme
 import com.vanbrusselgames.mindmix.core.navigation.navigateToMenu
-import com.vanbrusselgames.mindmix.feature.gamefinished.Buttons
-import com.vanbrusselgames.mindmix.feature.gamefinished.GameFinishedDialog
-import com.vanbrusselgames.mindmix.feature.gamefinished.GameFinishedRewardRow
+import com.vanbrusselgames.mindmix.core.ui.dialogs.gamefinished.Buttons
+import com.vanbrusselgames.mindmix.core.ui.dialogs.gamefinished.GameFinishedDialog
+import com.vanbrusselgames.mindmix.core.ui.dialogs.gamefinished.GameFinishedRewardRow
 import com.vanbrusselgames.mindmix.games.minesweeper.R
 import com.vanbrusselgames.mindmix.games.minesweeper.model.FinishedGame
 import com.vanbrusselgames.mindmix.games.minesweeper.model.SuccessType

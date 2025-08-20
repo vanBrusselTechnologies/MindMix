@@ -21,20 +21,16 @@ import com.vanbrusselgames.mindmix.games.solitaire.model.CardType
 import com.vanbrusselgames.mindmix.games.solitaire.model.CardVisualType
 import com.vanbrusselgames.mindmix.games.solitaire.model.FinishedGame
 import com.vanbrusselgames.mindmix.games.solitaire.model.PlayingCard
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-@HiltViewModel
-class MockSolitaireViewModel @Inject constructor() : BaseGameViewModel(), ISolitaireViewModel,
-    ITimerVM {
+class MockSolitaireViewModel : BaseGameViewModel(), ISolitaireViewModel, ITimerVM {
     companion object {
         private const val CARD_PIXEL_HEIGHT = 819f
         private const val CARD_PIXEL_WIDTH = 566f

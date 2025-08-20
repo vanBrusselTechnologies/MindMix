@@ -12,7 +12,6 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.navigation
-import com.vanbrusselgames.mindmix.core.common.BaseScreenViewModel
 import com.vanbrusselgames.mindmix.core.designsystem.theme.setFullScreen
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
@@ -80,15 +79,12 @@ fun NavController.navigateToMinesweeperSettings(
     navigate(route, navOptions)
 }
 
-fun NavGraphBuilder.minesweeper(
-    navController: NavController, setCurrentViewModel: (BaseScreenViewModel?) -> Unit
-) {
+fun NavGraphBuilder.minesweeper(navController: NavController) {
     navigation<MinesweeperFeatureRoute>(MinesweeperGameRoute) {
         composable<MinesweeperGameRoute> { navBackStackEntry ->
             val vm = hiltViewModel<MinesweeperViewModel>(remember(navBackStackEntry) {
                 navController.getBackStackEntry<MinesweeperFeatureRoute>()
             })
-            setCurrentViewModel(vm)
             // val route = navBackStackEntry.toRoute<MinesweeperGameRoute>()
             // route.mode
             GameUI(vm, navController)

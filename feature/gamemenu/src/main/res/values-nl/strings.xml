@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="back_to_menu">Terug naar menu</string>
-    <string name="play_again">Start nieuw spel</string>
-    <string name="settings">Instellingen</string>
-    <string name="continue_game">Doorgaan</string>
-</resources>

@@ -9,9 +9,9 @@ appUpdateKtx = "2.1.0"
 composeBom = "2025.07.00"
 constraintlayout = "2.2.1"
 datastorePreferences = "1.1.7"
-firebaseBom = "34.0.0"
-firebaseCrashlytics = "3.0.5"
-firebasePerfPlugin = "2.0.0"
+firebaseBom = "34.1.0"
+firebaseCrashlytics = "3.0.6"
+firebasePerfPlugin = "2.0.1"
 googleServices = "4.4.3"
 gradle = "8.12.0"
 hilt = "2.57"
@@ -38,6 +38,8 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
 androidx-compose-material3 = { module = "androidx.compose.material3:material3" }
 androidx-compose-ui = { module = "androidx.compose.ui:ui" }
+androidx-compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
+androidx-compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
 androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
@@ -46,10 +48,8 @@ androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscree
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-hilt-navigation = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigation" }
-androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 androidx-test-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "androidxEspresso" }
-androidx-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
-androidx-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
 app-update = { module = "com.google.android.play:app-update", version.ref = "appUpdate" }
 app-update-ktx = { module = "com.google.android.play:app-update-ktx", version.ref = "appUpdateKtx" }
 ext-junit = { module = "androidx.test.ext:junit", version.ref = "androidxJunit" }

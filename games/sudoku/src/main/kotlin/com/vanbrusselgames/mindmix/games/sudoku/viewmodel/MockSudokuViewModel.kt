@@ -6,7 +6,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.navigation.NavController
 import com.vanbrusselgames.mindmix.core.common.BaseGameViewModel
 import com.vanbrusselgames.mindmix.core.utils.constants.Difficulty
-import com.vanbrusselgames.mindmix.games.sudoku.R
 import com.vanbrusselgames.mindmix.games.sudoku.model.FinishedGame
 import com.vanbrusselgames.mindmix.games.sudoku.model.InputMode
 import com.vanbrusselgames.mindmix.games.sudoku.model.SudokuPuzzleCell

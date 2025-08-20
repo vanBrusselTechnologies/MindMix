@@ -13,12 +13,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        minSdk = 23
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary = true
-        }
+        minSdk = 21
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
@@ -27,14 +22,6 @@ android {
     tasks.withType<KotlinJvmCompile>().configureEach {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_21)
-        }
-    }
-    buildFeatures {
-        compose = true
-    }
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
 }

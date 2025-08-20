@@ -8,7 +8,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.vanbrusselgames.mindmix.core.designsystem.theme.MindMixTheme
 import com.vanbrusselgames.mindmix.core.navigation.navigateToMenu
-import com.vanbrusselgames.mindmix.feature.gamemenu.GameMenuDialog
+import com.vanbrusselgames.mindmix.core.ui.dialogs.gamemenu.GameMenuDialog
 import com.vanbrusselgames.mindmix.games.game2048.R
 import com.vanbrusselgames.mindmix.games.game2048.navigation.navigateToGame2048Settings
 import com.vanbrusselgames.mindmix.games.game2048.viewmodel.IGame2048ViewModel

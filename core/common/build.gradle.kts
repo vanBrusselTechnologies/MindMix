@@ -29,9 +29,6 @@ android {
 dependencies {
     implementation(project(":core:model"))
     implementation(project(":core:navigation"))
-    implementation(project(":feature:gamehelp"))
-    implementation(project(":feature:gamemenu"))
-    implementation(project(":feature:settings"))
 
     implementation(libs.androidx.appcompat)
     implementation(platform(libs.androidx.compose.bom))
