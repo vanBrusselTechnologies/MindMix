@@ -148,10 +148,10 @@ class SudokuRepository @Inject constructor(
         for (kvp in data.page) pages[kvp.key] = kvp.value
 
         val savedProgress = withContext(Dispatchers.Default) {
-            data.progress.filter { it.clues != "" }.map { progress ->
+            data.progress.filter { it.clues.trim() != "" }.map { progress ->
                 SudokuProgress(
-                    Decode.base94toIntList(progress.clues, size * size),
-                    Decode.base94toIntList(progress.input, size * size),
+                    Decode.base94toIntList(progress.clues.trim(), size * size),
+                    Decode.base94toIntList(progress.input.trim(), size * size),
                     progress.inputNotes.map { notes ->
                         val decodedNotes = Decode.base94toBooleanList(notes, SudokuViewModel.SIZE)
                         List(SudokuViewModel.SIZE) { if (decodedNotes[it]) it + 1 else 0 }

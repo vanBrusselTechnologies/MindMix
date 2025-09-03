@@ -71,8 +71,7 @@ class Game2048Repository @Inject constructor(private val dataManager: DataManage
 
     fun removeProgressForSize(size: GridSize2048) {
         _puzzleProgress.removeAll { it.size == size }
-        val data = Json.encodeToString(Game2048Data(_puzzleProgress, _puzzleRecords))
-        dataManager.saveScene(SceneRegistry.Game2048, data)
+        saveProgress()
     }
 
     fun forceSave() {

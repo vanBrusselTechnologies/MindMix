@@ -122,7 +122,7 @@ class SudokuViewModel @Inject constructor(
             return
         }
         Logger.d(
-            "[sudoku] Puzzle Loaded: ${p.difficulty}:\n${p.clues.joinToString("")}\n${
+            "[sudoku] Puzzle Loaded: ${p.difficulty}:\nclues: ${p.clues.joinToString("")}\ninput: ${
                 p.input.joinToString("")
             }"
         )
@@ -144,9 +144,7 @@ class SudokuViewModel @Inject constructor(
 
     private fun reset() {
         finished = false
-        cells.forEach {
-            it.reset()
-        }
+        cells.forEach { it.reset() }
         _puzzleLoaded.value = false
     }
 

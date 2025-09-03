@@ -1,5 +1,6 @@
 package com.vanbrusselgames.mindmix.feature.menu.ui
 
+import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -32,6 +33,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -79,28 +81,26 @@ fun WheelItem(
     model: WheelItem,
     modifier: Modifier = Modifier
 ) {
-    val game = model.game
-    val angle = model.angle
-    val name = stringResource(model.title)
+    val offsetX = remember { sin(model.angle * Math.PI / 180f) * model.radius }
+    val offsetY = remember { cos(model.angle * Math.PI / 180f) * model.radius }
+    val interactionSource = remember { MutableInteractionSource() }
+    if (!model.visible.value) return
 
     val selectedFactor by animateFloatAsState(
         targetValue = if (model.isSelected.value) 1f else 0f, tween(
             durationMillis = (animDuration * 1.25f).toInt(), easing = easing
         ), label = "selectedFactorAnim"
     )
-    val offsetX = remember { sin(angle * Math.PI / 180f) * model.radius }
-    val offsetY = remember { cos(angle * Math.PI / 180f) * model.radius }
-    val interactionSource = remember { MutableInteractionSource() }
     Card(
         modifier
             .zIndex(if (model.isSelected.value) 1f else 0f)
             .offset(-offsetX.dp, -offsetY.dp)
-            .rotate(-angle)
+            .rotate(-model.angle)
             .offset { IntOffset(0.dp.roundToPx(), (model.offsetY.dp * selectedFactor).roundToPx()) }
             .clickable(
-                interactionSource, null, true, "Play game: ${game.name.lowercase()}"
+                interactionSource, null, true, "Play game: ${model.game.name.lowercase()}"
             ) {
-                viewModel.selectedGame = game
+                viewModel.selectedGame = model.game
                 viewModel.navigateToSelectedGame(navController)
             }) {
         Column(
@@ -110,26 +110,23 @@ fun WheelItem(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
+            val name = stringResource(model.title)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 WheelItemTitle(name, selectedFactor)
-                WheelItemIconButton(viewModel, navController, model, name, game)
+                WheelItemIconButton(navController, model.isSelected, name, model.game)
             }
             Spacer(modifier = Modifier.height(5.dp))
-            WheelItemImage(model, name, selectedFactor)
+            WheelItemImage(model.image, name, selectedFactor)
         }
     }
 }
 
 @Composable
 fun WheelItemIconButton(
-    viewModel: IMenuScreenViewModel,
-    navController: NavController,
-    model: WheelItem,
-    name: String,
-    game: Scene
+    navController: NavController, isSelected: MutableState<Boolean>, name: String, game: Scene
 ) {
     AnimatedVisibility(
-        model.isSelected.value, enter = slideInHorizontally(
+        isSelected.value, enter = slideInHorizontally(
             tween(durationMillis = animDuration, easing = easing)
         ) + expandIn(
             tween(durationMillis = animDuration, easing = easing)
@@ -175,9 +172,7 @@ private fun WheelItemTitle(name: String, selectedFactor: Float) {
 }
 
 @Composable
-private fun WheelItemImage(
-    model: WheelItem, name: String, selectedFactor: Float
-) {
+private fun WheelItemImage(@DrawableRes imageResId: Int, name: String, selectedFactor: Float) {
     val localDensity = LocalDensity.current
     val containerSize = LocalWindowInfo.current.containerSize
     val growthFactor = remember(containerSize) {
@@ -189,7 +184,7 @@ private fun WheelItemImage(
         }
     }
 
-    val painterResource = painterResource(model.image)
+    val painterResource = painterResource(imageResId)
     val maxSize = remember { painterResource.intrinsicSize.maxDimension }
     val height = remember {
         with(painterResource.intrinsicSize) { height / (0.9f.coerceAtLeast(height / maxSize)) }
@@ -214,7 +209,7 @@ private fun WheelItemImage(
 @Composable
 private fun Prev_WheelItem() {
     Column {
-        val item = WheelItem(SceneRegistry.Sudoku)
+        val item = WheelItem(SceneRegistry.Sudoku, 0f, 0f)
         item.isSelected.value = true
         val vm = remember { MockMenuScreenViewModel() }
         WheelItem(vm, rememberNavController(), item)

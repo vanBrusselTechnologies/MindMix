@@ -11,5 +11,6 @@ interface IMenuScreenViewModel : IBaseScreenViewModel {
     val games: Map<Int, GameScene>
     var selectedGame: GameScene
     val wheelModel: GameWheel
+
     fun navigateToSelectedGame(navController: NavController)
 }

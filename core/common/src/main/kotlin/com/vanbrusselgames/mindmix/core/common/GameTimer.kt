@@ -1,40 +1,36 @@
 package com.vanbrusselgames.mindmix.core.common
 
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.LongState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import com.vanbrusselgames.mindmix.core.model.SceneRegistry
-import com.vanbrusselgames.mindmix.core.navigation.SceneManager
-import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 
 class GameTimer {
-    private val running = mutableStateOf(false)
+    private val _running = mutableStateOf(false)
+    val running: State<Boolean> = _running
+    private val _currentTime = mutableLongStateOf(0)
+    val currentTime: LongState = _currentTime
+
     var currentMillis = 0L
         private set
     private var startMillis = 0L
     private var pausedAt = 0L
     var addedMillis = 0L
         private set
-    private var currentTime = mutableLongStateOf(0)
 
     fun reset() {
         addedMillis = 0
         pausedAt = 0
-        currentTime.longValue = 0
-        running.value = false
+        _currentTime.longValue = 0
+        _running.value = false
     }
 
     fun start() {
         reset()
         startMillis = System.currentTimeMillis()
         currentMillis = 0L
-        running.value = true
+        _running.value = true
     }
 
     fun set(millis: Long) {
@@ -47,8 +43,8 @@ class GameTimer {
         if (pausedAt != 0L) return
         pausedAt = System.currentTimeMillis()
         currentMillis = pausedAt - startMillis
-        currentTime.longValue = currentMillis + addedMillis
-        running.value = false
+        _currentTime.longValue = currentMillis + addedMillis
+        _running.value = false
     }
 
     fun resume() {
@@ -56,10 +52,15 @@ class GameTimer {
             startMillis += System.currentTimeMillis() - pausedAt
             pausedAt = 0L
             currentMillis = System.currentTimeMillis() - startMillis
-            currentTime.longValue = currentMillis + addedMillis
+            _currentTime.longValue = currentMillis + addedMillis
         }
         if (startMillis == 0L) start()
-        running.value = true
+        _running.value = true
+    }
+
+    fun update() {
+        currentMillis = System.currentTimeMillis() - startMillis
+        _currentTime.longValue = currentMillis + addedMillis
     }
 
     fun stop() {
@@ -68,26 +69,7 @@ class GameTimer {
 
     fun addMillis(millis: Long) {
         addedMillis += millis
-        currentTime.longValue = currentMillis + addedMillis
-    }
-
-    @Composable
-    fun Timer(modifier: Modifier = Modifier) {
-        remember(SceneManager.dialogActiveState.value, SceneManager.currentScene) {
-            if (!SceneManager.dialogActiveState.value && SceneManager.currentScene != SceneRegistry.Menu) resume();0
-        }
-
-        currentTime = remember { mutableLongStateOf(currentMillis + addedMillis) }
-
-        Text(formatDuration(currentTime.longValue, false), modifier)
-
-        LaunchedEffect(running.value) {
-            while (running.value) {
-                delay(1.seconds)
-                currentMillis = System.currentTimeMillis() - startMillis
-                currentTime.longValue = currentMillis + addedMillis
-            }
-        }
+        _currentTime.longValue = currentMillis + addedMillis
     }
 
     fun formatDuration(millis: Long, includeMillis: Boolean = false): String {

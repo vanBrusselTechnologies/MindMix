@@ -61,8 +61,7 @@ class MinesweeperRepository @Inject constructor(private val dataManager: DataMan
 
     fun removeProgressForDifficulty(difficulty: Difficulty) {
         _puzzleProgress.removeAll { it.difficulty == difficulty }
-        val data = Json.encodeToString(MinesweeperData(_puzzleProgress))
-        dataManager.saveScene(SceneRegistry.Minesweeper, data)
+        saveProgress()
     }
 
     fun forceSave() {

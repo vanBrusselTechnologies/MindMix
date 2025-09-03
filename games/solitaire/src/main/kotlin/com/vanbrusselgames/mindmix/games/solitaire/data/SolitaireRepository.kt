@@ -89,8 +89,7 @@ class SolitaireRepository @Inject constructor(private val dataManager: DataManag
 
     fun removeProgress() {
         _puzzleProgress.removeAll { true }
-        val data = Json.encodeToString(SolitaireData(_puzzleProgress, _puzzleRecords))
-        dataManager.saveScene(SceneRegistry.Solitaire, data)
+        saveProgress()
     }
 
     fun forceSave() {

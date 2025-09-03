@@ -90,14 +90,8 @@ class MinesweeperViewModel @Inject constructor(
         }
     }
 
-    private fun reset() {
-        finished = false
-        mines.fill(false)
-        cells.forEach { it.reset() }
-        _puzzleLoaded.value = false
-    }
-
     override fun startNewGame() {
+        Logger.d("[minesweeper] startNewGame")
         reset()
         minesweeperRepository.removeProgressForDifficulty(difficulty.value)
         startPuzzle()
@@ -144,6 +138,13 @@ class MinesweeperViewModel @Inject constructor(
         _puzzleLoaded.value = true
     }
 
+    private fun reset() {
+        finished = false
+        mines.fill(false)
+        cells.forEach { it.reset() }
+        _puzzleLoaded.value = false
+    }
+
     private fun setCellMineCount(cell: MinesweeperCell) {
         if (cell.isMine) {
             cell.mineCount = 99
@@ -173,12 +174,12 @@ class MinesweeperViewModel @Inject constructor(
 
     override fun onSelectCell(offset: Offset, cellSize: Float, navController: NavController) {
         if (finished) return
-        val column = floor(offset.x / cellSize)
-        val row = floor(offset.y / cellSize)
+        val column = floor(offset.x / cellSize).roundToInt().coerceIn(0, sizeX - 1)
+        val row = floor(offset.y / cellSize).roundToInt().coerceIn(0, sizeY - 1)
         val cellIndex = if (sizeX < sizeY) {
-            (column + row * sizeX).roundToInt()
+            column + row * sizeX
         } else {
-            (sizeY * (column + 1) - (row + 1)).roundToInt()
+            sizeY * (column + 1) - (row + 1)
         }
         val cell = cells[cellIndex]
 
@@ -193,7 +194,6 @@ class MinesweeperViewModel @Inject constructor(
                     cell.state = CellState.Number
                     if (cell.mineCount == 0) findOtherSafeCells(cell)
                     if (autoFlag.value) autoFlag()
-                    checkFinished(navController)
                 }
             }
 
@@ -207,6 +207,7 @@ class MinesweeperViewModel @Inject constructor(
             else -> return
         }
         minesweeperRepository.setPuzzleProgressForDifficulty(difficulty.value, cells)
+        checkFinished(navController)
     }
 
     private fun findOtherSafeCells(cell: MinesweeperCell) {

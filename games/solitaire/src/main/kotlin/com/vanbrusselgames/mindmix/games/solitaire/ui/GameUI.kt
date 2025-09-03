@@ -42,6 +42,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.vanbrusselgames.mindmix.core.common.BaseScene
 import com.vanbrusselgames.mindmix.core.common.GameLoadingScreen
+import com.vanbrusselgames.mindmix.core.common.ui.Timer
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
 import com.vanbrusselgames.mindmix.games.solitaire.R
 import com.vanbrusselgames.mindmix.games.solitaire.navigation.navigateToSolitaireGameHelp
@@ -66,7 +67,7 @@ fun GameUI(viewModel: ISolitaireViewModel, navController: NavController) {
                 viewModel.onReleaseMovingCards(navController)
             }
             FinishGameButton(viewModel.couldGetFinished) { viewModel.onClickFinishGame(navController) }
-            viewModel.timer.Timer(Modifier.align(Alignment.BottomCenter))
+            Timer(viewModel.timer, Modifier.align(Alignment.BottomCenter))
         }
     }
 

@@ -8,12 +8,11 @@ import com.vanbrusselgames.mindmix.games.minesweeper.model.Minesweeper
 import com.vanbrusselgames.mindmix.games.solitaire.model.Solitaire
 import com.vanbrusselgames.mindmix.games.sudoku.model.Sudoku
 
-data class WheelItem(val game: GameScene) {
-    var isSelected = mutableStateOf(false)
+data class WheelItem(val game: GameScene, val radius: Float, val angle: Float) {
+    val isSelected = mutableStateOf(false)
     var growthFactor = 0f
     var offsetY = 0f
-    var angle = 0f
-    var radius = 0f
+    val visible = mutableStateOf(true)
 
     val title = when (game) {
         SceneRegistry.Minesweeper -> Minesweeper.NAME_RES_ID

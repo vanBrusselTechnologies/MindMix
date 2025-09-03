@@ -55,8 +55,7 @@ class MenuScreenViewModel @Inject constructor(
             SceneRegistry.allScenes.first { it.sceneId == preferences.selectedGame } as GameScene
         //selectedGameModeIndices = data.selectedGameModeIndices
 
-        wheelModel.selectedId = games.filter { it.value == selectedGame }.keys.first()
-        wheelModel.rotationAngle = wheelModel.selectedId * wheelModel.angleStep
+        wheelModel.setSelectedStartIndex(games.filter { it.value == selectedGame }.keys.first())
 
         _preferencesLoaded.emit(true)
     }
