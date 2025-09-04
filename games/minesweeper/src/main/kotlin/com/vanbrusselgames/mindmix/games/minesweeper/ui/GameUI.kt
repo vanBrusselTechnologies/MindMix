@@ -19,10 +19,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.vanbrusselgames.mindmix.core.common.BaseScene
 import com.vanbrusselgames.mindmix.core.common.GameLoadingScreen
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
@@ -30,6 +32,7 @@ import com.vanbrusselgames.mindmix.games.minesweeper.navigation.navigateToMinesw
 import com.vanbrusselgames.mindmix.games.minesweeper.navigation.navigateToMinesweeperGameMenu
 import com.vanbrusselgames.mindmix.games.minesweeper.navigation.navigateToMinesweeperSettings
 import com.vanbrusselgames.mindmix.games.minesweeper.viewmodel.IMinesweeperViewModel
+import com.vanbrusselgames.mindmix.games.minesweeper.viewmodel.MockMinesweeperViewModel
 import kotlin.math.max
 import kotlin.math.min
 
@@ -113,7 +116,7 @@ fun MinesweeperGrid(viewModel: IMinesweeperViewModel, navController: NavControll
             Modifier.fillMaxWidth(0.95f)
         } else {
             Modifier.fillMaxHeight(0.95f)
-        }
+        }, contentAlignment = Alignment.Center
     ) {
         var cellSize: Dp = 0.dp
         BoxWithConstraints(
@@ -127,7 +130,9 @@ fun MinesweeperGrid(viewModel: IMinesweeperViewModel, navController: NavControll
                 }) {
             val maxHeight = this.maxHeight.value
             val maxWidth = this.maxWidth.value
-            cellSize = min(max(maxHeight, maxWidth) / 22f, min(maxHeight, maxWidth) / 16f).dp
+            cellSize = remember(maxWidth, maxHeight) {
+                min(max(maxHeight, maxWidth) / 22f, min(maxHeight, maxWidth) / 16f).dp
+            }
             Column {
                 repeat(viewModel.sizeY) { j ->
                     Row {
@@ -146,4 +151,11 @@ fun MinesweeperGrid(viewModel: IMinesweeperViewModel, navController: NavControll
             }
         }
     }
+}
+
+@PreviewScreenSizes
+@Composable
+private fun MinesweeperGridPreview() {
+    val vm = remember { MockMinesweeperViewModel() }
+    GameUI(vm, rememberNavController())
 }

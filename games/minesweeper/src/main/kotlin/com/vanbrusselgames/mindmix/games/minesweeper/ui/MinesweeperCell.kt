@@ -2,7 +2,6 @@ package com.vanbrusselgames.mindmix.games.minesweeper.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -36,11 +35,10 @@ fun MinesweeperCell(cell: MinesweeperCell, cellSize: Dp) {
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .size(cellSize)
-            .padding(PaddingValues(0.75f.dp))
+            .padding(PaddingValues(0.5f.dp))
             .drawBehind {
                 drawRect(if (cell.background.value == Color.Red) cs.errorContainer else cs.secondaryContainer)
-            }
-            .aspectRatio(1f)) {
+            }) {
         MinesweeperCellContent(cell)
     }
 }

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -35,6 +36,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
@@ -42,6 +44,7 @@ import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.vanbrusselgames.mindmix.core.common.BaseScene
 import com.vanbrusselgames.mindmix.core.common.GameLoadingScreen
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
@@ -50,6 +53,7 @@ import com.vanbrusselgames.mindmix.games.sudoku.navigation.navigateToSudokuGameH
 import com.vanbrusselgames.mindmix.games.sudoku.navigation.navigateToSudokuGameMenu
 import com.vanbrusselgames.mindmix.games.sudoku.navigation.navigateToSudokuSettings
 import com.vanbrusselgames.mindmix.games.sudoku.viewmodel.ISudokuViewModel
+import com.vanbrusselgames.mindmix.games.sudoku.viewmodel.MockSudokuViewModel
 import kotlin.math.floor
 
 @Composable
@@ -123,43 +127,49 @@ fun SceneContent(viewModel: ISudokuViewModel, navController: NavController, hori
 //#region Grid
 @Composable
 fun SudokuGrid(viewModel: ISudokuViewModel) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier
+    BoxWithConstraints(
+        Modifier
             .aspectRatio(1f)
             .background(Color.Black)
+            .padding(2.dp),
+        contentAlignment = Alignment.Center
     ) {
+        val maxHeight = this.maxHeight.value
+        val maxWidth = this.maxWidth.value
+        val cellSize = remember(maxWidth, maxHeight) {
+            (if (maxWidth != maxHeight) 0f else maxHeight / 9f).dp
+        }
         LazyVerticalGrid(
             columns = GridCells.Fixed(9),
             userScrollEnabled = false,
-            modifier = Modifier.fillMaxSize(0.99f)
         ) {
-            items(viewModel.cells, { it.id }, contentType = { SudokuPuzzleCell::class }) { cell ->
-                SudokuCell(viewModel, cell)
+            items(viewModel.cells, { it.id }, contentType = { SudokuPuzzleCell::class }) {
+                SudokuCell(viewModel, it, cellSize)
             }
         }
     }
 }
 
 @Composable
-fun SudokuCell(viewModel: ISudokuViewModel, cell: SudokuPuzzleCell) {
+fun SudokuCell(viewModel: ISudokuViewModel, cell: SudokuPuzzleCell, cellSize: Dp) {
     val padding = remember(cell.id) {
+        val thickLine = cellSize / 20f
+        val thinLine = thickLine / 2f
         val index = cell.id
         val column = index % 3
         val row = (floor(index / 9f) % 3f).toInt()
         PaddingValues(
-            start = if (column == 0) 2.dp else if (column == 1) 1.dp else 0.dp,
-            end = if (column == 2) 2.dp else if (column == 1) 1.dp else 0.dp,
-            top = if (row == 0) 2.dp else if (row == 1) 1.dp else 0.dp,
-            bottom = if (row == 2) 2.dp else if (row == 1) 1.dp else 0.dp,
+            start = if (column == 0) thickLine else if (column == 1) thinLine else 0.dp,
+            end = if (column == 2) thickLine else if (column == 1) thinLine else 0.dp,
+            top = if (row == 0) thickLine else if (row == 1) thinLine else 0.dp,
+            bottom = if (row == 2) thickLine else if (row == 1) thinLine else 0.dp,
         )
     }
     val colorScheme = MaterialTheme.colorScheme
     Box(
         Modifier
-            .fillMaxSize()
+            .size(cellSize)
             .padding(padding)
-            .aspectRatio(1f)
             .clickable(enabled = !cell.isClue.value) { viewModel.setSelectedCell(cell.id) }
             .drawBehind {
                 drawRect(
@@ -254,3 +264,10 @@ fun SudokuNoteCellText(cell: SudokuPuzzleCell) {
     )
 }
 //#endregion
+
+@PreviewScreenSizes
+@Composable
+private fun SudokuGridPreview() {
+    val vm = remember { MockSudokuViewModel() }
+    GameUI(vm, rememberNavController())
+}
