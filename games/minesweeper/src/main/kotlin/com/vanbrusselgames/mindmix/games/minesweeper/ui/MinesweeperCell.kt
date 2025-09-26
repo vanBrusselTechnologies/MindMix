@@ -5,10 +5,10 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,9 +59,10 @@ fun MinesweeperCellContent(cell: MinesweeperCell) {
 
 @Composable
 private fun MinesweeperTextCell(value: Int) {
-    BasicText(
+    Text(
         text = AnnotatedString(if (value == 0) "-" else value.toString()),
         modifier = Modifier.scale(1.125f),
+        autoSize = TextAutoSize.StepBased(maxFontSize = 250.sp, minFontSize = 5.sp),
         style = TextStyle(
             color = MaterialTheme.colorScheme.onSecondaryContainer,
             fontWeight = FontWeight.Bold,
@@ -71,8 +72,7 @@ private fun MinesweeperTextCell(value: Int) {
                 alignment = LineHeightStyle.Alignment.Center, trim = LineHeightStyle.Trim.Both
             )
         ),
-        maxLines = 1,
-        autoSize = TextAutoSize.StepBased(maxFontSize = 250.sp, minFontSize = 5.sp)
+        maxLines = 1
     )
 }
 

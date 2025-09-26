@@ -18,10 +18,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -199,9 +199,10 @@ fun SudokuCellValueText(cell: SudokuPuzzleCell) {
 fun SudokuRegularCellText(cell: SudokuPuzzleCell, isClue: Boolean) {
     val value = cell.value.intValue
     if (value == 0) return
-    BasicText(
+    Text(
         text = AnnotatedString(value.toString()),
         modifier = Modifier.scale(if (isClue) 1.15f else 1f),
+        autoSize = TextAutoSize.StepBased(maxFontSize = 250.sp),
         style = LocalTextStyle.current.merge(
             TextStyle(
                 color = when (true) {
@@ -216,8 +217,7 @@ fun SudokuRegularCellText(cell: SudokuPuzzleCell, isClue: Boolean) {
                 ),
             )
         ),
-        maxLines = 1,
-        autoSize = TextAutoSize.StepBased(maxFontSize = 250.sp)
+        maxLines = 1
     )
 }
 
@@ -249,8 +249,9 @@ fun SudokuNoteCellText(cell: SudokuPuzzleCell) {
         )
     }
 
-    BasicText(
+    Text(
         text = AnnotatedString(str.toString()),
+        autoSize = TextAutoSize.StepBased(maxFontSize = 250.sp, minFontSize = 5.sp),
         style = textStyle.merge(
             color = when (true) {
                 cell.isIncorrect.value -> MaterialTheme.colorScheme.onErrorContainer
@@ -260,7 +261,6 @@ fun SudokuNoteCellText(cell: SudokuPuzzleCell) {
         ),
         maxLines = 3,
         minLines = 3,
-        autoSize = TextAutoSize.StepBased(maxFontSize = 250.sp, minFontSize = 5.sp)
     )
 }
 //#endregion

@@ -178,9 +178,8 @@ class SudokuRepository @Inject constructor(
         if (index == -1) _puzzleProgress.add(progress) else {
             val input1 = _puzzleProgress[index].input.joinToString("")
             val input2 = progress.input.joinToString("")
-            val notes1 =
-                _puzzleProgress[index].inputNotes.joinToString("") { it.joinToString { "" } }
-            val notes2 = progress.inputNotes.joinToString("") { it.joinToString { "" } }
+            val notes1 = _puzzleProgress[index].inputNotes.joinToString("") { it.joinToString("") }
+            val notes2 = progress.inputNotes.joinToString("") { it.joinToString("") }
             if (input1 == input2 && notes1 == notes2) return
             _puzzleProgress[index] = progress
         }

@@ -20,7 +20,6 @@ import androidx.compose.foundation.lazy.grid.LazyGridItemScope
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
@@ -155,8 +154,9 @@ fun LazyGridItemScope.GridCell2048(cell: GridCell2048, modifier: Modifier = Modi
             .drawBehind { if (cell.value != 0L) drawRect(background) }, Alignment.Center
     ) {
         if (cell.value != 0L) {
-            BasicText(
+            Text(
                 text = value.longValue.toString(),
+                autoSize = TextAutoSize.StepBased(maxFontSize = 1000.sp, minFontSize = 1.sp),
                 style = LocalTextStyle.current.merge(
                     TextStyle(
                         color = if (value.longValue < 256) Color.Black else Color(220, 220, 220),
@@ -164,8 +164,7 @@ fun LazyGridItemScope.GridCell2048(cell: GridCell2048, modifier: Modifier = Modi
                         fontFeatureSettings = "tnum"
                     )
                 ),
-                maxLines = 1,
-                autoSize = TextAutoSize.StepBased(maxFontSize = 1000.sp, minFontSize = 1.sp),
+                maxLines = 1
             )
         }
     }

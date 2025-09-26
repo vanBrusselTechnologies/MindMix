@@ -9,10 +9,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,18 +56,18 @@ private fun SudokuNumPadNumberCell(
     Box(modifier.clickable {
         viewModel.onClickNumPadCell(index, navController)
     }) {
-        BasicText(
+        Text(
             text = (index + 1).toString(),
             modifier = Modifier
                 .align(Alignment.Center)
                 .scale(1.125f),
+            autoSize = TextAutoSize.StepBased(maxFontSize = 250.sp),
             style = TextStyle(
                 color = MaterialTheme.colorScheme.onSecondaryContainer,
                 fontWeight = FontWeight.ExtraBold,
                 textAlign = TextAlign.Center
             ),
-            maxLines = 1,
-            autoSize = TextAutoSize.StepBased(maxFontSize = 250.sp)
+            maxLines = 1
         )
     }
 }
