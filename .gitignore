@@ -99,3 +99,4 @@ local.properties
 keystore.properties
 *.zip
 *.lnk
+/app/release/
