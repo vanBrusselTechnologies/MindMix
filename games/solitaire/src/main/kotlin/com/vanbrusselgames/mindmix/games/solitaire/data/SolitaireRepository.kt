@@ -55,7 +55,7 @@ class SolitaireRepository @Inject constructor(private val dataManager: DataManag
         for (i in cardStacks.indices) {
             stacks[i] = cardStacks[i].map { if (it.frontVisible.value) it.id else -1 * it.id - 1 }
         }
-        val progress = SolitaireProgress(stacks, timer.currentMillis, timer.addedMillis, moves)
+        val progress = SolitaireProgress(stacks, timer.currentMillis.value, timer.addedMillis, moves)
         val index = _puzzleProgress.indexOfFirst { true }
         if (index == -1) _puzzleProgress.add(progress) else _puzzleProgress[index] = progress
         saveProgress()

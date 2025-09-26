@@ -221,8 +221,7 @@ class SolitaireViewModel @Inject constructor(
         }
 
         moves = p.moves
-        timer.set(p.millis)
-        timer.addMillis(p.penaltyMillis)
+        timer.set(p.millis, p.penaltyMillis)
         couldGetFinished.value = couldGetFinished()
         restStackEnabled.value = cardStacks[6].isNotEmpty() || cardStacks[5].size > 1
 
@@ -498,7 +497,7 @@ class SolitaireViewModel @Inject constructor(
     private fun checkFinished(navController: NavController) {
         finished = isFinished()
         if (finished) {
-            timer.stop()
+            timer.pause()
             Logger.logEvent(FirebaseAnalytics.Event.LEVEL_END) {
                 param(FirebaseAnalytics.Param.LEVEL_NAME, SceneRegistry.Solitaire.name)
                 param(FirebaseAnalytics.Param.SUCCESS, 1)
@@ -520,14 +519,14 @@ class SolitaireViewModel @Inject constructor(
     private fun onGameFinished(navController: NavController) {
         val lastRecord = solitaireRepository.getPuzzleRecord()
         val lastRecordFastestMillis = lastRecord?.fastestMillis ?: -1L
-        val totalUsedTime = timer.currentMillis + timer.addedMillis
+        val totalUsedTime = timer.currentMillis.value + timer.addedMillis
         val isNewRecord = lastRecordFastestMillis == -1L || lastRecordFastestMillis > totalUsedTime
         if (isNewRecord) solitaireRepository.setPuzzleRecord(totalUsedTime)
         val minutes = max(1f, totalUsedTime / 1000f / 60f)
         val reward = max(1, floor(MAX_REWARD / minutes).toInt()) + if (isNewRecord) 2 else 0
         finishedGame.value = FinishedGame(
             reward,
-            timer.currentMillis,
+            timer.currentMillis.value,
             timer.addedMillis,
             lastRecordFastestMillis,
             isNewRecord,
