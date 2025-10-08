@@ -44,7 +44,7 @@ class SudokuViewModel @Inject constructor(
     private val sudokuRepository: SudokuRepository,
     private val prefsRepository: SudokuPreferencesRepository
 ) : BaseGameViewModel(), ISudokuViewModel {
-    companion object Instance {
+    companion object {
         const val SIZE = 9
     }
 

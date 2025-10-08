@@ -1,5 +1,6 @@
 package com.vanbrusselgames.mindmix.core.ui.dialogs.gamemenu
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Spacer
@@ -20,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
@@ -72,9 +72,7 @@ fun GameMenuDialog(
                 navController.popBackStack()
             }
             GameMenuDialogButton(
-                R.string.play_again,
-                painterResource(R.drawable.outline_autorenew_24),
-                "Start new game"
+                R.string.play_again, R.drawable.outline_autorenew_24, "Start new game"
             ) {
                 startNewGame()
                 navController.popBackStack()
@@ -98,9 +96,9 @@ private fun GameMenuDialogButton(
 
 @Composable
 private fun GameMenuDialogButton(
-    textId: Int, iconPainter: Painter, iconContentDescription: String, onClick: () -> Unit
+    textId: Int, @DrawableRes iconId: Int, iconContentDescription: String, onClick: () -> Unit
 ) {
-    GameMenuDialogButton(textId, onClick) { Icon(iconPainter, iconContentDescription) }
+    GameMenuDialogButton(textId, onClick) { Icon(painterResource(iconId), iconContentDescription) }
 }
 
 @Composable

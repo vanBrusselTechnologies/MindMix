@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class MockSudokuViewModel : BaseGameViewModel(), ISudokuViewModel {
-    companion object Instance {
+    companion object {
         const val SIZE = 9
     }
 

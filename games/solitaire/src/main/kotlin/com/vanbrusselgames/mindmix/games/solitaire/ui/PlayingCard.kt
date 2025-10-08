@@ -18,8 +18,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.LineHeightStyle
@@ -89,19 +89,18 @@ fun SimpleCardBackground(frontVisible: MutableState<Boolean>) {
 
 @Composable
 fun SimpleCardContent(viewModel: ISolitaireViewModel, model: PlayingCard) {
-    val cardHeightInDpTarget = remember(model.isLast.value) {
-        viewModel.cardHeightDp * (if (model.isLast.value) 1f else viewModel.distanceBetweenCards)
-    }
+    val cardHeightDp = viewModel.cardSizeDp.value.height
+    val cardHeightInDpTarget =
+        cardHeightDp * (if (model.isLast.value) 1f else viewModel.distanceBetweenCards)
     val cardHeightInDp = animateDpAsState(cardHeightInDpTarget, label = "selectedFactor").value
     Box(Modifier.height(cardHeightInDp), Alignment.Center) {
         val localDensity = LocalDensity.current
-        val context = LocalContext.current
-        val fontSize = remember(cardHeightInDp) {
-            val widthScale = if (model.contentLength == 2) 1.15f else 1f
-            val maxWidth = (viewModel.cardWidth * 0.33f * widthScale).roundToInt()
-            val maxHeight = with(localDensity) { (cardHeightInDp * 0.75f).toPx() }.roundToInt()
-            PixelHelper.pxToSp(context.resources, minOf(maxWidth, maxHeight))
-        }
+        val resources = LocalResources.current
+        val cardWidth = viewModel.cardSize.value.width
+        val widthScale = if (model.contentLength == 2) 1.15f else 1f
+        val maxWidth = (cardWidth * 0.33f * widthScale).roundToInt()
+        val maxHeight = with(localDensity) { (cardHeightInDp * 0.75f).toPx() }.roundToInt()
+        val fontSize = PixelHelper.pxToSp(resources, minOf(maxWidth, maxHeight))
         val localStyle = LocalTextStyle.current
         val style = remember {
             localStyle.merge(

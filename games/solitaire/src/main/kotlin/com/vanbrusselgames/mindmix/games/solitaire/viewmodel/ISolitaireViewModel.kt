@@ -4,6 +4,8 @@ import android.app.Activity
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
@@ -27,16 +29,14 @@ interface ISolitaireViewModel : IBaseGameViewModel, ITimerVM {
     val preferencesLoaded: StateFlow<Boolean>
 
     val cards: Array<PlayingCard>
-    var cardHeight: Float
-    var cardHeightDp: Dp
-    var cardWidth: Float
-    var cardWidthDp: Dp
+    val cardSize: State<Size>
+    val cardSizeDp: State<DpSize>
     var distanceBetweenCards: Float
     var finished: Boolean
 
     fun onTap(offset: Offset, onReleaseMovingCards: () -> Unit)
     fun onDragStart(offset: Offset)
-    fun moveCards(intOffset: IntOffset, coroutineScope: CoroutineScope)
+    fun moveCards(intOffset: IntOffset, dragBounds: Rect, coroutineScope: CoroutineScope)
     fun onReleaseMovingCards(navController: NavController)
     fun resetRestStack()
     fun turnFromRestStack()

@@ -4,6 +4,8 @@ import android.app.Activity
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
@@ -42,6 +44,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.max
@@ -136,10 +139,8 @@ class SolitaireViewModel @Inject constructor(
         PlayingCard(CardType.SPADES, CardIndex.K, R.drawable.playingcards_detailed_spades_k),
     )
 
-    override var cardHeight = 0f
-    override var cardHeightDp = 0.dp
-    override var cardWidth = 0f
-    override var cardWidthDp = 0.dp
+    override val cardSize = mutableStateOf(Size.Zero)
+    override val cardSizeDp = mutableStateOf(DpSize.Zero)
     override var distanceBetweenCards = 0.175f
     override var finished = false
 
@@ -149,6 +150,7 @@ class SolitaireViewModel @Inject constructor(
     private var moves = 0
 
     private suspend fun loadPreferences() {
+        Logger.d("[solitaire] loadPreferences")
         applyPreferences(prefsRepository.getPreferences().first())
     }
 
@@ -159,6 +161,7 @@ class SolitaireViewModel @Inject constructor(
     }
 
     private suspend fun loadData() {
+        Logger.d("[solitaire] loadData")
         withContext(Dispatchers.IO) {
             preferencesLoaded.first { it }
             val savedProgress = solitaireRepository.getPuzzleProgress()
@@ -168,15 +171,17 @@ class SolitaireViewModel @Inject constructor(
     }
 
     private fun reset() {
+        Logger.d("[solitaire] reset")
         finished = false
         cardStacks.forEach { it.clear() }
-        cards.forEach { it.reset(cardWidth) }
+        cards.forEach { it.reset(cardSize.value.width) }
         moves = 0
         timer.reset()
         _puzzleLoaded.value = false
     }
 
     override fun startNewGame() {
+        Logger.d("[solitaire] startNewGame")
         reset()
         solitaireRepository.removeProgress()
         startPuzzle()
@@ -201,6 +206,7 @@ class SolitaireViewModel @Inject constructor(
             return
         }
         for (stackId in p.cardStacks.indices) {
+            cardStacks[stackId].clear()
             p.cardStacks[stackId].forEachIndexed { cardStackIndex, cIndex ->
                 val cardIndex = if (cIndex >= 0) cIndex else -1 * cIndex - 1
                 val c = cards[cardIndex]
@@ -230,6 +236,8 @@ class SolitaireViewModel @Inject constructor(
     }
 
     private fun setCardBaseOffset(card: PlayingCard) {
+        val cardWidth = cardSize.value.width
+        val cardHeight = cardSize.value.height
         val x = (card.stackId % 7) * cardWidth
         val y =
             if (card.stackId < 7) 0f else (1 + (0.5f + card.stackIndex) * distanceBetweenCards) * cardHeight
@@ -262,6 +270,8 @@ class SolitaireViewModel @Inject constructor(
     }
 
     private fun getStackIndicesByPosition(offset: Offset): Pair<Int, Int> {
+        val cardWidth = cardSize.value.width
+        val cardHeight = cardSize.value.height
         val column = floor(offset.x / cardWidth).roundToInt()
         val row =
             if (offset.y < cardHeight) 0 else if (offset.y < cardHeight + 0.5 * cardHeight * distanceBetweenCards) -1 else ceil(
@@ -273,6 +283,7 @@ class SolitaireViewModel @Inject constructor(
                 (offset.y - cardHeight * 2 - 0.5f * distanceBetweenCards * cardHeight) / (distanceBetweenCards * cardHeight)
             ).roundToInt()
         val i1 = if (row == 0) column else 7 + column
+        if (i1 >= cardStacks.size) return Pair(i1, -1)
         val stack = cardStacks[i1]
         if (stack.isEmpty()) return Pair(i1, -1)
         if (stack.size < rowLastCard) return Pair(i1, -1)
@@ -340,12 +351,51 @@ class SolitaireViewModel @Inject constructor(
         if (index != 0 && stackId >= 7) stack[index - 1].isLast.value = true
     }
 
-    override fun moveCards(intOffset: IntOffset, coroutineScope: CoroutineScope) {
+    override fun moveCards(intOffset: IntOffset, dragBounds: Rect, coroutineScope: CoroutineScope) {
+        if (movingCards.isEmpty()) return
+
+        val topLeft = dragBounds.topLeft
+        val bottomRight = dragBounds.bottomRight
+
+        val minX = (topLeft.x).roundToInt()
+        val maxX = (bottomRight.x - cardSize.value.width).roundToInt()
+        val minY = (topLeft.y).roundToInt()
+        val maxY = (bottomRight.y - cardSize.value.height).roundToInt()
+
+        if (movingCards.size == 1) {
+            val card = movingCards.first()
+            card.offset += intOffset
+            val x = (card.baseOffset.x + card.offset.x).coerceIn(minX, maxX)
+            val y = (card.baseOffset.y + card.offset.y).coerceIn(minY, maxY)
+            card.targetOffset.value = IntOffset(x, y)
+            coroutineScope.launch {
+                card.animOffset.animateTo(IntOffset(x, y))
+            }
+            return
+        }
+
         movingCards.forEach { card ->
             card.offset += intOffset
-            card.targetOffset.value = card.baseOffset + card.offset
+        }
+        val topCard = movingCards.first()
+        val lastCard = movingCards.last()
+        val topLeftX =
+            (topCard.baseOffset.x + topCard.offset.x).coerceIn(minX, maxX) - topCard.baseOffset.x
+        val topLeftY =
+            (topCard.baseOffset.y + topCard.offset.y).coerceIn(minY, maxY) - topCard.baseOffset.y
+        val bottomRightX =
+            (lastCard.baseOffset.x + lastCard.offset.x).coerceIn(minX, maxX) - lastCard.baseOffset.x
+        val bottomRightY =
+            (lastCard.baseOffset.y + lastCard.offset.y).coerceIn(minY, maxY) - lastCard.baseOffset.y
+
+        val offsetX = listOf(topLeftX, bottomRightX).minBy { abs(it) }
+        val offsetY = listOf(topLeftY, bottomRightY).minBy { abs(it) }
+
+        movingCards.forEach { card ->
+            val offset = IntOffset(card.baseOffset.x + offsetX, card.baseOffset.y + offsetY)
+            card.targetOffset.value = offset
             coroutineScope.launch {
-                card.animOffset.animateTo(card.baseOffset + card.offset)
+                card.animOffset.animateTo(offset)
             }
         }
     }
@@ -358,6 +408,8 @@ class SolitaireViewModel @Inject constructor(
         val oldStack = cardStacks[firstCardStackId]
         val offset = firstCard.baseOffset + firstCard.offset
 
+        val cardWidth = cardSize.value.width
+        val cardHeight = cardSize.value.height
         val heightBorder = ((1 + 1.5f * distanceBetweenCards) * cardHeight) / 2f
         val selectedStackByOffset = MathUtils.clamp(((offset.x - 0) / cardWidth).roundToInt(), 0, 6)
 
@@ -471,14 +523,19 @@ class SolitaireViewModel @Inject constructor(
         val maxHeightDp = height * 0.95f
         val maxCardHeightDp = maxHeightDp / 4.2375f
         val cardHeightDp = min(maxCardHeightDp.value, maxWidthDp.value / 7f / CARD_ASPECT_RATIO).dp
+        val cardHeight = with(density) { cardHeightDp.toPx() }
 
-        this.cardHeightDp = cardHeightDp
-        cardWidthDp = cardHeightDp * CARD_ASPECT_RATIO
-        cardHeight = with(density) { cardHeightDp.toPx() }
-        cardWidth = cardHeight * CARD_ASPECT_RATIO
+        cardSizeDp.value = DpSize(cardHeightDp * CARD_ASPECT_RATIO, cardHeightDp)
+        cardSize.value = Size(cardHeight * CARD_ASPECT_RATIO, cardHeight)
+
         distanceBetweenCards = min(maxCardHeightDp / cardHeightDp, 2f) * 0.175f
 
-        return DpSize(cardHeightDp * CARD_ASPECT_RATIO, cardHeightDp)
+        cards.forEach {
+            setCardBaseOffset(it)
+            it.targetOffset.value = it.baseOffset
+        }
+
+        return cardSizeDp.value
     }
 
     override fun onClickFinishGame(navController: NavController) {

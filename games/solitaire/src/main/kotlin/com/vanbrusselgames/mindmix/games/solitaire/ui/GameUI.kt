@@ -28,7 +28,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -59,7 +63,7 @@ fun GameUI(viewModel: ISolitaireViewModel, navController: NavController) {
         { navController.navigateToSolitaireSettings() }) {
         BlurBox(viewModel.blurStrength) { width, height ->
             val localDensity = LocalDensity.current
-            val cardSize = remember(width, height) {
+            val cardSize = remember(width, height, localDensity) {
                 viewModel.onUpdateTableSize(width, height, localDensity)
             }
 
@@ -104,9 +108,14 @@ fun Foreground(
     onReleaseMovingCards: () -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
+    var dragBounds = Rect.Zero
     Box(Modifier
         .width(cardWidth * 7)
         .fillMaxHeight()
+        .onGloballyPositioned {
+            val p = it.positionInParent()
+            dragBounds = Rect(-p, Size(p.x * 2 + it.size.width, p.y * 2 + it.size.height))
+        }
         .pointerInput(Unit) {
             detectDragGestures(onDragStart = {
                 viewModel.onDragStart(it)
@@ -116,7 +125,7 @@ fun Foreground(
                 onReleaseMovingCards()
             }, onDrag = { change, offset ->
                 change.consume()
-                viewModel.moveCards(offset.round(), coroutineScope)
+                viewModel.moveCards(offset.round(), dragBounds, coroutineScope)
             })
         }
         .pointerInput(Unit) {
