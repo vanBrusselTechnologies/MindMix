@@ -11,11 +11,6 @@ class SceneManager {
         var currentScene: Scene = SceneRegistry.Menu
         val dialogActiveState = mutableStateOf(false)
     }
-
-    val onDestinationChange =
-        NavController.OnDestinationChangedListener { navController, destination, bundle ->
-            dialogActiveState.value = destination.navigatorName === "dialog"
-        }
 }
 
 fun NavController.navigateToMenu() {

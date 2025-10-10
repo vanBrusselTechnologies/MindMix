@@ -12,7 +12,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.navigation
-import com.vanbrusselgames.mindmix.core.designsystem.theme.setFullScreen
+import com.vanbrusselgames.mindmix.core.designsystem.theme.forceFullScreen
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
@@ -98,7 +98,7 @@ fun NavGraphBuilder.minesweeper(navController: NavController) {
                 navController.getBackStackEntry<MinesweeperFeatureRoute>()
             })
             val window = (LocalView.current.parent as? DialogWindowProvider)?.window
-            if (window != null) setFullScreen(null, window)
+            if (window != null) forceFullScreen(window)
             MinesweeperGameFinishedDialog(vm, navController)
         }
 
@@ -106,7 +106,7 @@ fun NavGraphBuilder.minesweeper(navController: NavController) {
             dialogProperties = DialogProperties(true, false, false)
         ) { navBackStackEntry ->
             val window = (LocalView.current.parent as? DialogWindowProvider)?.window
-            if (window != null) setFullScreen(null, window)
+            if (window != null) forceFullScreen(window)
             MinesweeperGameHelpDialog(navController)
         }
 
@@ -117,7 +117,7 @@ fun NavGraphBuilder.minesweeper(navController: NavController) {
                 navController.getBackStackEntry<MinesweeperFeatureRoute>()
             })
             val window = (LocalView.current.parent as? DialogWindowProvider)?.window
-            if (window != null) setFullScreen(null, window)
+            if (window != null) forceFullScreen(window)
             MinesweeperGameMenuDialog(vm, navController)
         }
 
@@ -128,7 +128,7 @@ fun NavGraphBuilder.minesweeper(navController: NavController) {
                 navController.getBackStackEntry<MinesweeperFeatureRoute>()
             })
             val window = (LocalView.current.parent as? DialogWindowProvider)?.window
-            if (window != null) setFullScreen(null, window)
+            if (window != null) forceFullScreen(window)
             MinesweeperSettingsDialog(vm, navController)
         }
     }

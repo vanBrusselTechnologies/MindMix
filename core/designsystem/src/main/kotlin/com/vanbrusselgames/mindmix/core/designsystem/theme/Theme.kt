@@ -1,12 +1,8 @@
 package com.vanbrusselgames.mindmix.core.designsystem.theme
 
-import android.app.ActionBar
 import android.app.Activity
 import android.os.Build
 import android.view.Window
-import android.view.WindowInsets
-import android.view.WindowInsetsController
-import android.view.WindowManager
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -15,7 +11,6 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
@@ -63,10 +58,7 @@ fun MindMixTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.primary.toArgb()
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
-
-            setFullScreen((view.context as Activity).actionBar, window)
         }
     }
 
@@ -87,17 +79,8 @@ enum class SelectedTheme : StringEnum {
     }
 }
 
-fun setFullScreen(actionBar: ActionBar?, window: Window) {
-    actionBar?.hide()
-    WindowCompat.setDecorFitsSystemWindows(window, false)
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
-        window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-    } else {
-        window.insetsController?.apply {
-            hide(WindowInsets.Type.statusBars())
-            systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        }
-    }
+fun forceFullScreen(window: Window) {
+    WindowCompat.enableEdgeToEdge(window)
     WindowInsetsControllerCompat(window, window.decorView).let { controller ->
         controller.hide(WindowInsetsCompat.Type.systemBars())
         controller.systemBarsBehavior =

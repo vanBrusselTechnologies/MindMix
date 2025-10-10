@@ -3,6 +3,7 @@ package com.vanbrusselgames.mindmix
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.fadeIn
@@ -33,6 +34,7 @@ import com.vanbrusselgames.mindmix.core.authentication.AuthManager
 import com.vanbrusselgames.mindmix.core.data.DataManager
 import com.vanbrusselgames.mindmix.core.designsystem.theme.MindMixTheme
 import com.vanbrusselgames.mindmix.core.designsystem.theme.SelectedTheme
+import com.vanbrusselgames.mindmix.core.designsystem.theme.forceFullScreen
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.core.navigation.AppRoutes
@@ -76,10 +78,14 @@ class MainActivity : ComponentActivity() {
     private lateinit var navController: NavHostController
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        //enableEdgeToEdge()
+        super.onCreate(savedInstanceState)
         val splashscreen = installSplashScreen()
         var keepSplashScreen = true
-        super.onCreate(savedInstanceState)
+
+        //Enable full screen
+        enableEdgeToEdge()
+        forceFullScreen(window)
+        actionBar?.hide()
 
         Firebase.initialize(this)
         Firebase.appCheck.installAppCheckProviderFactory(PlayIntegrityAppCheckProviderFactory.getInstance())
@@ -151,15 +157,19 @@ class MainActivity : ComponentActivity() {
                  }
                  */
 
+                navController = rememberNavController()
+                navController.enableOnBackPressed(false)
+                navController.addOnDestinationChangedListener { navController, destination, bundle ->
+                    forceFullScreen(window)
+                    SceneManager.dialogActiveState.value = destination.navigatorName === "dialog"
+                }
+
                 val viewModel = hiltViewModel<MainViewModel>()
                 val darkTheme = when (viewModel.theme.value) {
                     SelectedTheme.System -> isSystemInDarkTheme()
                     SelectedTheme.Dark -> true
                     SelectedTheme.Light -> false
                 }
-                navController = rememberNavController()
-                navController.enableOnBackPressed(false)
-                navController.addOnDestinationChangedListener(SceneManager().onDestinationChange)
                 MindMixTheme(darkTheme) {
                     Surface(
                         modifier = Modifier.fillMaxSize(),

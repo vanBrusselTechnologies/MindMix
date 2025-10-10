@@ -12,7 +12,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.navigation
-import com.vanbrusselgames.mindmix.core.designsystem.theme.setFullScreen
+import com.vanbrusselgames.mindmix.core.designsystem.theme.forceFullScreen
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
@@ -97,7 +97,7 @@ fun NavGraphBuilder.game2048(navController: NavController) {
                 navController.getBackStackEntry<Game2048FeatureRoute>()
             })
             val window = (LocalView.current.parent as? DialogWindowProvider)?.window
-            if (window != null) setFullScreen(null, window)
+            if (window != null) forceFullScreen(window)
             Game2048GameFinishedDialog(vm, navController)
         }
 
@@ -105,7 +105,7 @@ fun NavGraphBuilder.game2048(navController: NavController) {
             dialogProperties = DialogProperties(true, false, false)
         ) { navBackStackEntry ->
             val window = (LocalView.current.parent as? DialogWindowProvider)?.window
-            if (window != null) setFullScreen(null, window)
+            if (window != null) forceFullScreen(window)
             Game2048GameHelpDialog(navController)
         }
 
@@ -116,7 +116,7 @@ fun NavGraphBuilder.game2048(navController: NavController) {
                 navController.getBackStackEntry<Game2048FeatureRoute>()
             })
             val window = (LocalView.current.parent as? DialogWindowProvider)?.window
-            if (window != null) setFullScreen(null, window)
+            if (window != null) forceFullScreen(window)
             Game2048GameMenuDialog(vm, navController)
         }
 
@@ -127,7 +127,7 @@ fun NavGraphBuilder.game2048(navController: NavController) {
                 navController.getBackStackEntry<Game2048FeatureRoute>()
             })
             val window = (LocalView.current.parent as? DialogWindowProvider)?.window
-            if (window != null) setFullScreen(null, window)
+            if (window != null) forceFullScreen(window)
             Game2048SettingsDialog(vm, navController)
         }
     }

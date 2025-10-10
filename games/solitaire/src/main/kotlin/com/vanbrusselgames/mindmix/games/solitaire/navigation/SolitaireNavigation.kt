@@ -13,7 +13,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.navigation
-import com.vanbrusselgames.mindmix.core.designsystem.theme.setFullScreen
+import com.vanbrusselgames.mindmix.core.designsystem.theme.forceFullScreen
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
@@ -98,7 +98,7 @@ fun NavGraphBuilder.solitaire(navController: NavController) {
                 navController.getBackStackEntry<SolitaireFeatureRoute>()
             })
             val window = (LocalView.current.parent as? DialogWindowProvider)?.window
-            if (window != null) setFullScreen(null, window)
+            if (window != null) forceFullScreen(window)
             SolitaireGameFinishedDialog(vm, navController)
         }
 
@@ -106,7 +106,7 @@ fun NavGraphBuilder.solitaire(navController: NavController) {
             dialogProperties = DialogProperties(true, false, false)
         ) { navBackStackEntry ->
             val window = (LocalView.current.parent as? DialogWindowProvider)?.window
-            if (window != null) setFullScreen(null, window)
+            if (window != null) forceFullScreen(window)
             SolitaireGameHelpDialog(navController)
         }
 
@@ -117,7 +117,7 @@ fun NavGraphBuilder.solitaire(navController: NavController) {
                 navController.getBackStackEntry<SolitaireFeatureRoute>()
             })
             val window = (LocalView.current.parent as? DialogWindowProvider)?.window
-            if (window != null) setFullScreen(null, window)
+            if (window != null) forceFullScreen(window)
             SolitaireGameMenuDialog(vm, navController)
 
             // Force stop timer and save data
@@ -131,7 +131,7 @@ fun NavGraphBuilder.solitaire(navController: NavController) {
                 navController.getBackStackEntry<SolitaireFeatureRoute>()
             })
             val window = (LocalView.current.parent as? DialogWindowProvider)?.window
-            if (window != null) setFullScreen(null, window)
+            if (window != null) forceFullScreen(window)
             SolitaireSettingsDialog(vm, navController)
         }
     }
