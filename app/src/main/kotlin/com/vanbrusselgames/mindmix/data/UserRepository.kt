@@ -1,4 +1,4 @@
-package com.vanbrusselgames.mindmix
+package com.vanbrusselgames.mindmix.data
 
 import com.vanbrusselgames.mindmix.core.data.DataManager
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry

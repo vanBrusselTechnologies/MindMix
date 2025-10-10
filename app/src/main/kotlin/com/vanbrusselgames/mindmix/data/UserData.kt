@@ -1,4 +1,4 @@
-package com.vanbrusselgames.mindmix
+package com.vanbrusselgames.mindmix.data
 
 import kotlinx.serialization.Serializable
 

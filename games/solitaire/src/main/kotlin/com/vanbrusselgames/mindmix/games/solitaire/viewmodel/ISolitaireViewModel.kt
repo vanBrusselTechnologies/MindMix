@@ -11,8 +11,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntOffset
 import androidx.navigation.NavController
-import com.vanbrusselgames.mindmix.core.common.IBaseGameViewModel
-import com.vanbrusselgames.mindmix.core.common.ITimerVM
+import com.vanbrusselgames.mindmix.core.common.viewmodel.IBaseGameViewModel
+import com.vanbrusselgames.mindmix.core.common.viewmodel.ITimerVM
 import com.vanbrusselgames.mindmix.games.solitaire.model.CardVisualType
 import com.vanbrusselgames.mindmix.games.solitaire.model.FinishedGame
 import com.vanbrusselgames.mindmix.games.solitaire.model.PlayingCard

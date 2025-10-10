@@ -14,9 +14,9 @@ import androidx.compose.ui.unit.dp
 import androidx.core.math.MathUtils
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import com.vanbrusselgames.mindmix.core.common.BaseGameViewModel
-import com.vanbrusselgames.mindmix.core.common.GameTimer
-import com.vanbrusselgames.mindmix.core.common.ITimerVM
+import com.vanbrusselgames.mindmix.core.common.viewmodel.BaseGameViewModel
+import com.vanbrusselgames.mindmix.core.common.model.GameTimer
+import com.vanbrusselgames.mindmix.core.common.viewmodel.ITimerVM
 import com.vanbrusselgames.mindmix.games.solitaire.R
 import com.vanbrusselgames.mindmix.games.solitaire.model.CardIndex
 import com.vanbrusselgames.mindmix.games.solitaire.model.CardType

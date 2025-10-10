@@ -1,4 +1,4 @@
-package com.vanbrusselgames.mindmix.core.common
+package com.vanbrusselgames.mindmix.core.common.model
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

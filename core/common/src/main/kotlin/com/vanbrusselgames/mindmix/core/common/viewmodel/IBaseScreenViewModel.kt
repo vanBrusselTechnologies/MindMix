@@ -1,4 +1,4 @@
-package com.vanbrusselgames.mindmix.core.common
+package com.vanbrusselgames.mindmix.core.common.viewmodel
 
 import androidx.compose.ui.unit.Dp
 

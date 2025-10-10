@@ -16,9 +16,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.vanbrusselgames.mindmix.core.advertisement.AdManager
-import com.vanbrusselgames.mindmix.core.common.BaseGameViewModel
-import com.vanbrusselgames.mindmix.core.common.GameTimer
-import com.vanbrusselgames.mindmix.core.common.ITimerVM
+import com.vanbrusselgames.mindmix.core.common.viewmodel.BaseGameViewModel
+import com.vanbrusselgames.mindmix.core.common.model.GameTimer
+import com.vanbrusselgames.mindmix.core.common.viewmodel.ITimerVM
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.games.solitaire.R

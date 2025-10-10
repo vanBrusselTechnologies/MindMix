@@ -11,7 +11,7 @@ import androidx.compose.ui.util.fastFilter
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastRoundToInt
 import androidx.navigation.NavController
-import com.vanbrusselgames.mindmix.core.common.BaseGameViewModel
+import com.vanbrusselgames.mindmix.core.common.viewmodel.BaseGameViewModel
 import com.vanbrusselgames.mindmix.games.game2048.model.FinishedGame
 import com.vanbrusselgames.mindmix.games.game2048.model.GridCell2048
 import com.vanbrusselgames.mindmix.games.game2048.model.GridSize2048

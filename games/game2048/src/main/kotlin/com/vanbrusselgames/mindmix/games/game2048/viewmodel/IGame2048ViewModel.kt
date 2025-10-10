@@ -7,7 +7,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.geometry.Offset
 import androidx.navigation.NavController
-import com.vanbrusselgames.mindmix.core.common.IBaseGameViewModel
+import com.vanbrusselgames.mindmix.core.common.viewmodel.IBaseGameViewModel
 import com.vanbrusselgames.mindmix.games.game2048.model.FinishedGame
 import com.vanbrusselgames.mindmix.games.game2048.model.GridCell2048
 import com.vanbrusselgames.mindmix.games.game2048.model.GridSize2048

@@ -4,7 +4,7 @@ import android.app.Activity
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.navigation.NavController
-import com.vanbrusselgames.mindmix.core.common.IBaseGameViewModel
+import com.vanbrusselgames.mindmix.core.common.viewmodel.IBaseGameViewModel
 import com.vanbrusselgames.mindmix.core.utils.constants.Difficulty
 import com.vanbrusselgames.mindmix.games.sudoku.model.FinishedGame
 import com.vanbrusselgames.mindmix.games.sudoku.model.InputMode

@@ -17,7 +17,7 @@ import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.google.android.ump.ConsentInformation
 import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.UserMessagingPlatform
-import com.vanbrusselgames.mindmix.core.common.NetworkMonitor
+import com.vanbrusselgames.mindmix.core.common.data.NetworkMonitor
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope

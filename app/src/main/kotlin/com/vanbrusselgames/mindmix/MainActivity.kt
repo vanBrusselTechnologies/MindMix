@@ -47,6 +47,7 @@ import com.vanbrusselgames.mindmix.games.solitaire.navigation.navigateToSolitair
 import com.vanbrusselgames.mindmix.games.solitaire.navigation.solitaire
 import com.vanbrusselgames.mindmix.games.sudoku.navigation.navigateToSudokuGameMenu
 import com.vanbrusselgames.mindmix.games.sudoku.navigation.sudoku
+import com.vanbrusselgames.mindmix.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

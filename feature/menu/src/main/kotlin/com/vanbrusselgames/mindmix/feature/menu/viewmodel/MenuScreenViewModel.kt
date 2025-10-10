@@ -2,7 +2,7 @@ package com.vanbrusselgames.mindmix.feature.menu.viewmodel
 
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import com.vanbrusselgames.mindmix.core.common.BaseScreenViewModel
+import com.vanbrusselgames.mindmix.core.common.viewmodel.BaseScreenViewModel
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.model.GameScene
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry

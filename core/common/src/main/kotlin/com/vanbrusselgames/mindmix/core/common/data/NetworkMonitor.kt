@@ -1,4 +1,4 @@
-package com.vanbrusselgames.mindmix.core.common
+package com.vanbrusselgames.mindmix.core.common.data
 
 import android.content.Context
 import android.net.ConnectivityManager

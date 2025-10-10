@@ -1,4 +1,4 @@
-package com.vanbrusselgames.mindmix.core.common
+package com.vanbrusselgames.mindmix.core.common.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -21,6 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
+import com.vanbrusselgames.mindmix.core.common.R
+import com.vanbrusselgames.mindmix.core.common.viewmodel.IBaseScreenViewModel
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
 
 val topRowButtonSize = 48.dp

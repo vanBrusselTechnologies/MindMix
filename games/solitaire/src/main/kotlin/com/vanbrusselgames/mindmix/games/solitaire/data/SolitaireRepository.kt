@@ -1,6 +1,6 @@
 package com.vanbrusselgames.mindmix.games.solitaire.data
 
-import com.vanbrusselgames.mindmix.core.common.GameTimer
+import com.vanbrusselgames.mindmix.core.common.model.GameTimer
 import com.vanbrusselgames.mindmix.core.data.DataManager
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.games.solitaire.model.PlayingCard

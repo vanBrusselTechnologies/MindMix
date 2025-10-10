@@ -1,13 +1,14 @@
-package com.vanbrusselgames.mindmix
+package com.vanbrusselgames.mindmix.viewmodel
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.vanbrusselgames.mindmix.core.common.coins
+import com.vanbrusselgames.mindmix.core.common.data.coins
+import com.vanbrusselgames.mindmix.core.data.preferences.UserPreferences
+import com.vanbrusselgames.mindmix.core.data.preferences.UserPreferencesRepository
 import com.vanbrusselgames.mindmix.core.designsystem.theme.SelectedTheme
 import com.vanbrusselgames.mindmix.core.logging.Logger
-import com.vanbrusselgames.mindmix.preferences.UserPreferences
-import com.vanbrusselgames.mindmix.preferences.UserPreferencesRepository
+import com.vanbrusselgames.mindmix.data.UserData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -22,7 +23,7 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
     private val _preferencesLoaded = MutableStateFlow(false)
     val preferencesLoaded =
-        _preferencesLoaded.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), false)
+        _preferencesLoaded.stateIn(viewModelScope, SharingStarted.Companion.WhileSubscribed(5000L), false)
 
     val theme = mutableStateOf(SelectedTheme.System)
 
@@ -48,13 +49,5 @@ class MainViewModel @Inject constructor(
 
     fun saveToFile(): String {
         return Json.Default.encodeToString(UserData(coins))
-    }
-
-    fun setTheme(value: SelectedTheme) {
-        theme.value = value
-
-        viewModelScope.launch {
-            prefsRepository.savePreferences(UserPreferences(value.ordinal))
-        }
     }
 }

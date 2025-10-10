@@ -25,8 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.vanbrusselgames.mindmix.core.common.BaseScene
-import com.vanbrusselgames.mindmix.core.common.GameLoadingScreen
+import com.vanbrusselgames.mindmix.core.common.ui.BaseScene
+import com.vanbrusselgames.mindmix.core.common.ui.GameLoadingScreen
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
 import com.vanbrusselgames.mindmix.games.minesweeper.navigation.navigateToMinesweeperGameHelp
 import com.vanbrusselgames.mindmix.games.minesweeper.navigation.navigateToMinesweeperGameMenu

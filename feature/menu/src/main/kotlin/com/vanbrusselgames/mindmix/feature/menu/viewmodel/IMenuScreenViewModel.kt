@@ -1,7 +1,7 @@
 package com.vanbrusselgames.mindmix.feature.menu.viewmodel
 
 import androidx.navigation.NavController
-import com.vanbrusselgames.mindmix.core.common.IBaseScreenViewModel
+import com.vanbrusselgames.mindmix.core.common.viewmodel.IBaseScreenViewModel
 import com.vanbrusselgames.mindmix.core.model.GameScene
 import com.vanbrusselgames.mindmix.feature.menu.model.GameWheel
 import kotlinx.coroutines.flow.StateFlow
