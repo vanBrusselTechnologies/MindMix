@@ -373,6 +373,11 @@ class Game2048ViewModel @Inject constructor(
             .fastRoundToInt()
     }
 
+
+    override fun continueGame() {
+        finished = false
+    }
+
     override fun forceSave() {
         game2048Repository.forceSave()
     }

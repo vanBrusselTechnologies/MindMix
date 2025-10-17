@@ -26,6 +26,8 @@ interface IGame2048ViewModel : IBaseGameViewModel {
 
     fun handleDragGestures(navController: NavController, totalDragOffset: Offset)
 
+    fun continueGame()
+
     fun forceSave()
     fun checkAdLoaded(activity: Activity, adLoaded: MutableState<Boolean>)
     fun showAd(activity: Activity, adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit)

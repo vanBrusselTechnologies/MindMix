@@ -77,7 +77,10 @@ fun Game2048GameFinishedDialog(viewModel: IGame2048ViewModel, navController: Nav
             }
             Spacer(Modifier.height(8.dp))
             if (successType == SuccessType.REACHED_TARGET) {
-                DialogButton({ navController.popBackStack() }, Modifier.fillMaxWidth()) {
+                DialogButton({
+                    viewModel.continueGame()
+                    navController.popBackStack()
+                }, Modifier.fillMaxWidth()) {
                     Text(stringResource(R.string.game_2048_continue_game))
                 }
             } else {

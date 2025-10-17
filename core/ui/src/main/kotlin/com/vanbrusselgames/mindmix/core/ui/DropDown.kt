@@ -34,7 +34,6 @@ fun <T : StringEnum> EnumDropdown(
         onExpandedChange = { dropdownExpanded = !dropdownExpanded },
         Modifier.padding(4.dp)
     ) {
-        state.value.getStringResource()
         TextField(
             stringResource(state.value.getStringResource()),
             {},

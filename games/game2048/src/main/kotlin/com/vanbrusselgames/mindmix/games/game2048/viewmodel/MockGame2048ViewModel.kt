@@ -270,6 +270,10 @@ class MockGame2048ViewModel : BaseGameViewModel(), IGame2048ViewModel {
             .fastRoundToInt()
     }
 
+    override fun continueGame() {
+        finished = false
+    }
+
     override fun forceSave() {
     }
 
