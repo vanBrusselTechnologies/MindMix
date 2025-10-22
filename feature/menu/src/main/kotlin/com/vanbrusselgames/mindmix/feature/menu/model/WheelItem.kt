@@ -1,6 +1,7 @@
 package com.vanbrusselgames.mindmix.feature.menu.model
 
 import androidx.compose.runtime.mutableStateOf
+import com.vanbrusselgames.mindmix.core.games.model.GameType
 import com.vanbrusselgames.mindmix.core.model.GameScene
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.games.game2048.model.Game2048
@@ -15,18 +16,18 @@ data class WheelItem(val game: GameScene, val radius: Float, val angle: Float) {
     val visible = mutableStateOf(true)
 
     val title = when (game) {
+        SceneRegistry.Game2048 -> Game2048.NAME_RES_ID
         SceneRegistry.Minesweeper -> Minesweeper.NAME_RES_ID
         SceneRegistry.Solitaire -> Solitaire.NAME_RES_ID
         SceneRegistry.Sudoku -> Sudoku.NAME_RES_ID
-        SceneRegistry.Game2048 -> Game2048.NAME_RES_ID
         else -> -1
     }
 
-    val image = when (game) {
-        SceneRegistry.Minesweeper -> Minesweeper.IMAGE_RES_ID
-        SceneRegistry.Solitaire -> Solitaire.IMAGE_RES_ID
-        SceneRegistry.Sudoku -> Sudoku.IMAGE_RES_ID
-        SceneRegistry.Game2048 -> Game2048.IMAGE_RES_ID
-        else -> -1
+    val gameType = when (game) {
+        SceneRegistry.Game2048 -> GameType.GAME2048
+        SceneRegistry.Minesweeper -> GameType.MINESWEEPER
+        SceneRegistry.Solitaire -> GameType.SOLITAIRE
+        SceneRegistry.Sudoku -> GameType.SUDOKU
+        else -> GameType.GAME2048
     }
 }

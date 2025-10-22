@@ -1,7 +1,9 @@
 package com.vanbrusselgames.mindmix.feature.menu.ui
 
-import androidx.annotation.DrawableRes
+import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -55,8 +57,8 @@ import androidx.compose.ui.unit.times
 import androidx.compose.ui.util.lerp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.vanbrusselgames.mindmix.core.designsystem.theme.Typography
+import com.vanbrusselgames.mindmix.core.games.model.GameType
 import com.vanbrusselgames.mindmix.core.model.Scene
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.core.ui.measureTextWidth
@@ -74,10 +76,12 @@ import kotlin.math.sin
 const val animDuration = 150
 val easing = LinearEasing
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun WheelItem(
+fun SharedTransitionScope.WheelItem(
     viewModel: IMenuScreenViewModel,
     navController: NavController,
+    animatedContentScope: AnimatedContentScope,
     model: WheelItem,
     modifier: Modifier = Modifier
 ) {
@@ -116,7 +120,7 @@ fun WheelItem(
                 WheelItemIconButton(navController, model.isSelected, name, model.game)
             }
             Spacer(modifier = Modifier.height(5.dp))
-            WheelItemImage(model.image, name, selectedFactor)
+            WheelItemImage(animatedContentScope, model.gameType, name, selectedFactor)
         }
     }
 }
@@ -171,8 +175,9 @@ private fun WheelItemTitle(name: String, selectedFactor: Float) {
     )
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-private fun WheelItemImage(@DrawableRes imageResId: Int, name: String, selectedFactor: Float) {
+private fun SharedTransitionScope.WheelItemImage(animatedContentScope: AnimatedContentScope, gameType: GameType, name: String, selectedFactor: Float) {
     val localDensity = LocalDensity.current
     val containerSize = LocalWindowInfo.current.containerSize
     val growthFactor = remember(containerSize) {
@@ -184,7 +189,7 @@ private fun WheelItemImage(@DrawableRes imageResId: Int, name: String, selectedF
         }
     }
 
-    val painterResource = painterResource(imageResId)
+    val painterResource = painterResource(gameType.iconRes)
     val maxSize = remember { painterResource.intrinsicSize.maxDimension }
     val height = remember {
         with(painterResource.intrinsicSize) { height / (0.9f.coerceAtLeast(height / maxSize)) }
@@ -202,6 +207,11 @@ private fun WheelItemImage(@DrawableRes imageResId: Int, name: String, selectedF
             .size(width * factor, height * factor)
             .fillMaxSize()
             .clip(RoundedCornerShape(8.dp))
+            .sharedElement(
+                // GEBRUIK DEZELFDE KEY ALS IN HET MENUSCHERM
+                rememberSharedContentState(key = "image-${gameType.name}"),
+                animatedContentScope
+            )
     )
 }
 
@@ -212,6 +222,6 @@ private fun Prev_WheelItem() {
         val item = WheelItem(SceneRegistry.Sudoku, 0f, 0f)
         item.isSelected.value = true
         val vm = remember { MockMenuScreenViewModel() }
-        WheelItem(vm, rememberNavController(), item)
+        //WheelItem(vm, rememberNavController(), item)
     }
 }

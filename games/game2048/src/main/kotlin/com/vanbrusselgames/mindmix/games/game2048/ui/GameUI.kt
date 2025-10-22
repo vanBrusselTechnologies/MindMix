@@ -45,11 +45,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastRoundToInt
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.vanbrusselgames.mindmix.core.common.ui.BaseScene
-import com.vanbrusselgames.mindmix.core.common.ui.GameLoadingScreen
 import com.vanbrusselgames.mindmix.core.designsystem.theme.MindMixTheme
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
 import com.vanbrusselgames.mindmix.games.game2048.R
@@ -81,9 +79,6 @@ fun GameUI(viewModel: IGame2048ViewModel, navController: NavController) {
             }
         }
     }
-
-    val loadedState = viewModel.puzzleLoaded.collectAsStateWithLifecycle()
-    if (!loadedState.value) GameLoadingScreen()
 }
 
 @Composable

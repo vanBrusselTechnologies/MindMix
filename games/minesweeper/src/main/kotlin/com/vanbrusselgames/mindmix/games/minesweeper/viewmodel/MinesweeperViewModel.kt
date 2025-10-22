@@ -12,6 +12,7 @@ import androidx.navigation.NavController
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.vanbrusselgames.mindmix.core.advertisement.AdManager
 import com.vanbrusselgames.mindmix.core.common.viewmodel.BaseGameViewModel
+import com.vanbrusselgames.mindmix.core.games.ui.minimumDurationLoadingScreen
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.core.utils.constants.Difficulty
@@ -27,8 +28,10 @@ import com.vanbrusselgames.mindmix.games.minesweeper.model.SuccessType
 import com.vanbrusselgames.mindmix.games.minesweeper.navigation.navigateToMinesweeperGameFinished
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
@@ -63,9 +66,12 @@ class MinesweeperViewModel @Inject constructor(
     override val preferencesLoaded = _preferencesLoaded.onStart { loadPreferences() }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), false)
 
+    private val _minTimeElapsed = MutableStateFlow(false)
+
     private val _puzzleLoaded = MutableStateFlow(false)
-    override val puzzleLoaded = _puzzleLoaded.onStart { loadData() }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), false)
+    override val puzzleLoaded =
+        _puzzleLoaded.onStart { loadData() }.combine(_minTimeElapsed) { a, b -> a && b }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), false)
 
     override var finished = false
 
@@ -81,12 +87,22 @@ class MinesweeperViewModel @Inject constructor(
         _preferencesLoaded.emit(true)
     }
 
+    private fun guaranteeMinimumDuration() {
+        viewModelScope.launch {
+            _minTimeElapsed.value = false
+            delay(minimumDurationLoadingScreen)
+            _minTimeElapsed.value = true
+        }
+    }
+
     private suspend fun loadData() {
         withContext(Dispatchers.IO) {
             preferencesLoaded.first { Logger.d("PreferencesLoaded? $it");it }
-            val savedProgress = minesweeperRepository.getPuzzleProgress(difficulty.value)
-            if (savedProgress != null) onPuzzleLoaded(savedProgress)
-            else onPuzzleLoaded(minesweeperRepository.createNewPuzzle(difficulty.value, cellCount))
+            guaranteeMinimumDuration()
+            onPuzzleLoaded(
+                minesweeperRepository.getPuzzleProgress(difficulty.value)
+                    ?: minesweeperRepository.createNewPuzzle(difficulty.value, cellCount)
+            )
         }
     }
 
@@ -104,6 +120,7 @@ class MinesweeperViewModel @Inject constructor(
         Logger.d("[minesweeper] startPuzzle")
         if (finished) reset()
         if (_puzzleLoaded.value) return
+        guaranteeMinimumDuration()
         onPuzzleLoaded(
             minesweeperRepository.getPuzzleProgress(difficulty.value)
                 ?: minesweeperRepository.createNewPuzzle(difficulty.value, cellCount)
@@ -370,6 +387,7 @@ class MinesweeperViewModel @Inject constructor(
         }
 
         reset()
+        guaranteeMinimumDuration()
         onPuzzleLoaded(
             minesweeperRepository.getPuzzleProgress(difficulty)
                 ?: minesweeperRepository.createNewPuzzle(difficulty, cellCount)

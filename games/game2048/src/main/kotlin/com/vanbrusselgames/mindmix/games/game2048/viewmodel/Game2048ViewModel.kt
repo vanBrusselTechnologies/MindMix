@@ -15,6 +15,7 @@ import androidx.navigation.NavController
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.vanbrusselgames.mindmix.core.advertisement.AdManager
 import com.vanbrusselgames.mindmix.core.common.viewmodel.BaseGameViewModel
+import com.vanbrusselgames.mindmix.core.games.ui.minimumDurationLoadingScreen
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.games.game2048.data.Game2048Repository
@@ -33,6 +34,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
@@ -60,9 +62,12 @@ class Game2048ViewModel @Inject constructor(
     override val preferencesLoaded = _preferencesLoaded.onStart { loadPreferences() }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), false)
 
+    private val _minTimeElapsed = MutableStateFlow(false)
+
     private val _puzzleLoaded = MutableStateFlow(false)
-    override val puzzleLoaded = _puzzleLoaded.onStart { loadData() }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), false)
+    override val puzzleLoaded =
+        _puzzleLoaded.onStart { loadData() }.combine(_minTimeElapsed) { a, b -> a && b }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), false)
 
     override var finished = false
 
@@ -86,12 +91,22 @@ class Game2048ViewModel @Inject constructor(
         _preferencesLoaded.emit(true)
     }
 
+    private fun guaranteeMinimumDuration() {
+        viewModelScope.launch {
+            _minTimeElapsed.value = false
+            delay(minimumDurationLoadingScreen)
+            _minTimeElapsed.value = true
+        }
+    }
+
     private suspend fun loadData() {
         withContext(Dispatchers.IO) {
             preferencesLoaded.first { it }
-            val savedProgress = game2048Repository.getPuzzleProgress(gridSize.value)
-            if (savedProgress != null) onPuzzleLoaded(savedProgress)
-            else onPuzzleLoaded(game2048Repository.createNewPuzzle(gridSize.value))
+            guaranteeMinimumDuration()
+            onPuzzleLoaded(
+                game2048Repository.getPuzzleProgress(gridSize.value)
+                    ?: game2048Repository.createNewPuzzle(gridSize.value)
+            )
         }
     }
 
@@ -125,6 +140,7 @@ class Game2048ViewModel @Inject constructor(
         Logger.d("[2048] startPuzzle")
         if (finished) reset()
         if (_puzzleLoaded.value) return
+        guaranteeMinimumDuration()
         onPuzzleLoaded(
             game2048Repository.getPuzzleProgress(gridSize.value)
                 ?: game2048Repository.createNewPuzzle(gridSize.value)
@@ -410,6 +426,7 @@ class Game2048ViewModel @Inject constructor(
         )
 
         reset()
+        guaranteeMinimumDuration()
         onPuzzleLoaded(
             game2048Repository.getPuzzleProgress(size) ?: game2048Repository.createNewPuzzle(size)
         )

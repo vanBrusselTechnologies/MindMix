@@ -1,4 +1,4 @@
-package com.vanbrusselgames.mindmix.core.games
+package com.vanbrusselgames.mindmix.core.games.data
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext

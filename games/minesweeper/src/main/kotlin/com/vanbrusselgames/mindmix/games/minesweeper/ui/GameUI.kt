@@ -22,11 +22,9 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.vanbrusselgames.mindmix.core.common.ui.BaseScene
-import com.vanbrusselgames.mindmix.core.common.ui.GameLoadingScreen
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
 import com.vanbrusselgames.mindmix.games.minesweeper.navigation.navigateToMinesweeperGameHelp
 import com.vanbrusselgames.mindmix.games.minesweeper.navigation.navigateToMinesweeperGameMenu
@@ -49,9 +47,6 @@ fun GameUI(viewModel: IMinesweeperViewModel, navController: NavController) {
             }
         }
     }
-
-    val loadedState = viewModel.puzzleLoaded.collectAsStateWithLifecycle()
-    if (!loadedState.value) GameLoadingScreen()
 }
 
 @Composable
@@ -111,13 +106,14 @@ fun SceneContent(
 
 @Composable
 fun MinesweeperGrid(viewModel: IMinesweeperViewModel, navController: NavController) {
-    Box(
-        if (viewModel.sizeX < viewModel.sizeY) {
-            Modifier.fillMaxWidth(0.95f)
-        } else {
-            Modifier.fillMaxHeight(0.95f)
-        }, contentAlignment = Alignment.Center
-    ) {
+    val isPortrait = viewModel.sizeX < viewModel.sizeY
+    val gridModifier = if (isPortrait) {
+        Modifier.fillMaxWidth(0.95f)
+    } else {
+        Modifier.fillMaxHeight(0.95f)
+    }
+
+    Box(gridModifier, Alignment.Center) {
         var cellSize: Dp = 0.dp
         BoxWithConstraints(
             Modifier
@@ -137,12 +133,10 @@ fun MinesweeperGrid(viewModel: IMinesweeperViewModel, navController: NavControll
                 repeat(viewModel.sizeY) { j ->
                     Row {
                         repeat(viewModel.sizeX) { i ->
-                            val cellIndex = remember {
-                                if (viewModel.sizeX < viewModel.sizeY) {
-                                    j * viewModel.sizeX + i
-                                } else {
-                                    viewModel.sizeY * (i + 1) - (j + 1)
-                                }
+                            val cellIndex = if (isPortrait) {
+                                j * viewModel.sizeX + i
+                            } else {
+                                viewModel.sizeY * (i + 1) - (j + 1)
                             }
                             MinesweeperCell(viewModel.cells[cellIndex], cellSize)
                         }

@@ -45,7 +45,6 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.vanbrusselgames.mindmix.core.common.ui.BaseScene
-import com.vanbrusselgames.mindmix.core.common.ui.GameLoadingScreen
 import com.vanbrusselgames.mindmix.core.common.ui.Timer
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
 import com.vanbrusselgames.mindmix.games.solitaire.R
@@ -74,9 +73,6 @@ fun GameUI(viewModel: ISolitaireViewModel, navController: NavController) {
             Timer(viewModel.timer, Modifier.align(Alignment.BottomCenter))
         }
     }
-
-    val loadedState = viewModel.puzzleLoaded.collectAsStateWithLifecycle()
-    if (!loadedState.value) GameLoadingScreen()
 }
 
 @Composable

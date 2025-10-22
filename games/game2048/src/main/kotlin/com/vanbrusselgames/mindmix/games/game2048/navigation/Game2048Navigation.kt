@@ -1,11 +1,14 @@
 package com.vanbrusselgames.mindmix.games.game2048.navigation
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -13,6 +16,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.navigation
 import com.vanbrusselgames.mindmix.core.designsystem.theme.forceFullScreen
+import com.vanbrusselgames.mindmix.core.games.model.GameType
+import com.vanbrusselgames.mindmix.core.games.ui.GameLoadingScreen
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
@@ -78,7 +83,10 @@ fun NavController.navigateToGame2048Settings(
     navigate(route, navOptions)
 }
 
-fun NavGraphBuilder.game2048(navController: NavController) {
+@OptIn(ExperimentalSharedTransitionApi::class)
+fun NavGraphBuilder.game2048(
+    navController: NavController, sharedTransitionScope: SharedTransitionScope
+) {
     navigation<Game2048FeatureRoute>(Game2048GameRoute) {
         composable<Game2048GameRoute> { navBackStackEntry ->
             val vm = hiltViewModel<Game2048ViewModel>(remember(navBackStackEntry) {
@@ -86,8 +94,15 @@ fun NavGraphBuilder.game2048(navController: NavController) {
             })
             // val route = navBackStackEntry.toRoute<Game2048GameRoute>()
             // route.mode
-            GameUI(vm, navController)
-            BackHandler { navController.navigateToGame2048GameMenu() }
+
+            with(sharedTransitionScope) {
+                val loadedState = vm.puzzleLoaded.collectAsStateWithLifecycle()
+                when (loadedState.value) {
+                    true -> GameUI(vm, navController)
+                    false -> GameLoadingScreen(this@composable, GameType.GAME2048)
+                }
+                BackHandler { navController.navigateToGame2048GameMenu() }
+            }
         }
 
         dialog<Game2048GameFinishedRoute>(

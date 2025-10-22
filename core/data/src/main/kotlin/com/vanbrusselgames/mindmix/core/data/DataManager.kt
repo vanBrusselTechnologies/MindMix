@@ -63,7 +63,7 @@ class DataManager @Inject constructor(@ApplicationContext ctx: Context) {
 
     private fun load() {
         try {
-            //TODO: Download online file from firebase
+            // TODO: Download online file from firebase
             val content = file.readLines(fileDecoding)
             for (line in content) {
                 try {

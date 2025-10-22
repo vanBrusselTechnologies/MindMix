@@ -81,7 +81,7 @@ fun SolitaireGameFinishedDialog(viewModel: ISolitaireViewModel, navController: N
                                 .rotate(-16.25f)
                                 .align(Alignment.CenterEnd),
                             Color.Red,
-                            fontSize = 13.5f.sp,
+                            fontSize = 13.5.sp,
                             fontWeight = FontWeight.ExtraBold
                         )
                     }

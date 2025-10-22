@@ -16,9 +16,10 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.vanbrusselgames.mindmix.core.advertisement.AdManager
-import com.vanbrusselgames.mindmix.core.common.viewmodel.BaseGameViewModel
 import com.vanbrusselgames.mindmix.core.common.model.GameTimer
+import com.vanbrusselgames.mindmix.core.common.viewmodel.BaseGameViewModel
 import com.vanbrusselgames.mindmix.core.common.viewmodel.ITimerVM
+import com.vanbrusselgames.mindmix.core.games.ui.minimumDurationLoadingScreen
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.games.solitaire.R
@@ -36,8 +37,10 @@ import com.vanbrusselgames.mindmix.games.solitaire.navigation.navigateToSolitair
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
@@ -74,9 +77,12 @@ class SolitaireViewModel @Inject constructor(
     override val preferencesLoaded = _preferencesLoaded.onStart { loadPreferences() }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), false)
 
+    private val _minTimeElapsed = MutableStateFlow(false)
+
     private val _puzzleLoaded = MutableStateFlow(false)
-    override val puzzleLoaded = _puzzleLoaded.onStart { loadData() }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), false)
+    override val puzzleLoaded =
+        _puzzleLoaded.onStart { loadData() }.combine(_minTimeElapsed) { a, b -> a && b }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), false)
 
     override val cards = arrayOf(
         PlayingCard(CardType.CLOVERS, CardIndex.A, R.drawable.playingcards_detailed_clovers_a),
@@ -160,13 +166,22 @@ class SolitaireViewModel @Inject constructor(
         _preferencesLoaded.emit(true)
     }
 
+    private fun guaranteeMinimumDuration() {
+        viewModelScope.launch {
+            _minTimeElapsed.value = false
+            delay(minimumDurationLoadingScreen)
+            _minTimeElapsed.value = true
+        }
+    }
+
     private suspend fun loadData() {
         Logger.d("[solitaire] loadData")
         withContext(Dispatchers.IO) {
             preferencesLoaded.first { it }
-            val savedProgress = solitaireRepository.getPuzzleProgress()
-            if (savedProgress != null) onPuzzleLoaded(savedProgress)
-            else onPuzzleLoaded(solitaireRepository.createNewPuzzle())
+            guaranteeMinimumDuration()
+            onPuzzleLoaded(
+                solitaireRepository.getPuzzleProgress() ?: solitaireRepository.createNewPuzzle()
+            )
         }
     }
 
@@ -194,6 +209,7 @@ class SolitaireViewModel @Inject constructor(
         Logger.d("[solitaire] startPuzzle")
         if (finished) reset()
         if (_puzzleLoaded.value) return
+        guaranteeMinimumDuration()
         onPuzzleLoaded(
             solitaireRepository.getPuzzleProgress() ?: solitaireRepository.createNewPuzzle()
         )

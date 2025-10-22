@@ -1,11 +1,14 @@
 package com.vanbrusselgames.mindmix.games.sudoku.navigation
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -13,6 +16,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.navigation
 import com.vanbrusselgames.mindmix.core.designsystem.theme.forceFullScreen
+import com.vanbrusselgames.mindmix.core.games.model.GameType
+import com.vanbrusselgames.mindmix.core.games.ui.GameLoadingScreen
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
@@ -78,7 +83,10 @@ fun NavController.navigateToSudokuSettings(
     navigate(route, navOptions)
 }
 
-fun NavGraphBuilder.sudoku(navController: NavController) {
+@OptIn(ExperimentalSharedTransitionApi::class)
+fun NavGraphBuilder.sudoku(
+    navController: NavController, sharedTransitionScope: SharedTransitionScope
+) {
     navigation<SudokuFeatureRoute>(SudokuGameRoute) {
         composable<SudokuGameRoute> { navBackStackEntry ->
             val vm = hiltViewModel<SudokuViewModel>(remember(navBackStackEntry) {
@@ -86,8 +94,15 @@ fun NavGraphBuilder.sudoku(navController: NavController) {
             })
             // val route = navBackStackEntry.toRoute<SudokuGameRoute>()
             // route.mode
-            GameUI(vm, navController)
-            BackHandler { navController.navigateToSudokuGameMenu() }
+
+            with(sharedTransitionScope) {
+                val loadedState = vm.puzzleLoaded.collectAsStateWithLifecycle()
+                when (loadedState.value) {
+                    true -> GameUI(vm, navController)
+                    false -> GameLoadingScreen(this@composable, GameType.SUDOKU)
+                }
+                BackHandler { navController.navigateToSudokuGameMenu() }
+            }
         }
 
         dialog<SudokuGameFinishedRoute>(

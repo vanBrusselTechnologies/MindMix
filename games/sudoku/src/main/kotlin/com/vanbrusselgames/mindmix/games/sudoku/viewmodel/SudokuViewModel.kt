@@ -8,6 +8,7 @@ import androidx.navigation.NavController
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.vanbrusselgames.mindmix.core.advertisement.AdManager
 import com.vanbrusselgames.mindmix.core.common.viewmodel.BaseGameViewModel
+import com.vanbrusselgames.mindmix.core.games.ui.minimumDurationLoadingScreen
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.core.utils.constants.Difficulty
@@ -29,6 +30,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOn
@@ -60,9 +62,12 @@ class SudokuViewModel @Inject constructor(
     override val preferencesLoaded = _preferencesLoaded.onStart { loadPreferences() }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), false)
 
+    private val _minTimeElapsed = MutableStateFlow(false)
+
     private val _puzzleLoaded = MutableStateFlow(false)
-    override val puzzleLoaded = _puzzleLoaded.onStart { loadData() }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), false)
+    override val puzzleLoaded =
+        _puzzleLoaded.onStart { loadData() }.combine(_minTimeElapsed) { a, b -> a && b }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), false)
 
     private var finished = false
     private var gameMode = PuzzleType.Classic
@@ -80,14 +85,22 @@ class SudokuViewModel @Inject constructor(
         _preferencesLoaded.emit(true)
     }
 
+    private fun guaranteeMinimumDuration() {
+        viewModelScope.launch {
+            _minTimeElapsed.value = false
+            delay(minimumDurationLoadingScreen)
+            _minTimeElapsed.value = true
+        }
+    }
+
     private suspend fun loadData() {
         withContext(Dispatchers.IO) {
             preferencesLoaded.first { it }
-            val savedProgress = sudokuRepository.getPuzzleProgress(difficulty.value)
-            if (savedProgress != null) onPuzzleLoaded(savedProgress)
-            else onPuzzleLoaded(
-                sudokuRepository.requestNewPuzzleFlow(difficulty.value, gameMode)
-                    .flowOn(Dispatchers.IO).firstOrNull()
+            guaranteeMinimumDuration()
+            onPuzzleLoaded(
+                sudokuRepository.getPuzzleProgress(difficulty.value)
+                    ?: sudokuRepository.requestNewPuzzleFlow(difficulty.value, gameMode)
+                        .flowOn(Dispatchers.IO).firstOrNull()
             )
         }
     }
@@ -107,10 +120,11 @@ class SudokuViewModel @Inject constructor(
         if (finished) reset()
         if (_puzzleLoaded.value) return
         viewModelScope.launch(Dispatchers.IO) {
+            guaranteeMinimumDuration()
             onPuzzleLoaded(
                 sudokuRepository.getPuzzleProgress(difficulty.value)
                     ?: sudokuRepository.requestNewPuzzleFlow(difficulty.value, gameMode)
-                        .firstOrNull()
+                        .flowOn(Dispatchers.IO).firstOrNull()
             )
         }
     }
@@ -321,6 +335,7 @@ class SudokuViewModel @Inject constructor(
 
         reset()
         viewModelScope.launch(Dispatchers.IO) {
+            guaranteeMinimumDuration()
             onPuzzleLoaded(
                 sudokuRepository.getPuzzleProgress(difficulty)
                     ?: sudokuRepository.requestNewPuzzleFlow(difficulty, gameMode).firstOrNull()

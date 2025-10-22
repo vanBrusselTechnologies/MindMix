@@ -1,5 +1,8 @@
 package com.vanbrusselgames.mindmix.feature.menu.ui
 
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
@@ -20,15 +23,15 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.feature.menu.model.GameWheel
 import com.vanbrusselgames.mindmix.feature.menu.viewmodel.IMenuScreenViewModel
 import com.vanbrusselgames.mindmix.feature.menu.viewmodel.MockMenuScreenViewModel
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun GameWheel(viewModel: IMenuScreenViewModel, navController: NavController, model: GameWheel) {
+fun SharedTransitionScope.GameWheel(viewModel: IMenuScreenViewModel, navController: NavController, animatedContentScope: AnimatedContentScope, model: GameWheel) {
     val coroutineScope = rememberCoroutineScope()
     val interactionSource = remember { MutableInteractionSource() }
     model.setGrowthFactor(LocalDensity.current, LocalWindowInfo.current)
@@ -53,7 +56,7 @@ fun GameWheel(viewModel: IMenuScreenViewModel, navController: NavController, mod
                     rotationZ = model.anim.value
                 }) {
             for (wheelItem in model.items) {
-                WheelItem(viewModel, navController, wheelItem)
+                WheelItem(viewModel, navController, animatedContentScope, wheelItem)
             }
         }
     }
@@ -64,5 +67,5 @@ fun GameWheel(viewModel: IMenuScreenViewModel, navController: NavController, mod
 private fun PrevWheel() {
     val vm = remember { MockMenuScreenViewModel() }
     vm.selectedGame = SceneRegistry.Sudoku
-    GameWheel(vm, rememberNavController(), GameWheel(vm, 3))
+    //GameWheel(vm, rememberNavController(), GameWheel(vm, 3))
 }

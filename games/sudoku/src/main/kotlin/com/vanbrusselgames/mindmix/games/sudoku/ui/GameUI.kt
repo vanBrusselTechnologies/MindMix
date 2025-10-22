@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -30,7 +29,6 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -42,11 +40,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.vanbrusselgames.mindmix.core.common.ui.BaseScene
-import com.vanbrusselgames.mindmix.core.common.ui.GameLoadingScreen
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
 import com.vanbrusselgames.mindmix.games.sudoku.model.SudokuPuzzleCell
 import com.vanbrusselgames.mindmix.games.sudoku.navigation.navigateToSudokuGameHelp
@@ -69,9 +65,6 @@ fun GameUI(viewModel: ISudokuViewModel, navController: NavController) {
             }
         }
     }
-
-    val loadedState = viewModel.puzzleLoaded.collectAsStateWithLifecycle()
-    if (!loadedState.value) GameLoadingScreen()
 }
 
 @Composable
@@ -181,48 +174,49 @@ fun SudokuCell(viewModel: ISudokuViewModel, cell: SudokuPuzzleCell, cellSize: Dp
                 )
             }, Alignment.Center
     ) {
-        SudokuCellValueText(cell)
+        SudokuCellValueText(cell, cellSize)
     }
 }
 
 @Composable
-fun SudokuCellValueText(cell: SudokuPuzzleCell) {
+fun SudokuCellValueText(cell: SudokuPuzzleCell, cellSize: Dp) {
     val isNoteInput = !cell.isClue.value && cell.value.intValue == 0
     if (!isNoteInput) {
-        SudokuRegularCellText(cell, cell.isClue.value)
+        SudokuRegularCellText(cell, cell.isClue.value, cellSize)
     } else {
-        SudokuNoteCellText(cell)
+        SudokuNoteCellText(cell, cellSize)
     }
 }
 
 @Composable
-fun SudokuRegularCellText(cell: SudokuPuzzleCell, isClue: Boolean) {
+fun SudokuRegularCellText(cell: SudokuPuzzleCell, isClue: Boolean, cellSize: Dp) {
     val value = cell.value.intValue
     if (value == 0) return
-    Text(
-        text = AnnotatedString(value.toString()),
-        modifier = Modifier.scale(if (isClue) 1.15f else 1f),
-        autoSize = TextAutoSize.StepBased(maxFontSize = 250.sp),
-        style = LocalTextStyle.current.merge(
-            TextStyle(
-                color = when (true) {
-                    cell.isIncorrect.value -> MaterialTheme.colorScheme.onErrorContainer
-                    cell.isSelected.value -> MaterialTheme.colorScheme.onPrimaryContainer
-                    else -> MaterialTheme.colorScheme.onSecondaryContainer
-                },
-                fontWeight = if (isClue) FontWeight.ExtraBold else FontWeight.Light,
-                textAlign = TextAlign.Center,
-                lineHeightStyle = LineHeightStyle(
-                    alignment = LineHeightStyle.Alignment.Center, trim = LineHeightStyle.Trim.Both
-                ),
+
+    val scaleFactor = if (isClue) 1.15f else 1f
+    val fontSize = remember(cellSize, scaleFactor) { (cellSize * 0.825f).value.sp }
+
+    val style = remember(isClue) {
+        TextStyle(
+            fontWeight = if (isClue) FontWeight.ExtraBold else FontWeight.Light,
+            textAlign = TextAlign.Center,
+            lineHeightStyle = LineHeightStyle(
+                alignment = LineHeightStyle.Alignment.Center, trim = LineHeightStyle.Trim.Both
             )
-        ),
-        maxLines = 1
+        )
+    }
+
+    Text(
+        text = value.toString(), Modifier.scale(scaleFactor), color = when (true) {
+            cell.isIncorrect.value -> MaterialTheme.colorScheme.onErrorContainer
+            cell.isSelected.value -> MaterialTheme.colorScheme.onPrimaryContainer
+            else -> MaterialTheme.colorScheme.onSecondaryContainer
+        }, fontSize = fontSize, style = LocalTextStyle.current.merge(style), maxLines = 1
     )
 }
 
 @Composable
-fun SudokuNoteCellText(cell: SudokuPuzzleCell) {
+fun SudokuNoteCellText(cell: SudokuPuzzleCell, cellSize: Dp) {
     if (cell.notes.none { it }) return
     val str = StringBuilder()
     var i = 0
@@ -235,30 +229,28 @@ fun SudokuNoteCellText(cell: SudokuPuzzleCell) {
         if (rIndex < 2) str.append(" ")
     }
 
-    val localTextStyle = LocalTextStyle.current
-    val textStyle = remember(localTextStyle) {
-        localTextStyle.merge(
-            TextStyle(
-                fontFamily = FontFamily(Typeface.MONOSPACE),
-                textAlign = TextAlign.Center,
-                lineHeight = 1.25.em,
-                lineHeightStyle = LineHeightStyle(
-                    alignment = LineHeightStyle.Alignment.Center, trim = LineHeightStyle.Trim.Both
-                )
+    val fontSize = remember(cellSize) { (cellSize * 0.75f / 3f).value.sp }
+
+    val textStyle = remember {
+        TextStyle(
+            fontFamily = FontFamily(Typeface.MONOSPACE),
+            textAlign = TextAlign.Center,
+            lineHeight = 1.25.em,
+            lineHeightStyle = LineHeightStyle(
+                alignment = LineHeightStyle.Alignment.Center, trim = LineHeightStyle.Trim.Both
             )
         )
     }
 
     Text(
-        text = AnnotatedString(str.toString()),
-        autoSize = TextAutoSize.StepBased(maxFontSize = 250.sp, minFontSize = 5.sp),
-        style = textStyle.merge(
-            color = when (true) {
-                cell.isIncorrect.value -> MaterialTheme.colorScheme.onErrorContainer
-                cell.isSelected.value -> MaterialTheme.colorScheme.onPrimaryContainer
-                else -> MaterialTheme.colorScheme.onSecondaryContainer
-            }
-        ),
+        text = str.toString(),
+        color = when (true) {
+            cell.isIncorrect.value -> MaterialTheme.colorScheme.onErrorContainer
+            cell.isSelected.value -> MaterialTheme.colorScheme.onPrimaryContainer
+            else -> MaterialTheme.colorScheme.onSecondaryContainer
+        },
+        fontSize = fontSize,
+        style = LocalTextStyle.current.merge(textStyle),
         maxLines = 3,
         minLines = 3,
     )

@@ -4,7 +4,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.functions.FirebaseFunctionsException
 import com.google.firebase.functions.functions
 import com.vanbrusselgames.mindmix.core.data.DataManager
-import com.vanbrusselgames.mindmix.core.games.GameLoader
+import com.vanbrusselgames.mindmix.core.games.data.GameLoader
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.core.utils.constants.Difficulty

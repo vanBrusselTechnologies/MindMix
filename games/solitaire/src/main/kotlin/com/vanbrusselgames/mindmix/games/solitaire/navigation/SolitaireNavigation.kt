@@ -1,12 +1,15 @@
 package com.vanbrusselgames.mindmix.games.solitaire.navigation
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -14,6 +17,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.navigation
 import com.vanbrusselgames.mindmix.core.designsystem.theme.forceFullScreen
+import com.vanbrusselgames.mindmix.core.games.model.GameType
+import com.vanbrusselgames.mindmix.core.games.ui.GameLoadingScreen
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
@@ -79,7 +84,10 @@ fun NavController.navigateToSolitaireSettings(
     navigate(route, navOptions)
 }
 
-fun NavGraphBuilder.solitaire(navController: NavController) {
+@OptIn(ExperimentalSharedTransitionApi::class)
+fun NavGraphBuilder.solitaire(
+    navController: NavController, sharedTransitionScope: SharedTransitionScope
+) {
     navigation<SolitaireFeatureRoute>(SolitaireGameRoute) {
         composable<SolitaireGameRoute> { navBackStackEntry ->
             val vm = hiltViewModel<SolitaireViewModel>(remember(navBackStackEntry) {
@@ -87,8 +95,15 @@ fun NavGraphBuilder.solitaire(navController: NavController) {
             })
             // val route = navBackStackEntry.toRoute<SolitaireGameRoute>()
             // route.mode
-            GameUI(vm, navController)
-            BackHandler { navController.navigateToSolitaireGameMenu() }
+
+            with(sharedTransitionScope) {
+                val loadedState = vm.puzzleLoaded.collectAsStateWithLifecycle()
+                when (loadedState.value) {
+                    true -> GameUI(vm, navController)
+                    false -> GameLoadingScreen(this@composable, GameType.SOLITAIRE)
+                }
+                BackHandler { navController.navigateToSolitaireGameMenu() }
+            }
         }
 
         dialog<SolitaireGameFinishedRoute>(

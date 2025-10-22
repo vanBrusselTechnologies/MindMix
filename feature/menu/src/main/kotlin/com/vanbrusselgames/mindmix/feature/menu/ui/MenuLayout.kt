@@ -1,5 +1,8 @@
 package com.vanbrusselgames.mindmix.feature.menu.ui
 
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,7 +31,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.vanbrusselgames.mindmix.core.common.ui.BaseScene
 import com.vanbrusselgames.mindmix.core.designsystem.theme.MindMixTheme
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
@@ -37,23 +39,29 @@ import com.vanbrusselgames.mindmix.feature.menu.viewmodel.IMenuScreenViewModel
 import com.vanbrusselgames.mindmix.feature.menu.viewmodel.MockMenuScreenViewModel
 import com.vanbrusselgames.mindmix.feature.settings.navigation.navigateToSettings
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun SceneUI(viewModel: IMenuScreenViewModel, navController: NavController) {
+fun SharedTransitionScope.SceneUI(
+    viewModel: IMenuScreenViewModel,
+    navController: NavController,
+    animatedContentScope: AnimatedContentScope
+) {
     BaseScene(viewModel, {}, {}, { navController.navigateToSettings() }) {
         val loadedState = viewModel.preferencesLoaded.collectAsStateWithLifecycle()
-        if (loadedState.value) SetLayoutGameWheel(viewModel, navController)
+        if (loadedState.value) SetLayoutGameWheel(viewModel, navController, animatedContentScope)
     }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun SetLayoutGameWheel(viewModel: IMenuScreenViewModel, navController: NavController) {
+fun SharedTransitionScope.SetLayoutGameWheel(viewModel: IMenuScreenViewModel, navController: NavController, animatedContentScope: AnimatedContentScope) {
     Box(
         Modifier
             .fillMaxSize()
             .blur(if (SceneManager.dialogActiveState.value) 6.dp else 0.dp),
         Alignment.BottomCenter
     ) {
-        GameWheel(viewModel, navController, viewModel.wheelModel)
+        GameWheel(viewModel, navController, animatedContentScope, viewModel.wheelModel)
         PlayButton(viewModel, navController, Modifier.align(Alignment.BottomCenter))
     }
 }
@@ -98,7 +106,7 @@ private fun PrevSettings() {
     MindMixTheme {
         Surface {
             val vm = remember { MockMenuScreenViewModel() }
-            SetLayoutGameWheel(vm, rememberNavController())
+            //SetLayoutGameWheel(vm, rememberNavController())
         }
     }
 }

@@ -89,7 +89,7 @@ private fun TopBar(
                     }
                 }
             } else Row(Modifier.align(Alignment.TopEnd)) {
-                /* todo: Add Shop
+                /* TODO: Add Shop
                     if (isMenu) {
                         IconButton(
                             onClick = {

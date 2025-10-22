@@ -6,9 +6,12 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
@@ -77,10 +80,12 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var navController: NavHostController
 
+    @OptIn(ExperimentalSharedTransitionApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val splashscreen = installSplashScreen()
         var keepSplashScreen = true
+        splashscreen.setKeepOnScreenCondition { keepSplashScreen }
 
         //Enable full screen
         enableEdgeToEdge()
@@ -105,7 +110,6 @@ class MainActivity : ComponentActivity() {
                 keepSplashScreen = false
             }
         }
-        splashscreen.setKeepOnScreenCondition { keepSplashScreen }
         setContentView(ComposeView(this).apply {
             setContent {
                 /* ////// https://github.com/tminet/ComposeThemeSwitch/tree/master //////
@@ -170,34 +174,37 @@ class MainActivity : ComponentActivity() {
                     SelectedTheme.Dark -> true
                     SelectedTheme.Light -> false
                 }
-                MindMixTheme(darkTheme) {
-                    Surface(
-                        modifier = Modifier.fillMaxSize(),
-                        color = MaterialTheme.colorScheme.background,
-                        contentColor = MaterialTheme.colorScheme.onBackground
-                    ) {
-                        Scaffold(Modifier.safeDrawingPadding(), snackbarHost = {
-                            SnackbarHost(hostState = snackbarHostState)
-                        }) {
-                            NavHost(
-                                navController,
-                                startDestination = AppRoutes.Menu,
-                                Modifier
-                                    .fillMaxSize()
-                                    .padding(it),
-                                enterTransition = { fadeIn() },
-                                exitTransition = { fadeOut() }) {
-                                solitaire(navController)
-                                sudoku(navController)
-                                minesweeper(navController)
-                                game2048(navController)
+                SharedTransitionLayout {
+                    MindMixTheme(darkTheme) {
+                        Surface(
+                            modifier = Modifier.fillMaxSize(),
+                            color = MaterialTheme.colorScheme.background,
+                            contentColor = MaterialTheme.colorScheme.onBackground
+                        ) {
+                            Scaffold(Modifier.safeDrawingPadding(), snackbarHost = {
+                                SnackbarHost(hostState = snackbarHostState)
+                            }) {
+                                NavHost(
+                                    navController,
+                                    startDestination = AppRoutes.Menu,
+                                    Modifier
+                                        .fillMaxSize()
+                                        .padding(it)
+                                        .consumeWindowInsets(it),
+                                    enterTransition = { fadeIn() },
+                                    exitTransition = { fadeOut() }) {
+                                    solitaire(navController, this@SharedTransitionLayout)
+                                    sudoku(navController, this@SharedTransitionLayout)
+                                    minesweeper(navController, this@SharedTransitionLayout)
+                                    game2048(navController, this@SharedTransitionLayout)
 
-                                menu(navController)
-                                settingsDialog(navController) { authManager.signIn(this@MainActivity) }
+                                    menu(navController, this@SharedTransitionLayout)
+                                    settingsDialog(navController) { authManager.signIn(this@MainActivity) }
+                                }
                             }
                         }
+                        BackHandler { }
                     }
-                    BackHandler { }
                 }
             }
         })
