@@ -14,7 +14,8 @@ data class GameWheel(val viewModel: IMenuScreenViewModel, val gameCount: Int) {
     val angleStep = 360f / wheelItemCount
     val radius = 275f
 
-    var selectedIndex = viewModel.games.filter { it.value == viewModel.selectedGame }.keys.first()
+    var selectedIndex =
+        viewModel.games.filter { it.value == viewModel.selectedGame.value }.keys.first()
         private set
     var rotationAngle = selectedIndex * angleStep
         private set
@@ -34,6 +35,13 @@ data class GameWheel(val viewModel: IMenuScreenViewModel, val gameCount: Int) {
 
     suspend fun rotate(delta: Float) {
         rotationAngle += delta / 8f
+
+        // Set selected index and game to improve Accessibility
+        val unsafeCurrentItem = (rotationAngle / angleStep).roundToInt()
+        selectedIndex = (unsafeCurrentItem.mod(wheelItemCount) + wheelItemCount).mod(wheelItemCount)
+        val wheelItem = items[selectedIndex]
+        viewModel.selectedGame.value = wheelItem.game
+
         rotateToTarget()
     }
 
@@ -58,7 +66,7 @@ data class GameWheel(val viewModel: IMenuScreenViewModel, val gameCount: Int) {
         selectedIndex = (unsafeCurrentItem.mod(wheelItemCount) + wheelItemCount).mod(wheelItemCount)
         val wheelItem = items[selectedIndex]
         wheelItem.isSelected.value = true
-        viewModel.selectedGame = wheelItem.game
+        viewModel.selectedGame.value = wheelItem.game
         rotateToTarget()
     }
 

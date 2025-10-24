@@ -1,5 +1,6 @@
 package com.vanbrusselgames.mindmix.feature.menu.viewmodel
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.navigation.NavController
 import com.vanbrusselgames.mindmix.core.common.viewmodel.BaseScreenViewModel
 import com.vanbrusselgames.mindmix.core.model.GameScene
@@ -24,7 +25,7 @@ class MockMenuScreenViewModel : BaseScreenViewModel(), IMenuScreenViewModel {
         SceneRegistry.Game2048.gameId to SceneRegistry.Game2048
     )
 
-    override var selectedGame: GameScene = SceneRegistry.Game2048
+    override var selectedGame = mutableStateOf(SceneRegistry.Game2048)
 
     override val wheelModel = GameWheel(this, games.size)
 
@@ -45,7 +46,7 @@ class MockMenuScreenViewModel : BaseScreenViewModel(), IMenuScreenViewModel {
     //}
 
     override fun navigateToSelectedGame(navController: NavController) {
-        when (selectedGame) {
+        when (selectedGame.value) {
             SceneRegistry.Game2048 -> navController.navigateToGame2048()
             SceneRegistry.Minesweeper -> navController.navigateToMinesweeper()
             SceneRegistry.Solitaire -> navController.navigateToSolitaire()

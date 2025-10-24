@@ -1,8 +1,10 @@
 package com.vanbrusselgames.mindmix.feature.menu.ui
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -46,6 +48,10 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.CollectionItemInfo
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.collectionItemInfo
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -54,9 +60,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
-import androidx.compose.ui.util.lerp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.vanbrusselgames.mindmix.core.designsystem.theme.Typography
 import com.vanbrusselgames.mindmix.core.games.model.GameType
 import com.vanbrusselgames.mindmix.core.model.Scene
@@ -95,16 +101,26 @@ fun SharedTransitionScope.WheelItem(
             durationMillis = (animDuration * 1.25f).toInt(), easing = easing
         ), label = "selectedFactorAnim"
     )
+
+    val onClickLabel =
+        "Play game: ${model.game.name}"// TODO: stringResource(R.string.accessibility_action_select_game)
+
     Card(
         modifier
             .zIndex(if (model.isSelected.value) 1f else 0f)
             .offset(-offsetX.dp, -offsetY.dp)
             .rotate(-model.angle)
             .offset { IntOffset(0.dp.roundToPx(), (model.offsetY.dp * selectedFactor).roundToPx()) }
-            .clickable(
-                interactionSource, null, true, "Play game: ${model.game.name.lowercase()}"
-            ) {
-                viewModel.selectedGame = model.game
+            .semantics {
+                this.collectionItemInfo = CollectionItemInfo(
+                    1,
+                    1,
+                    viewModel.wheelModel.items.indexOfFirst { it.game.name == model.game.name },
+                    1
+                )
+            }
+            .clickable(interactionSource, null, true, onClickLabel, Role.Button) {
+                viewModel.selectedGame.value = model.game
                 viewModel.navigateToSelectedGame(navController)
             }) {
         Column(
@@ -120,7 +136,7 @@ fun SharedTransitionScope.WheelItem(
                 WheelItemIconButton(navController, model.isSelected, name, model.game)
             }
             Spacer(modifier = Modifier.height(5.dp))
-            WheelItemImage(animatedContentScope, model.gameType, name, selectedFactor)
+            WheelItemImage(animatedContentScope, model.gameType, selectedFactor)
         }
     }
 }
@@ -129,6 +145,9 @@ fun SharedTransitionScope.WheelItem(
 fun WheelItemIconButton(
     navController: NavController, isSelected: MutableState<Boolean>, name: String, game: Scene
 ) {
+    val settingsContentDescription =
+        "$name settings"// TODO: stringResource(R.string.accessibility_settings_for_game, name)
+
     AnimatedVisibility(
         isSelected.value, enter = slideInHorizontally(
             tween(durationMillis = animDuration, easing = easing)
@@ -153,7 +172,7 @@ fun WheelItemIconButton(
                 else -> navController.navigateToSettings()
             }
         }) {
-            Icon(Icons.Filled.Settings, "$name settings")
+            Icon(Icons.Filled.Settings, settingsContentDescription)
         }
     }
 }
@@ -167,17 +186,19 @@ private fun WheelItemTitle(name: String, selectedFactor: Float) {
 
     Text(
         name,
+        modifier = Modifier.width(lerp(widthSmall, widthBig, selectedFactor)),
+        fontSize = lerp(fontSizeSmall, fontSizeBig, selectedFactor),
         textAlign = TextAlign.Center,
-        modifier = Modifier.width(lerp(widthSmall.value, widthBig.value, selectedFactor).dp),
         maxLines = 1,
-        style = Typography.headlineSmall,
-        fontSize = lerp(fontSizeSmall, fontSizeBig, selectedFactor)
+        style = Typography.headlineSmall
     )
 }
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-private fun SharedTransitionScope.WheelItemImage(animatedContentScope: AnimatedContentScope, gameType: GameType, name: String, selectedFactor: Float) {
+private fun SharedTransitionScope.WheelItemImage(
+    animatedContentScope: AnimatedContentScope, gameType: GameType, selectedFactor: Float
+) {
     val localDensity = LocalDensity.current
     val containerSize = LocalWindowInfo.current.containerSize
     val growthFactor = remember(containerSize) {
@@ -202,26 +223,30 @@ private fun SharedTransitionScope.WheelItemImage(animatedContentScope: AnimatedC
 
     Image(
         painterResource,
-        name,
+        null,
         modifier = Modifier
             .size(width * factor, height * factor)
             .fillMaxSize()
             .clip(RoundedCornerShape(8.dp))
             .sharedElement(
-                // GEBRUIK DEZELFDE KEY ALS IN HET MENUSCHERM
-                rememberSharedContentState(key = "image-${gameType.name}"),
-                animatedContentScope
+                rememberSharedContentState(key = "image-${gameType.name}"), animatedContentScope
             )
     )
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Preview
 @Composable
 private fun Prev_WheelItem() {
-    Column {
-        val item = WheelItem(SceneRegistry.Sudoku, 0f, 0f)
-        item.isSelected.value = true
-        val vm = remember { MockMenuScreenViewModel() }
-        //WheelItem(vm, rememberNavController(), item)
+    SharedTransitionLayout {
+        AnimatedContent(null) {
+            it
+            Column {
+                val item = WheelItem(SceneRegistry.Sudoku, 0f, 0f)
+                item.isSelected.value = true
+                val vm = remember { MockMenuScreenViewModel() }
+                WheelItem(vm, rememberNavController(), this@AnimatedContent, item, Modifier)
+            }
+        }
     }
 }

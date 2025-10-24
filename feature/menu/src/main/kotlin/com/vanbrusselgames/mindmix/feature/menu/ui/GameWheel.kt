@@ -20,6 +20,16 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.semantics.CollectionInfo
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.ScrollAxisRange
+import androidx.compose.ui.semantics.collectionInfo
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.horizontalScrollAxisRange
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.scrollBy
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -31,13 +41,34 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun SharedTransitionScope.GameWheel(viewModel: IMenuScreenViewModel, navController: NavController, animatedContentScope: AnimatedContentScope, model: GameWheel) {
+fun SharedTransitionScope.GameWheel(
+    viewModel: IMenuScreenViewModel,
+    navController: NavController,
+    animatedContentScope: AnimatedContentScope,
+    model: GameWheel
+) {
     val coroutineScope = rememberCoroutineScope()
     val interactionSource = remember { MutableInteractionSource() }
     model.setGrowthFactor(LocalDensity.current, LocalWindowInfo.current)
+
     Box(
         contentAlignment = Alignment.BottomCenter, modifier = Modifier
-            .fillMaxSize()
+            .fillMaxSize(1f)
+            .semantics {
+                val selectedGameName = viewModel.selectedGame.value.name
+                val stateDescription =
+                    "Selected $selectedGameName" // TODO: stringResource(R.string.accessibility_state_selected_game, selectedGameName)
+
+                this.contentDescription =
+                    "Horizontal Game Selection Wheel" // TODO: stringResource(R.string.accessibility_content_description_horizontal_game_selection_wheel)
+                this.stateDescription = stateDescription
+                this.collectionInfo = CollectionInfo(rowCount = 1, columnCount = model.gameCount)
+                this.role = Role.ValuePicker
+                this.horizontalScrollAxisRange = ScrollAxisRange(
+                    value = { model.selectedIndex.toFloat() },
+                    maxValue = { Float.POSITIVE_INFINITY })
+                this.scrollBy { x, y -> true }
+            }
             .draggable(
                 rememberDraggableState { coroutineScope.launch { model.rotate(it) } },
                 Orientation.Horizontal,
@@ -66,6 +97,6 @@ fun SharedTransitionScope.GameWheel(viewModel: IMenuScreenViewModel, navControll
 @Composable
 private fun PrevWheel() {
     val vm = remember { MockMenuScreenViewModel() }
-    vm.selectedGame = SceneRegistry.Sudoku
+    vm.selectedGame.value = SceneRegistry.Sudoku
     //GameWheel(vm, rememberNavController(), GameWheel(vm, 3))
 }

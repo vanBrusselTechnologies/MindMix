@@ -1,7 +1,9 @@
 package com.vanbrusselgames.mindmix.feature.menu.ui
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -21,16 +23,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.ParagraphStyle
-import androidx.compose.ui.text.style.LineHeightStyle
-import androidx.compose.ui.text.style.LineHeightStyle.Trim
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.vanbrusselgames.mindmix.core.common.ui.BaseScene
 import com.vanbrusselgames.mindmix.core.designsystem.theme.MindMixTheme
 import com.vanbrusselgames.mindmix.core.navigation.SceneManager
@@ -54,7 +53,11 @@ fun SharedTransitionScope.SceneUI(
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun SharedTransitionScope.SetLayoutGameWheel(viewModel: IMenuScreenViewModel, navController: NavController, animatedContentScope: AnimatedContentScope) {
+fun SharedTransitionScope.SetLayoutGameWheel(
+    viewModel: IMenuScreenViewModel,
+    navController: NavController,
+    animatedContentScope: AnimatedContentScope
+) {
     Box(
         Modifier
             .fillMaxSize()
@@ -81,17 +84,11 @@ fun PlayButton(viewModel: IMenuScreenViewModel, navController: NavController, mo
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 Icons.Rounded.PlayArrow,
-                "Play",
+                null,
                 tint = colorScheme.onPrimary,
             )
             Text(
-                AnnotatedString(
-                    stringResource(R.string.play), ParagraphStyle(
-                        lineHeightStyle = LineHeightStyle(
-                            LineHeightStyle.Alignment.Center, Trim.Both
-                        )
-                    )
-                ),
+                stringResource(R.string.play),
                 color = colorScheme.onPrimary,
                 fontSize = 21.sp,
                 textAlign = TextAlign.Center,
@@ -100,13 +97,19 @@ fun PlayButton(viewModel: IMenuScreenViewModel, navController: NavController, mo
     }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @PreviewScreenSizes
 @Composable
-private fun PrevSettings() {
-    MindMixTheme {
-        Surface {
-            val vm = remember { MockMenuScreenViewModel() }
-            //SetLayoutGameWheel(vm, rememberNavController())
+private fun PrevMenu() {
+    SharedTransitionLayout {
+        AnimatedContent(null) {
+            it
+            MindMixTheme {
+                Surface {
+                    val vm = remember { MockMenuScreenViewModel() }
+                    SetLayoutGameWheel(vm, rememberNavController(), this@AnimatedContent)
+                }
+            }
         }
     }
 }

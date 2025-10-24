@@ -1,5 +1,6 @@
 package com.vanbrusselgames.mindmix.feature.menu.viewmodel
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.vanbrusselgames.mindmix.core.common.viewmodel.BaseScreenViewModel
@@ -41,7 +42,7 @@ class MenuScreenViewModel @Inject constructor(
         SceneRegistry.Game2048.gameId to SceneRegistry.Game2048
     )
 
-    override var selectedGame: GameScene = SceneRegistry.Game2048
+    override var selectedGame = mutableStateOf(SceneRegistry.Game2048)
 
     override val wheelModel = GameWheel(this, games.size)
 
@@ -51,11 +52,11 @@ class MenuScreenViewModel @Inject constructor(
 
     private suspend fun applyPreferences(preferences: MenuPreferences) {
         Logger.d("[menu] applyPreferences")
-        selectedGame =
+        selectedGame.value =
             SceneRegistry.allScenes.first { it.sceneId == preferences.selectedGame } as GameScene
         //selectedGameModeIndices = data.selectedGameModeIndices
 
-        wheelModel.setSelectedStartIndex(games.filter { it.value == selectedGame }.keys.first())
+        wheelModel.setSelectedStartIndex(games.filter { it.value == selectedGame.value }.keys.first())
 
         _preferencesLoaded.emit(true)
     }
@@ -78,9 +79,9 @@ class MenuScreenViewModel @Inject constructor(
 
     override fun navigateToSelectedGame(navController: NavController) {
         viewModelScope.launch {
-            prefsRepository.savePreferences(MenuPreferences(selectedGame.sceneId))
+            prefsRepository.savePreferences(MenuPreferences(selectedGame.value.sceneId))
         }
-        when (selectedGame) {
+        when (selectedGame.value) {
             SceneRegistry.Game2048 -> navController.navigateToGame2048()
             SceneRegistry.Minesweeper -> navController.navigateToMinesweeper()
             SceneRegistry.Solitaire -> navController.navigateToSolitaire()
