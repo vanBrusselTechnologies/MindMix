@@ -23,7 +23,7 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
     private val _preferencesLoaded = MutableStateFlow(false)
     val preferencesLoaded =
-        _preferencesLoaded.stateIn(viewModelScope, SharingStarted.Companion.WhileSubscribed(5000L), false)
+        _preferencesLoaded.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), false)
 
     val theme = mutableStateOf(SelectedTheme.System)
 

@@ -73,7 +73,7 @@ fun SharedTransitionScope.SetLayoutGameWheel(
 fun PlayButton(viewModel: IMenuScreenViewModel, navController: NavController, modifier: Modifier) {
     Button(
         { viewModel.navigateToSelectedGame(navController) },
-        modifier.offset(0.dp, (-15).dp),
+        modifier.offset(0.dp, (-5).dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = colorScheme.primary,
             contentColor = colorScheme.onPrimary,
@@ -90,7 +90,7 @@ fun PlayButton(viewModel: IMenuScreenViewModel, navController: NavController, mo
             Text(
                 stringResource(R.string.play),
                 color = colorScheme.onPrimary,
-                fontSize = 21.sp,
+                fontSize = 19.sp,
                 textAlign = TextAlign.Center,
             )
         }
@@ -107,7 +107,7 @@ private fun PrevMenu() {
             MindMixTheme {
                 Surface {
                     val vm = remember { MockMenuScreenViewModel() }
-                    SetLayoutGameWheel(vm, rememberNavController(), this@AnimatedContent)
+                    SceneUI(vm, rememberNavController(), this@AnimatedContent)
                 }
             }
         }

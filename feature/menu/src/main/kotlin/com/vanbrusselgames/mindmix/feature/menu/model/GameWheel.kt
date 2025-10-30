@@ -3,8 +3,6 @@ package com.vanbrusselgames.mindmix.feature.menu.model
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.ui.platform.WindowInfo
-import androidx.compose.ui.unit.Density
 import com.vanbrusselgames.mindmix.feature.menu.viewmodel.IMenuScreenViewModel
 import kotlin.math.roundToInt
 
@@ -12,7 +10,7 @@ data class GameWheel(val viewModel: IMenuScreenViewModel, val gameCount: Int) {
     private val withDuplicates = true
     val wheelItemCount = gameCount * if (withDuplicates) 2 else 1
     val angleStep = 360f / wheelItemCount
-    val radius = 275f
+    val radius = 200f
 
     var selectedIndex =
         viewModel.games.filter { it.value == viewModel.selectedGame.value }.keys.first()
@@ -78,20 +76,6 @@ data class GameWheel(val viewModel: IMenuScreenViewModel, val gameCount: Int) {
             val a = wheelItem.angle
             wheelItem.visible.value =
                 (maximum < minimum && (a > minimum || a < maximum)) || (maximum >= minimum && a in minimum..maximum)
-        }
-    }
-
-    fun setGrowthFactor(localDensity: Density, localWindowInfo: WindowInfo) {
-        val containerSize = localWindowInfo.containerSize
-        val growthFactor = with(localDensity) {
-            val screenHeight = containerSize.height.toDp().value
-            val screenWidth = containerSize.width.toDp().value
-            val minScreenSize = screenHeight.coerceAtMost(screenWidth) - 300f
-            100f.coerceAtMost(minScreenSize)
-        }
-        items.forEach {
-            it.growthFactor = growthFactor
-            it.offsetY = -60f * (growthFactor / 100f)
         }
     }
 }

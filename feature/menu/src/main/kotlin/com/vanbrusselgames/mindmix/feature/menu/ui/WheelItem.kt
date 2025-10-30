@@ -19,16 +19,17 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
@@ -44,8 +45,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.CollectionItemInfo
@@ -57,8 +57,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.lerp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.max
+import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.times
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
@@ -79,8 +79,14 @@ import com.vanbrusselgames.mindmix.games.sudoku.navigation.navigateToSudokuSetti
 import kotlin.math.cos
 import kotlin.math.sin
 
-const val animDuration = 150
+const val animDurationMs = 150
 val easing = LinearEasing
+
+val standardWheelItemCardHeight = 280.dp
+val standardWheelItemCardWidth = 250.dp
+val padding = 10.dp
+val spacerHeight = 5.dp
+val textHeight = 48.dp
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -89,28 +95,41 @@ fun SharedTransitionScope.WheelItem(
     navController: NavController,
     animatedContentScope: AnimatedContentScope,
     model: WheelItem,
-    modifier: Modifier = Modifier
+    maxHeight: Dp
 ) {
-    val offsetX = remember { sin(model.angle * Math.PI / 180f) * model.radius }
-    val offsetY = remember { cos(model.angle * Math.PI / 180f) * model.radius }
+    val wheelItemCardHeight = min(maxHeight, standardWheelItemCardHeight)
+    val wheelItemCardWidth = standardWheelItemCardWidth
+    val offsetX =
+        remember(wheelItemCardHeight.value) { sin(model.angle * Math.PI / 180f) * (model.radius + wheelItemCardHeight.value / 2f) }
+    val offsetY =
+        remember(wheelItemCardHeight.value) { cos(model.angle * Math.PI / 180f) * (model.radius + wheelItemCardHeight.value / 2f) }
     val interactionSource = remember { MutableInteractionSource() }
     if (!model.visible.value) return
 
     val selectedFactor by animateFloatAsState(
-        targetValue = if (model.isSelected.value) 1f else 0f, tween(
-            durationMillis = (animDuration * 1.25f).toInt(), easing = easing
-        ), label = "selectedFactorAnim"
+        targetValue = if (model.isSelected.value) 1f else 0f,
+        tween(durationMillis = (animDurationMs * 1.25f).toInt(), easing = easing),
+        label = "selectedFactorAnim"
     )
 
-    val onClickLabel =
-        "Play game: ${model.game.name}"// TODO: stringResource(R.string.accessibility_action_select_game)
+    val onClickLabel = "Play game: ${model.game.name}"
+    // TODO: stringResource(R.string.accessibility_action_select_game)
+
+    val heightScaleChange = 0.4f
+    val offsetChangeDp = wheelItemCardHeight * heightScaleChange / 2
 
     Card(
-        modifier
+        Modifier
+            .sizeIn(10.dp, 10.dp, wheelItemCardWidth, wheelItemCardHeight)
             .zIndex(if (model.isSelected.value) 1f else 0f)
             .offset(-offsetX.dp, -offsetY.dp)
             .rotate(-model.angle)
-            .offset { IntOffset(0.dp.roundToPx(), (model.offsetY.dp * selectedFactor).roundToPx()) }
+            .offset { IntOffset(0, (offsetChangeDp * (1 - selectedFactor)).roundToPx()) }
+            .graphicsLayer {
+                val scaleFactor = 0.6f + selectedFactor * heightScaleChange
+                scaleY = scaleFactor
+                scaleX = scaleFactor
+            }
             .semantics {
                 this.collectionItemInfo = CollectionItemInfo(
                     1,
@@ -122,21 +141,27 @@ fun SharedTransitionScope.WheelItem(
             .clickable(interactionSource, null, true, onClickLabel, Role.Button) {
                 viewModel.selectedGame.value = model.game
                 viewModel.navigateToSelectedGame(navController)
-            }) {
+            }, RoundedCornerShape(8.dp)
+    ) {
         Column(
             Modifier
-                .padding(10.dp)
-                .widthIn(1.dp, Dp.Infinity),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .width(IntrinsicSize.Max)
+                .padding(padding),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             val name = stringResource(model.title)
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                WheelItemTitle(name, selectedFactor)
+            Row(
+                Modifier.padding(start = if (model.isSelected.value) 12.dp else 0.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                WheelItemTitle(name)
                 WheelItemIconButton(navController, model.isSelected, name, model.game)
             }
-            Spacer(modifier = Modifier.height(5.dp))
-            WheelItemImage(animatedContentScope, model.gameType, selectedFactor)
+            Spacer(Modifier.height(spacerHeight))
+            WheelItemImage(
+                animatedContentScope, model.gameType, wheelItemCardWidth, wheelItemCardHeight
+            )
         }
     }
 }
@@ -145,23 +170,22 @@ fun SharedTransitionScope.WheelItem(
 fun WheelItemIconButton(
     navController: NavController, isSelected: MutableState<Boolean>, name: String, game: Scene
 ) {
-    val settingsContentDescription =
-        "$name settings"// TODO: stringResource(R.string.accessibility_settings_for_game, name)
+    val settingsContentDescription = "$name settings"
+    // TODO: stringResource(R.string.accessibility_settings_for_game, name)
+
+    val enterTransition = remember {
+        slideInHorizontally(tween(durationMillis = animDurationMs, easing = easing)) +
+                expandIn(tween(durationMillis = animDurationMs, easing = easing)) +
+                fadeIn(tween(durationMillis = animDurationMs, easing = easing))
+    }
+    val exitTransition = remember {
+        slideOutHorizontally(tween(durationMillis = animDurationMs, easing = easing)) +
+                shrinkOut(tween(durationMillis = animDurationMs, easing = easing)) +
+                fadeOut(tween(durationMillis = animDurationMs, easing = easing))
+    }
 
     AnimatedVisibility(
-        isSelected.value, enter = slideInHorizontally(
-            tween(durationMillis = animDuration, easing = easing)
-        ) + expandIn(
-            tween(durationMillis = animDuration, easing = easing)
-        ) + fadeIn(
-            tween(durationMillis = animDuration, easing = easing)
-        ), exit = slideOutHorizontally(
-            tween(durationMillis = animDuration, easing = easing)
-        ) + shrinkOut(
-            tween(durationMillis = animDuration, easing = easing)
-        ) + fadeOut(
-            tween(durationMillis = animDuration, easing = easing)
-        ), label = "ShowSettings"
+        isSelected.value, Modifier, enterTransition, exitTransition, "ShowSettings"
     ) {
         IconButton({
             when (game) {
@@ -178,58 +202,44 @@ fun WheelItemIconButton(
 }
 
 @Composable
-private fun WheelItemTitle(name: String, selectedFactor: Float) {
-    val widthSmall = measureTextWidth(name, Typography.titleLarge)
-    val widthBig = measureTextWidth(name, Typography.headlineLarge)
-    val fontSizeSmall = remember { Typography.titleLarge.fontSize.value.sp }
-    val fontSizeBig = remember { Typography.headlineLarge.fontSize.value.sp }
+private fun WheelItemTitle(name: String) {
+    val textWidthDp = measureTextWidth(name, Typography.titleLarge)
 
     Text(
         name,
-        modifier = Modifier.width(lerp(widthSmall, widthBig, selectedFactor)),
-        fontSize = lerp(fontSizeSmall, fontSizeBig, selectedFactor),
+        Modifier
+            .width(textWidthDp)
+            .height(textHeight)
+            .wrapContentHeight(),
         textAlign = TextAlign.Center,
         maxLines = 1,
-        style = Typography.headlineSmall
+        style = Typography.titleLarge
     )
 }
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 private fun SharedTransitionScope.WheelItemImage(
-    animatedContentScope: AnimatedContentScope, gameType: GameType, selectedFactor: Float
+    animatedContentScope: AnimatedContentScope,
+    gameType: GameType,
+    wheelItemWidth: Dp,
+    wheelItemHeight: Dp
 ) {
-    val localDensity = LocalDensity.current
-    val containerSize = LocalWindowInfo.current.containerSize
-    val growthFactor = remember(containerSize) {
-        with(localDensity) {
-            val screenHeight = containerSize.height.toDp().value
-            val screenWidth = containerSize.width.toDp().value
-            val minScreenSize = screenHeight.coerceAtMost(screenWidth) - 300f
-            100f.coerceAtMost(minScreenSize)
-        }
-    }
-
     val painterResource = painterResource(gameType.iconRes)
-    val maxSize = remember { painterResource.intrinsicSize.maxDimension }
-    val height = remember {
-        with(painterResource.intrinsicSize) { height / (0.9f.coerceAtLeast(height / maxSize)) }
-    }
-    val width = remember {
-        with(painterResource.intrinsicSize) { width / (0.9f.coerceAtLeast(width / maxSize)) }
-    }
-
-    val factor = ((125 + selectedFactor * growthFactor) / maxSize).dp
+    val size = painterResource.intrinsicSize
+    val maxFactorX = (wheelItemWidth - padding * 2) / size.width
+    val maxFactorY = (wheelItemHeight - padding * 2 - spacerHeight - textHeight) / size.height
+    val factor = min(maxFactorX, maxFactorY)
+    val imgSize = max(size.width * factor, size.height * factor)
 
     Image(
         painterResource,
         null,
-        modifier = Modifier
-            .size(width * factor, height * factor)
-            .fillMaxSize()
+        Modifier
+            .sizeIn(10.dp, 10.dp, imgSize, imgSize)
             .clip(RoundedCornerShape(8.dp))
             .sharedElement(
-                rememberSharedContentState(key = "image-${gameType.name}"), animatedContentScope
+                rememberSharedContentState("image-${gameType.name}"), animatedContentScope
             )
     )
 }
@@ -241,11 +251,22 @@ private fun Prev_WheelItem() {
     SharedTransitionLayout {
         AnimatedContent(null) {
             it
-            Column {
-                val item = WheelItem(SceneRegistry.Sudoku, 0f, 0f)
-                item.isSelected.value = true
+            val isSelected = true
+            val heightScaleChange = 0.4f
+            val offsetChangeDp = standardWheelItemCardHeight * heightScaleChange / 2
+            Box(Modifier.offset {
+                IntOffset(0, (offsetChangeDp * if (isSelected) 1 else 0).roundToPx())
+            }) {
+                val item = WheelItem(SceneRegistry.Solitaire, 0f, 0f)
+                item.isSelected.value = isSelected
                 val vm = remember { MockMenuScreenViewModel() }
-                WheelItem(vm, rememberNavController(), this@AnimatedContent, item, Modifier)
+                WheelItem(
+                    vm,
+                    rememberNavController(),
+                    this@AnimatedContent,
+                    item,
+                    standardWheelItemCardHeight
+                )
             }
         }
     }

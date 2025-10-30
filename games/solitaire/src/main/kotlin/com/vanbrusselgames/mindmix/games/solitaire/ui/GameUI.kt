@@ -42,7 +42,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.round
 import androidx.compose.ui.unit.times
 import androidx.compose.ui.zIndex
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.vanbrusselgames.mindmix.core.common.ui.BaseScene
 import com.vanbrusselgames.mindmix.core.common.ui.Timer
@@ -105,30 +104,31 @@ fun Foreground(
 ) {
     val coroutineScope = rememberCoroutineScope()
     var dragBounds = Rect.Zero
-    Box(Modifier
-        .width(cardWidth * 7)
-        .fillMaxHeight()
-        .onGloballyPositioned {
-            val p = it.positionInParent()
-            dragBounds = Rect(-p, Size(p.x * 2 + it.size.width, p.y * 2 + it.size.height))
-        }
-        .pointerInput(Unit) {
-            detectDragGestures(onDragStart = {
-                viewModel.onDragStart(it)
-            }, onDragCancel = {
-                onReleaseMovingCards()
-            }, onDragEnd = {
-                onReleaseMovingCards()
-            }, onDrag = { change, offset ->
-                change.consume()
-                viewModel.moveCards(offset.round(), dragBounds, coroutineScope)
-            })
-        }
-        .pointerInput(Unit) {
-            detectTapGestures {
-                viewModel.onTap(it) { onReleaseMovingCards() }
+    Box(
+        Modifier
+            .width(cardWidth * 7)
+            .fillMaxHeight()
+            .onGloballyPositioned {
+                val p = it.positionInParent()
+                dragBounds = Rect(-p, Size(p.x * 2 + it.size.width, p.y * 2 + it.size.height))
             }
-        }) {
+            .pointerInput(Unit) {
+                detectDragGestures(onDragStart = {
+                    viewModel.onDragStart(it)
+                }, onDragCancel = {
+                    onReleaseMovingCards()
+                }, onDragEnd = {
+                    onReleaseMovingCards()
+                }, onDrag = { change, offset ->
+                    change.consume()
+                    viewModel.moveCards(offset.round(), dragBounds, coroutineScope)
+                })
+            }
+            .pointerInput(Unit) {
+                detectTapGestures {
+                    viewModel.onTap(it) { onReleaseMovingCards() }
+                }
+            }) {
         viewModel.cards.forEach {
             PlayingCard(viewModel, it, modifier)
         }

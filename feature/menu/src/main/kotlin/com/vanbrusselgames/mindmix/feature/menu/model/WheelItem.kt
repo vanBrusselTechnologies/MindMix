@@ -11,8 +11,6 @@ import com.vanbrusselgames.mindmix.games.sudoku.model.Sudoku
 
 data class WheelItem(val game: GameScene, val radius: Float, val angle: Float) {
     val isSelected = mutableStateOf(false)
-    var growthFactor = 0f
-    var offsetY = 0f
     val visible = mutableStateOf(true)
 
     val title = when (game) {

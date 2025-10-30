@@ -11,12 +11,11 @@ import com.vanbrusselgames.mindmix.games.minesweeper.navigation.navigateToMinesw
 import com.vanbrusselgames.mindmix.games.solitaire.navigation.navigateToSolitaire
 import com.vanbrusselgames.mindmix.games.sudoku.navigation.navigateToSudoku
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
 class MockMenuScreenViewModel : BaseScreenViewModel(), IMenuScreenViewModel {
     override val isMenu = true
 
-    override val preferencesLoaded = MutableStateFlow(false).asStateFlow()
+    override val preferencesLoaded = MutableStateFlow(true)
 
     override val games = mapOf(
         SceneRegistry.Sudoku.gameId to SceneRegistry.Sudoku,

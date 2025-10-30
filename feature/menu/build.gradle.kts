@@ -55,5 +55,6 @@ dependencies {
     implementation(libs.androidx.hilt.navigation)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.hilt)
+    implementation(libs.androidx.compose.foundation.layout)
     ksp(libs.hilt.compiler)
 }
