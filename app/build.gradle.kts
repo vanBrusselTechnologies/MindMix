@@ -78,7 +78,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:advertisement"))
     implementation(project(":core:authentication"))
     implementation(project(":core:common"))
     implementation(project(":core:data"))
@@ -121,8 +120,6 @@ dependencies {
     implementation(libs.app.update)
     implementation(libs.app.update.ktx)
     implementation(libs.play.integrity)
-    implementation(libs.play.services.ads)
-    implementation(libs.play.services.auth)
     implementation(libs.play.services.games.v2)
     implementation(libs.review)
     implementation(libs.review.ktx)

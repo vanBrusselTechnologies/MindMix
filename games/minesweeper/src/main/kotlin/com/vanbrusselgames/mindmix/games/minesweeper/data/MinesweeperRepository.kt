@@ -63,8 +63,4 @@ class MinesweeperRepository @Inject constructor(private val dataManager: DataMan
         _puzzleProgress.removeAll { it.difficulty == difficulty }
         saveProgress()
     }
-
-    fun forceSave() {
-        dataManager.save(true)
-    }
 }

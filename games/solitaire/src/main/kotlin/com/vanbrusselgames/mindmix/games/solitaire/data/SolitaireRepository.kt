@@ -91,8 +91,4 @@ class SolitaireRepository @Inject constructor(private val dataManager: DataManag
         _puzzleProgress.removeAll { true }
         saveProgress()
     }
-
-    fun forceSave() {
-        dataManager.save(true)
-    }
 }

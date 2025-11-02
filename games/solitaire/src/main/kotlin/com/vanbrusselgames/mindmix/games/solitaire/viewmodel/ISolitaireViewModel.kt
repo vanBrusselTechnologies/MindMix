@@ -43,9 +43,5 @@ interface ISolitaireViewModel : IBaseGameViewModel, ITimerVM {
     fun onUpdateTableSize(width: Dp, height: Dp, density: Density): DpSize
     fun onClickFinishGame(navController: NavController)
 
-    fun forceSave()
-    fun checkAdLoaded(activity: Activity, adLoaded: MutableState<Boolean>)
-    fun showAd(activity: Activity, adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit)
-
     fun setCardVisualType(value: CardVisualType)
 }

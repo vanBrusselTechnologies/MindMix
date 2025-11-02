@@ -440,17 +440,6 @@ class MockSolitaireViewModel : BaseGameViewModel(), ISolitaireViewModel, ITimerV
         }
     }
 
-    override fun forceSave() {
-    }
-
-    override fun checkAdLoaded(activity: Activity, adLoaded: MutableState<Boolean>) {
-    }
-
-    override fun showAd(
-        activity: Activity, adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit
-    ) {
-    }
-
     override fun setCardVisualType(value: CardVisualType) {
         cardVisualType.value = value
     }

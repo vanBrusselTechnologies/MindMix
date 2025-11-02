@@ -20,10 +20,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -32,7 +34,6 @@ import com.google.firebase.Firebase
 import com.google.firebase.appcheck.appCheck
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
 import com.google.firebase.initialize
-import com.vanbrusselgames.mindmix.core.advertisement.AdManager
 import com.vanbrusselgames.mindmix.core.authentication.AuthManager
 import com.vanbrusselgames.mindmix.core.data.DataManager
 import com.vanbrusselgames.mindmix.core.designsystem.theme.MindMixTheme
@@ -62,9 +63,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @Inject
-    lateinit var adManager: AdManager
-
-    @Inject
     lateinit var authManager: AuthManager
 
     @Inject
@@ -79,6 +77,9 @@ class MainActivity : ComponentActivity() {
     private val snackbarHostState = SnackbarHostState()
 
     private lateinit var navController: NavHostController
+
+    private var dataReady = false
+    private var preferencesLoaded = false
 
     @OptIn(ExperimentalSharedTransitionApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -96,7 +97,6 @@ class MainActivity : ComponentActivity() {
         Firebase.appCheck.installAppCheckProviderFactory(PlayIntegrityAppCheckProviderFactory.getInstance())
 
         authManager.initialAuthCheck(this)
-        adManager.initialize(this)
 
         updateManager.checkForUpdates(registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result: ActivityResult ->
             if (result.resultCode != RESULT_OK) Logger.w("Update flow failed! Result code: " + result.resultCode)
@@ -107,7 +107,8 @@ class MainActivity : ComponentActivity() {
 
             withContext(Dispatchers.Main) {
                 Logger.d("Finished initial load!")
-                keepSplashScreen = false
+                dataReady = true
+                if (preferencesLoaded) keepSplashScreen = false
             }
         }
         setContentView(ComposeView(this).apply {
@@ -163,12 +164,22 @@ class MainActivity : ComponentActivity() {
 
                 navController = rememberNavController()
                 navController.enableOnBackPressed(false)
-                navController.addOnDestinationChangedListener { navController, destination, bundle ->
+                navController.addOnDestinationChangedListener { _, destination, _ ->
                     forceFullScreen(window)
                     SceneManager.dialogActiveState.value = destination.navigatorName === "dialog"
                 }
 
                 val viewModel = hiltViewModel<MainViewModel>()
+                val loadedState = viewModel.preferencesLoaded.collectAsStateWithLifecycle()
+                if (!loadedState.value) return@setContent
+                LaunchedEffect(Unit) {
+                    preferencesLoaded = true
+                    if (dataReady) keepSplashScreen = false
+                }
+                LaunchedEffect(keepSplashScreen) {
+                    if (!keepSplashScreen) viewModel.initUserData()
+                }
+
                 val darkTheme = when (viewModel.theme.value) {
                     SelectedTheme.System -> isSystemInDarkTheme()
                     SelectedTheme.Dark -> true

@@ -73,8 +73,4 @@ class Game2048Repository @Inject constructor(private val dataManager: DataManage
         _puzzleProgress.removeAll { it.size == size }
         saveProgress()
     }
-
-    fun forceSave() {
-        dataManager.save(true)
-    }
 }

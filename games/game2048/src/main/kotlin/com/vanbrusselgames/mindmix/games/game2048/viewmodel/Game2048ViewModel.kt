@@ -1,7 +1,5 @@
 package com.vanbrusselgames.mindmix.games.game2048.viewmodel
 
-import android.app.Activity
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -13,8 +11,8 @@ import androidx.compose.ui.util.fastRoundToInt
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.vanbrusselgames.mindmix.core.advertisement.AdManager
 import com.vanbrusselgames.mindmix.core.common.viewmodel.BaseGameViewModel
+import com.vanbrusselgames.mindmix.core.data.UserRepository
 import com.vanbrusselgames.mindmix.core.games.ui.minimumDurationLoadingScreen
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
@@ -48,9 +46,9 @@ import kotlin.random.Random
 
 @HiltViewModel
 class Game2048ViewModel @Inject constructor(
-    private val adManager: AdManager,
     private val game2048Repository: Game2048Repository,
-    private val prefsRepository: Game2048PreferencesRepository
+    private val prefsRepository: Game2048PreferencesRepository,
+    private val userRepository: UserRepository
 ) : BaseGameViewModel(), IGame2048ViewModel {
     override val finishedGame = mutableStateOf(FinishedGame())
     override val gridSize = mutableStateOf(GridSize2048.FOUR)
@@ -325,7 +323,7 @@ class Game2048ViewModel @Inject constructor(
         }
         val cell = options.random()
         cellList[cellList.indexOf(cell)] =
-            GridCell2048(newId++, if (Random.Default.nextFloat() < 0.9) 2 else 4)
+            GridCell2048(newId++, if (Random.nextFloat() < 0.9) 2 else 4)
         checkStuck(navController)
     }
 
@@ -378,6 +376,7 @@ class Game2048ViewModel @Inject constructor(
             else SuccessType.REACHED_TARGET
         } else SuccessType.GAME_OVER
         val reward = if (successType == SuccessType.SUCCESS) 10 + getBonusReward() else 0
+        onReward(reward)
         finishedGame.value = FinishedGame(
             successType, reward, getHighestTileValue(), getTarget(), score.longValue
         )
@@ -389,23 +388,18 @@ class Game2048ViewModel @Inject constructor(
             .fastRoundToInt()
     }
 
+    fun onReward(reward: Int) {
+        if (reward == 0) return
+        userRepository.addCoins(reward)
+        Logger.logEvent(FirebaseAnalytics.Event.EARN_VIRTUAL_CURRENCY) {
+            param(FirebaseAnalytics.Param.VIRTUAL_CURRENCY_NAME, "Coin")
+            param(FirebaseAnalytics.Param.VALUE, reward.toDouble())
+            param(FirebaseAnalytics.Param.CURRENCY, "EUR")
+        }
+    }
 
     override fun continueGame() {
         finished = false
-    }
-
-    override fun forceSave() {
-        game2048Repository.forceSave()
-    }
-
-    override fun checkAdLoaded(activity: Activity, adLoaded: MutableState<Boolean>) {
-        adManager.checkAdLoaded(activity, adLoaded)
-    }
-
-    override fun showAd(
-        activity: Activity, adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit
-    ) {
-        adManager.showAd(activity, adLoaded, onAdWatched)
     }
 
     override fun setSize(value: GridSize2048) {

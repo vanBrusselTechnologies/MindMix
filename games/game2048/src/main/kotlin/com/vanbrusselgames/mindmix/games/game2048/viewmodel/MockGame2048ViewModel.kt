@@ -1,7 +1,5 @@
 package com.vanbrusselgames.mindmix.games.game2048.viewmodel
 
-import android.app.Activity
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -15,11 +13,8 @@ import com.vanbrusselgames.mindmix.core.common.viewmodel.BaseGameViewModel
 import com.vanbrusselgames.mindmix.games.game2048.model.FinishedGame
 import com.vanbrusselgames.mindmix.games.game2048.model.GridCell2048
 import com.vanbrusselgames.mindmix.games.game2048.model.GridSize2048
-import com.vanbrusselgames.mindmix.games.game2048.model.SuccessType
-import com.vanbrusselgames.mindmix.games.game2048.navigation.navigateToGame2048GameFinished
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -201,8 +196,6 @@ class MockGame2048ViewModel : BaseGameViewModel(), IGame2048ViewModel {
         addScore(points)
         if (reachedTarget) CoroutineScope(Dispatchers.Main).launch {
             finished = true
-            delay(500)
-            onGameFinished(navController, reachedTarget, false)
         }
     }
 
@@ -214,15 +207,13 @@ class MockGame2048ViewModel : BaseGameViewModel(), IGame2048ViewModel {
         }
         val cell = options.random()
         cellList[cellList.indexOf(cell)] =
-            GridCell2048(newId++, if (Random.Default.nextFloat() < 0.9) 2 else 4)
+            GridCell2048(newId++, if (Random.nextFloat() < 0.9) 2 else 4)
         checkStuck(navController)
     }
 
     private fun checkStuck(navController: NavController) {
         if (!canMove()) CoroutineScope(Dispatchers.Main).launch {
             finished = true
-            delay(1000)
-            onGameFinished(navController, getHighestTileValue() >= getTarget(), true)
         }
     }
 
@@ -251,20 +242,6 @@ class MockGame2048ViewModel : BaseGameViewModel(), IGame2048ViewModel {
         score.longValue += points
     }
 
-    private fun onGameFinished(
-        navController: NavController, reachedTarget: Boolean, isStuck: Boolean
-    ) {
-        val successType = if (reachedTarget) {
-            if (isStuck) SuccessType.SUCCESS
-            else SuccessType.REACHED_TARGET
-        } else SuccessType.GAME_OVER
-        val reward = if (successType == SuccessType.SUCCESS) 10 + getBonusReward() else 0
-        finishedGame.value = FinishedGame(
-            successType, reward, getHighestTileValue(), getTarget(), score.longValue
-        )
-        navController.navigateToGame2048GameFinished()
-    }
-
     private fun getBonusReward(): Int {
         return 1.5.pow((log2(getHighestTileValue().toDouble()) - log2(getTarget().toDouble())))
             .fastRoundToInt()
@@ -272,17 +249,6 @@ class MockGame2048ViewModel : BaseGameViewModel(), IGame2048ViewModel {
 
     override fun continueGame() {
         finished = false
-    }
-
-    override fun forceSave() {
-    }
-
-    override fun checkAdLoaded(activity: Activity, adLoaded: MutableState<Boolean>) {
-    }
-
-    override fun showAd(
-        activity: Activity, adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit
-    ) {
     }
 
     override fun setSize(value: GridSize2048) {

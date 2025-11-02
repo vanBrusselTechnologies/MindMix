@@ -108,9 +108,9 @@ class SudokuPuzzle private constructor(private val n: Int) {
                 }
                 val unsolvedCellIndexes: IntArray = unsolvedCellIndexesList.toIntArray()
                 val cellIndex: Int =
-                    unsolvedCellIndexes[Random.Default.nextInt(unsolvedCellIndexes.size)]
+                    unsolvedCellIndexes[Random.nextInt(unsolvedCellIndexes.size)]
                 val candidateValue: Int =
-                    puzzle.cells[cellIndex][Random.Default.nextInt(puzzle.cells[cellIndex].size)]
+                    puzzle.cells[cellIndex][Random.nextInt(puzzle.cells[cellIndex].size)]
                 val workingPuzzle = puzzle.placeValue(cellIndex, candidateValue)
                 if (workingPuzzle != null) {
                     val solutions = multiSolve(workingPuzzle, 2)
@@ -140,7 +140,7 @@ class SudokuPuzzle private constructor(private val n: Int) {
             while (true) {
                 if (testedClues.size == size) return clues
                 //Pick a random cell to blank
-                val clueCell: Int = Random.Default.nextInt(clues.size)
+                val clueCell: Int = Random.nextInt(clues.size)
 
                 if (testedClues.contains(clueCell)) continue
                 if (clues[clueCell] == 0) {

@@ -1,9 +1,7 @@
 package com.vanbrusselgames.mindmix.games.minesweeper.viewmodel
 
-import android.app.Activity
 import androidx.collection.MutableIntList
 import androidx.collection.mutableIntListOf
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.geometry.Offset
@@ -17,8 +15,6 @@ import com.vanbrusselgames.mindmix.games.minesweeper.model.CellState
 import com.vanbrusselgames.mindmix.games.minesweeper.model.FinishedGame
 import com.vanbrusselgames.mindmix.games.minesweeper.model.InputMode
 import com.vanbrusselgames.mindmix.games.minesweeper.model.MinesweeperCell
-import com.vanbrusselgames.mindmix.games.minesweeper.model.SuccessType
-import com.vanbrusselgames.mindmix.games.minesweeper.navigation.navigateToMinesweeperGameFinished
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlin.math.floor
@@ -139,7 +135,6 @@ class MockMinesweeperViewModel : BaseGameViewModel(), IMinesweeperViewModel {
         cells.forEach {
             if (it.isMine && it.state == CellState.Empty) it.state = CellState.Bomb
         }
-        onGameFinished(navController, false)
     }
 
     private fun calculateMinesLeft() {
@@ -158,7 +153,6 @@ class MockMinesweeperViewModel : BaseGameViewModel(), IMinesweeperViewModel {
                 param(FirebaseAnalytics.Param.LEVEL_NAME, SceneRegistry.Minesweeper.name)
                 param(FirebaseAnalytics.Param.SUCCESS, 1)
             }
-            onGameFinished(navController, true)
         }
     }
 
@@ -168,24 +162,6 @@ class MockMinesweeperViewModel : BaseGameViewModel(), IMinesweeperViewModel {
             if (cell.state == CellState.Bomb) return false
         }
         return true
-    }
-
-    private fun onGameFinished(navController: NavController, success: Boolean) {
-        val successType = if (success) SuccessType.SUCCESS else SuccessType.GAME_OVER
-        val reward = if (success) 10 else 0
-        finishedGame.value = FinishedGame(successType, reward)
-        navController.navigateToMinesweeperGameFinished()
-    }
-
-    override fun forceSave() {
-    }
-
-    override fun checkAdLoaded(activity: Activity, adLoaded: MutableState<Boolean>) {
-    }
-
-    override fun showAd(
-        activity: Activity, adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit
-    ) {
     }
 
     override fun onClickUpdateAutoFlag() {

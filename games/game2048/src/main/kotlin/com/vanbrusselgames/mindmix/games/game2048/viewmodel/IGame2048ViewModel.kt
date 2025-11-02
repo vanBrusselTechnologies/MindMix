@@ -28,9 +28,5 @@ interface IGame2048ViewModel : IBaseGameViewModel {
 
     fun continueGame()
 
-    fun forceSave()
-    fun checkAdLoaded(activity: Activity, adLoaded: MutableState<Boolean>)
-    fun showAd(activity: Activity, adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit)
-
     fun setSize(value: GridSize2048)
 }

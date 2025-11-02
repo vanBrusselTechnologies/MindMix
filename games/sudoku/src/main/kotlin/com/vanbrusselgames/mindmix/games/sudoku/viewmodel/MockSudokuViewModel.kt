@@ -63,17 +63,6 @@ class MockSudokuViewModel : BaseGameViewModel(), ISudokuViewModel {
         checkConflictingCells.value = !checkConflictingCells.value
     }
 
-    override fun forceSave() {
-    }
-
-    override fun checkAdLoaded(activity: Activity, adLoaded: MutableState<Boolean>) {
-    }
-
-    override fun showAd(
-        activity: Activity, adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit
-    ) {
-    }
-
     override fun setDifficulty(value: Difficulty) {
         difficulty.value = value
     }

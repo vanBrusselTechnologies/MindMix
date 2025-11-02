@@ -26,10 +26,6 @@ interface ISudokuViewModel : IBaseGameViewModel {
     fun changeInputMode()
     fun onClickNumPadCell(numPadCellIndex: Int, navController: NavController)
 
-    fun forceSave()
-    fun checkAdLoaded(activity: Activity, adLoaded: MutableState<Boolean>)
-    fun showAd(activity: Activity, adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit)
-
     fun onClickUpdateAutoEditNotes()
     fun onClickUpdateCheckConflictingCells()
     fun setDifficulty(value: Difficulty)

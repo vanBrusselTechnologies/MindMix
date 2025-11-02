@@ -1,6 +1,5 @@
 package com.vanbrusselgames.mindmix.games.sudoku.ui.dialogs
 
-import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Spacer
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,7 +25,6 @@ import com.vanbrusselgames.mindmix.core.designsystem.theme.MindMixTheme
 import com.vanbrusselgames.mindmix.core.navigation.navigateToMenu
 import com.vanbrusselgames.mindmix.core.ui.dialogs.gamefinished.Buttons
 import com.vanbrusselgames.mindmix.core.ui.dialogs.gamefinished.GameFinishedDialog
-import com.vanbrusselgames.mindmix.core.ui.dialogs.gamefinished.GameFinishedRewardRow
 import com.vanbrusselgames.mindmix.games.sudoku.R
 import com.vanbrusselgames.mindmix.games.sudoku.model.FinishedGame
 import com.vanbrusselgames.mindmix.games.sudoku.viewmodel.ISudokuViewModel
@@ -42,23 +39,11 @@ fun SudokuGameFinishedDialog(viewModel: ISudokuViewModel, navController: NavCont
                 .width(IntrinsicSize.Min),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            val finishedGame = viewModel.finishedGame.value
+            viewModel.finishedGame.value
 
             GameFinishedDialogTitle()
             Spacer(Modifier.height(2.dp))
             GameFinishedDialogText()
-            if (finishedGame.reward != 0) {
-                val activity = LocalActivity.current
-                val checkAdLoaded = { adLoaded: MutableState<Boolean> ->
-                    if (activity != null) viewModel.checkAdLoaded(activity, adLoaded)
-                }
-                val showAd = { adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit ->
-                    if (activity != null) viewModel.showAd(activity, adLoaded, onAdWatched)
-                }
-                val forceSave = { viewModel.forceSave() }
-                Spacer(Modifier.height(8.dp))
-                GameFinishedRewardRow(finishedGame.reward, checkAdLoaded, showAd, forceSave)
-            }
             Spacer(Modifier.height(8.dp))
             Buttons(
                 navController,

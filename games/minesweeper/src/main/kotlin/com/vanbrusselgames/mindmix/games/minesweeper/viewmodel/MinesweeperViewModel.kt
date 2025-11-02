@@ -1,17 +1,15 @@
 package com.vanbrusselgames.mindmix.games.minesweeper.viewmodel
 
-import android.app.Activity
 import androidx.collection.MutableIntList
 import androidx.collection.mutableIntListOf
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.vanbrusselgames.mindmix.core.advertisement.AdManager
 import com.vanbrusselgames.mindmix.core.common.viewmodel.BaseGameViewModel
+import com.vanbrusselgames.mindmix.core.data.UserRepository
 import com.vanbrusselgames.mindmix.core.games.ui.minimumDurationLoadingScreen
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
@@ -44,9 +42,9 @@ import kotlin.math.roundToInt
 
 @HiltViewModel
 class MinesweeperViewModel @Inject constructor(
-    private val adManager: AdManager,
     private val minesweeperRepository: MinesweeperRepository,
-    private val prefsRepository: MinesweeperPreferencesRepository
+    private val prefsRepository: MinesweeperPreferencesRepository,
+    private val userRepository: UserRepository
 ) : BaseGameViewModel(), IMinesweeperViewModel {
     override val finishedGame = mutableStateOf(FinishedGame())
     override val autoFlag = mutableStateOf(false)
@@ -97,7 +95,7 @@ class MinesweeperViewModel @Inject constructor(
 
     private suspend fun loadData() {
         withContext(Dispatchers.IO) {
-            preferencesLoaded.first { Logger.d("PreferencesLoaded? $it");it }
+            preferencesLoaded.first { Logger.d("PreferencesLoaded? $it"); it }
             guaranteeMinimumDuration()
             onPuzzleLoaded(
                 minesweeperRepository.getPuzzleProgress(difficulty.value)
@@ -296,22 +294,19 @@ class MinesweeperViewModel @Inject constructor(
     private fun onGameFinished(navController: NavController, success: Boolean) {
         val successType = if (success) SuccessType.SUCCESS else SuccessType.GAME_OVER
         val reward = if (success) 10 else 0
+        onReward(reward)
         finishedGame.value = FinishedGame(successType, reward)
         navController.navigateToMinesweeperGameFinished()
     }
 
-    override fun forceSave() {
-        minesweeperRepository.forceSave()
-    }
-
-    override fun checkAdLoaded(activity: Activity, adLoaded: MutableState<Boolean>) {
-        adManager.checkAdLoaded(activity, adLoaded)
-    }
-
-    override fun showAd(
-        activity: Activity, adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit
-    ) {
-        adManager.showAd(activity, adLoaded, onAdWatched)
+    fun onReward(reward: Int) {
+        if (reward == 0) return
+        userRepository.addCoins(reward)
+        Logger.logEvent(FirebaseAnalytics.Event.EARN_VIRTUAL_CURRENCY) {
+            param(FirebaseAnalytics.Param.VIRTUAL_CURRENCY_NAME, "Coin")
+            param(FirebaseAnalytics.Param.VALUE, reward.toDouble())
+            param(FirebaseAnalytics.Param.CURRENCY, "EUR")
+        }
     }
 
     override fun onClickUpdateAutoFlag() {

@@ -15,8 +15,4 @@ class MenuRepository @Inject constructor(private val dataManager: DataManager) {
         val data = ""//Json.encodeToString(MenuData(0))
         dataManager.saveScene(SceneRegistry.Menu, data)
     }
-
-    fun forceSave() {
-        dataManager.save(true)
-    }
 }

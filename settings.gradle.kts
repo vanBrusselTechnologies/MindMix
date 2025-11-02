@@ -16,7 +16,6 @@ rootProject.name = "MindMix"
 
 include(":app")
 
-include(":core:advertisement")
 //include(":core:analytics")
 include(":core:authentication")
 include(":core:common")

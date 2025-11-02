@@ -1,13 +1,11 @@
 package com.vanbrusselgames.mindmix.games.sudoku.viewmodel
 
-import android.app.Activity
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.vanbrusselgames.mindmix.core.advertisement.AdManager
 import com.vanbrusselgames.mindmix.core.common.viewmodel.BaseGameViewModel
+import com.vanbrusselgames.mindmix.core.data.UserRepository
 import com.vanbrusselgames.mindmix.core.games.ui.minimumDurationLoadingScreen
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
@@ -42,9 +40,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SudokuViewModel @Inject constructor(
-    private val adManager: AdManager,
     private val sudokuRepository: SudokuRepository,
-    private val prefsRepository: SudokuPreferencesRepository
+    private val prefsRepository: SudokuPreferencesRepository,
+    private val userRepository: UserRepository
 ) : BaseGameViewModel(), ISudokuViewModel {
     companion object {
         const val SIZE = 9
@@ -221,22 +219,19 @@ class SudokuViewModel @Inject constructor(
 
     private fun onGameFinished(navController: NavController) {
         val reward = rewardForDifficulty[difficulty.value]!!
+        onReward(reward)
         finishedGame.value = FinishedGame(reward)
         navController.navigateToSudokuGameFinished()
     }
 
-    override fun forceSave() {
-        sudokuRepository.forceSave()
-    }
-
-    override fun checkAdLoaded(activity: Activity, adLoaded: MutableState<Boolean>) {
-        adManager.checkAdLoaded(activity, adLoaded)
-    }
-
-    override fun showAd(
-        activity: Activity, adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit
-    ) {
-        adManager.showAd(activity, adLoaded, onAdWatched)
+    fun onReward(reward: Int) {
+        if (reward == 0) return
+        userRepository.addCoins(reward)
+        Logger.logEvent(FirebaseAnalytics.Event.EARN_VIRTUAL_CURRENCY) {
+            param(FirebaseAnalytics.Param.VIRTUAL_CURRENCY_NAME, "Coin")
+            param(FirebaseAnalytics.Param.VALUE, reward.toDouble())
+            param(FirebaseAnalytics.Param.CURRENCY, "EUR")
+        }
     }
 
     override fun onClickUpdateAutoEditNotes() {

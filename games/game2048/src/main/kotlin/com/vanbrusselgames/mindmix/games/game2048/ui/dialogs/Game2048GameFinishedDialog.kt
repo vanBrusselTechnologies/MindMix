@@ -1,6 +1,5 @@
 package com.vanbrusselgames.mindmix.games.game2048.ui.dialogs
 
-import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Spacer
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,7 +26,6 @@ import com.vanbrusselgames.mindmix.core.navigation.navigateToMenu
 import com.vanbrusselgames.mindmix.core.ui.dialogs.DialogButton
 import com.vanbrusselgames.mindmix.core.ui.dialogs.gamefinished.Buttons
 import com.vanbrusselgames.mindmix.core.ui.dialogs.gamefinished.GameFinishedDialog
-import com.vanbrusselgames.mindmix.core.ui.dialogs.gamefinished.GameFinishedRewardRow
 import com.vanbrusselgames.mindmix.core.ui.dialogs.gamefinished.StatRow
 import com.vanbrusselgames.mindmix.core.ui.dialogs.gamefinished.Stats
 import com.vanbrusselgames.mindmix.games.game2048.R
@@ -62,18 +59,6 @@ fun Game2048GameFinishedDialog(viewModel: IGame2048ViewModel, navController: Nav
                     fieldText = stringResource(R.string.game_2048_stat_max_tile_label),
                     valueText = finishedGame.highestTileValue.toString()
                 )
-            }
-            if (finishedGame.reward != 0) {
-                val activity = LocalActivity.current
-                val checkAdLoaded = { adLoaded: MutableState<Boolean> ->
-                    if (activity != null) viewModel.checkAdLoaded(activity, adLoaded)
-                }
-                val showAd = { adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit ->
-                    if (activity != null) viewModel.showAd(activity, adLoaded, onAdWatched)
-                }
-                val forceSave = { viewModel.forceSave() }
-                Spacer(Modifier.height(8.dp))
-                GameFinishedRewardRow(finishedGame.reward, checkAdLoaded, showAd, forceSave)
             }
             Spacer(Modifier.height(8.dp))
             if (successType == SuccessType.REACHED_TARGET) {

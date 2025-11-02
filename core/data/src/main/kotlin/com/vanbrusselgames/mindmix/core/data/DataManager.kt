@@ -70,7 +70,7 @@ class DataManager @Inject constructor(@ApplicationContext ctx: Context) {
                     if (line.isEmpty()) continue
                     val i = line.indexOf('%')
                     if (i == -1) continue
-                    val safeCode = line.substring(0, i).toInt()
+                    val safeCode = line.take(i).toInt()
                     val json = line.substring(i + 1)
                     if (dataMap.containsKey(safeCode) && dataMap[safeCode] != "") continue
                     dataMap[safeCode] = json

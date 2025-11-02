@@ -1,7 +1,5 @@
 package com.vanbrusselgames.mindmix.games.solitaire.viewmodel
 
-import android.app.Activity
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -15,10 +13,10 @@ import androidx.core.math.MathUtils
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.vanbrusselgames.mindmix.core.advertisement.AdManager
 import com.vanbrusselgames.mindmix.core.common.model.GameTimer
 import com.vanbrusselgames.mindmix.core.common.viewmodel.BaseGameViewModel
 import com.vanbrusselgames.mindmix.core.common.viewmodel.ITimerVM
+import com.vanbrusselgames.mindmix.core.data.UserRepository
 import com.vanbrusselgames.mindmix.core.games.ui.minimumDurationLoadingScreen
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
@@ -56,9 +54,9 @@ import kotlin.math.roundToInt
 
 @HiltViewModel
 class SolitaireViewModel @Inject constructor(
-    private val adManager: AdManager,
     private val solitaireRepository: SolitaireRepository,
-    private val prefsRepository: SolitairePreferencesRepository
+    private val prefsRepository: SolitairePreferencesRepository,
+    private val userRepository: UserRepository
 ) : BaseGameViewModel(), ISolitaireViewModel, ITimerVM {
     companion object {
         private const val CARD_PIXEL_HEIGHT = 819f
@@ -597,6 +595,7 @@ class SolitaireViewModel @Inject constructor(
         if (isNewRecord) solitaireRepository.setPuzzleRecord(totalUsedTime)
         val minutes = max(1f, totalUsedTime / 1000f / 60f)
         val reward = max(1, floor(MAX_REWARD / minutes).toInt()) + if (isNewRecord) 2 else 0
+        onReward(reward)
         finishedGame.value = FinishedGame(
             reward,
             timer.currentMillis.value,
@@ -608,18 +607,14 @@ class SolitaireViewModel @Inject constructor(
         navController.navigateToSolitaireGameFinished()
     }
 
-    override fun forceSave() {
-        solitaireRepository.forceSave()
-    }
-
-    override fun checkAdLoaded(activity: Activity, adLoaded: MutableState<Boolean>) {
-        adManager.checkAdLoaded(activity, adLoaded)
-    }
-
-    override fun showAd(
-        activity: Activity, adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit
-    ) {
-        adManager.showAd(activity, adLoaded, onAdWatched)
+    fun onReward(reward: Int) {
+        if (reward == 0) return
+        userRepository.addCoins(reward)
+        Logger.logEvent(FirebaseAnalytics.Event.EARN_VIRTUAL_CURRENCY) {
+            param(FirebaseAnalytics.Param.VIRTUAL_CURRENCY_NAME, "Coin")
+            param(FirebaseAnalytics.Param.VALUE, reward.toDouble())
+            param(FirebaseAnalytics.Param.CURRENCY, "EUR")
+        }
     }
 
     override fun onOpenDialog() {

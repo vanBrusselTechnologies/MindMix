@@ -32,10 +32,6 @@ interface IMinesweeperViewModel : IBaseGameViewModel {
     fun onSelectCell(offset: Offset, cellSize: Float, navController: NavController)
     fun changeInputMode()
 
-    fun forceSave()
-    fun checkAdLoaded(activity: Activity, adLoaded: MutableState<Boolean>)
-    fun showAd(activity: Activity, adLoaded: MutableState<Boolean>, onAdWatched: (Int) -> Unit)
-
     fun onClickUpdateAutoFlag()
     fun onClickUpdateSafeStart()
     fun setDifficulty(value: Difficulty)
