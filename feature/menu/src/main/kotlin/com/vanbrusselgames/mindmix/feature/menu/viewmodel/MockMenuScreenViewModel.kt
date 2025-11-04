@@ -3,7 +3,6 @@ package com.vanbrusselgames.mindmix.feature.menu.viewmodel
 import androidx.compose.runtime.mutableStateOf
 import androidx.navigation.NavController
 import com.vanbrusselgames.mindmix.core.common.viewmodel.BaseScreenViewModel
-import com.vanbrusselgames.mindmix.core.model.GameScene
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
 import com.vanbrusselgames.mindmix.feature.menu.model.GameWheel
 import com.vanbrusselgames.mindmix.games.game2048.navigation.navigateToGame2048

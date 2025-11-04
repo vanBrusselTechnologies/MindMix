@@ -8,7 +8,6 @@
     <string name="card_type">Card type</string>
     <string name="card_type_simple">Simple</string>
     <string name="card_type_detailed">Detailed</string>
-    <string name="time">Time:</string>
     <string name="game_solitaire_label_last_best">Last best time:</string>
     <string name="game_solitaire_label_fastest_time">Fastest time:</string>
     <string name="game_solitaire_new_record">New best!</string>

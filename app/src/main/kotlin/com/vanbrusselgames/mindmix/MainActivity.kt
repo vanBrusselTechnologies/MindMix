@@ -169,6 +169,7 @@ class MainActivity : ComponentActivity() {
                 navController = rememberNavController()
                 navController.enableOnBackPressed(false)
                 navController.addOnDestinationChangedListener { _, destination, _ ->
+                    forceFullScreen(window)
                     SceneManager.dialogActiveState.value = destination.navigatorName === "dialog"
                 }
 

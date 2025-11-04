@@ -2,6 +2,5 @@
     <string name="app_name">MindMix</string>
     <string name="game_services_project_id" translatable="false">528380549151</string>
     <string name="default_web_client_id" translatable="false">528380549151-l079h9g6e2hpo6biq15j58o96p39j8pd.apps.googleusercontent.com</string>
-    <string name="admob_application_id" translatable="false">ca-app-pub-7048585956228368~3762816385</string>
     <string name="flexible_update_downloaded">An update has just been downloaded.</string>
 </resources>

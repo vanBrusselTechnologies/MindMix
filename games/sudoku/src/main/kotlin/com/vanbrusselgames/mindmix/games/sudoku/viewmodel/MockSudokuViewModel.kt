@@ -1,7 +1,5 @@
 package com.vanbrusselgames.mindmix.games.sudoku.viewmodel
 
-import android.app.Activity
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.navigation.NavController
 import com.vanbrusselgames.mindmix.core.common.viewmodel.BaseGameViewModel

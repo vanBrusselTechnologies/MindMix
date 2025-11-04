@@ -19,7 +19,7 @@ class SudokuPuzzle private constructor(private val n: Int) {
 
     constructor(input: IntArray) : this(n = sqrt(input.size.toFloat()).toInt()) {
         for (i: Int in input.indices) {
-            if (input[i] <= 0 || input[i] > n) continue
+            if (input[i] !in 1..n) continue
             val puzzle = placeValue(i, input[i])
                 ?: throw IllegalArgumentException("This puzzle is unsolvable!")
             cells = puzzle.cells

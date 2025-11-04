@@ -8,7 +8,7 @@ object Decode {
         var result = BigInteger.ZERO
         for (char in s) {
             val value = char.code - 33
-            if (value < 0 || value >= 94) throw IllegalArgumentException("Invalid character in base94 string: $char")
+            if (value !in 0..<94) throw IllegalArgumentException("Invalid character in base94 string: $char")
             result = result * base + value.toBigInteger()
         }
         return result

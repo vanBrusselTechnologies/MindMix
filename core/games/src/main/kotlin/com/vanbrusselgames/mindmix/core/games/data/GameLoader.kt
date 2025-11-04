@@ -18,7 +18,7 @@ class GameLoader @Inject constructor(@param:ApplicationContext private val ctx: 
     }
 
     private fun getDir(filePath: String, fileName: String): File {
-        val dirPath = filePath.substring(0, filePath.length - fileName.length)
+        val dirPath = filePath.dropLast(fileName.length)
         val dir = File(ctx.filesDir, dirPath)
         if (!dir.exists()) dir.mkdirs()
         return dir

@@ -173,7 +173,7 @@ class MinesweeperViewModel @Inject constructor(
             while (j < 1) {
                 j++
                 val mineIndex = cell.id + i + j * shortSide
-                if (mineIndex < 0 || mineIndex >= cellCount) continue
+                if (mineIndex !in 0..<cellCount) continue
                 if (mineIndex % shortSide == 0 && i == 1 || cell.id % shortSide == 0 && i == -1) continue
                 mineCount += if (mines[mineIndex]) 1 else 0
             }
@@ -233,7 +233,7 @@ class MinesweeperViewModel @Inject constructor(
             while (j < 1) {
                 j++
                 val mineIndex = if (sizeX < sizeY) index + i + j * sizeX else index + sizeY * i + j
-                if (mineIndex < 0 || mineIndex >= cellCount) continue
+                if (mineIndex !in 0..<cellCount) continue
                 if (sizeX < sizeY) {
                     if (mineIndex % sizeX == 0 && i == 1 || index % sizeX == 0 && i == -1) continue
                 } else {

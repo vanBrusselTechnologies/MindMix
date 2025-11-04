@@ -9,7 +9,6 @@
     <string name="card_type">Kaart type</string>
     <string name="card_type_simple">Simpel</string>
     <string name="card_type_detailed">Gedetailleerd</string>
-    <string name="time">"Tijd: "</string>
     <string name="game_solitaire_label_last_best">Vorige beste tijd:</string>
     <string name="game_solitaire_label_fastest_time">Snelste tijd:</string>
     <string name="game_solitaire_new_record">Nieuw record!</string>

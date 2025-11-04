@@ -90,7 +90,7 @@ private fun TopBar(
                 }
             } else Row(Modifier.align(Alignment.TopEnd)) {
                 /* TODO: Add Shop
-                    if (isMenu) {
+                    if (viewModel.isMenu) {
                         IconButton(
                             onClick = {
                                 navController.navigateToShop()

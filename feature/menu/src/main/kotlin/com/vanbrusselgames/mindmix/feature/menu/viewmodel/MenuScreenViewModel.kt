@@ -7,7 +7,6 @@ import com.vanbrusselgames.mindmix.core.common.viewmodel.BaseScreenViewModel
 import com.vanbrusselgames.mindmix.core.logging.Logger
 import com.vanbrusselgames.mindmix.core.model.GameScene
 import com.vanbrusselgames.mindmix.core.model.SceneRegistry
-import com.vanbrusselgames.mindmix.feature.menu.data.MenuRepository
 import com.vanbrusselgames.mindmix.feature.menu.data.preferences.MenuPreferences
 import com.vanbrusselgames.mindmix.feature.menu.data.preferences.MenuPreferencesRepository
 import com.vanbrusselgames.mindmix.feature.menu.model.GameWheel
@@ -26,7 +25,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MenuScreenViewModel @Inject constructor(
-    private val menuRepository: MenuRepository,
     private val prefsRepository: MenuPreferencesRepository
 ) : BaseScreenViewModel(), IMenuScreenViewModel {
     override val isMenu = true

@@ -75,7 +75,7 @@ data class GameWheel(val viewModel: IMenuScreenViewModel, val gameCount: Int) {
         for (wheelItem in items) {
             val a = wheelItem.angle
             wheelItem.visible.value =
-                (maximum < minimum && (a > minimum || a < maximum)) || (maximum >= minimum && a in minimum..maximum)
+                (maximum < minimum && (a !in maximum..minimum)) || (maximum >= minimum && a in minimum..maximum)
         }
     }
 }

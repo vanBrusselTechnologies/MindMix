@@ -1,6 +1,4 @@
 <resources>
-    <string name="ad_loading">Loading…</string>
-    <string name="ad_tripler_percentage" translatable="false">+200%</string>
     <string name="back_to_menu">Return to menu</string>
     <string name="continue_game">Continue</string>
     <string name="play_again">Play again</string>

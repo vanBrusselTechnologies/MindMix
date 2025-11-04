@@ -83,11 +83,11 @@ class MockMinesweeperViewModel : BaseGameViewModel(), IMinesweeperViewModel {
                     cell.state = CellState.Flag
                     calculateMinesLeft()
                 } else {
-                    if (cell.isMine) return showAllMines(navController)
+                    if (cell.isMine) return showAllMines()
                     cell.state = CellState.Number
                     if (cell.mineCount == 0) findOtherSafeCells(cell)
                     if (autoFlag.value) autoFlag()
-                    checkFinished(navController)
+                    checkFinished()
                 }
             }
 
@@ -110,7 +110,7 @@ class MockMinesweeperViewModel : BaseGameViewModel(), IMinesweeperViewModel {
             while (j < 1) {
                 j++
                 val mineIndex = if (sizeX < sizeY) index + i + j * sizeX else index + sizeY * i + j
-                if (mineIndex < 0 || mineIndex >= cellCount) continue
+                if (mineIndex !in 0..<cellCount) continue
                 if (sizeX < sizeY) {
                     if (mineIndex % sizeX == 0 && i == 1 || index % sizeX == 0 && i == -1) continue
                 } else {
@@ -125,7 +125,7 @@ class MockMinesweeperViewModel : BaseGameViewModel(), IMinesweeperViewModel {
         }
     }
 
-    private fun showAllMines(navController: NavController) {
+    private fun showAllMines() {
         if (finished) return
         finished = true
         Logger.logEvent(FirebaseAnalytics.Event.LEVEL_END) {
@@ -146,7 +146,7 @@ class MockMinesweeperViewModel : BaseGameViewModel(), IMinesweeperViewModel {
         minesLeft.intValue = count
     }
 
-    private fun checkFinished(navController: NavController) {
+    private fun checkFinished() {
         finished = isFinished()
         if (finished) {
             Logger.logEvent(FirebaseAnalytics.Event.LEVEL_END) {

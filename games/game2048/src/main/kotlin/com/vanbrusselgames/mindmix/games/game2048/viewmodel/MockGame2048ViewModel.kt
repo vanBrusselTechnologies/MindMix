@@ -7,7 +7,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastFilter
 import androidx.compose.ui.util.fastForEach
-import androidx.compose.ui.util.fastRoundToInt
 import androidx.navigation.NavController
 import com.vanbrusselgames.mindmix.core.common.viewmodel.BaseGameViewModel
 import com.vanbrusselgames.mindmix.games.game2048.model.FinishedGame
@@ -19,8 +18,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlin.math.abs
-import kotlin.math.log2
-import kotlin.math.pow
 import kotlin.random.Random
 
 class MockGame2048ViewModel : BaseGameViewModel(), IGame2048ViewModel {
@@ -59,16 +56,16 @@ class MockGame2048ViewModel : BaseGameViewModel(), IGame2048ViewModel {
         val y = totalDragOffset.y
         if (abs(x) < threshold && abs(y) < threshold) return
         if (abs(x) > abs(y)) { // Horizontal
-            if (x > 0) swipeRight(navController) else swipeLeft(navController)
+            if (x > 0) swipeRight() else swipeLeft()
         } else { // Vertical
-            if (y > 0) swipeDown(navController) else swipeUp(navController)
+            if (y > 0) swipeDown() else swipeUp()
         }
     }
 
-    private fun swipeUp(navController: NavController) {
+    private fun swipeUp() {
         val lastValues = cellList.map { it.value }
         val columns = getColumns()
-        combineEqualCells(navController, columns)
+        combineEqualCells(columns)
 
         val tempCellList = mutableListOf<GridCell2048>()
         getColumns().forEachIndexed { cId, column ->
@@ -82,13 +79,13 @@ class MockGame2048ViewModel : BaseGameViewModel(), IGame2048ViewModel {
 
         for (i in 0 until cellCount) cellList[i] = tempCellList[i]
         if (lastValues == cellList.map { it.value }) return
-        tryAddCell(navController)
+        tryAddCell()
     }
 
-    private fun swipeDown(navController: NavController) {
+    private fun swipeDown() {
         val lastValues = cellList.map { it.value }
         val columns = getColumns().map { it.reversed() }
-        combineEqualCells(navController, columns)
+        combineEqualCells(columns)
 
         val tempCellList = mutableListOf<GridCell2048>()
         getColumns().forEachIndexed { cId, column ->
@@ -102,13 +99,13 @@ class MockGame2048ViewModel : BaseGameViewModel(), IGame2048ViewModel {
 
         for (i in 0 until cellCount) cellList[i] = tempCellList[i]
         if (lastValues == cellList.map { it.value }) return
-        tryAddCell(navController)
+        tryAddCell()
     }
 
-    private fun swipeLeft(navController: NavController) {
+    private fun swipeLeft() {
         val lastValues = cellList.map { it.value }
         val rows = getRows()
-        combineEqualCells(navController, rows)
+        combineEqualCells(rows)
 
         val newRows = getRows().mapIndexed { rId, row ->
             val cells = row.sortedBy { if (it.value == 0L) 1 else 0 }.toMutableList()
@@ -128,13 +125,13 @@ class MockGame2048ViewModel : BaseGameViewModel(), IGame2048ViewModel {
         }
 
         if (lastValues == cellList.map { it.value }) return
-        tryAddCell(navController)
+        tryAddCell()
     }
 
-    private fun swipeRight(navController: NavController) {
+    private fun swipeRight() {
         val lastValues = cellList.map { it.value }
         val rows = getRows().map { it.reversed() }
-        combineEqualCells(navController, rows)
+        combineEqualCells(rows)
 
         val newRows = getRows().mapIndexed { rId, row ->
             val cells = row.sortedBy { if (it.value == 0L) 0 else 1 }.toMutableList()
@@ -154,7 +151,7 @@ class MockGame2048ViewModel : BaseGameViewModel(), IGame2048ViewModel {
         }
 
         if (lastValues == cellList.map { it.value }) return
-        tryAddCell(navController)
+        tryAddCell()
     }
 
     private fun getColumns(): List<List<GridCell2048>> {
@@ -171,7 +168,7 @@ class MockGame2048ViewModel : BaseGameViewModel(), IGame2048ViewModel {
         return rows
     }
 
-    private fun combineEqualCells(navController: NavController, cells: List<List<GridCell2048>>) {
+    private fun combineEqualCells(cells: List<List<GridCell2048>>) {
         var reachedTarget = false
         var points = 0L
         for (r in cells) {
@@ -199,19 +196,19 @@ class MockGame2048ViewModel : BaseGameViewModel(), IGame2048ViewModel {
         }
     }
 
-    private fun tryAddCell(navController: NavController) {
+    private fun tryAddCell() {
         val options = cellList.fastFilter { it.value == 0L }
         if (options.isEmpty()) {
-            checkStuck(navController)
+            checkStuck()
             return
         }
         val cell = options.random()
         cellList[cellList.indexOf(cell)] =
             GridCell2048(newId++, if (Random.nextFloat() < 0.9) 2 else 4)
-        checkStuck(navController)
+        checkStuck()
     }
 
-    private fun checkStuck(navController: NavController) {
+    private fun checkStuck() {
         if (!canMove()) CoroutineScope(Dispatchers.Main).launch {
             finished = true
         }
@@ -240,11 +237,6 @@ class MockGame2048ViewModel : BaseGameViewModel(), IGame2048ViewModel {
 
     private fun addScore(points: Long) {
         score.longValue += points
-    }
-
-    private fun getBonusReward(): Int {
-        return 1.5.pow((log2(getHighestTileValue().toDouble()) - log2(getTarget().toDouble())))
-            .fastRoundToInt()
     }
 
     override fun continueGame() {

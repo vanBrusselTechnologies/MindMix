@@ -17,7 +17,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val userRepository: UserRepository,
     private val prefsRepository: UserPreferencesRepository
 ) : ViewModel() {
     private val _preferencesLoaded = MutableStateFlow(false)
@@ -39,9 +38,5 @@ class MainViewModel @Inject constructor(
         Logger.d("[main] applyPreferences")
         theme.value = SelectedTheme.entries.first { it.ordinal == preferences.theme }
         _preferencesLoaded.emit(true)
-    }
-
-    fun initUserData() {
-        userRepository.initUserData()
     }
 }

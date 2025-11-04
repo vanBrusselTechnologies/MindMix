@@ -66,8 +66,7 @@ class SudokuRepository @Inject constructor(
     }
 
     private fun getCachedPuzzle(difficulty: Difficulty, gameMode: PuzzleType): SudokuProgress? {
-        val newPuzzleEncodedClues = newPuzzles[difficulty]?.removeFirstOrNull()
-        if (newPuzzleEncodedClues == null) return null
+        val newPuzzleEncodedClues = newPuzzles[difficulty]?.removeFirstOrNull() ?: return null
         gameLoader.removeFromFile(getFileName(gameMode, difficulty), newPuzzleEncodedClues)
 
         val clues = Decode.base94toIntList(newPuzzleEncodedClues.trim(), size * size)
