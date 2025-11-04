@@ -51,9 +51,8 @@ fun MinesweeperSettingsDialog(viewModel: IMinesweeperViewModel, navController: N
                 fontWeight = FontWeight.ExtraBold,
                 textAlign = TextAlign.Center
             )
-            val loadedState = viewModel.preferencesLoaded.collectAsStateWithLifecycle()
-            if (!loadedState.value) return@SettingsDialog
             Spacer(Modifier.height(20.dp))
+            viewModel.preferencesLoaded.collectAsStateWithLifecycle()
             Button(
                 { viewModel.onClickUpdateAutoFlag() },
                 Modifier.fillMaxWidth(),

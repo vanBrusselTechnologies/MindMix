@@ -108,11 +108,12 @@ fun NavGraphBuilder.game2048(
         dialog<Game2048GameFinishedRoute>(
             dialogProperties = DialogProperties(false, false, false)
         ) { navBackStackEntry ->
+            val window = (LocalView.current.parent as? DialogWindowProvider)?.window
+            if (window != null) forceFullScreen(window)
+
             val vm = hiltViewModel<Game2048ViewModel>(remember(navBackStackEntry) {
                 navController.getBackStackEntry<Game2048FeatureRoute>()
             })
-            val window = (LocalView.current.parent as? DialogWindowProvider)?.window
-            if (window != null) forceFullScreen(window)
             Game2048GameFinishedDialog(vm, navController)
         }
 
@@ -121,28 +122,31 @@ fun NavGraphBuilder.game2048(
         ) { navBackStackEntry ->
             val window = (LocalView.current.parent as? DialogWindowProvider)?.window
             if (window != null) forceFullScreen(window)
+
             Game2048GameHelpDialog(navController)
         }
 
         dialog<Game2048GameMenuRoute>(
             dialogProperties = DialogProperties(true, false, false)
         ) { navBackStackEntry ->
+            val window = (LocalView.current.parent as? DialogWindowProvider)?.window
+            if (window != null) forceFullScreen(window)
+
             val vm = hiltViewModel<Game2048ViewModel>(remember(navBackStackEntry) {
                 navController.getBackStackEntry<Game2048FeatureRoute>()
             })
-            val window = (LocalView.current.parent as? DialogWindowProvider)?.window
-            if (window != null) forceFullScreen(window)
             Game2048GameMenuDialog(vm, navController)
         }
 
         dialog<Game2048SettingsRoute>(
             dialogProperties = DialogProperties(true, false, false)
         ) { navBackStackEntry ->
+            val window = (LocalView.current.parent as? DialogWindowProvider)?.window
+            if (window != null) forceFullScreen(window)
+
             val vm = hiltViewModel<Game2048ViewModel>(remember(navBackStackEntry) {
                 navController.getBackStackEntry<Game2048FeatureRoute>()
             })
-            val window = (LocalView.current.parent as? DialogWindowProvider)?.window
-            if (window != null) forceFullScreen(window)
             Game2048SettingsDialog(vm, navController)
         }
     }

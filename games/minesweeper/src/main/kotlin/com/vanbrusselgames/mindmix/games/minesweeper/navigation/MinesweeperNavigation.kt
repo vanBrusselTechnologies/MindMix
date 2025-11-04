@@ -93,8 +93,6 @@ fun NavGraphBuilder.minesweeper(
             val vm = hiltViewModel<MinesweeperViewModel>(remember(navBackStackEntry) {
                 navController.getBackStackEntry<MinesweeperFeatureRoute>()
             })
-            // val route = navBackStackEntry.toRoute<MinesweeperGameRoute>()
-            // route.mode
 
             with(sharedTransitionScope) {
                 val loadedState = vm.puzzleLoaded.collectAsStateWithLifecycle()
@@ -109,11 +107,12 @@ fun NavGraphBuilder.minesweeper(
         dialog<MinesweeperGameFinishedRoute>(
             dialogProperties = DialogProperties(false, false, false)
         ) { navBackStackEntry ->
+            val window = (LocalView.current.parent as? DialogWindowProvider)?.window
+            if (window != null) forceFullScreen(window)
+
             val vm = hiltViewModel<MinesweeperViewModel>(remember(navBackStackEntry) {
                 navController.getBackStackEntry<MinesweeperFeatureRoute>()
             })
-            val window = (LocalView.current.parent as? DialogWindowProvider)?.window
-            if (window != null) forceFullScreen(window)
             MinesweeperGameFinishedDialog(vm, navController)
         }
 
@@ -122,28 +121,31 @@ fun NavGraphBuilder.minesweeper(
         ) { navBackStackEntry ->
             val window = (LocalView.current.parent as? DialogWindowProvider)?.window
             if (window != null) forceFullScreen(window)
+
             MinesweeperGameHelpDialog(navController)
         }
 
         dialog<MinesweeperGameMenuRoute>(
             dialogProperties = DialogProperties(true, false, false)
         ) { navBackStackEntry ->
+            val window = (LocalView.current.parent as? DialogWindowProvider)?.window
+            if (window != null) forceFullScreen(window)
+
             val vm = hiltViewModel<MinesweeperViewModel>(remember(navBackStackEntry) {
                 navController.getBackStackEntry<MinesweeperFeatureRoute>()
             })
-            val window = (LocalView.current.parent as? DialogWindowProvider)?.window
-            if (window != null) forceFullScreen(window)
             MinesweeperGameMenuDialog(vm, navController)
         }
 
         dialog<MinesweeperSettingsRoute>(
             dialogProperties = DialogProperties(true, false, false)
         ) { navBackStackEntry ->
+            val window = (LocalView.current.parent as? DialogWindowProvider)?.window
+            if (window != null) forceFullScreen(window)
+
             val vm = hiltViewModel<MinesweeperViewModel>(remember(navBackStackEntry) {
                 navController.getBackStackEntry<MinesweeperFeatureRoute>()
             })
-            val window = (LocalView.current.parent as? DialogWindowProvider)?.window
-            if (window != null) forceFullScreen(window)
             MinesweeperSettingsDialog(vm, navController)
         }
     }

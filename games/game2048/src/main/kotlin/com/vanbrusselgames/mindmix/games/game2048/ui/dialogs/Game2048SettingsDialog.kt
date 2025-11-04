@@ -15,6 +15,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +29,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.vanbrusselgames.mindmix.core.designsystem.theme.MindMixTheme
+import com.vanbrusselgames.mindmix.core.ui.EmptyDropdown
 import com.vanbrusselgames.mindmix.core.ui.EnumDropdown
 import com.vanbrusselgames.mindmix.core.ui.dialogs.settings.SettingsDialog
 import com.vanbrusselgames.mindmix.games.game2048.R
@@ -52,15 +54,14 @@ fun Game2048SettingsDialog(viewModel: IGame2048ViewModel, navController: NavCont
                 textAlign = TextAlign.Center
             )
             val loadedState = viewModel.preferencesLoaded.collectAsStateWithLifecycle()
-            if (!loadedState.value) return@SettingsDialog
             Spacer(Modifier.height(20.dp))
-            SizeDropdownRow(viewModel)
+            SizeDropdownRow(viewModel, loadedState)
         }
     }
 }
 
 @Composable
-fun SizeDropdownRow(viewModel: IGame2048ViewModel) {
+fun SizeDropdownRow(viewModel: IGame2048ViewModel, loadedState: State<Boolean>) {
     val defaultButtonColors = ButtonDefaults.buttonColors()
     Row(
         Modifier
@@ -79,7 +80,9 @@ fun SizeDropdownRow(viewModel: IGame2048ViewModel) {
             .padding(4.dp)
             .width(IntrinsicSize.Min)
         val callback = { size: GridSize2048 -> viewModel.setSize(size) }
-        EnumDropdown(modifier, viewModel.gridSize, callback, GridSize2048.entries.toList())
+        if (loadedState.value) {
+            EnumDropdown(modifier, viewModel.gridSize, callback, GridSize2048.entries.toList())
+        } else EmptyDropdown()
     }
 }
 

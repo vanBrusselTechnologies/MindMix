@@ -12,9 +12,8 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -36,6 +35,7 @@ import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderF
 import com.google.firebase.initialize
 import com.vanbrusselgames.mindmix.core.authentication.AuthManager
 import com.vanbrusselgames.mindmix.core.data.DataManager
+import com.vanbrusselgames.mindmix.core.data.UserRepository
 import com.vanbrusselgames.mindmix.core.designsystem.theme.MindMixTheme
 import com.vanbrusselgames.mindmix.core.designsystem.theme.SelectedTheme
 import com.vanbrusselgames.mindmix.core.designsystem.theme.forceFullScreen
@@ -74,6 +74,9 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var updateManager: UpdateManager
 
+    @Inject
+    lateinit var userRepository: UserRepository
+
     private val snackbarHostState = SnackbarHostState()
 
     private lateinit var navController: NavHostController
@@ -107,6 +110,7 @@ class MainActivity : ComponentActivity() {
 
             withContext(Dispatchers.Main) {
                 Logger.d("Finished initial load!")
+                userRepository.initUserData()
                 dataReady = true
                 if (preferencesLoaded) keepSplashScreen = false
             }
@@ -165,7 +169,6 @@ class MainActivity : ComponentActivity() {
                 navController = rememberNavController()
                 navController.enableOnBackPressed(false)
                 navController.addOnDestinationChangedListener { _, destination, _ ->
-                    forceFullScreen(window)
                     SceneManager.dialogActiveState.value = destination.navigatorName === "dialog"
                 }
 
@@ -175,9 +178,6 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(Unit) {
                     preferencesLoaded = true
                     if (dataReady) keepSplashScreen = false
-                }
-                LaunchedEffect(keepSplashScreen) {
-                    if (!keepSplashScreen) viewModel.initUserData()
                 }
 
                 val darkTheme = when (viewModel.theme.value) {
@@ -192,7 +192,7 @@ class MainActivity : ComponentActivity() {
                             color = MaterialTheme.colorScheme.background,
                             contentColor = MaterialTheme.colorScheme.onBackground
                         ) {
-                            Scaffold(Modifier.safeDrawingPadding(), snackbarHost = {
+                            Scaffold(Modifier.displayCutoutPadding(), snackbarHost = {
                                 SnackbarHost(hostState = snackbarHostState)
                             }) {
                                 NavHost(
@@ -200,7 +200,6 @@ class MainActivity : ComponentActivity() {
                                     startDestination = AppRoutes.Menu,
                                     Modifier
                                         .fillMaxSize()
-                                        .padding(it)
                                         .consumeWindowInsets(it),
                                     enterTransition = { fadeIn() },
                                     exitTransition = { fadeOut() }) {

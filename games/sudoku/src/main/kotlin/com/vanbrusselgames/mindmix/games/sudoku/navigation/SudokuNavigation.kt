@@ -108,11 +108,12 @@ fun NavGraphBuilder.sudoku(
         dialog<SudokuGameFinishedRoute>(
             dialogProperties = DialogProperties(false, false, false)
         ) { navBackStackEntry ->
+            val window = (LocalView.current.parent as? DialogWindowProvider)?.window
+            if (window != null) forceFullScreen(window)
+
             val vm = hiltViewModel<SudokuViewModel>(remember(navBackStackEntry) {
                 navController.getBackStackEntry<SudokuFeatureRoute>()
             })
-            val window = (LocalView.current.parent as? DialogWindowProvider)?.window
-            if (window != null) forceFullScreen(window)
             SudokuGameFinishedDialog(vm, navController)
         }
 
@@ -121,28 +122,31 @@ fun NavGraphBuilder.sudoku(
         ) { navBackStackEntry ->
             val window = (LocalView.current.parent as? DialogWindowProvider)?.window
             if (window != null) forceFullScreen(window)
+
             SudokuGameHelpDialog(navController)
         }
 
         dialog<SudokuGameMenuRoute>(
             dialogProperties = DialogProperties(true, false, false)
         ) { navBackStackEntry ->
+            val window = (LocalView.current.parent as? DialogWindowProvider)?.window
+            if (window != null) forceFullScreen(window)
+
             val vm = hiltViewModel<SudokuViewModel>(remember(navBackStackEntry) {
                 navController.getBackStackEntry<SudokuFeatureRoute>()
             })
-            val window = (LocalView.current.parent as? DialogWindowProvider)?.window
-            if (window != null) forceFullScreen(window)
             SudokuGameMenuDialog(vm, navController)
         }
 
         dialog<SudokuSettingsRoute>(
             dialogProperties = DialogProperties(true, false, false)
         ) { navBackStackEntry ->
+            val window = (LocalView.current.parent as? DialogWindowProvider)?.window
+            if (window != null) forceFullScreen(window)
+
             val vm = hiltViewModel<SudokuViewModel>(remember(navBackStackEntry) {
                 navController.getBackStackEntry<SudokuFeatureRoute>()
             })
-            val window = (LocalView.current.parent as? DialogWindowProvider)?.window
-            if (window != null) forceFullScreen(window)
             SudokuSettingsDialog(vm, navController)
         }
     }

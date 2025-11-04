@@ -22,12 +22,11 @@ fun NavController.navigateToSettings(navOptions: NavOptions? = null) {
     navigate(SettingsRoute, navOptions)
 }
 
-fun NavGraphBuilder.settingsDialog(
-    navController: NavController, onClickSignIn: () -> Unit
-) {
+fun NavGraphBuilder.settingsDialog(navController: NavController, onClickSignIn: () -> Unit) {
     dialog<SettingsRoute>(dialogProperties = DialogProperties(true, false, false)) {
         val window = (LocalView.current.parent as? DialogWindowProvider)?.window
         if (window != null) forceFullScreen(window)
+
         val vm = hiltViewModel<SettingsViewModel>()
         MainSettings(vm, navController, onClickSignIn)
     }

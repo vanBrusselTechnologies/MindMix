@@ -59,3 +59,20 @@ fun <T : StringEnum> EnumDropdown(
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EmptyDropdown() {
+    val dropdownExpanded = false
+    ExposedDropdownMenuBox(dropdownExpanded, { }, Modifier.padding(4.dp)) {
+        TextField(
+            "",
+            {},
+            Modifier
+                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true)
+                .widthIn(1.dp, Dp.Infinity),
+            readOnly = true,
+            singleLine = true,
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(dropdownExpanded) })
+    }
+}

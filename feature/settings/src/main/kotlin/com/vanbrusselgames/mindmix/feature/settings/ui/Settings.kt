@@ -37,6 +37,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.vanbrusselgames.mindmix.core.designsystem.theme.MindMixTheme
 import com.vanbrusselgames.mindmix.core.designsystem.theme.SelectedTheme
+import com.vanbrusselgames.mindmix.core.ui.EmptyDropdown
 import com.vanbrusselgames.mindmix.core.ui.EnumDropdown
 import com.vanbrusselgames.mindmix.core.ui.dialogs.settings.SettingsDialog
 import com.vanbrusselgames.mindmix.feature.settings.R
@@ -66,8 +67,7 @@ fun MainSettings(
             )
             Spacer(Modifier.height(20.dp))
             val loadedState = viewModel.preferencesLoaded.collectAsStateWithLifecycle()
-            if (!loadedState.value) return@SettingsDialog
-            ThemeDropdownRow(viewModel)
+            ThemeDropdownRow(viewModel, loadedState)
             Spacer(Modifier.height(4.dp))
             SignInButton(viewModel.signedIn, onClickSignIn)
             DeleteDataButton { viewModel.userId.value }
@@ -83,7 +83,7 @@ fun MainSettings(
 }
 
 @Composable
-fun ThemeDropdownRow(viewModel: ISettingsViewModel) {
+fun ThemeDropdownRow(viewModel: ISettingsViewModel, loadedState: State<Boolean>) {
     val defaultButtonColors = ButtonDefaults.buttonColors()
     Row(
         Modifier
@@ -102,16 +102,16 @@ fun ThemeDropdownRow(viewModel: ISettingsViewModel) {
             .padding(4.dp)
             .width(IntrinsicSize.Min)
         val callback = { theme: SelectedTheme -> viewModel.setTheme(theme) }
-        EnumDropdown(modifier, viewModel.theme, callback, SelectedTheme.entries.toList())
+        if (loadedState.value) {
+            EnumDropdown(modifier, viewModel.theme, callback, SelectedTheme.entries.toList())
+        } else EmptyDropdown()
     }
 }
 
 @Composable
 fun SignInButton(signedInState: State<Boolean>, onClickSignIn: () -> Unit) {
     val signedIn by signedInState
-    Button(
-        onClickSignIn, Modifier.fillMaxWidth(), enabled = !signedIn, RoundedCornerShape(6.dp)
-    ) {
+    Button(onClickSignIn, Modifier.fillMaxWidth(), !signedIn, RoundedCornerShape(6.dp)) {
         Row(Modifier.heightIn(max = 36.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(painterResource(R.drawable.games_controller), "Play Games Sign-In")
             Spacer(Modifier.width(8.dp))

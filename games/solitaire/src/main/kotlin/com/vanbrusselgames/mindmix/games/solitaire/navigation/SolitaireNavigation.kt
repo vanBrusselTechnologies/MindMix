@@ -109,11 +109,12 @@ fun NavGraphBuilder.solitaire(
         dialog<SolitaireGameFinishedRoute>(
             dialogProperties = DialogProperties(false, false, false)
         ) { navBackStackEntry ->
+            val window = (LocalView.current.parent as? DialogWindowProvider)?.window
+            if (window != null) forceFullScreen(window)
+
             val vm = hiltViewModel<SolitaireViewModel>(remember(navBackStackEntry) {
                 navController.getBackStackEntry<SolitaireFeatureRoute>()
             })
-            val window = (LocalView.current.parent as? DialogWindowProvider)?.window
-            if (window != null) forceFullScreen(window)
             SolitaireGameFinishedDialog(vm, navController)
         }
 
@@ -122,17 +123,19 @@ fun NavGraphBuilder.solitaire(
         ) { navBackStackEntry ->
             val window = (LocalView.current.parent as? DialogWindowProvider)?.window
             if (window != null) forceFullScreen(window)
+
             SolitaireGameHelpDialog(navController)
         }
 
         dialog<SolitaireGameMenuRoute>(
             dialogProperties = DialogProperties(true, false, false)
         ) { navBackStackEntry ->
+            val window = (LocalView.current.parent as? DialogWindowProvider)?.window
+            if (window != null) forceFullScreen(window)
+
             val vm = hiltViewModel<SolitaireViewModel>(remember(navBackStackEntry) {
                 navController.getBackStackEntry<SolitaireFeatureRoute>()
             })
-            val window = (LocalView.current.parent as? DialogWindowProvider)?.window
-            if (window != null) forceFullScreen(window)
             SolitaireGameMenuDialog(vm, navController)
 
             // Force stop timer and save data
@@ -142,11 +145,12 @@ fun NavGraphBuilder.solitaire(
         dialog<SolitaireSettingsRoute>(
             dialogProperties = DialogProperties(true, false, false)
         ) { navBackStackEntry ->
+            val window = (LocalView.current.parent as? DialogWindowProvider)?.window
+            if (window != null) forceFullScreen(window)
+
             val vm = hiltViewModel<SolitaireViewModel>(remember(navBackStackEntry) {
                 navController.getBackStackEntry<SolitaireFeatureRoute>()
             })
-            val window = (LocalView.current.parent as? DialogWindowProvider)?.window
-            if (window != null) forceFullScreen(window)
             SolitaireSettingsDialog(vm, navController)
         }
     }

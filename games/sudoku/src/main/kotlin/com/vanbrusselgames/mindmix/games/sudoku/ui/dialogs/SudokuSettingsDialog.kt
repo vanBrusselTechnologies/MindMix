@@ -17,23 +17,27 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.vanbrusselgames.mindmix.core.designsystem.theme.MindMixTheme
+import com.vanbrusselgames.mindmix.core.ui.EmptyDropdown
 import com.vanbrusselgames.mindmix.core.ui.EnumDropdown
-import com.vanbrusselgames.mindmix.core.utils.constants.Difficulty
 import com.vanbrusselgames.mindmix.core.ui.dialogs.settings.SettingsDialog
+import com.vanbrusselgames.mindmix.core.utils.constants.Difficulty
 import com.vanbrusselgames.mindmix.games.sudoku.R
 import com.vanbrusselgames.mindmix.games.sudoku.model.enabledDifficulties
 import com.vanbrusselgames.mindmix.games.sudoku.viewmodel.ISudokuViewModel
@@ -56,9 +60,8 @@ fun SudokuSettingsDialog(viewModel: ISudokuViewModel, navController: NavControll
                 textAlign = TextAlign.Center
             )
             val loadedState = viewModel.preferencesLoaded.collectAsStateWithLifecycle()
-            if (!loadedState.value) return@SettingsDialog
             Spacer(Modifier.height(20.dp))
-            DifficultyDropdownRow(viewModel)
+            DifficultyDropdownRow(viewModel, loadedState)
             Spacer(Modifier.height(2.dp))
             Button(
                 { viewModel.onClickUpdateAutoEditNotes() },
@@ -102,7 +105,7 @@ fun SudokuSettingsDialog(viewModel: ISudokuViewModel, navController: NavControll
 }
 
 @Composable
-fun DifficultyDropdownRow(viewModel: ISudokuViewModel) {
+fun DifficultyDropdownRow(viewModel: ISudokuViewModel, loadedState: State<Boolean>) {
     val defaultButtonColors = ButtonDefaults.buttonColors()
     Row(
         Modifier
@@ -121,14 +124,19 @@ fun DifficultyDropdownRow(viewModel: ISudokuViewModel) {
             .padding(4.dp)
             .width(IntrinsicSize.Min)
         val callback = { diff: Difficulty -> viewModel.setDifficulty(diff) }
-        EnumDropdown(modifier, viewModel.difficulty, callback, enabledDifficulties)
+        if (loadedState.value) {
+            EnumDropdown(modifier, viewModel.difficulty, callback, enabledDifficulties)
+        } else EmptyDropdown()
     }
 }
 
-@Preview(locale = "nl")
-@Preview
+@PreviewLightDark
 @Composable
 fun Prev_Settings() {
-    val vm = remember { MockSudokuViewModel() }
-    SudokuSettingsDialog(vm, rememberNavController())
+    MindMixTheme {
+        Surface {
+            val vm = remember { MockSudokuViewModel() }
+            SudokuSettingsDialog(vm, rememberNavController())
+        }
+    }
 }

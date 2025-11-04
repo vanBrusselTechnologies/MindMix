@@ -62,9 +62,7 @@ fun MindMixTheme(
         }
     }
 
-    MaterialTheme(
-        colorScheme = colorScheme, typography = Typography, content = content
-    )
+    MaterialTheme(colorScheme = colorScheme, typography = Typography, content = content)
 }
 
 enum class SelectedTheme : StringEnum {

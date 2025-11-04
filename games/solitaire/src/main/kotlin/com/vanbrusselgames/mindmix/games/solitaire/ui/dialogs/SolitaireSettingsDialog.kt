@@ -1,6 +1,5 @@
 package com.vanbrusselgames.mindmix.games.solitaire.ui.dialogs
 
-import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,19 +15,21 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.vanbrusselgames.mindmix.core.designsystem.theme.MindMixTheme
+import com.vanbrusselgames.mindmix.core.ui.EmptyDropdown
 import com.vanbrusselgames.mindmix.core.ui.EnumDropdown
 import com.vanbrusselgames.mindmix.core.ui.dialogs.settings.SettingsDialog
 import com.vanbrusselgames.mindmix.games.solitaire.R
@@ -53,15 +54,14 @@ fun SolitaireSettingsDialog(viewModel: ISolitaireViewModel, navController: NavCo
                 textAlign = TextAlign.Center
             )
             val loadedState = viewModel.preferencesLoaded.collectAsStateWithLifecycle()
-            if (!loadedState.value) return@SettingsDialog
             Spacer(Modifier.height(20.dp))
-            CardTypeDropdownRow(viewModel)
+            CardTypeDropdownRow(viewModel, loadedState)
         }
     }
 }
 
 @Composable
-fun CardTypeDropdownRow(viewModel: ISolitaireViewModel) {
+fun CardTypeDropdownRow(viewModel: ISolitaireViewModel, loadedState: State<Boolean>) {
     val defaultButtonColors = ButtonDefaults.buttonColors()
     Row(
         Modifier
@@ -80,14 +80,18 @@ fun CardTypeDropdownRow(viewModel: ISolitaireViewModel) {
             .padding(4.dp)
             .width(IntrinsicSize.Min)
         val callback = { type: CardVisualType -> viewModel.setCardVisualType(type) }
-        EnumDropdown(modifier, viewModel.cardVisualType, callback, CardVisualType.entries.toList())
+        if (loadedState.value) {
+            EnumDropdown(
+                modifier,
+                viewModel.cardVisualType,
+                callback,
+                CardVisualType.entries.toList()
+            )
+        } else EmptyDropdown()
     }
 }
 
-@Preview(
-    locale = "nl", uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
-)
-@Preview
+@PreviewLightDark
 @Composable
 fun Prev_Settings() {
     MindMixTheme {
