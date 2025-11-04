@@ -31,7 +31,7 @@ class Game2048Repository @Inject constructor(private val dataManager: DataManage
     }
 
     fun getPuzzleProgress(size: GridSize2048): Game2048Progress? {
-        if (_puzzleProgress.isNotEmpty()) return _puzzleProgress.firstOrNull { it.size == size }
+        if (_puzzleProgress.isNotEmpty()) return _puzzleProgress.firstOrNull { it.size == size && it.cellValues.isNotEmpty() }
 
         val json = dataManager.getSavedDataForScene(SceneRegistry.Game2048)
         if (json.trim() == "") return null
@@ -41,19 +41,14 @@ class Game2048Repository @Inject constructor(private val dataManager: DataManage
         _puzzleProgress.addAll(data.progress)
         _puzzleRecords.clear()
         _puzzleRecords.addAll(data.records)
-        return data.progress.firstOrNull { it.size == size }
+        return data.progress.firstOrNull { it.size == size && it.cellValues.isNotEmpty() }
     }
 
     fun setPuzzleProgressForSize(
         size: GridSize2048, cellValues: List<Long>, moves: Int, score: Long
     ) {
         val index = _puzzleProgress.indexOfFirst { it.size == size }
-        val progress = Game2048Progress(
-            size,
-            cellValues,
-            moves,
-            score,
-        )
+        val progress = Game2048Progress(size, cellValues, moves, score)
         if (index == -1) _puzzleProgress.add(progress) else {
             val input1 = _puzzleProgress[index].cellValues.joinToString("")
             val input2 = progress.cellValues.joinToString("")
