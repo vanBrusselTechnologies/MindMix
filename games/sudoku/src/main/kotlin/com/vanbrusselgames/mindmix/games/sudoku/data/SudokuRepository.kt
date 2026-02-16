@@ -201,10 +201,7 @@ class SudokuRepository @Inject constructor(
         return SudokuSavedProgress(
             Encode.base94IntCollection(progress.clues),
             Encode.base94IntCollection(progress.input),
-            progress.inputNotes.map { notes ->
-                val booleans = notes.map { it != 0 }
-                Encode.base94BooleanCollection(booleans)
-            },
+            progress.inputNotes.map { notes -> Encode.base94BooleanCollection(notes.map { it != 0 }) },
             progress.difficulty
         )
     }

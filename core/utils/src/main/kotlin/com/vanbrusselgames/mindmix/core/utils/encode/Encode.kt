@@ -24,9 +24,8 @@ object Encode {
 
     fun base94BooleanCollection(input: Collection<Boolean>): String {
         if (input.isEmpty()) return base94(BigInteger.ZERO)
-        val bigint =
-            BigInteger.valueOf(input.fold(0) { acc, bit -> (acc shl 1) or if (bit) 1 else 0 }
-                .toLong())
+        val bigint = BigInteger.valueOf(
+            input.reversed().fold(0L) { acc, bit -> (acc shl 1) or if (bit) 1 else 0 })
         return base94(bigint)
     }
 }

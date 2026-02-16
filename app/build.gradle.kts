@@ -10,7 +10,6 @@ plugins {
     alias(libs.plugins.firebase.perf)
     alias(libs.plugins.gms)
     alias(libs.plugins.hilt)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
 }
@@ -29,14 +28,14 @@ android {
         }
     }
     namespace = "com.vanbrusselgames.mindmix"
-    compileSdk = 36
+    compileSdk { version = release(36) }
 
     defaultConfig {
         applicationId = "com.vanBrusselGames.MindMix"
         minSdk = 23
         targetSdk = 36
-        versionCode = 109
-        versionName = "1.3.0"
+        versionCode = 110
+        versionName = "1.3.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

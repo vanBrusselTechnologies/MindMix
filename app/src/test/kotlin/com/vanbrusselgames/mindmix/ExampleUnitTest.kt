@@ -1,8 +1,7 @@
 package com.vanbrusselgames.mindmix
 
-
 import org.junit.Test
-import kotlin.system.measureTimeMillis
+import kotlin.time.measureTime
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -12,19 +11,16 @@ import kotlin.system.measureTimeMillis
 class ExampleUnitTest {
     @Test
     fun benchmark() {
-
-        val times = 1_000_000
-
         println("Start Test!\n")
+        val times = 1_000_000f
         var t = 0
-        val elapsed = measureTimeMillis {
+        val elapsed = measureTime {
             while (t < times) {
+                // assert(input == output)
                 t++
             }
         }
-
-        println("(average) elapsed Time: ${elapsed / times}")
+        println("elapsed Time: $elapsed, average (μs): ${elapsed.inWholeMicroseconds / times}")
         println("\nEnd Test!\n")
-
     }
 }
